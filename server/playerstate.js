@@ -5,7 +5,7 @@ import {newCloak, toggle as cloakToggle, tick as cloakTick, shortCircuit as cloa
 import {GUN_ROUNDS, MAX_ROUNDS, MAX_BEACONS, roundsAfterPack} from "../shared/loot.js";
 import {SHOT_COOL} from "../shared/monsters.js";
 
-export const DOWNED_S = 45, IMMUNE_S = 4, REVIVE_R = 2.5, THROW_GAP_S = 1;
+export const DOWNED_S = 20, IMMUNE_S = 4, REVIVE_R = 2.5, THROW_GAP_S = 1;
 export const newPS = () => ({hp: newHealth(), gun: false, rounds: 0, beacons: 0, cloak: null, downAt: 0, immUntil: 0, shotAt: -99, throwAt: -99, sent: ""});
 export const isDown = ps => downed(ps.hp);
 export const isImmune = (ps, now) => now < ps.immUntil;
