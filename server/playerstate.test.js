@@ -7,7 +7,7 @@ test("three hits down a player; the grace second and the gap protect; being down
   assert.ok(hit(ps, 35, 11.2)); assert.ok(hit(ps, 35, 12.5)); assert.ok(isDown(ps)); assert.ok(!hit(ps, 35, 20), "already down");
   const imm = newPS(); imm.immUntil = 50; assert.ok(isImmune(imm, 49) && !hit(imm, 35, 49), "immune"); assert.ok(hit(imm, 35, 51));
 });
-test("regeneration after 10 s; a downed player gets up alone after 45 s with 100 HP and a few seconds of safety", () => {
+test("regeneration after 10 s; a downed player gets up alone after DOWNED_S (20 s) with 100 HP and a few seconds of safety", () => {
   const ps = newPS(); hit(ps, 35, 0); tick(ps, 1, 5); assert.equal(view(ps).hp, 65); tick(ps, 1, 11); assert.equal(view(ps).hp, 66);
   const d = newPS(); hit(d, 50, 0); hit(d, 50, 2); assert.ok(isDown(d), "two hits of 50");
   assert.equal(tick(d, 1, 2 + DOWNED_S - 1), null); assert.equal(tick(d, 1, 2 + DOWNED_S), "respawn"); assert.equal(view(d).hp, 100); assert.ok(isImmune(d, 2 + DOWNED_S + IMMUNE_S - 0.1));
