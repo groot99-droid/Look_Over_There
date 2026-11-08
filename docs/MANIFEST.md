@@ -39,9 +39,9 @@ The puzzle rules (how many fuses, the keypad length), monster counts and the ala
 
 `built` is in the game. `planned` is designed. `reserved` holds a place for an addon. Planned and reserved things are listed (`tools/manifest.mjs links`) but never reach the page or the server.
 
-## Known gap the check reports
+## Gate return (fixed)
 
-`world/L4.json`: the link on `DoorLeaf_Gate_RDW` has no `scene`, unlike the Intern's gate. Reading `enterGame` in `index.html`, the page returns with `loadScene(l.scene || S.id)`, and when a game ends `S.id` should be the passage scene `T`, which has no entry in `SCENES`. That would fail on the way back from Right Door, Wrong Exit. **This has been read, not reproduced in a browser.** The manifest records the intended return scene as L4 (`returnTo`). The page does not use it yet; session 2 in `docs/SESSIONS.md` reproduces it first, then fixes it.
+The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.
 
 ## Commands
 
