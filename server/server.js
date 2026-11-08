@@ -10,7 +10,7 @@ import {WebSocketServer} from "ws";
 import {GATED, newFloor, act as fuseAct} from "../shared/fuses.js";
 import {SWITCH_FLOORS, newSwitches, flip as flipSwitch} from "../shared/switches.js";
 import {POWER_SOURCES, newPower, throwPower} from "../shared/power.js";
-import {ALARM_MS, newRun, exitPlayer, done as runDone, finish, results as runResults} from "../shared/finish.js";
+import {ALARM_MS, newRun, exitPlayer, done as runDone, finish, results as runResults, score, runRecord} from "../shared/finish.js";
 import {LOOT_FLOORS, newLoot, takeLocker, takePack, takeBeacon, putBack} from "../shared/loot.js";
 import {KEYPAD_FLOORS, newKeypad, view as keypadView, find as keypadFind, tryCode} from "../shared/keypad.js";
 import {FLOORS} from "../shared/world.js";
@@ -25,7 +25,7 @@ const RATE_BURST = 240, RATE_PER_S = 90, RATE_KICK = 600;                       
 const NUM_CHARS = 5, MAX_PLAYERS = REGISTRY.maxPlayers("original"), COLORS = ["#e0a040", "#4fc3f7", "#9ccc65", "#f06292", "#ba68c8", "#ffd54f", "#4db6ac", "#ff8a65", "#7986cb", "#90a4ae"];
 if (COLORS.length < MAX_PLAYERS) throw new Error(`the world manifest allows ${MAX_PLAYERS} players a room but the server has ${COLORS.length} player colours: add colours first`);
 
-export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = Math.random, simHz = Number(process.env.SIM_HZ) || 20, clock = () => Date.now() / 1000} = {}) {
+export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = Math.random, simHz = Number(process.env.SIM_HZ) || 20, clock = () => Date.now() / 1000, log = line => console.log(line)} = {}) {
   const docs = new Map(), readJson = rel => JSON.parse(fs.readFileSync(path.join(root, rel), "utf8"));
   const worldDoc = scene => { if (!docs.has(scene)) docs.set(scene, readJson(`world/${scene}.json`)); return docs.get(scene); };
   let monCfgCache = null; const monCfg = () => monCfgCache ||= readJson("world/monsters.json");
@@ -67,6 +67,11 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
     const t0 = performance.now();
     for (const room of rooms.values()) {
       for (const f of Object.values(room.floors)) f.step(1 / simHz);
+      if (room.run && !room.run.ended) {                                // time on each floor: per player (until they leave the store) and per floor with anyone on it
+        const seen = new Set();
+        for (const p of room.players.values()) if (p.scene && !room.out.has(p.id)) { PS.onFloor(p.ps, p.scene, 1 / simHz); seen.add(p.scene); }
+        for (const s of seen) room.floorMs[s] = (room.floorMs[s] || 0) + 1000 / simHz;
+      }
       for (const p of room.players.values()) { const r = PS.tick(p.ps, 1 / simHz, clock()); if (r === "respawn") sendMe(p, {respawn: 1}); else if (PS.changed(p.ps)) sendMe(p); }
     }
     const ms = performance.now() - t0; tickStats.n++; tickStats.sum += ms; if (ms > tickStats.max) tickStats.max = ms;
@@ -99,10 +104,15 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
     if (room.alarmAt || !room.power.on || ![...room.players.values()].some(p => p.scene === "L4")) return;
     room.alarmAt = Date.now(); broadcast(room, {t: "alarm", ms: ALARM_MS});
   }
-  const resultsMsg = room => ({t: "results", rows: runResults(room.run)});
+  // a row for the results screen: the old fields (id, name, place, ms) plus what the player did; stats were taken as they walked out
+  const rowOf = (room, e) => { const s = room.out.get(e.id) || PS.newStats(); return {...e, char: s.char, downs: s.downs, deaths: s.deaths, revives: s.revives, shots: s.shots, hits: s.hits, beacons: s.beacons, score: score({deaths: s.deaths, revives: s.revives, ms: e.ms})}; };
+  const resultsMsg = room => ({t: "results", rows: room.final, mode: "original", floors: room.floorList()});
   function checkDone(room) {
     if (!runDone(room.run, [...room.players.keys()])) return;
-    room.run = finish(room.run); broadcast(room, resultsMsg(room));
+    room.run = finish(room.run); room.final = runResults(room.run).map(e => rowOf(room, e)); broadcast(room, resultsMsg(room));
+    // one JSON line per finished round, with no player names; nothing is stored
+    log(JSON.stringify({event: "run", ...runRecord({roomCode: room.code, mode: "original", startedAt: room.run.startedAt, endedAt: Date.now(), floors: room.floorList(),
+      players: room.final.map(r => ({char: r.char, place: r.place, ms: r.ms, downs: r.downs, deaths: r.deaths, revives: r.revives, shots: r.shots}))})}));
   }
   // the waiting room: everyone readies, then a countdown, then the round starts for the whole room (a round runs until the room empties)
   const lobbyMsg = room => ({t: "lobby", phase: room.phase, countdownMs: room.timer ? countdownMs : null,
@@ -112,7 +122,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
     clearTimeout(room.timer); room.timer = null;
     const all = [...room.players.values()];
     if (all.length && all.every(p => p.ready)) {
-      room.timer = setTimeout(() => { room.timer = null; room.phase = "playing"; room.run = newRun(Date.now()); for (const p of room.players.values()) { p.ps = PS.newPS(); sendMe(p); } broadcast(room, {t: "start"}); }, countdownMs);
+      room.timer = setTimeout(() => { room.timer = null; room.phase = "playing"; room.run = newRun(Date.now()); room.out = new Map(); room.floorMs = {}; room.final = null; for (const p of room.players.values()) { p.ps = PS.newPS(); sendMe(p); } broadcast(room, {t: "start"}); }, countdownMs);
     }
     broadcast(room, lobbyMsg(room));
   }
@@ -128,7 +138,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
       if (!me) {
         if (m.t !== "join") return;
         const code = String(m.room || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "MAIN";
-        room = rooms.get(code) || {code, players: new Map(), floors: {}, seq: 0, phase: "lobby", timer: null, fuses: {}, switches: {}, keypads: {}, power: newPower(), run: null, alarmAt: 0, loot: {}, armed: new Map()}; rooms.set(code, room);
+        room = rooms.get(code) || {code, players: new Map(), floors: {}, seq: 0, phase: "lobby", timer: null, fuses: {}, switches: {}, keypads: {}, power: newPower(), run: null, alarmAt: 0, loot: {}, armed: new Map(), out: new Map(), floorMs: {}, final: null, floorList() { return Object.entries(this.floorMs).map(([scene, ms]) => ({scene, ms})); }}; rooms.set(code, room);
         if (room.players.size >= MAX_PLAYERS) { ws.send(JSON.stringify({t: "full"})); return ws.close(); }
         const used = new Set([...room.players.values()].map(p => p.color));
         const taken = new Set([...room.players.values()].map(p => p.char));                    // a character you ask for is yours even if someone has it; with no choice you get one nobody has
@@ -136,7 +146,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
         me = {id: ++room.seq, seq: room.seq, ws, scene: null, ready: false, ps: PS.newPS(), st: null, char, name: String(m.name || "Player").replace(/[^\w .-]/g, "").slice(0, 16) || "Player",
               color: COLORS.find(c => !used.has(c)) || COLORS[0]};
         room.players.set(me.id, me);
-        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? runResults(room.run) : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char}))});
+        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? room.final : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char}))});
         broadcast(room, {t: "join", id: me.id, name: me.name, color: me.color, char: me.char}, me.id);
         lobbyChanged(room);
         return;
@@ -189,7 +199,10 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
           const nums = (v, n) => Array.isArray(v) && v.length === n && v.every(x => typeof x === "number" && Number.isFinite(x)) ? v : null;
           const o = nums(m.o, 3), d = nums(m.d, 3); if (!o || !d) break;
           const e = nums(m.e, 3) || [o[0] + d[0] * 25, o[1] + d[1] * 25, o[2] + d[2] * 25];
-          if (!room.floors[scene]?.shot(me, o, d, () => PS.shoot(me.ps, clock()) && (sendMe(me), true))) break;          // a genuine shot with a round to spend: the server decides what it does (a banished monster sends the floor a zap)
+          // a genuine shot with a round to spend: the server decides what it does (a banished monster sends the floor a zap)
+          const shot = room.floors[scene]?.shot(me, o, d, () => PS.shoot(me.ps, clock()) && (sendMe(me), true));
+          if (!shot) break;
+          if (shot.r) PS.shotHit(me.ps);
           broadcast(room, {t: "beam", id: me.id, o, e}, me.id, scene);
           break;
         }
@@ -219,7 +232,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
         case "exit": {                                                // walked out of the store onto the parking lot
           if (me.scene !== "L4" || !room.power.on || !room.run) break;
           const r = exitPlayer(room.run, me.id, Date.now(), me.name);
-          if (r) { room.run = r.run; broadcast(room, {t: "exited", ...r.entry}); checkDone(room); }
+          if (r) { room.run = r.run; room.out.set(me.id, {...PS.statsOf(me.ps), char: me.char}); broadcast(room, {t: "exited", ...r.entry}); checkDone(room); }
           break;
         }
         case "switch": {                                              // flip one switch on the floor you are on
@@ -245,7 +258,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
           const to = room.players.get(m.to);
           if (!to || !to.scene || to.scene !== me.scene || to === me || !me.st || !to.st || PS.isDown(me.ps) || !PS.isDown(to.ps)) break;
           if (Math.hypot(me.st.x - to.st.x, me.st.z - to.st.z) > PS.REVIVE_R || Math.abs(me.st.y - to.st.y) > 2) break;
-          if (PS.lift(to.ps, clock())) { send(to, {t: "revived", by: me.id}); sendMe(to); }
+          if (PS.lift(to.ps, clock())) { PS.gaveRevive(me.ps); send(to, {t: "revived", by: me.id}); sendMe(to); }
           break;
         }
       }
