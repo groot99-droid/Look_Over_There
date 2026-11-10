@@ -9,7 +9,7 @@ test("every floor has ammo, only B1 has lockers, enough of them for a full room"
   assert.equal(LOOT.B1.lockers, 8); for (const f of ["L1", "L2", "L3", "L4"]) assert.equal(LOOT[f].lockers, 0);
   assert.equal(LOOT.L3.packs, 4, "L3 has no monsters: the place to restock");
   assert.equal(newLoot("nope"), null);
-  const st = newLoot("B1"); assert.equal(lockersLeft(st), 8); assert.equal(packsLeft(st), 3);
+  const st = newLoot("B1"); assert.equal(lockersLeft(st), 8); assert.equal(packsLeft(st), 6);
 });
 test("a locker is opened once, by someone without a gun", () => {
   const st = newLoot("B1"), a = takeLocker(st, 2, 7, false);
