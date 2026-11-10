@@ -22,16 +22,24 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SERVE = new Set(["index.html", "world", "monsters", "characters", "shared", "models", "audio", "games"]);            // nothing else in the repo is public
 const TYPES = {".html": "text/html; charset=utf-8", ".json": "application/json", ".glb": "model/gltf-binary", ".jpg": "image/jpeg", ".js": "text/javascript", ".ogg": "audio/ogg", ".m4a": "audio/mp4"};
 const RATE_BURST = 240, RATE_PER_S = 90, RATE_KICK = 600;                                   // messages: a burst of 240, 90 a second after (the game sends about 25 a second)
-const NUM_CHARS = 5, MAX_PLAYERS = REGISTRY.maxPlayers("original"), COLORS = ["#e0a040", "#4fc3f7", "#9ccc65", "#f06292", "#ba68c8", "#ffd54f", "#4db6ac", "#ff8a65", "#7986cb", "#90a4ae"];
+const NUM_CHARS = 5, DEFAULT_MODE = "original", MAX_PLAYERS = REGISTRY.maxPlayers(DEFAULT_MODE), COLORS = ["#e0a040", "#4fc3f7", "#9ccc65", "#f06292", "#ba68c8", "#ffd54f", "#4db6ac", "#ff8a65", "#7986cb", "#90a4ae"];
 if (COLORS.length < MAX_PLAYERS) throw new Error(`the world manifest allows ${MAX_PLAYERS} players a room but the server has ${COLORS.length} player colours: add colours first`);
+// a party is a room: the same mode and the same code. The original keeps its plain code as the key; any other mode is "mode:CODE".
+const partyKey = (mode, code) => mode === DEFAULT_MODE ? code : `${mode}:${code}`;
 
 export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = Math.random, simHz = Number(process.env.SIM_HZ) || 20, clock = () => Date.now() / 1000, log = line => console.log(line)} = {}) {
   const docs = new Map(), readJson = rel => JSON.parse(fs.readFileSync(path.join(root, rel), "utf8"));
   const worldDoc = scene => { if (!docs.has(scene)) docs.set(scene, readJson(`world/${scene}.json`)); return docs.get(scene); };
   let monCfgCache = null; const monCfg = () => monCfgCache ||= readJson("world/monsters.json");
-  const rooms = new Map();                                             // code -> {players, hosts: {scene: id}, seq, phase: "lobby" | "playing", timer}
+  const rooms = new Map();                                             // party key -> {players, hosts: {scene: id}, seq, phase: "lobby" | "playing", timer}
   const httpServer = http.createServer((req, res) => {
     const url = new URL(req.url, "http://x");
+    if (url.pathname === "/rooms") {                                // open rooms of a mode (all modes with none given): no player names
+      const mode = url.searchParams.get("mode");
+      if (mode !== null && !Object.hasOwn(REGISTRY.modes, mode)) { res.writeHead(400, {"content-type": "application/json"}); return res.end(JSON.stringify({error: "unknown_mode"})); }
+      const list = [...rooms.values()].filter(r => (mode === null || r.mode === mode) && r.players.size < r.max).map(r => ({mode: r.mode, code: r.code, players: r.players.size, max: r.max, state: r.phase}));
+      res.writeHead(200, {"content-type": "application/json", "cache-control": "no-store"}); return res.end(JSON.stringify({rooms: list}));
+    }
     if (url.pathname === "/health") { res.writeHead(200, {"content-type": "application/json"}); return res.end(JSON.stringify({ok: true, rooms: rooms.size})); }
     let rel = decodeURIComponent(url.pathname).replace(/^\/+/, "") || "index.html";
     const file = path.resolve(root, rel);
@@ -101,17 +109,17 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
   // the finale: the alarm goes off once the doors are open and someone is in the store; everyone leaving through them ends the round
   const alarmMs = room => room.alarmAt ? Math.max(0, ALARM_MS - (Date.now() - room.alarmAt)) : 0;
   function maybeAlarm(room) {
-    if (room.alarmAt || !room.power.on || ![...room.players.values()].some(p => p.scene === "L4")) return;
+    if (room.alarmAt || !room.power.on || ![...room.players.values()].some(p => p.scene === room.finish)) return;
     room.alarmAt = Date.now(); broadcast(room, {t: "alarm", ms: ALARM_MS});
   }
   // a row for the results screen: the old fields (id, name, place, ms) plus what the player did; stats were taken as they walked out
   const rowOf = (room, e) => { const s = room.out.get(e.id) || PS.newStats(); return {...e, char: s.char, downs: s.downs, deaths: s.deaths, revives: s.revives, shots: s.shots, hits: s.hits, beacons: s.beacons, score: score({deaths: s.deaths, revives: s.revives, ms: e.ms})}; };
-  const resultsMsg = room => ({t: "results", rows: room.final, mode: "original", floors: room.floorList()});
+  const resultsMsg = room => ({t: "results", rows: room.final, mode: room.mode, floors: room.floorList()});
   function checkDone(room) {
     if (!runDone(room.run, [...room.players.keys()])) return;
     room.run = finish(room.run); room.final = runResults(room.run).map(e => rowOf(room, e)); broadcast(room, resultsMsg(room));
     // one JSON line per finished round, with no player names; nothing is stored
-    log(JSON.stringify({event: "run", ...runRecord({roomCode: room.code, mode: "original", startedAt: room.run.startedAt, endedAt: Date.now(), floors: room.floorList(),
+    log(JSON.stringify({event: "run", ...runRecord({roomCode: room.code, mode: room.mode, startedAt: room.run.startedAt, endedAt: Date.now(), floors: room.floorList(),
       players: room.final.map(r => ({char: r.char, place: r.place, ms: r.ms, downs: r.downs, deaths: r.deaths, revives: r.revives, shots: r.shots}))})}));
   }
   // the waiting room: everyone readies, then a countdown, then the round starts for the whole room (a round runs until the room empties)
@@ -138,15 +146,19 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
       if (!me) {
         if (m.t !== "join") return;
         const code = String(m.room || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "MAIN";
-        room = rooms.get(code) || {code, players: new Map(), floors: {}, seq: 0, phase: "lobby", timer: null, fuses: {}, switches: {}, keypads: {}, power: newPower(), run: null, alarmAt: 0, loot: {}, armed: new Map(), out: new Map(), floorMs: {}, final: null, floorList() { return Object.entries(this.floorMs).map(([scene, ms]) => ({scene, ms})); }}; rooms.set(code, room);
-        if (room.players.size >= MAX_PLAYERS) { ws.send(JSON.stringify({t: "full"})); return ws.close(); }
+        const mode = m.mode === undefined ? DEFAULT_MODE : m.mode, def = typeof mode === "string" && Object.hasOwn(REGISTRY.modes, mode) ? REGISTRY.modes[mode] : null;
+        if (!def) { send({ws}, {t: "refused", reason: "unknown_mode"}); return ws.close(); }
+        if (def.status !== "built") { send({ws}, {t: "refused", reason: "soon", mode}); return ws.close(); }          // planned modes are listed but cannot be joined yet
+        const key = partyKey(mode, code);
+        room = rooms.get(key) || {code, mode, floorNames: def.floors, finish: def.finish.scene, max: def.players.max, players: new Map(), floors: {}, seq: 0, phase: "lobby", timer: null, fuses: {}, switches: {}, keypads: {}, power: newPower(), run: null, alarmAt: 0, loot: {}, armed: new Map(), out: new Map(), floorMs: {}, final: null, floorList() { return Object.entries(this.floorMs).map(([scene, ms]) => ({scene, ms})); }}; rooms.set(key, room);
+        if (room.players.size >= room.max) { ws.send(JSON.stringify({t: "full", max: room.max})); return ws.close(); }
         const used = new Set([...room.players.values()].map(p => p.color));
         const taken = new Set([...room.players.values()].map(p => p.char));                    // a character you ask for is yours even if someone has it; with no choice you get one nobody has
         const char = Number.isInteger(m.char) && m.char >= 0 && m.char < NUM_CHARS ? m.char : ([...Array(NUM_CHARS).keys()].find(c => !taken.has(c)) ?? (room.seq % NUM_CHARS));
         me = {id: ++room.seq, seq: room.seq, ws, scene: null, ready: false, ps: PS.newPS(), st: null, char, name: String(m.name || "Player").replace(/[^\w .-]/g, "").slice(0, 16) || "Player",
               color: COLORS.find(c => !used.has(c)) || COLORS[0]};
         room.players.set(me.id, me);
-        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? room.final : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char}))});
+        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, mode: room.mode, floors: room.floorNames, max: room.max, finish: room.finish, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? room.final : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char}))});
         broadcast(room, {t: "join", id: me.id, name: me.name, color: me.color, char: me.char}, me.id);
         lobbyChanged(room);
         return;
@@ -156,7 +168,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
           me.ready = !!m.ready; lobbyChanged(room);
           break;
         case "s": {                                                   // a player's state goes only to those on the same floor; everyone else just learns which floor you are on
-          const scene = typeof m.scene === "string" && Object.hasOwn(FLOORS, m.scene) ? m.scene : null;          // only the five floors exist for the server (the solo-only passages and games never reach a room)
+          const scene = typeof m.scene === "string" && Object.hasOwn(FLOORS, m.scene) && room.floorNames.includes(m.scene) ? m.scene : null;          // only the five floors exist for the server (the solo-only passages and games never reach a room)
           const was = me.scene; me.scene = scene;
           const f = k => Number.isFinite(m[k]) ? m[k] : 0, inMap = Math.abs(f("x")) <= 100 && Math.abs(f("z")) <= 100 && f("y") > -20 && f("y") < 30;          // a position off the map (or not a number) is ignored: the player stays where they were
           if (!inMap && me.st) { m = {...m, x: me.st.x, y: me.st.y, z: me.st.z}; }
@@ -172,6 +184,12 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
             if (LOOT_FLOORS.includes(scene)) send(me, {t: "loot", scene, st: floorLoot(room, scene)});
             maybeAlarm(room);
           }
+          break;
+        }
+        case "goto": {                                                // jump to a friend: their floor and spot, only for someone in this party who is standing on a floor
+          const to = room.players.get(m.to);
+          if (!to || to === me || !to.scene || !to.st) break;
+          send(me, {t: "goto", id: to.id, scene: to.scene, x: to.st.x, y: to.st.y, z: to.st.z});
           break;
         }
         case "keypad": {                                              // read a note ("find") or type the code ("try") on the floor you are on
@@ -269,7 +287,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
       putBackLocker(room, me.id);
       room.players.delete(me.id); pruneFloors(room);
       broadcast(room, {t: "leave", id: me.id});
-      if (!room.players.size) { clearTimeout(room.timer); rooms.delete(room.code); } else { lobbyChanged(room); checkDone(room); }
+      if (!room.players.size) { clearTimeout(room.timer); rooms.delete(partyKey(room.mode, room.code)); } else { lobbyChanged(room); checkDone(room); }
     });
   });
   return new Promise(resolve => httpServer.listen(port, () => resolve({httpServer, wss, port: httpServer.address().port, rooms, tickStats,
