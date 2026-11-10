@@ -45,6 +45,12 @@ The puzzle rules (how many fuses, the keypad length), monster counts and the ala
 
 `lot.L4.front_doors>overworld` is built, `soloOnly`, and `requires: ["original_complete"]`. It is not a door in `world/L4.json` (the glass doors are open once the power is on and the player walks out), so the world-file check only compares links whose connector is `stair_door` or `gate`. `parking_lot` is a page scene and not a `multiplayer` scene, so the server never runs it and a room cannot enter it. Its arrival point is the table and chairs, which are built in `index.html` (`overworldProps`) because no model of them exists yet. If the table moves, change `OW_TABLE` in `index.html`, `SPAWN` in `tools/make_parking_lot.mjs` and the link's `arrive` together; `shared/manifest.test.js` checks that the link and the scene's spawn marker agree.
 
+## The City, v0 (built, session 9)
+
+`city` is a built area with one built scene, `street` (`floorY` 0, files: `world/street.json`, so no model). Its layout (buildings, doors, lamps, the two bus stops) and the day clock are in `shared/city.js`, which the page draws from; `node tools/make_street.mjs` writes `world/street.json` (colliders and markers) from the same layout, and `shared/city.test.js` fails if the file is stale. Two built links, both `bus`, `soloOnly`: `overworld.bus>city` (from `parking_lot`, door `bus_stop`, arrival on the east sidewalk) and `city.bus>overworld` (back to the lot's shelter). The street's arrival point is in the link and in `BUS_STREET` in `shared/city.js` (a test compares them); the lot's shelter is `BUS_LOT`. `bus_stop` stays a planned scene and `jobs` a planned area. The street is a page scene, so the server never runs it.
+
+The clock: a game day is 900 real seconds, it starts at 08:00 on day 1, `CITY.t` counts seconds spent on the street (paused elsewhere, in memory only), stores open 08:00 to 20:00, 20:00 to 24:00 is the grace period, 00:00 to 06:00 is where the danger goes (slice 2; `dangerous()` is ready, nothing uses it yet).
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.
