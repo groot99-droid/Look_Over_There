@@ -49,14 +49,14 @@ A player who joins during PLAYING skips the lobby and spawns with the group. A r
 
 | ID | Requirement | Status | How we know |
 |---|---|---|---|
-| RND-20 | The server counts per player: downs, **deaths** (a down nobody revived: the 45 s ran out, or any down in solo play), **revives given**, shots, shots that hit, beacons thrown, cloak seconds, time on each floor. Today it keeps none of these. | NEW | `server/playerstate.test.js` covers each counter. |
-| RND-21 | At the end the server builds one **run record**: `{roomCode, mode, startedAt, endedAt, floors: [{scene, ms}], players: [{name, char, place, ms, downs, deaths, revives, shots, score}]}`. Only the server writes it. For now it goes to the server log as one JSON line without names; a database comes with session 5. | NEW | A test plays a fake round and checks the record. |
-| RND-22 | The results screen shows place, time, deaths, revives and score, your best time on this browser, and a welcome to Farway the first time you finish the Original. | CHANGE | A browser test finishes a solo round and reads the screen. |
-| RND-23 | Finishing the Original for the first time sets the flag `original_complete`. It is stored on this device first and moves to the account when accounts exist. | NEW | The flag survives a reload. |
+| RND-20 | The server counts per player: downs, **deaths** (a down nobody revived: the 45 s ran out, or any down in solo play), **revives given**, shots, shots that hit, beacons thrown, cloak seconds, time on each floor. Today it keeps none of these. | BUILT, except cloak seconds (not counted yet) | `server/playerstate.test.js` covers each counter. |
+| RND-21 | At the end the server builds one **run record**: `{roomCode, mode, startedAt, endedAt, floors: [{scene, ms}], players: [{name, char, place, ms, downs, deaths, revives, shots, score}]}`. Only the server writes it. For now it goes to the server log as one JSON line without names; a database comes with session 5. | BUILT (the record has no names; solo play has no server, so it is not logged) | A test plays a fake round and checks the record. |
+| RND-22 | The results screen shows place, time, deaths, revives and score, your best time on this browser, and a welcome to Farway the first time you finish the Original. | BUILT (shows place, time, deaths, revives, score, best; the browser check is `tools/results_test.mjs`, solo only) | A browser test finishes a solo round and reads the screen. |
+| RND-23 | Finishing the Original for the first time sets the flag `original_complete`. It is stored on this device first and moves to the account when accounts exist. | BUILT (stored on this browser only) | The flag survives a reload. |
 | RND-24 | After the results the player can walk out to the Overworld. The link `lot.L4.front_doors>overworld` requires `original_complete`. | NEW (needs the Overworld) | `tools/manifest.mjs links` shows it open once the flag is held. |
 | RND-25 | Ranking is online and counts runs from the whole game. Boards are kept apart by mode and by group size: solo, 2 to 4, 5 to 10. Whether a board ranks by time or by score is open. | NEW | `docs/BACKEND.md`; Decision 1 (time or score) |
 | RND-26 | A run time is accepted only from a run record the server made. A client cannot send a time. | NEW | A test posts a made-up time and it is refused. |
-| RND-27 | Revives count toward a player's total score and deaths count against it. Starting formula, to tune: 1000, plus 150 per revive, minus 100 per death, minus 1 per 5 s of round time, never below 0. | NEW (formula is a proposal) | A test scores a made-up run. |
+| RND-27 | Revives count toward a player's total score and deaths count against it. Starting formula, to tune: 1000, plus 150 per revive, minus 100 per death, minus 1 per 5 s of round time, never below 0. | BUILT (placeholder numbers in `SCORE`, `shared/finish.js`; not confirmed by the owner) | A test scores a made-up run. |
 
 ### Safety and load
 

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {newPS, hit, tick, lift, gotLocker, gotPack, gotBeacon, shoot, throwBeacon, toggleCloak, shortCircuit, view, changed, isDown, isImmune, canTakePack, canTakeBeacon, DOWNED_S, IMMUNE_S, THROW_GAP_S} from "./playerstate.js";
+import {newPS, newStats, gaveRevive, shotHit, onFloor, statsOf, hit, tick, lift, gotLocker, gotPack, gotBeacon, shoot, throwBeacon, toggleCloak, shortCircuit, view, changed, isDown, isImmune, canTakePack, canTakeBeacon, DOWNED_S, IMMUNE_S, THROW_GAP_S} from "./playerstate.js";
 
 test("three hits down a player; the grace second and the gap protect; being down or immune takes no more", () => {
   const ps = newPS(); assert.ok(hit(ps, 35, 10)); assert.equal(view(ps).hp, 65); assert.ok(!hit(ps, 35, 10.5), "grace");
@@ -40,4 +40,31 @@ test("short circuit: needs a working cloak and a living player; kills the cloak 
   assert.ok(shortCircuit(ps)); assert.deepEqual([ps.cloak.on, ps.cloak.b, view(ps).cloak.x], [false, 0, 300]); assert.ok(!shortCircuit(ps), "already dead"); assert.ok(!toggleCloak(ps), "cannot be switched on");
   tick(ps, 100, 0); assert.equal(view(ps).cloak.x, 200, "the broken seconds count down on the server's clock");
   const d = newPS(); gotLocker(d); hit(d, 50, 0); hit(d, 50, 2); assert.ok(isDown(d) && !shortCircuit(d), "a downed player cannot");
+});
+
+test("counters: a down is counted; a down nobody lifted becomes a death, a lifted one does not", () => {
+  const ps = newPS(); assert.deepEqual(ps.stats, newStats());
+  hit(ps, 50, 0); hit(ps, 50, 2); assert.ok(isDown(ps));
+  assert.equal(ps.stats.downs, 1); assert.equal(ps.stats.deaths, 0, "not a death yet");
+  assert.equal(tick(ps, 1, DOWNED_S + 2), "respawn"); assert.equal(ps.stats.deaths, 1, "the time ran out");
+  const b = newPS(); hit(b, 50, 0); hit(b, 50, 2); lift(b, 10);
+  assert.equal(tick(b, 1, 10 + DOWNED_S + 5), null); assert.deepEqual([b.stats.downs, b.stats.deaths], [1, 0], "lifted: a down, not a death");
+  hit(b, 50, 100); hit(b, 50, 102); assert.equal(b.stats.downs, 2, "a second down counts again");
+});
+test("counters: only hits that landed count as downs; a hit on someone down or immune adds nothing", () => {
+  const ps = newPS(); hit(ps, 35, 0); assert.equal(ps.stats.downs, 0);
+  hit(ps, 35, 0.5); hit(ps, 35, 1.5); hit(ps, 35, 3); assert.equal(ps.stats.downs, 1); hit(ps, 35, 9); assert.equal(ps.stats.downs, 1, "already down");
+});
+test("counters: shots, beacons, revives given, hits", () => {
+  const ps = newPS(); gotLocker(ps); gotBeacon(ps);
+  assert.ok(shoot(ps, 10)); assert.ok(!shoot(ps, 10.01), "too fast: refused shots do not count"); assert.ok(shoot(ps, 12)); assert.equal(ps.stats.shots, 2);
+  shotHit(ps); assert.equal(ps.stats.hits, 1);
+  assert.ok(throwBeacon(ps, 20)); assert.ok(!throwBeacon(ps, 20.1)); assert.equal(ps.stats.beacons, 1);
+  const empty = newPS(); assert.ok(!shoot(empty, 5)); assert.ok(!throwBeacon(empty, 5)); assert.equal(empty.stats.shots + empty.stats.beacons, 0, "no gun, no beacon: nothing counted");
+  gaveRevive(ps); gaveRevive(ps); assert.equal(ps.stats.revives, 2);
+});
+test("counters: time on each floor adds up per scene, and a snapshot does not change afterwards", () => {
+  const ps = newPS(); onFloor(ps, "B1", 0.5); onFloor(ps, "B1", 0.25); onFloor(ps, "L1", 1); onFloor(ps, null, 5);
+  assert.deepEqual(ps.stats.floorMs, {B1: 750, L1: 1000});
+  const snap = statsOf(ps); onFloor(ps, "B1", 1); assert.equal(snap.floorMs.B1, 750); assert.equal(ps.stats.floorMs.B1, 1750);
 });
