@@ -121,7 +121,7 @@ export function brain(idx, N, opts = {}) {
     const key = x.toFixed(1) + "," + z.toFixed(1) + g.S.id;
     if (B.goalKey !== key) { B.goalKey = key; B.waitT = 0; }                   // the patience budget belongs to the goal, so a flee does not refill it
     if (B.cur !== key || now() - B.pathAt > 1.2) { B.cur = key; B.pathAt = now(); B.path = plan(x, z); }
-    if (B.tier >= 2 && (B.waitT || 0) < 25 && dist(x, z) > close + 1) {      // only a risky route is open: wait still and quiet while this spot is safe, as a patrol passes
+    if (B.tier >= 2 && (B.waitT || 0) < (opts.bold ? 5 : 25) && dist(x, z) > close + 1) {      // only a risky route is open: wait still and quiet while this spot is safe, as a patrol passes
       const F = fields(), here = cellOf(g.P.p.x, g.P.p.z);
       if (here >= 0 && margin(F, here) >= 2 && !F.mons.some(k => Math.hypot(k.m.pos.x - g.P.p.x, k.m.pos.z - g.P.p.z) < 9)) { B.waitT = (B.waitT || 0) + 0.05; stop(); g.P.crouch = true; B.waited = (B.waited || 0) + 0.05; return false; }
     }
@@ -167,7 +167,7 @@ export function brain(idx, N, opts = {}) {
   function tryShoot() {
     if (opts.nogun || !g.LT.gun || g.LT.rounds <= 0 || g.GUN.cool > 0 || g.myCarry() >= 0) return false;
     let best = null;
-    for (const m of known()) { if (m.ghost || !m.onFloorY(g.P.p.y) || m.immuneT > 0 || m.glitchT > 0 || m.state !== "chase") continue; const d = dist(m.pos.x, m.pos.z); if (d <= 13 && (!best || d < best.d)) best = {m, d}; }
+    for (const m of known()) { if (m.ghost || !m.onFloorY(g.P.p.y) || m.immuneT > 0 || m.glitchT > 0 || m.state !== "chase") continue; const d = dist(m.pos.x, m.pos.z); if (d <= (opts.bold ? 20 : 13) && (!best || d < best.d)) best = {m, d}; }
     if (!best) return false;
     const o = eye(), tx = best.m.pos.x - o[0], ty = best.m.fy + 0.5 * (best.m.cfg.height || 2.2) - o[1], tz = best.m.pos.z - o[2], L = Math.hypot(tx, ty, tz) || 1;
     const keep = [g.P.yaw, g.P.pitch]; g.P.yaw = Math.atan2(-tx, -tz); g.P.pitch = Math.asin(ty / L);
@@ -201,7 +201,7 @@ export function brain(idx, N, opts = {}) {
     if (!g.LT.gun && v.lockers.length) { kind = "locker"; items = free(v.lockers, st.lockers, kind); }
     else {
       if (!opts.nobeacons && g.BC.have < 2 && v.beacons) { kind = "beacon"; items = free(v.beacons, st.beacons || [], kind).filter(it => { const c = cellOf(it.x, it.z); return c >= 0 && F.bot.d[c] < (opts.legacyItems ? 20 : 40); }); }
-      if (!items.length && g.LT.gun && g.LT.rounds < 6) { kind = "pack"; items = free(v.packs, st.packs, kind).filter(it => { const c = cellOf(it.x, it.z); return c >= 0 && F.bot.d[c] < 22; }); }
+      if (!items.length && g.LT.gun && g.LT.rounds < (opts.bold ? 9 : 6)) { kind = "pack"; items = free(v.packs, st.packs, kind).filter(it => { const c = cellOf(it.x, it.z); return c >= 0 && F.bot.d[c] < (opts.bold ? 40 : 22); }); }
     }
     if (!items.length) return false;
     const it = pickNearest(items, kind); if (!it) return false;

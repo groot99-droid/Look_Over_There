@@ -25,7 +25,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
   assert.deepEqual(REGISTRY.scenesWith("keypad"), ["L2"]);
   assert.deepEqual(REGISTRY.powerSources, ["L3", "L4"]);
-  assert.deepEqual(REGISTRY.loot, {B1: {lockers: 8, packs: 3}, L1: {lockers: 0, packs: 3}, L2: {lockers: 0, packs: 3}, L3: {lockers: 0, packs: 4}, L4: {lockers: 0, packs: 3}});
+  assert.deepEqual(REGISTRY.loot, {B1: {lockers: 8, packs: 6}, L1: {lockers: 0, packs: 3}, L2: {lockers: 0, packs: 3}, L3: {lockers: 0, packs: 4}, L4: {lockers: 0, packs: 3}});
   assert.equal(REGISTRY.maxPlayers("original"), 10);
 });
 

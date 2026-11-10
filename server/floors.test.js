@@ -106,7 +106,7 @@ test("a monster's hit costs 35 HP that the server tracks and tells the player an
   ps[1].inbox.length = 0; at(ps[0], "B1", m.pos.x + 0.4, m.pos.z, {hp: 100, dead: 0}); const s2 = await ps[1].next(m2 => m2.t === "s" && m2.id === ps[0].id); assert.equal(s2.hp, 65, "the client's own hp (100) is ignored");
   await srv.close();
 });
-test("three hits down a player: the server says so (dead on the relay), and they get up alone after 45 s with 100 HP", async () => {
+test("three hits down a player: the server says so (dead on the relay), and they get up alone after DOWNED_S (20 s) with 100 HP", async () => {
   const clk = clockOf(), srv = await createServer({clock: clk.now}), {ps, floor} = await floorWith(srv, "P2", "B1", ["Ann", "Bob"]);
   const m = floor.monsters[0]; m.state = "patrol"; m.wait = 99; at(ps[0], "B1", m.pos.x + 0.4, m.pos.z); at(ps[1], "B1", m.pos.x + 30, m.pos.z); await sleep(150);
   for (let i = 0; i < 3; i++) { clk.adv(1.5); floor.t += 2; stepN(floor, 0.1); await sleep(30); }
