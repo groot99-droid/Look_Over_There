@@ -1435,7 +1435,7 @@ function showResults(rows) {
 
 // ---------------------------------------------------------------- multiplayer: a room of up to 8; server/server.js relays everything and only picks each scene's host
 // Everyone sees the same monsters because one client per scene (the host) simulates them and sends snapshots; the rest follow.
-const DOWNED_S = 45, REVIVE_S = 4;
+const DOWNED_S = 20, REVIVE_S = 4;
 const CHARS = [{id: "plaid", name: "Plaid"}, {id: "suit", name: "Suit"}, {id: "shorts", name: "Shorts"}, {id: "red", name: "Red Dress"}, {id: "white", name: "White Suit"}];
 const net = {on: false, ws: null, id: 0, room: "", phase: "lobby", peers: new Map(), snap: null, t: 0, mt: 0, ticks: 0, ready: null, started: null, startRes: null, lobby: null, alert: null,
   host() { return !this.on; },                                // alone, this page runs the monsters; in a room the server does, and everyone follows it

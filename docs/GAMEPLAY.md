@@ -241,3 +241,28 @@ Before using the bots to tune a floor again: make them spend resources and take 
 - **Beacon, secondary: reverse the frequency** (`shared/beacon.js`: `reverse`, `REVERSE_S` 12, `GROUP_S` 10). The nearest running beacon within 30 m: for 12 s the monsters it would pull run up to 18 m away from it (`MonsterSim.flee`); then it pulls again and they group up round it (it is kept running at least 10 s more). Once per beacon. In a room: `beacon2` intent, `Floor.reverseBeacon`, `reverse` message.
 - **Not built yet:** the consumable slots (LB / RB, Q / E) hold nothing; the camera feeds have no controls (a later item is meant to bring them back as a full-screen ability). Walk, run and crouch speeds and the run stamina are this game's (4 / 7.5 / 2.2 m/s); main's unified paces were not adopted because the monsters are tuned against these.
 - **Stairs** are main's: a stair door opens onto a lit hallway drawn through the doorway; step into the doorway to cross. Tests: `tools/stairs_test.mjs`, `tools/controls_test.mjs`.
+
+## Session 12: tuning B1 with the bots (2026-11-08)
+
+All runs: 4 bots, B1, 420 s, `node tools/bots.mjs 4 --bold --timeout=420` (`--bold` is new: a 5 s patience budget instead of 25 s, shooting from 20 m, ammo packs fetched from 40 m). One run per row, so the spread (a bot's downs ranged 0 to 7 in the same setting) is as large as most effects. Team downs, fuses in the door out of 3:
+
+| Setting | Team downs | Fuses in door | Notes |
+|---|---|---|---|
+| Original numbers, cautious bots | 5 | 1 | waited 51 to 166 s each |
+| Original numbers, `--bold` | 10 | 0 | the baseline for the rows below |
+| Down time 45 s to 20 s | 12 | 0 | more downs, since a bot is back in the corridor sooner |
+| and B1 packs 3 to 6 | 4 | 0 | the largest change seen; every gun used |
+| and spawn weight `NEAR_M` 15 to 8 | 10 | 1 | inside the spread; **reverted** |
+| and B1 monsters 4 to 3 | 14 | 0 | no better, and three server tests assume 4; **reverted** |
+
+**What stayed:** down time 20 s (`DOWNED_S` in `server/playerstate.js` and `index.html`, one number each) and 6 packs on B1 (`shared/farway.manifest.js`). The pinned tests were updated on purpose (`shared/loot.test.js`, `shared/manifest.test.js`, and two test titles).
+
+**What the bots cannot tell us.** No bot team delivered a fuse in more than 1 of 8 runs, and the runner often carried a fuse for 300 to 400 s of 420 (stuck counts of 50 to 100). That looks like the bots' route to the stair door, not only the floor's difficulty, so time to clear B1 is not measured here. Not tried: moving the round-start spawn (`groupSpawn` in `index.html`, outside this session's files), a way round the corridor, and changing the cloak (the owner's call).
+
+### Playtest checklist for the owner (3 or 4 players, B1 only, a stopwatch)
+1. Time from the countdown to the third fuse in the door. Target about 4 min.
+2. Downs per player on B1. Target under 5.
+3. With a 20 s down time: does it feel like a penalty, or like nothing? Try 30 s if nothing.
+4. With 6 packs: do you run out of rounds before the corridor, or have spare at the end? If spare, take packs back to 4 or 5.
+5. Where does everyone go down? If it is still the corridor near x 0 to 9, z -10 to -15, the next lever is the spawn or a way round it.
+6. Does anyone use the cloak? (Not changed.)
