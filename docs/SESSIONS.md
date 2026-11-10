@@ -9,7 +9,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | # | Session | When | Needs | Status |
 |---|---|---|---|---|
 | 1 | Manifest core and loader | done | | **done**, in the draft PR for `claude/manifest-loader` |
-| 2 | Gate return fix, links read from the manifest | Now | 1 | not started |
+| 2 | Gate return fix, links read from the manifest | Now | 1 | **done**, in the draft PR for `claude/gate-return` (not merged) |
 | 3 | Results v2, local: deaths, revives, score, a round log line | Now | 1 | not started |
 | 12 | Tune the Original, starting with B1 | Now | 1 (better with 3) | not started |
 | 6 | Overworld v0 | Next | 1 and 3, after 2 | not started |

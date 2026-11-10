@@ -28,11 +28,10 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
   assert.equal(REGISTRY.maxPlayers("original"), 10);
 });
 
-test("the shipped manifest has no errors, and its only warning is the known missing return scene on the RDWE gate", () => {
+test("the shipped manifest has no errors and no warnings (both gates name their return scene in world/L4.json)", () => {
   const {errors, warnings} = checkManifest(FARWAY, {worldDocs: worldDocs()});
   assert.deepEqual(errors, []);
-  assert.equal(warnings.length, 1, JSON.stringify(warnings));
-  assert.match(warnings[0], /DoorLeaf_Gate_RDW.*no return scene/);
+  assert.deepEqual(warnings, []);
 });
 
 test("every door link in world/*.json is in the manifest, with the same arrival, and the other way round", () => {
