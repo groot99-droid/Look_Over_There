@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {WebSocket} from "ws";
 import {createServer} from "./server.js";
 import {REGISTRY} from "../shared/registry.js";
+import * as PS from "./playerstate.js";
 
 // a tiny client: queues what it receives so a test can wait for a message of a given kind
 function client(port) {
@@ -378,5 +379,47 @@ test("a room holds the manifest's maximum number of players, each with a differe
   const extra = client(srv.port); await extra.open; extra.send({t: "join", room: "FULL", name: "Late"});
   await extra.next(kind("full"));
   assert.ok(!(await extra.quiet(100)).some(m => m.t === "welcome"), "the one over the limit is never welcomed");
+  await srv.close();
+});
+
+test("stats: downs, deaths, revives, shots, hits, beacons and floor time reach the results and one log line without names", async () => {
+  let t = 1000; const lines = [], srv = await createServer({countdownMs: 100, clock: () => t, log: l => lines.push(l)});
+  const [a, b] = await round(srv, "R30", ["Ann", "Bob"]), room = srv.rooms.get("R30"), A = room.players.get(a.id).ps, B = room.players.get(b.id).ps;
+  for (const c of [a, b]) c.send({t: "s", scene: "L4", x: 0, y: 0, z: 0});
+  a.send({t: "power"}); await a.next(kind("power")); await a.quiet(300);
+  // Ann is downed and Bob lifts her: a down and a revive given, no death
+  PS.hit(A, 50, t); t += 2; PS.hit(A, 50, t); assert.ok(PS.isDown(A));
+  b.send({t: "revive", to: a.id}); await a.next(kind("revived"));
+  // Ann is downed again and nobody comes: the 45 s run out, which is a death
+  t += 10; PS.hit(A, 50, t); t += 2; PS.hit(A, 50, t); t += PS.DOWNED_S + 1; await a.next(kind("me"), 2000); await a.quiet(300);
+  // Bob shoots twice (one hits) and throws a beacon
+  PS.gotLocker(B); PS.gotBeacon(B); room.floors.L4.shot = (p, o, d, spend) => spend() ? {r: p.id === b.id && B.stats.shots === 2 ? {i: 0} : null} : null;
+  b.send({t: "shot", o: [0, 1.5, 0], d: [0, 0, -1]}); await b.quiet(100); t += 2; b.send({t: "shot", o: [0, 1.5, 0], d: [0, 0, -1]}); await b.quiet(100); t += 2;
+  b.send({t: "beacon", x: 3, z: 3}); await b.quiet(150);
+  assert.deepEqual([A.stats.downs, A.stats.deaths, A.stats.revives], [2, 1, 0]);
+  assert.deepEqual([B.stats.revives, B.stats.shots, B.stats.hits, B.stats.beacons], [1, 2, 1, 1]);
+  assert.ok(B.stats.floorMs.L4 > 100, "floor time is counted");
+  assert.equal(lines.length, 0, "nothing logged before the round ends");
+  a.send({t: "exit"}); await a.next(kind("exited")); b.send({t: "exit"});
+  const r = await a.next(kind("results")), ann = r.rows.find(x => x.id === a.id), bob = r.rows.find(x => x.id === b.id);
+  assert.equal(ann.name, "Ann", "the old fields stay");
+  assert.deepEqual([ann.downs, ann.deaths, ann.revives], [2, 1, 0]); assert.deepEqual([bob.revives, bob.shots, bob.hits, bob.beacons], [1, 2, 1, 1]);
+  assert.equal(bob.score, 1000 + 150 - Math.floor(bob.ms / 5000)); assert.equal(r.mode, "original"); assert.ok(r.floors.some(f => f.scene === "L4" && f.ms > 100));
+  assert.equal(lines.length, 1, "one line per finished round");
+  const rec = JSON.parse(lines[0]); assert.equal(rec.event, "run"); assert.equal(rec.roomCode, "R30"); assert.equal(rec.mode, "original");
+  assert.ok(rec.endedAt >= rec.startedAt && rec.floors.some(f => f.scene === "L4"));
+  assert.deepEqual(rec.players.map(p => p.place), [1, 2]); assert.deepEqual(rec.players.map(p => [p.downs, p.deaths, p.revives, p.shots]), [[2, 1, 0, 0], [0, 0, 1, 2]]);
+  assert.ok(!/Ann|Bob/.test(lines[0]), "no names in the log");
+  await b.next(kind("results")); await srv.close();
+});
+test("stats: a player who walks out and then disconnects still counts", async () => {
+  const lines = [], srv = await createServer({countdownMs: 100, log: l => lines.push(l)});
+  const [a, b] = await round(srv, "R31", ["Ann", "Bob"]), room = srv.rooms.get("R31");
+  for (const c of [a, b]) c.send({t: "s", scene: "L4", x: 0, y: 0, z: 0});
+  a.send({t: "power"}); await a.next(kind("power"));
+  PS.gotBeacon(room.players.get(a.id).ps); a.send({t: "beacon", x: 2, z: 2}); await a.quiet(150);
+  a.send({t: "exit"}); await b.next(kind("exited")); a.ws.close(); await b.quiet(100);
+  b.send({t: "exit"}); const r = await b.next(kind("results"));
+  assert.equal(r.rows.find(x => x.name === "Ann").beacons, 1, "Ann's numbers were taken when she walked out"); assert.equal(lines.length, 1);
   await srv.close();
 });
