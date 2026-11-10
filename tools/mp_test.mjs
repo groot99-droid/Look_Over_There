@@ -276,7 +276,7 @@ try {
   await until("when the second is out both see the results", x, () => !!window.__game.FIN.results);
   await until("and the other one", y, () => !!window.__game.FIN.results);
   check("places are 1 and 2, in the order they left", await x.evaluate(() => window.__game.FIN.results.map(r => r.place + r.name).join()) === "1Xia,2Yul");
-  check("the results screen shows", await y.evaluate(() => getComputedStyle(document.getElementById("results")).display === "flex" && document.querySelectorAll("#r-rows tr").length === 2));
+  check("the results screen shows", await y.evaluate(() => getComputedStyle(document.getElementById("results")).display === "flex" && [...document.querySelectorAll("#r-rows tr")].filter(r => r.querySelector("td")).length === 2));   // the table has a header row since results v2
 } catch (e) { console.log("ERROR", e); failed++; }
 await browser.close(); await srv.close();
 console.log(failed ? `${failed} FAILED` : "ALL PASSED");
