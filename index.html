@@ -77,8 +77,12 @@
   #results h1{margin:0;font:700 22px/1 Georgia,serif;letter-spacing:.2em;text-align:center}
   #results table{width:100%;border-collapse:collapse}
   #results td{padding:6px 4px;border-bottom:1px solid #22221c}
-  #results td:last-child{text-align:right}
   #results tr.me td{color:#e0a040;font-weight:700}
+  #results th{font-weight:400;font-size:11px;letter-spacing:.1em;color:#8a8a78;text-align:right;padding:2px 4px}
+  #results th:first-child,#results th:nth-child(2){text-align:left}
+  #results td{text-align:right}
+  #results td:first-child,#results td:nth-child(2){text-align:left}
+  #results #r-welcome{text-align:center;color:#e0a040;font:italic 15px/1.4 Georgia,serif;padding:6px 0}
   #results #r-best{text-align:center;color:#9ccc65;letter-spacing:.08em}
   #gamemount{position:fixed;inset:0;display:none;z-index:2;background:#000}
   #gamemount canvas{position:absolute;inset:0;width:100%;height:100%}
@@ -103,7 +107,7 @@
 <div id="death">YOU DIED</div>
 <div id="hud"></div>
 <div id="camhud"></div><div id="buzz"></div><div id="cloak"><b>CLOAK · V</b><i></i></div><div id="cloakfx"></div><div id="beacons"></div><div id="hp"><b>HP</b><i></i></div><div id="hurt"></div><div id="stam"><i></i></div><div id="alarm"></div><div id="redpulse"></div>
-<div id="results"><div class="card"><h1>OUT</h1><table id="r-rows"></table><div id="r-best"></div><button id="r-again" type="button">Play again</button></div></div>
+<div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-again" type="button">Play again</button></div></div>
 <div id="help"><div class="card"><h2>CONTROLS</h2><div class="cols"><div>
 <div><b>WASD</b>move</div><div><b>Mouse</b>look</div><div><b>Space</b>jump</div><div><b>Shift</b>crouch (press again to walk)</div><div><b>R (hold)</b>run, loud</div><div><b>X / F</b>action: doors, fuses, switches, loot (hold to lift a teammate)</div><div><b>Y</b>take out what you carry; tap again to rotate; hold for the wheel (arrows or mouse wheel)</div><div><b>1 2 3</b>ray gun, cloak, beacon</div></div><div>
 <div><b>Left click</b>use what you hold: fire, cloak on/off, roll a beacon</div><div><b>Right click</b>gun: aim. Cloak: short circuit (stuns monsters near you, cloak dead 5 min). Beacon: reverse it (monsters run away, then group up)</div><div><b>Q / E</b>support / combat consumable (none yet)</div><div><b>Tab / M</b>handheld map</div><div><b>N</b>sound on / off</div><div><b>H</b>this list</div></div></div>
@@ -140,7 +144,7 @@ import {KEYPAD_FLOORS, CODE_LEN, newKeypad, view as kpView, foundCount, find as 
 import {LOOT, MAX_ROUNDS, GUN_ROUNDS, MAX_BEACONS, newLoot, takeLocker, takePack, takeBeacon, roundsAfterPack} from "./shared/loot.js";
 import {newCloak, toggle as cloakToggle, tick as cloakTick, SHORT_M, shortCircuit as cloakShort, broken as cloakBroken, STUN_S} from "./shared/cloak.js";
 import {LURE_S, SAFE_M, ROLL_M, lures as lureCovers, ringSpot, rollEnd, reverse as beaconReverse, REVERSE_S} from "./shared/beacon.js";
-import {ALARM_MS, fmtTime} from "./shared/finish.js";
+import {ALARM_MS, fmtTime, score as runScore} from "./shared/finish.js";
 import {MAX_HP, HIT_DMG, newHealth, hurt as hpHurt, regen as hpRegen, revived as hpRevived, downed as hpDowned, mayHit} from "./shared/health.js";
 import {pick as pickSpawn} from "./shared/spawn.js";
 import {createAudio} from "./audio/engine.js";
@@ -1364,6 +1368,8 @@ function setPower(on, by, quiet) {
 // The alarm starts once the doors are open and someone is in the store (the server says when in a room). Walking out onto the parking lot is the finish
 // for you; the lot is safe and is the lobby. The round is over when everyone in the room is out, then everyone sees places, times and their best.
 const FIN = {t0: performance.now(), alarmUntil: 0, out: false, exited: new Map(), results: null, hunt: 0};
+const SOLO = {downs: 0, deaths: 0};                                       // alone there is no server to count: a down is always a death (nobody can lift you)
+const ORIGINAL_KEY = "original_complete";                                  // set the first time the Original is finished on this browser
 const EXIT_Z = 28.8, EXIT_HALF_X = 5;                                      // the store's glass opening is at z 27.0-27.5; past this line you are on the lot
 function startAlarm(ms) { if (FIN.alarmUntil) return; FIN.alarmUntil = performance.now() + ms; if (S.id === "L4") AUD.stinger("st_finale"); if (S.id === "L4") toast("The alarm goes off. They are coming for the doors."); }
 const alarmLeft = () => Math.max(0, FIN.alarmUntil - performance.now());
@@ -1374,7 +1380,10 @@ function exitCheck() {
 function goOut() {
   FIN.out = true; closeKeypad(); AUD.stinger("st_exit");
   if (net.on) net.send({t: "exit"});
-  else { const ms = performance.now() - FIN.t0; FIN.exited.set(0, {id: 0, name: "You", place: 1, ms}); showResults([{id: 0, name: "You", place: 1, ms}]); }
+  else {
+    const ms = performance.now() - FIN.t0, row = {id: 0, name: "You", place: 1, ms, downs: SOLO.downs, deaths: SOLO.deaths, revives: 0, score: runScore({deaths: SOLO.deaths, revives: 0, ms})};
+    FIN.exited.set(0, {id: 0, name: "You", place: 1, ms}); showResults([row]);
+  }
 }
 function animateAlarm(dt) {
   const el = $("alarm"), pulse = $("redpulse"), left = alarmLeft();
@@ -1397,11 +1406,23 @@ function bestTime(ms) {                                                    // be
   if (isNew) { best = ms; try { localStorage.setItem("lot-best", String(ms)); } catch (e) {} }
   return {best, isNew};
 }
+// true the first time the Original is finished on this browser (and remembers it). If storage is blocked we cannot know, so we say nothing rather than welcome you every time.
+function firstOriginalFinish() {
+  let had = true;
+  try { had = !!localStorage.getItem(ORIGINAL_KEY); } catch (e) { return false; }
+  if (had) return false;
+  try { localStorage.setItem(ORIGINAL_KEY, "1"); } catch (e) {}
+  return true;
+}
 function showResults(rows) {
   if (FIN.results) return;
   FIN.results = rows; document.exitPointerLock?.(); AUD.resultMusic();
   const me = rows.find(r => r.id === (net.on ? net.id : 0));
-  $("r-rows").innerHTML = rows.map(r => `<tr class="${r === me ? "me" : ""}"><td>${r.place}</td><td>${String(r.name).replace(/[<>&]/g, "")}</td><td>${fmtTime(r.ms)}</td></tr>`).join("");
+  const n = v => Number.isFinite(v) ? v : "–";
+  $("r-rows").innerHTML = `<tr><th>#</th><th></th><th>TIME</th><th>DEATHS</th><th>REVIVES</th><th>SCORE</th></tr>` +
+    rows.map(r => `<tr class="${r === me ? "me" : ""}"><td>${r.place}</td><td>${String(r.name).replace(/[<>&]/g, "")}</td><td>${fmtTime(r.ms)}</td><td>${n(r.deaths)}</td><td>${n(r.revives)}</td><td>${n(r.score)}</td></tr>`).join("");
+  const welcome = $("r-welcome"), first = !!me && firstOriginalFinish();
+  welcome.hidden = !first; welcome.textContent = first ? "Welcome to Farway. You made it out." : "";
   const b = me ? bestTime(me.ms) : null;
   $("r-best").textContent = b ? (b.isNew ? `NEW RECORD ${fmtTime(b.best)}` : `BEST ${fmtTime(b.best)}`) : "";
   $("r-again").onclick = () => location.reload();
@@ -1660,6 +1681,7 @@ function hpHud(dt) {
 function die() {
   closeKeypad();
   if (myCarry() >= 0) fuseAct({a: "drop", x: P.p.x, z: P.p.z});                      // it stays where you fell
+  if (!net.on) { SOLO.downs++; SOLO.deaths++; }
   AUD.stinger("st_down"); dead = true; deadT = 0; deathLevel = S.id; devOn.v = false; P.reviveT = 0; $("revive").style.display = "none";
   $("death").style.opacity = 1; $("fear").style.opacity = 1;
   if (net.on) { $("death").textContent = "DOWNED"; $("death").style.background = "rgba(0,0,0,.55)"; }       // in a room you can be lifted, so you may still look around
@@ -1798,7 +1820,7 @@ FIN.t0 = performance.now();
 await loadScene("B1");
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, startAlarm, exitCheck, showResults, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
