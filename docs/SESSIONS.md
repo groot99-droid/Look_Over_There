@@ -13,7 +13,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 3 | Results v2, local: deaths, revives, score, a round log line | Now | 1 | **done**, merged (PR #4) |
 | 12 | Tune the Original, starting with B1 | Now | 1 (better with 3) | **bot pass done and merged** (PR #6): down time 20 s, 6 packs on B1; needs the owner's playtests |
 | 6 | Overworld v0 | Next | 1 and 3, after 2 | **done**, merged (PR #9); solo only, rooms cannot enter it yet |
-| 7 | Physics: decision and a playground prototype | Next | | not started |
+| 7 | Physics: decision and a playground prototype | Next | | **done**, merged (PR #8); `docs/PHYSICS.md` accepted by the owner with cannon-es, visual only in rooms |
 | 4 | Modes and parties | Next | 1 | **done**, merged (PR #7); server and lobby, "go to a friend" is server-side only |
 | 8 | Going back in prototype | Then | 3 and 4 | not started |
 | 9 | City v0 on Hallam Row | Then | 6 | not started |
