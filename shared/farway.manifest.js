@@ -37,7 +37,7 @@ export const FARWAY = {
     {
       id: "lot", name: "Look Over There", status: "built", tone: "backrooms",
       scenes: [
-        {id: "B1", floorY: -3.0, files: ["world/B1.glb", "world/B1.json"], multiplayer: true, puzzle: "fuses", loot: {lockers: 8, packs: 3}},
+        {id: "B1", floorY: -3.0, files: ["world/B1.glb", "world/B1.json"], multiplayer: true, puzzle: "fuses", loot: {lockers: 8, packs: 6}},
         {id: "L1", floorY: 0, files: ["world/L1.glb", "world/L1.json"], multiplayer: true, puzzle: "switches", loot: {lockers: 0, packs: 3}},
         {id: "L2", floorY: 3.2, files: ["world/L2.glb", "world/L2.json"], multiplayer: true, puzzle: "keypad", loot: {lockers: 0, packs: 3}},
         {id: "L3", floorY: 6.4, files: ["world/L3.glb", "world/L3.json"], multiplayer: true, powerSource: true, loot: {lockers: 0, packs: 4}},
