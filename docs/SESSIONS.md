@@ -14,7 +14,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 12 | Tune the Original, starting with B1 | Now | 1 (better with 3) | **bot pass done**, PR #6 for `claude/tune-original`: down time 20 s, 6 packs on B1; needs the owner's playtests |
 | 6 | Overworld v0 | Next | 1 and 3, after 2 | not started |
 | 7 | Physics: decision and a playground prototype | Next | | **done**, merged (PR #8); `docs/PHYSICS.md` accepted by the owner with cannon-es, visual only in rooms |
-| 7 | Physics: decision and a playground prototype | Next | | not started |
+| 4 | Modes and parties | Next | 1 | **done**, in the draft PR for `claude/modes-parties` (server and lobby; "go to a friend" is server-side only) |
 | 8 | Going back in prototype | Then | 3 and 4 | not started |
 | 9 | City v0 on Hallam Row | Then | 6 | not started |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
