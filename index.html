@@ -188,7 +188,7 @@ let pendingLink = null, loading = false;
 function openDoor(dr, byPlayer) {
   if (dr.target !== 0) return;
   if (dr.link && !byPlayer) return;                           // monsters do not use the stair doors
-  if (dr.link && dr.link.game && net.on) { toast("That door does not open in a room"); return; }          // the game gates are for solo play
+  if (dr.link && dr.link.game && net.on && (gateEntry(dr.link) || {}).soloOnly !== false) { toast("That door does not open in a room"); return; }          // the manifest says which gates are solo only (all of them for now)
   if (dr.link && isLocked(dr)) { doorLocked(); return; }
   dr.target = 1; dr.at = performance.now(); AUD.play(dr.link ? "door_open" : "door_creak", {pos: [dr.cx, dr.cy + 1, dr.cz], loud: true}); if (dr.link && !net.on && (dr.link.game || S.id === "T")) pendingLink = dr;                  // the game gates lead into a walkable passage (solo only)
   else if (dr.link) addPortal(dr, P.p.toArray());                                                  // a stair door opens onto its hallway: step into the doorway to cross
@@ -389,6 +389,8 @@ const RDWE_SCALE = 1.7;                                                         
 const INTERN_SCALE = 1.6;
 const RDWE_ORDER = ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"];
 const mkEl = (tag = "div") => document.createElement(tag);                          // detached elements: the original HUD stays invisible
+// the manifest's entry for a game gate (its soloOnly flag and where the player returns to); world/L4.json links carry the game and arrival, the manifest the rest
+const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === l.game && JSON.stringify(x.to.arrive) === JSON.stringify(l.arrive));
 async function enterGame(l) {
   if (inGame) return;
   inGame = l.game; loading = true; devOn.v = false;
@@ -421,7 +423,9 @@ async function enterGame(l) {
   }
   mount.style.display = "none"; renderer.domElement.style.display = "block";
   inGame = null;
-  await loadScene(l.scene || S.id, {pos: l.arrive, face: l.face});
+  // back to the floor the gate is on: the manifest's returnTo, else the link's own scene. S.id is the passage "T" here, which has no scene file.
+  const ret = (gateEntry(l) || {}).returnTo;
+  await loadScene((ret && ret.scene) || l.scene || "L4", {pos: l.arrive, face: l.face});
   gf.style.opacity = 0;
 }
 const levelOfY = () => S.id;
