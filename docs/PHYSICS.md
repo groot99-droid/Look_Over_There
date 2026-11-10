@@ -1,20 +1,18 @@
 # Physics: the decision
 
-Status: **proposal for the owner to accept.** Nothing here touches `index.html`, the server or the manifest. The prototype is in `tools/physics/` and does not import the game.
+Status: **accepted by the owner: cannon-es.** The first draft of this document recommended Rapier; the owner chose cannon-es instead, and this section is rewritten to match. The Rapier numbers stay below as the comparison. Nothing here touches `index.html`, the server or the manifest, and no game code uses either engine yet. The prototype is in `tools/physics/` and does not import the game.
 
-## Recommendation
+## Decision
 
-**Use Rapier (WASM), pinned to `@dimforge/rapier3d-compat@0.19.3`, loaded lazily the first time a scene that has physics objects opens.** Scenes without physics objects never download it.
+**Use cannon-es, pinned to `cannon-es@0.20.0` (MIT), for gravity and physics objects everywhere in Farway.** It is 36 KB gzip minified (75 KB unminified, as served from unpkg), loads in about 35 ms in Node, and has no WASM to compile. The prototype's default engine is already cannon-es.
 
-Why, in one line each:
-- At 200 bodies it costs about 0.5 ms per step against 2.4 to 3 ms for cannon-es, and it stays flat when the world has many static boxes (cannon-es went to about 8 ms with 1000 extra static boxes).
-- Bodies go to sleep reliably (196 of 200 asleep after 20 s, against 119), so a settled room costs almost nothing.
-- Joints (the swing) matched the pendulum formula to 0.1%; cannon-es was 1.7% long.
-- The download is the price: about 834 KB gzip, against 36 KB for cannon-es. That is a lot for a few toys, which is why it loads lazily and why the fallback below exists.
-
-**Fallback, if first-load size matters more than headroom:** cannon-es 0.20.0 (36 KB gzip minified). It is fine for a room with a few dozen bodies and only the nearby static boxes in its world (see "Fit with the box colliders"). Both engines sit behind the same 10-method adapter in `tools/physics/engines/`, so the choice can be reversed without touching scene code.
-
-Do not take Rapier 0.21.0 yet: its inlined WASM is 3.1 MB (1.65 MB gzip), twice the size of 0.19.3, and in the same bench its bodies slept far less (83 of 200) so the settled cost was 10 times higher. I did not investigate why; it may be changed defaults. Re-check when the owner wants to upgrade.
+What choosing it costs, from the measurements below, and the rules that keep the cost small:
+- **Step cost grows with the world, so keep the world small.** 200 bodies cost about 2.4 to 3 ms per step while moving and 1.7 to 1.9 ms at rest (cannon-es slept 119 of 200). That is acceptable for a room, but a share of a 16.7 ms frame that matters on a phone, which I could not measure. Budget about 50 bodies per scene as a working limit until a phone has been tried; measured in Node with 50 bodies and 40 nearby static boxes (3 runs): 0.4 to 0.5 ms per step while moving, about 0.14 ms at rest, worst step 1.3 to 2.6 ms.
+- **Never hand a scene's whole `boxes` array to the world.** With 1000 extra static boxes the step went to about 8 ms (worst step 52 ms in Node, 22 ms in Chromium), against 0.5 ms for Rapier. Feed only the boxes within a few metres of a physics object, using the existing `near()` grid. Scenes here have 48 to 591 colliders, so the full array is in the bad zone.
+- **Sleeping must be on** (the adapter sets it) and bodies that leave the playable area should be removed.
+- **The swing is 1.7% long** against the pendulum formula (2.942 s against 2.894 s); Rapier was within 0.1%. Fine for a toy; tune the constraint if a mini-game needs timing.
+- **No continuous collision detection.** Fast kicked balls can pass through thin walls (0.2 m here). Cap the kick speed and use thicker invisible colliders around physics areas. Not tested.
+- **cannon-es is unmaintained** (last release 0.20.0, August 2022). Both engines sit behind the same small adapter in `tools/physics/engines/`, so Rapier remains a drop-in if this ever bites. If a phone test shows cannon-es too slow, that is the trigger to revisit; Rapier 0.19.3 (834 KB gzip) is the measured alternative. Rapier 0.21.0 is not recommended (1.65 MB gzip, and bodies slept far less in the same bench).
 
 ## What was measured, and where
 
@@ -96,7 +94,7 @@ Nothing is vendored: no library file is committed. `tools/physics/package.json` 
 - Rapier at 1000 or more bodies; only 200 was asked for.
 - That cannon-es is unmaintained: its last release is 0.20.0 (Aug 2022). I take that as a risk, not a measurement.
 
-## Questions for the owner (defaults used)
+## Open items
 
-1. Is 834 KB gzip, lazily loaded, acceptable on first entry to a physics scene? Default: yes, with a loading spinner in the scene change. If not: cannon-es.
-2. Visual only until a physics object pays or is shared; then server simulates. Default as above.
+1. Visual only until a physics object pays or is shared; then the server simulates it. Still the default; the owner has not commented on it.
+2. Try the prototype on a real phone and record the 200-body and 50-body step times; that decides whether the body budget above is right.
