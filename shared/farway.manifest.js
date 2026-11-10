@@ -29,7 +29,8 @@ export const FARWAY = {
       finish: {scene: "L4", trigger: "parking_lot", alarmMs: 60000}, results: ["place", "time", "bestOnBrowser"],
     },
     going_back_in: {
-      status: "planned", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20,
+      // status stays planned: rooms cannot run this mode yet (the server answers "soon"). Solo play enters it from the Overworld's options screen (session 8), at `startChamber`.
+      status: "planned", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20, startChamber: "gbi_L4_4",
     },
   },
 
@@ -52,6 +53,15 @@ export const FARWAY = {
       scenes: [
         {id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/parking_lot.json"]},
         ...["table_and_chairs", "playground", "tree_house", "bus_station", "road", "endless_hills"].map(id => ({id})),
+      ],
+    },
+    {
+      // Going back in, slice 1: two chambers made from existing floors (tools/make_chambers.mjs writes their world files). `chamber.floor` and `index` place it in the run (wave number =
+      // floor position x chambersPerFloor + index); the 4th chamber of a floor has the stairs down, to the next floor's first. Page scenes only: the server does not run them.
+      id: "gbi", name: "Going back in", status: "built", tone: "backrooms",
+      scenes: [
+        {id: "gbi_L4_4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
+        {id: "gbi_L3_1", floorY: 6.4, files: ["world/L3.glb", "world/gbi_L3_1.json"], chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
       ],
     },
     stub("dreamcore_forest", "Dreamcore forest and meadow", "planned", ["forest", "meadow"]),
@@ -77,6 +87,10 @@ export const FARWAY = {
     stair("L4", "DoorLeaf_Stair_L3_L4_down", "L3", "DoorLeaf_Stair_L3_L4_up", [16.0, 9.6, 8.0], [0.0, 1.0]),
     gate("DoorLeaf_Gate_RDW", "rdwe", {room: "dining", arrive: [-121.2, 9.6, 63.6], face: [0.0, 1.0]}, "L4"),
     gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4"),
+
+    // Going back in: the stairs down from the 4th chamber of L4 to the first chamber of L3. One way (the chamber's own `up` door has no link). Arrival is on L3's floor (6.4).
+    {id: "gbi.gbi_L4_4.stairs_down", status: "built", connector: "stair_door", soloOnly: true,
+     from: {area: "gbi", scene: "gbi_L4_4", door: "DoorLeaf_Stair_L3_L4_down"}, to: {area: "gbi", scene: "gbi_L3_1", door: "DoorLeaf_Stair_L3_L4_up", arrive: [16.0, 6.4, 8.0], face: [0.0, 1.0]}},
 
     // ---- planned: from the world bible. None of these reach the game until their area is built.
     // walking out of the store after the Original: the results screen offers it once the flag is held. Not a door in world/L4.json (the glass doors are open once the power is on),

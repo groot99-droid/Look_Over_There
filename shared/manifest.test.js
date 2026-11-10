@@ -20,6 +20,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     B1: {glbs: ["world/B1.glb"], floor: -3.0}, L1: {glbs: ["world/L1.glb"], floor: 0}, L2: {glbs: ["world/L2.glb"], floor: 3.2},
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
+    gbi_L4_4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
@@ -36,11 +37,14 @@ test("the shipped manifest has no errors and no warnings (both gates name their 
 });
 
 test("every door link in world/*.json is in the manifest, with the same arrival, and the other way round", () => {
-  const docs = worldDocs(), built = REGISTRY.links.filter(l => l.status === "built" && ["stair_door", "gate"].includes(l.connector));          // walking out of the store is not a door in the file
+  const docs = worldDocs(), built = REGISTRY.links.filter(l => l.status === "built" && ["stair_door", "gate"].includes(l.connector) && l.from.area === "lot");          // walking out of the store is not a door in the file
   let n = 0;
   for (const [scene, doc] of Object.entries(docs)) for (const d of doc.doors) if (d.link) { n++; assert.ok(REGISTRY.linkFrom(scene, d.name), `${scene}/${d.name}`); }
   assert.equal(built.length, n, "same count");
   assert.equal(n, 10);
+  const gdocs = Object.fromEntries(["gbi_L4_4", "gbi_L3_1"].map(id => [id, JSON.parse(fs.readFileSync(path.join(ROOT, `world/${id}.json`), "utf8"))]));          // the chambers' files: one link, from gbi_L4_4 down
+  assert.deepEqual(checkManifest(FARWAY, {worldDocs: gdocs}).errors, []);
+  assert.equal(Object.values(gdocs).flatMap(d => d.doors).filter(d => d.link).length, REGISTRY.links.filter(l => l.status === "built" && l.from.area === "gbi").length);
 });
 
 test("a drifted door link is caught", () => {
@@ -160,4 +164,20 @@ test("an addon cannot reuse ids, redefine a base mode, or add a link between bas
   const e = addon(); e.links[0].requires = ["undeclared"];
   assert.throws(() => mergeAddon(FARWAY, e), /undeclared flag/);
   assert.throws(() => mergeAddon(FARWAY, {}), /at least one area/);
+});
+
+// ---- Going back in chambers (session 8)
+test("the chambers: wave numbers follow the run (4th chamber of L4 is wave 4, 1st of L3 is wave 5), and the start is a built chamber", () => {
+  const c = REGISTRY.chamber("gbi_L4_4"), n = REGISTRY.chamber("gbi_L3_1");
+  assert.equal(c.wave.no, 4); assert.equal(n.wave.no, 5); assert.equal(c.next, "gbi_L3_1"); assert.equal(c.stairsDown, "DoorLeaf_Stair_L3_L4_down");
+  assert.equal(REGISTRY.modes.going_back_in.startChamber, "gbi_L4_4");
+  assert.equal(REGISTRY.chamber("L3"), null, "an Original floor is not a chamber");
+  assert.equal(REGISTRY.modes.going_back_in.status, "planned", "rooms cannot run the mode yet");
+});
+test("a bad chamber is caught", () => {
+  bad(d => { d.modes.going_back_in.startChamber = "L3"; }, /startChamber L3 is not a chamber/);
+  bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.floor = "L9"; }, /not a floor of going_back_in/);
+  bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.index = 5; }, /past chambersPerFloor/);
+  bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.next = "nope"; }, /is not a chamber/);
+  bad(d => { delete d.areas.find(a => a.id === "gbi").scenes[0].chamber.wave; }, /chamber needs a floor/);
 });

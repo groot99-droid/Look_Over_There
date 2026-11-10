@@ -15,7 +15,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 6 | Overworld v0 | Next | 1 and 3, after 2 | **done**, merged (PR #9); solo only, rooms cannot enter it yet |
 | 7 | Physics: decision and a playground prototype | Next | | **done**, merged (PR #8); `docs/PHYSICS.md` accepted by the owner with cannon-es, visual only in rooms |
 | 4 | Modes and parties | Next | 1 | **done**, merged (PR #7); server and lobby, "go to a friend" is server-side only |
-| 8 | Going back in prototype | Then | 3 and 4 | not started |
+| 8 | Going back in prototype | Then | 3 and 4 | **slice 1 in draft PR** (solo: the options screen to a chamber, a wave on entry, stairs down to the next chamber); slice 2 (locker, Q/E slots, crossbow) not started |
 | 9 | City v0 on Hallam Row | Then | 6 | not started |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
