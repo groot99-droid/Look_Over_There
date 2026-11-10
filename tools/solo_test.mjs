@@ -54,13 +54,13 @@ try {
   const load = id => p.evaluate(i => window.__game.loadScene(i), id).then(() => p.waitForFunction(i => window.__game.S.id === i && !window.__game.loading, id, {timeout: 180000}));
   const at = i => p.evaluate(i => { const g = window.__game, f = g.FZ.st.B1[i]; return f.s === 3 ? [f.x, f.z] : g.FZ.vis.items[i].home; }, i);
   const go = xz => p.evaluate(t => { const g = window.__game; g.P.p.set(t[0], g.S.floor + 0.02, t[1]); g.P.v.set(0, 0, 0); }, xz);
-  // guns and ammo: 8 lockers (one gun each) and 3 packs on B1; 3 rounds from a gun, +3 a pack, 9 at most
+  // guns and ammo: 8 lockers (one gun each) and 6 packs on B1; 3 rounds from a gun, +3 a pack, 9 at most
   const loot = await p.evaluate(() => {
     const g = window.__game, v = g.LT.vis, pts = [...v.lockers, ...v.packs].map(i => i.home); let min = 99;
     for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) min = Math.min(min, Math.hypot(pts[a][0] - pts[b][0], pts[a][1] - pts[b][1]));
     return {lockers: v.lockers.length, packs: v.packs.length, min: +min.toFixed(1), gun: g.LT.gun};
   });
-  check("B1 has 8 lockers and 3 ammo packs, none on top of another", loot.lockers === 8 && loot.packs === 3 && loot.min >= 1.4 && !loot.gun, JSON.stringify(loot));
+  check("B1 has 8 lockers and 6 ammo packs, none on top of another", loot.lockers === 8 && loot.packs === 6 && loot.min >= 1.4 && !loot.gun, JSON.stringify(loot));
   const stand = (kind, i) => p.evaluate(([k, i]) => { const g = window.__game, it = g.LT.vis[k][i]; g.P.p.set(it.home[0] + 0.5, g.S.floor + 0.02, it.home[1]); g.P.v.set(0, 0, 0); g.step(0.016); return document.getElementById("prompt").textContent; }, [kind, i]);
   check("beside a locker the prompt offers it", /open the locker/.test(await stand("lockers", 0)));
   await p.evaluate(() => window.__game.tryLoot());
@@ -70,7 +70,7 @@ try {
   const picked = [];
   for (const i of [0, 1, 2]) { await stand("packs", i); await p.evaluate(() => window.__game.tryLoot()); picked.push(await p.evaluate(() => window.__game.LT.rounds)); }
   check("each pack adds 3 rounds, and nobody carries more than 9", picked.join() === "6,9,9", picked.join());
-  check("a pack you cannot carry stays on the floor", await p.evaluate(() => window.__game.LT.st.B1.packs.filter(v => v === 0).length === 1));
+  check("a pack you cannot carry stays on the floor", await p.evaluate(() => window.__game.LT.st.B1.packs.filter(v => v === 0).length === 4));
   // the gun: held, fired, a hit banishes the monster far away and out of sight, a shot is as loud as a run
   await p.waitForFunction(() => window.__game.GUN.obj, null, {timeout: 60000});
   check("the gun is held once you have one (the Meshy model, not the placeholder)", await p.evaluate(() => { const g = window.__game; g.step(0.016); return g.GUN.pivot.visible && g.GUN.obj.isGroup === true; }));
