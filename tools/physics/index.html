@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Farway physics prototype</title>
+<style>body{margin:0;background:#111;color:#ddd;font:14px system-ui}canvas{display:block;width:100%;max-width:960px;margin:auto;background:#1b2330}p{max-width:960px;margin:8px auto;padding:0 12px}button{font:inherit}</style>
+<p id="hud">loading...</p>
+<canvas id="c" width="960" height="480"></canvas>
+<p><button id="reset">Reset ball</button> <button id="push">Push swing</button> Click the canvas to kick the ball away from the click. Engine: <a href="?engine=cannon">cannon-es</a> | <a href="?engine=rapier">rapier</a>.
+Side view of a 3D simulation. Standalone: it does not import the game.</p>
+<script type="importmap">{"imports":{"cannon-es":"https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js","@dimforge/rapier3d-compat":"https://unpkg.com/@dimforge/rapier3d-compat@0.19.3/rapier.mjs"}}</script>
+<script type="module">
+import {load} from "./engines/index.mjs";
+import {FLOOR, DT, ballScene, swingScene, swingAngle} from "./scenes.mjs";
+const name = new URLSearchParams(location.search).get("engine") === "rapier" ? "rapier" : "cannon";
+const e = await load(name);
+const {ball, r} = ballScene(e, {drop: 5});
+const sw = swingScene(e, {length: 2, angle: 0.5, pivot: [3, 4, 0]});
+const cv = document.getElementById("c"), g = cv.getContext("2d"), hud = document.getElementById("hud");
+const S = 80, X0 = 480, Y0 = 440;                      // metres to pixels; world x=0 is mid-canvas
+const tx = x => X0 + x * S, ty = y => Y0 - y * S;
+let acc = 0, last = performance.now(), steps = 0;
+function draw() {
+  g.clearRect(0, 0, 960, 480);
+  g.fillStyle = "#2e3b2a"; g.fillRect(0, ty(0), 960, 40);
+  const bp = e.pos(ball); g.fillStyle = "#e8c33a"; g.beginPath(); g.arc(tx(bp[0]), ty(bp[1]), r * S, 0, 7); g.fill();
+  const sp = e.pos(sw.seat), q = e.rot(sw.seat), a = 2 * Math.atan2(q[2], q[3]);
+  g.strokeStyle = "#bbb"; g.lineWidth = 2; g.beginPath(); g.moveTo(tx(sw.pivot[0]), ty(sw.pivot[1])); g.lineTo(tx(sp[0]), ty(sp[1])); g.stroke();
+  g.save(); g.translate(tx(sp[0]), ty(sp[1])); g.rotate(-a); g.fillStyle = "#8a5a2b"; g.fillRect(-0.3 * S, -0.04 * S, 0.6 * S, 0.08 * S); g.restore();
+  g.fillStyle = "#777"; g.fillRect(tx(sw.pivot[0]) - 40, ty(sw.pivot[1]) - 4, 80, 6);
+  hud.textContent = `${name}  ball y=${bp[1].toFixed(2)} m  speed=${Math.hypot(...e.vel(ball)).toFixed(2)}  asleep=${e.asleep(ball)}  swing angle=${(swingAngle(e, sw) * 57.3).toFixed(1)} deg`;
+}
+function frame(t) { acc = Math.min(acc + (t - last) / 1000, 0.25); last = t; while (acc >= DT) { e.step(DT); acc -= DT; steps++; } draw(); requestAnimationFrame(frame); }
+const kick = (dx, dy) => e.impulse(ball, [dx, dy, 0]);
+cv.addEventListener("click", ev => { const b = cv.getBoundingClientRect(), x = (ev.clientX - b.left) * 960 / b.width, y = (ev.clientY - b.top) * 480 / b.height; const bp = e.pos(ball); const dx = bp[0] - (x - X0) / S, dy = Math.max(0.3, bp[1] - (Y0 - y) / S); const n = Math.hypot(dx, dy) || 1; kick(dx / n * 1.5, dy / n * 1.5); });
+document.getElementById("reset").onclick = () => { e.world.removeBody ? (ball.position.set(0, 5, 0), ball.velocity.set(0, 0, 0), ball.wakeUp()) : (ball.setTranslation({x: 0, y: 5, z: 0}, true), ball.setLinvel({x: 0, y: 0, z: 0}, true)); };
+document.getElementById("push").onclick = () => e.impulse(sw.seat, [3, 0, 0]);
+// handle for the automated check: manual stepping, so the check does not depend on wall-clock time
+window.__physics = {name, e, ball, sw, kick, steps: () => steps, step: n => { for (let i = 0; i < n; i++) e.step(DT); draw(); }, ballPos: () => e.pos(ball), ballVel: () => e.vel(ball), ballAsleep: () => e.asleep(ball), angle: () => swingAngle(e, sw), ready: true};
+requestAnimationFrame(t => { last = t; frame(t); });
+</script>

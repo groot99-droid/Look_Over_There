@@ -1,0 +1,10 @@
+{
+  "name": "farway-physics-prototype",
+  "private": true,
+  "type": "module",
+  "description": "Isolated physics prototype and benchmark. Not imported by the game.",
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.19.3",
+    "cannon-es": "0.20.0"
+  }
+}
