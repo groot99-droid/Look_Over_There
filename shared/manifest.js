@@ -85,12 +85,13 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
 }
 export const validateManifest = (doc, opts) => checkManifest(doc, opts).errors;
 
+const DOOR_BACKED = ["stair_door", "gate"];
 // The door links stored in world/<scene>.json and the built links here must be the same set, with the same arrival points.
 function compareWorldDocs(doc, worldDocs, err, warn) {
   const built = (doc.links || []).filter(l => l && l.status === "built");
   for (const [scene, wdoc] of Object.entries(worldDocs)) {
     const doors = new Map((wdoc.doors || []).filter(d => d.link).map(d => [d.name, d.link]));
-    const mine = built.filter(l => l.from && l.from.scene === scene);
+    const mine = built.filter(l => l.from && l.from.scene === scene && DOOR_BACKED.includes(l.connector));          // other connectors (walking out of the store) are not doors in the file
     for (const [name, jl] of doors) {
       const l = mine.find(x => x.from.door === name);
       if (!l) { err(`world/${scene}.json: door ${name} has a link that the manifest does not list`); continue; }
