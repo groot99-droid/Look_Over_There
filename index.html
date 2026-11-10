@@ -17,6 +17,8 @@
   #lobby button{cursor:pointer;letter-spacing:.06em}
   #lobby button.go{background:#2b2a1c;border-color:#6d6a3d}
   #lobby small{color:#7a7a6a}
+  #l-mode{display:flex;gap:8px}#l-mode button{flex:1}#l-mode button.on{background:#2b2a1c;border-color:#6d6a3d}#l-mode button:disabled{opacity:.5;cursor:default}
+  #l-open{display:flex;flex-wrap:wrap;gap:6px;font-size:13px}#l-open button{padding:4px 8px}
   #l-err{color:#d46a5a;min-height:1.4em}
   #hud{position:fixed;left:12px;top:10px;color:#9a9a8a;font:12px/1.5 system-ui,sans-serif;letter-spacing:.06em;z-index:1;pointer-events:none;text-shadow:0 0 4px #000}
   #kp{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);z-index:7;font-family:system-ui,sans-serif;color:#d8d8c4}
@@ -123,7 +125,9 @@
   <div id="l-chars"></div>
   <div id="l-snd"><span>MUSIC</span><input id="l-vm" type="range" min="0" max="1" step="0.05"><span>EFFECTS</span><input id="l-vs" type="range" min="0" max="1" step="0.05"></div>
   <input id="l-name" placeholder="Your name" maxlength="16">
+  <div id="l-mode"><button type="button" class="on" data-mode="original">ORIGINAL</button><button type="button" data-mode="going_back_in" disabled title="Planned">GOING BACK IN · soon</button></div>
   <input id="l-room" placeholder="Room code (share it with friends)" maxlength="8">
+  <div id="l-open"></div>
   <button class="go" id="l-join" type="submit">JOIN ROOM</button>
   <button id="l-solo" type="button">PLAY SOLO</button>
   <div id="l-err"></div>
@@ -1596,7 +1600,7 @@ function netTick(dt) {
     net.send({t: "s", scene: loading ? null : S.id, x: r2(P.p.x), y: r2(P.p.y), z: r2(P.p.z), yaw: r2(P.yaw), crouch: P.crouch ? 1 : 0, moving: P.moving ? 1 : 0, run: P.running ? 1 : 0, dead: dead ? 1 : 0, imm: P.imm > 0 ? 1 : 0, carry: myCarry() >= 0 ? 1 : 0, hp: Math.round(HP.h.hp), cloak: CL.st.on ? 1 : 0, gun: LT.gun ? 1 : 0});
   }
 }
-function connect(name, room, char) {
+function connect(name, room, char, mode = "original") {
   const q = new URLSearchParams(location.search);
   const url = q.get("server") || ((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
   return new Promise((resolve, reject) => {
@@ -1605,8 +1609,8 @@ function connect(name, room, char) {
     const timer = setTimeout(() => fail("Could not reach the server. Play solo, or run server/server.js and open the game from it."), 5000);
     net.ready = () => { clearTimeout(timer); resolve(); };
     net.started = new Promise(r => { net.startRes = r; });
-    ws.onopen = () => ws.send(JSON.stringify({t: "join", room, name, char}));
-    ws.onmessage = ev => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === "full") fail("That room is full (8 players)."); else onNet(m); };
+    ws.onopen = () => ws.send(JSON.stringify({t: "join", room, name, char, mode}));
+    ws.onmessage = ev => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === "full") fail(`That room is full (${m.max || 10} players).`); else if (m.t === "refused") fail(m.reason === "soon" ? "That mode is coming soon." : "That mode does not exist."); else onNet(m); };
     ws.onerror = () => { if (!net.on) fail("Could not reach the server. Play solo, or run server/server.js and open the game from it."); };
     ws.onclose = () => {
       if (!net.on) return;
@@ -1647,6 +1651,15 @@ function lobby() {
   mark();
   $("l-name").value = q.get("name") || store.get("lot-name");
   $("l-room").value = (q.get("room") || store.get("lot-room")).toUpperCase();
+  let mode = "original";                                                  // the planned modes are shown but cannot be picked yet
+  const openRooms = async () => {                                         // open rooms of the mode (no names): click one to fill in its code
+    try { const r = await (await fetch("/rooms?mode=" + mode)).json();
+      $("l-open").innerHTML = r.rooms.map(x => `<button type="button" data-code="${String(x.code).replace(/[^A-Z0-9]/g, "")}">${String(x.code).replace(/[^A-Z0-9]/g, "")} · ${x.players}/${x.max}${x.state === "playing" ? " · playing" : ""}</button>`).join("");
+    } catch (e) { $("l-open").innerHTML = ""; }
+  };
+  $("l-open").onclick = e => { const b = e.target.closest("button"); if (b) $("l-room").value = b.dataset.code; };
+  $("l-mode").onclick = e => { const b = e.target.closest("button"); if (!b || b.disabled) return; mode = b.dataset.mode; $("l-mode").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); openRooms(); };
+  openRooms();
   el.style.display = "flex";
   return new Promise(resolve => {
     $("l-solo").onclick = () => { el.remove(); resolve(); };
@@ -1654,7 +1667,7 @@ function lobby() {
       e.preventDefault();
       const name = $("l-name").value.trim() || "Player", room = $("l-room").value.trim().toUpperCase() || "MAIN";
       $("l-err").textContent = "Connecting…"; $("l-join").disabled = true;
-      try { await connect(name, room, char); store.set("lot-name", name); store.set("lot-room", room); store.set("lot-char", String(char)); await waitingRoom(); el.remove(); resolve(); }
+      try { await connect(name, room, char, mode); store.set("lot-name", name); store.set("lot-room", room); store.set("lot-char", String(char)); await waitingRoom(); el.remove(); resolve(); }
       catch (err) { $("l-err").textContent = err.message; $("l-join").disabled = false; }
     };
     if (q.get("room") && q.get("auto")) $("l-form").requestSubmit();

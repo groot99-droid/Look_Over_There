@@ -423,3 +423,82 @@ test("stats: a player who walks out and then disconnects still counts", async ()
   assert.equal(r.rows.find(x => x.name === "Ann").beacons, 1, "Ann's numbers were taken when she walked out"); assert.equal(lines.length, 1);
   await srv.close();
 });
+
+// ---- session 4: modes and parties
+const joinRaw = async (srv, msg) => { const c = client(srv.port); await c.open; c.send({t: "join", ...msg}); return c; };
+const getJson = async (srv, p) => { const r = await fetch(`http://localhost:${srv.port}${p}`); return {status: r.status, body: await r.json()}; };
+
+test("a join with no mode is the original; the room takes its floors, size and finish from the manifest", async () => {
+  const srv = await createServer(), a = await join(srv, "MD1", "Ann"), w = a.welcome;
+  assert.equal(w.mode, "original");
+  assert.deepEqual(w.floors, REGISTRY.modes.original.floors);
+  assert.equal(w.max, REGISTRY.maxPlayers("original"));
+  assert.equal(w.finish, REGISTRY.modes.original.finish.scene);
+  const b = await joinRaw(srv, {room: "MD2", name: "Bob", mode: "original"}); assert.equal((await b.next(kind("welcome"))).mode, "original");
+  await srv.close();
+});
+
+test("a mode that is planned is refused with 'soon', an unknown one with 'unknown_mode', and neither crashes or opens a room", async () => {
+  const srv = await createServer();
+  const g = await joinRaw(srv, {room: "MD3", name: "Gus", mode: "going_back_in"});
+  const r1 = await g.next(kind("refused")); assert.equal(r1.reason, "soon"); assert.equal(r1.mode, "going_back_in");
+  const x = await joinRaw(srv, {room: "MD3", name: "Xi", mode: "nope"});
+  assert.equal((await x.next(kind("refused"))).reason, "unknown_mode");
+  const j = await joinRaw(srv, {room: "MD3", name: "Jo", mode: {}}); assert.equal((await j.next(kind("refused"))).reason, "unknown_mode");
+  assert.equal(srv.rooms.size, 0);
+  assert.ok(!(await g.quiet(50)).some(m => m.t === "welcome"));
+  const ok = await join(srv, "MD3", "Ok"); assert.ok(ok.id, "the server still serves joins");
+  await srv.close();
+});
+
+test("a party is one room per mode and code, whatever the letter case (guard; it also passes on main)", async () => {
+  const srv = await createServer(), a = await join(srv, "KEY1", "Ann"), b = await join(srv, "key1", "Bob");
+  assert.equal(srv.rooms.size, 1, "the same mode and code, in any case, is one room");
+  assert.equal(b.welcome.players.length, 2);
+  await srv.close();
+});
+
+test("GET /rooms?mode= lists open rooms with mode, code, players, max and state, and no names", async () => {
+  const srv = await createServer({countdownMs: 60}), max = REGISTRY.maxPlayers("original");
+  const a = await join(srv, "OPEN1", "Secretname"), b = await join(srv, "OPEN1", "Other");
+  const full = []; for (let i = 0; i < max; i++) full.push(await join(srv, "FULLR", "F" + i));
+  const c = await join(srv, "PLAY1", "Pat"); c.send({t: "ready", ready: true}); await c.next(kind("start"));
+  const r = await getJson(srv, "/rooms?mode=original");
+  assert.equal(r.status, 200);
+  const by = Object.fromEntries(r.body.rooms.map(x => [x.code, x]));
+  assert.deepEqual(by.OPEN1, {mode: "original", code: "OPEN1", players: 2, max, state: "lobby"});
+  assert.equal(by.PLAY1.state, "playing");
+  assert.ok(!by.FULLR, "a full room is not open");
+  assert.ok(!JSON.stringify(r.body).match(/Secretname|Other|Pat/), "no player names");
+  assert.equal((await getJson(srv, "/rooms?mode=going_back_in")).body.rooms.length, 0);
+  assert.equal((await getJson(srv, "/rooms?mode=nope")).status, 400);
+  assert.equal((await getJson(srv, "/rooms")).body.rooms.length, 2, "no mode: all modes");
+  await srv.close();
+});
+
+test("ten players: ten colours in the lobby, all ten see each other on a floor, an eleventh is refused with the limit", async () => {
+  const srv = await createServer({countdownMs: 60}), cs = [];
+  for (let i = 0; i < 10; i++) cs.push(await join(srv, "TEN", "P" + i));
+  const lobby = await cs[0].next(m => m.t === "lobby" && m.players.length === 10);
+  assert.equal(new Set(lobby.players.map(p => p.color)).size, 10);
+  for (const c of cs) c.send({t: "ready", ready: true});
+  for (const c of cs) await c.next(kind("start"));
+  cs.forEach((c, i) => c.send({t: "s", scene: "B1", x: i, y: -3, z: 0, yaw: 0}));
+  await new Promise(r => setTimeout(r, 150));                           // everyone is on B1 now: a state from one reaches the other nine
+  cs.forEach((c, i) => c.send({t: "s", scene: "B1", x: i, y: -3, z: 1, yaw: 0}));
+  for (const c of cs) for (const o of cs) if (o !== c) await c.next(m => m.t === "s" && m.id === o.id && m.z === 1);
+  const late = await joinRaw(srv, {room: "TEN", name: "Late"});
+  const f = await late.next(kind("full")); assert.equal(f.max, 10);
+  await srv.close();
+});
+
+test("go to a friend: the server tells you their floor and spot; refused for yourself, a stranger, or someone not on a floor", async () => {
+  const srv = await createServer(), a = await join(srv, "GO", "Ann"), b = await join(srv, "GO", "Bob"), other = await join(srv, "GO2", "Zed");
+  a.send({t: "goto", to: b.id}); await a.quiet(60);
+  b.send({t: "s", scene: "L2", x: 5, y: 3.2, z: 6, yaw: 0}); await a.next(m => m.t === "p" && m.id === b.id);
+  a.send({t: "goto", to: b.id});
+  const g = await a.next(kind("goto")); assert.deepEqual([g.id, g.scene, g.x, g.y, g.z], [b.id, "L2", 5, 3.2, 6]);
+  a.send({t: "goto", to: a.id}); a.send({t: "goto", to: other.id}); a.send({t: "goto", to: "x"});
+  assert.ok(!(await a.quiet(100)).some(m => m.t === "goto"));
+  await srv.close();
+});
