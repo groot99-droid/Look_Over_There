@@ -39,6 +39,12 @@ The puzzle rules (how many fuses, the keypad length), monster counts and the ala
 
 `built` is in the game. `planned` is designed. `reserved` holds a place for an addon. Planned and reserved things are listed (`tools/manifest.mjs links`) but never reach the page or the server.
 
+## The Overworld, v0 (built)
+
+`overworld` is a built area with one built scene, `parking_lot` (`floorY` 9.6: the same ground as L4). Its files are the store and lot models (`world/L4.glb`, `world/Exterior.glb`) and `world/parking_lot.json`, which `node tools/make_parking_lot.mjs` makes from `world/L4.json`: every collider the lot already had, plus a solid block across the store's glass doors, no doors and no cameras. The other Overworld scenes (`playground`, `bus_station`, ...) are listed without files, so they are designed but not on the page.
+
+`lot.L4.front_doors>overworld` is built, `soloOnly`, and `requires: ["original_complete"]`. It is not a door in `world/L4.json` (the glass doors are open once the power is on and the player walks out), so the world-file check only compares links whose connector is `stair_door` or `gate`. `parking_lot` is a page scene and not a `multiplayer` scene, so the server never runs it and a room cannot enter it. Its arrival point is the table and chairs, which are built in `index.html` (`overworldProps`) because no model of them exists yet. If the table moves, change `OW_TABLE` in `index.html`, `SPAWN` in `tools/make_parking_lot.mjs` and the link's `arrive` together; `shared/manifest.test.js` checks that the link and the scene's spawn marker agree.
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.
