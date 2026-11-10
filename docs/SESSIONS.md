@@ -8,7 +8,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 
 | # | Session | When | Needs | Status |
 |---|---|---|---|---|
-| 1 | Manifest core and loader | done | | **done**, in the draft PR for `claude/manifest-loader` |
+| 1 | Manifest core and loader | done | | **done**, merged (PR #3) |
 | 2 | Gate return fix, links read from the manifest | Now | 1 | **done**, merged (PR #5) |
 | 3 | Results v2, local: deaths, revives, score, a round log line | Now | 1 | **done**, merged (PR #4) |
 | 12 | Tune the Original, starting with B1 | Now | 1 (better with 3) | **bot pass done and merged** (PR #6): down time 20 s, 6 packs on B1; needs the owner's playtests |
