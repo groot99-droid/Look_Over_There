@@ -83,6 +83,14 @@
   #results td{text-align:right}
   #results td:first-child,#results td:nth-child(2){text-align:left}
   #results #r-welcome{text-align:center;color:#e0a040;font:italic 15px/1.4 Georgia,serif;padding:6px 0}
+  #results button,#options button{font:600 14px/1 system-ui,sans-serif;letter-spacing:.12em;padding:11px 14px;color:#d8d8c4;background:#1c1c16;border:1px solid #4a4a3c;border-radius:3px;cursor:pointer}
+  #results button:hover,#options button:not(:disabled):hover{background:#2a2a20;border-color:#e0a040}
+  #options{position:fixed;inset:0;z-index:7;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);color:#d8d8c4;font:14px/1.5 system-ui,sans-serif}
+  #options .card{width:min(380px,90vw);display:flex;flex-direction:column;gap:10px;text-align:center}
+  #options h2{margin:0;font:700 20px/1.1 Georgia,serif;letter-spacing:.18em}
+  #options p{margin:0 0 6px;color:#9a9a86}
+  #options button:disabled{opacity:.45;cursor:default}
+  #options small{display:block;margin-top:4px;font-weight:400;letter-spacing:.08em;color:#8a8a78}
   #results #r-best{text-align:center;color:#9ccc65;letter-spacing:.08em}
   #gamemount{position:fixed;inset:0;display:none;z-index:2;background:#000}
   #gamemount canvas{position:absolute;inset:0;width:100%;height:100%}
@@ -107,7 +115,8 @@
 <div id="death">YOU DIED</div>
 <div id="hud"></div>
 <div id="camhud"></div><div id="buzz"></div><div id="cloak"><b>CLOAK · V</b><i></i></div><div id="cloakfx"></div><div id="beacons"></div><div id="hp"><b>HP</b><i></i></div><div id="hurt"></div><div id="stam"><i></i></div><div id="alarm"></div><div id="redpulse"></div>
-<div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-again" type="button">Play again</button></div></div>
+<div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-walk" type="button" hidden>Walk out to the parking lot</button><button id="r-again" type="button">Play again</button></div></div>
+<div id="options"><div class="card"><h2>LOOK OVER THERE</h2><p>The doors are open. Where to?</p><button id="o-original" type="button">Original</button><button id="o-back" type="button" disabled>Going back in<small>soon</small></button><button id="o-close" type="button">Not yet</button></div></div>
 <div id="help"><div class="card"><h2>CONTROLS</h2><div class="cols"><div>
 <div><b>WASD</b>move</div><div><b>Mouse</b>look</div><div><b>Space</b>jump</div><div><b>Shift</b>crouch (press again to walk)</div><div><b>R (hold)</b>run, loud</div><div><b>X / F</b>action: doors, fuses, switches, loot (hold to lift a teammate)</div><div><b>Y</b>take out what you carry; tap again to rotate; hold for the wheel (arrows or mouse wheel)</div><div><b>1 2 3</b>ray gun, cloak, beacon</div></div><div>
 <div><b>Left click</b>use what you hold: fire, cloak on/off, roll a beacon</div><div><b>Right click</b>gun: aim. Cloak: short circuit (stuns monsters near you, cloak dead 5 min). Beacon: reverse it (monsters run away, then group up)</div><div><b>Q / E</b>support / combat consumable (none yet)</div><div><b>Tab / M</b>handheld map</div><div><b>N</b>sound on / off</div><div><b>H</b>this list</div></div></div>
@@ -153,6 +162,7 @@ import {MonsterSim, MON_STATES, SHOT_RANGE, SHOT_COOL, HIT_R, SHOT_NOISE_S, BANI
 import {levelMix, stepInterval, stepGain} from "./shared/mix.js";
 import {POWER_SOURCES, newPower, throwPower} from "./shared/power.js";
 import {REGISTRY} from "./shared/registry.js";
+import {requirementsMet} from "./shared/manifest.js";
 
 const MON_URL = "world/monsters.json";
 // one scene is resident at a time; the floors are joined by doors at the top of the stairs (doors carry a "link" to the scene they open)
@@ -332,6 +342,7 @@ async function loadScene(id, arrival) {
   for (const g of gl) { g.scene.traverse(o => { if (o.isMesh) { o.matrixAutoUpdate = false; o.updateMatrix(); } }); root.add(g.scene); }
   scene.add(root);
   Object.assign(S, {id, floor: cfg.floor, root, grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
+  applySky(id, root);
   boxes.length = 0; doors.length = 0;
   for (const c of doc.colliders) boxes.push({n: c.min, x: c.max});
   for (const d of doc.doors || []) {
@@ -348,6 +359,7 @@ async function loadScene(id, arrival) {
   }
   S.shutter = null;
   if (id === "L4") { S.shutter = {n: [-2.7, 9.6, 27.0], x: [2.7, 13.0, 27.5], off: POWER.on}; boxes.push(S.shutter); }       // the store's glass doors: shut until the power is on (the opening has no collider in the model)
+  if (id === OW_SCENE) overworldProps(root);
   indexBoxes(S);
   S.nav = buildNav(cfg.floor);
   spawnMonsters();
@@ -1406,6 +1418,7 @@ function bestTime(ms) {                                                    // be
   if (isNew) { best = ms; try { localStorage.setItem("lot-best", String(ms)); } catch (e) {} }
   return {best, isNew};
 }
+const heldFlags = () => { try { return localStorage.getItem(ORIGINAL_KEY) ? ["original_complete"] : []; } catch (e) { return []; } };          // the flags this browser holds (only this one is stored so far)
 // true the first time the Original is finished on this browser (and remembers it). If storage is blocked we cannot know, so we say nothing rather than welcome you every time.
 function firstOriginalFinish() {
   let had = true;
@@ -1425,8 +1438,53 @@ function showResults(rows) {
   welcome.hidden = !first; welcome.textContent = first ? "Welcome to Farway. You made it out." : "";
   const b = me ? bestTime(me.ms) : null;
   $("r-best").textContent = b ? (b.isNew ? `NEW RECORD ${fmtTime(b.best)}` : `BEST ${fmtTime(b.best)}`) : "";
+  const walk = $("r-walk"), out = REGISTRY.linkFrom("L4", "front_doors");          // the way on: only alone for now, and only once the flag is held (it was just set above if this was the first finish)
+  walk.hidden = !(!net.on && me && out && requirementsMet(out, heldFlags()).ok); walk.onclick = () => walkOut(out);
   $("r-again").onclick = () => location.reload();
   $("results").style.display = "flex";
+}
+
+// ---------------------------------------------------------------- the Overworld, v0: the parking lot after the Original (session 6)
+// One scene, `parking_lot` (world/parking_lot.json, built by tools/make_parking_lot.mjs, over the store and lot models). The results screen offers the walk out once
+// `original_complete` is held; you arrive at the table and chairs facing the store, and walking up to the glass doors opens the options screen (Original, or Going back
+// in, which is not built yet). Alone only: the server runs five floors and a room cannot enter this scene, so the manifest link says soloOnly.
+const OW = {open: false, armed: true};
+const OW_SCENE = "parking_lot", OW_TABLE = [-8, 41];                                      // the table's centre; the spawn (the manifest link's `arrive`) is 2.6 m toward the store
+const SKY = {parking_lot: 3.5};                                                          // one sky mode so far: clear and bright (the exterior model's own sky, lit up). Every other scene keeps the model's dusk.
+function applySky(id, root) {
+  root.traverse(o => { if (o.name === "Sky_LOT_Exterior" && o.material) { o.userData.sky0 ??= o.material.emissiveIntensity; o.material.emissiveIntensity = SKY[id] ?? o.userData.sky0; o.material.needsUpdate = true; } });
+}
+// the table and four chairs, plain plastic; they are solid (their boxes go in before the grid is indexed)
+function overworldProps(root) {
+  const g = new THREE.Group(), [tx, tz] = OW_TABLE, y = S.floor, mat = c => new THREE.MeshLambertMaterial({color: c});
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.06, 28), mat(0xf6f1e6)); top.position.set(tx, y + 0.76, tz);
+  const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 0.74, 12), mat(0xcfc8b8)); leg.position.set(tx, y + 0.37, tz);
+  g.add(top, leg); boxes.push({n: [tx - 0.85, y, tz - 0.85], x: [tx + 0.85, y + 0.8, tz + 0.85]});
+  [[1.35, 0, 0xf7a8c4], [-1.35, 0, 0x9fe0c8], [0, 1.35, 0xffe08a], [0, -1.35, 0x9cc8ff]].forEach(([dx, dz, c]) => {
+    const ch = new THREE.Group(), seat = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.06, 0.46), mat(c)), back = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.5, 0.05), mat(c)), post = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.44, 0.08), mat(0xcfc8b8));
+    seat.position.y = 0.46; back.position.set(0, 0.74, 0.2); post.position.y = 0.22; ch.add(seat, back, post);
+    ch.position.set(tx + dx, y, tz + dz); ch.rotation.y = Math.atan2(-dx, -dz) + Math.PI;                  // the back is away from the table
+    g.add(ch); boxes.push({n: [tx + dx - 0.25, y, tz + dz - 0.25], x: [tx + dx + 0.25, y + 0.9, tz + dz + 0.25]});
+  });
+  root.add(g);
+}
+function openOptions() {
+  OW.open = true; document.exitPointerLock?.(); $("options").style.display = "flex";
+  $("o-original").onclick = () => location.reload();                                         // a fresh round starts from the start screen, as Play again does
+  $("o-close").onclick = closeOptions;
+}
+function closeOptions() { OW.open = false; OW.armed = false; $("options").style.display = "none"; }            // not offered again until you have walked away from the doors
+addEventListener("keydown", e => { if (e.code === "Escape" && OW.open) closeOptions(); });
+function overworldTick() {
+  if (S.id !== OW_SCENE || loading || OW.open) return;
+  const atDoors = Math.abs(P.p.x) < 3.2 && P.p.z < 31;
+  if (atDoors && OW.armed) openOptions();
+  else if (!atDoors && (P.p.z > 36 || Math.abs(P.p.x) > 8)) OW.armed = true;
+}
+// the results screen's "Walk out": into the parking lot, with the HUD back (the results screen had hidden it)
+async function walkOut(link) {
+  $("results").style.display = "none"; FIN.results = null; FIN.out = false; OW.open = false; OW.armed = true;
+  await loadScene(link.to.scene, {pos: link.to.arrive, face: link.to.face});
 }
 
 // ---------------------------------------------------------------- multiplayer: a room of up to 8; server/server.js relays everything and only picks each scene's host
@@ -1716,7 +1774,7 @@ function simMonsters(dt) {
   } else monsters.forEach((m, i) => m.follow(dt, net.snap && net.snap.l[i]));
 }
 function update(dt) {
-  if (loading) return;
+  if (loading || OW.open) return;
   updateDoors(dt);
   if (dead) {
     deadT += dt;
@@ -1787,7 +1845,7 @@ function audioTick(dt) {
     return {id: p.id, x: p.x, y: p.y, z: p.z, moving: p.moving, run: p.run, crouch: p.crouch, blocked: !!p.audBlocked}; }), levelMix(S.id).step);
 }
 function sim(dt, t) {
-  update(dt); hpHud(dt); audioTick(dt); exitCheck(); if ((seenT -= dt) <= 0) { seenT = 0.2; updateSeen(ctime()); } updatePeers(dt); drawAlert(); animateAlarm(dt); animateFuses(t); animateLoot(); camHud(); animateGun(dt); animateCloak(dt); animateBeacons(dt); animatePower(dt); updatePrompt(); renderKp(); netTick(dt);
+  update(dt); hpHud(dt); audioTick(dt); exitCheck(); overworldTick(); if ((seenT -= dt) <= 0) { seenT = 0.2; updateSeen(ctime()); } updatePeers(dt); drawAlert(); animateAlarm(dt); animateFuses(t); animateLoot(); camHud(); animateGun(dt); animateCloak(dt); animateBeacons(dt); animatePower(dt); updatePrompt(); renderKp(); netTick(dt);
 }
 const BOT = new URLSearchParams(location.search).has("bot");
 function step(dtOverride) {
@@ -1820,7 +1878,7 @@ FIN.t0 = performance.now();
 await loadScene("B1");
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>

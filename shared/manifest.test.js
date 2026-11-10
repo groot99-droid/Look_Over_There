@@ -19,6 +19,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
   assert.deepEqual(REGISTRY.pageScenes, {
     B1: {glbs: ["world/B1.glb"], floor: -3.0}, L1: {glbs: ["world/L1.glb"], floor: 0}, L2: {glbs: ["world/L2.glb"], floor: 3.2},
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
+    parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
@@ -35,7 +36,7 @@ test("the shipped manifest has no errors and no warnings (both gates name their 
 });
 
 test("every door link in world/*.json is in the manifest, with the same arrival, and the other way round", () => {
-  const docs = worldDocs(), built = REGISTRY.links.filter(l => l.status === "built");
+  const docs = worldDocs(), built = REGISTRY.links.filter(l => l.status === "built" && ["stair_door", "gate"].includes(l.connector));          // walking out of the store is not a door in the file
   let n = 0;
   for (const [scene, doc] of Object.entries(docs)) for (const d of doc.doors) if (d.link) { n++; assert.ok(REGISTRY.linkFrom(scene, d.name), `${scene}/${d.name}`); }
   assert.equal(built.length, n, "same count");
@@ -101,9 +102,21 @@ test("the registry is frozen, so nothing can edit the floors at run time", () =>
 });
 
 test("a planned scene never reaches the page or the server", () => {
-  for (const id of ["parking_lot", "lobby", "street"]) { assert.equal(REGISTRY.floors[id], undefined); assert.equal(REGISTRY.pageScenes[id], undefined); }
-  assert.equal(REGISTRY.linkFrom("L4", "front_doors"), undefined, "planned links are not looked up as doors");
-  assert.ok(REGISTRY.links.some(l => l.id === "lot.L4.front_doors>overworld"), "but they are listed");
+  for (const id of ["lobby", "street", "playground", "bus_station"]) { assert.equal(REGISTRY.floors[id], undefined); assert.equal(REGISTRY.pageScenes[id], undefined); }
+  assert.equal(REGISTRY.linkFrom("L4", "front_doors").id, "lot.L4.front_doors>overworld", "the built link is found by its door name");
+  assert.equal(REGISTRY.linkFrom("lot", "overworld.bus>city"), undefined);
+  assert.ok(REGISTRY.links.some(l => l.id === "overworld.bus>city" && l.status === "planned"), "planned links are listed");
+});
+test("the Overworld's parking lot is on the page but never a floor the server runs", () => {
+  assert.equal(REGISTRY.floors.parking_lot, undefined, "a room cannot enter it yet");
+  assert.deepEqual(REGISTRY.pageScenes.parking_lot, {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6});
+  const l = REGISTRY.links.find(x => x.id === "lot.L4.front_doors>overworld");
+  assert.deepEqual([l.status, l.soloOnly, l.requires], ["built", true, ["original_complete"]]);
+  assert.deepEqual(requirementsMet(l, []), {ok: false, missing: ["original_complete"]}, "shut until the Original has been finished");
+  assert.equal(requirementsMet(l, ["original_complete"]).ok, true);
+  const doc = JSON.parse(fs.readFileSync(path.join(ROOT, "world/parking_lot.json"), "utf8"));
+  assert.deepEqual(l.to.arrive, doc.markers.find(m => m.kind === "Spawn").position, "the link arrives at the table, which is the scene's spawn marker");
+  assert.ok(doc.colliders.some(c => c.s === "Block_store_doors"), "the store cannot be entered from the lot");
 });
 
 // ---- requirements
