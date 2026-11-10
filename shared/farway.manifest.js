@@ -46,7 +46,14 @@ export const FARWAY = {
     },
     {id: "rdwe", name: "Right Door, Wrong Exit", status: "built", soloOnly: true, tone: "dreamcore", rooms: ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"]},
     {id: "intern", name: "The Intern", status: "built", soloOnly: true, tone: "liminal", spine: ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"]},
-    stub("overworld", "Overworld", "planned", ["parking_lot", "table_and_chairs", "playground", "tree_house", "bus_station", "road", "endless_hills"]),
+    {
+      // v0 is one scene: the parking lot with the table and chairs as the spawn, the store doors, and one sky mode. The other scenes are designed, not built (they have no files).
+      id: "overworld", name: "Overworld", status: "built", tone: "dreamcore",
+      scenes: [
+        {id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/parking_lot.json"]},
+        ...["table_and_chairs", "playground", "tree_house", "bus_station", "road", "endless_hills"].map(id => ({id})),
+      ],
+    },
     stub("dreamcore_forest", "Dreamcore forest and meadow", "planned", ["forest", "meadow"]),
     stub("city", "City", "planned", ["street", "bus_stop"]),
     stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
@@ -72,7 +79,11 @@ export const FARWAY = {
     gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4"),
 
     // ---- planned: from the world bible. None of these reach the game until their area is built.
-    plan("lot.L4.front_doors>overworld", {area: "lot", scene: "L4", door: "front_doors"}, {area: "overworld", scene: "parking_lot"}, "doors", {requires: ["original_complete"], note: "The existing finish is walking out onto the parking lot. Extend its results with deaths, an online ranking and the welcome to Farway."}),
+    // walking out of the store after the Original: the results screen offers it once the flag is held. Not a door in world/L4.json (the glass doors are open once the power is on),
+    // and rooms stay on the five floors, so it is solo only for now.
+    {id: "lot.L4.front_doors>overworld", status: "built", connector: "doors", soloOnly: true, requires: ["original_complete"],
+     from: {area: "lot", scene: "L4", door: "front_doors"}, to: {area: "overworld", scene: "parking_lot", arrive: [-8.0, 9.6, 43.6], face: [0.0, -1.0]},
+     note: "You arrive at the table and chairs in the parking lot, facing the store."},
     plan("overworld.store_doors>lot", {area: "overworld", scene: "parking_lot", door: "store_doors"}, {area: "lot"}, "doors", {requires: ["original_complete"], note: "Options screen: Original or Going back in."}),
     plan("overworld.bus>city", {area: "overworld", scene: "bus_station"}, {area: "city", scene: "bus_stop"}, "bus", {note: "Just a ride."}),
     plan("overworld.road>forest", {area: "overworld", scene: "road"}, {area: "dreamcore_forest", scene: "forest"}, "walk"),
