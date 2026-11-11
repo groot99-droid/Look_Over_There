@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET, APARTMENT, TOWER_FRONT, CITY_SCENES, apartmentDoc, computerPages, JOBS} from "./city.js";
+import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET, APARTMENT, TOWER_FRONT, CITY_SCENES, apartmentDoc, computerPages, JOBS, inView, stalkerSpawn, stalkerStep, STALKER, nextMorning, ROAD} from "./city.js";
 import {REGISTRY} from "./registry.js";
 
 test("a game day is 15 real minutes and starts at 08:00", () => {
@@ -46,4 +46,35 @@ test("the computer's pages say the day, the store hours and the five jobs", () =
   assert.match(open.news.lines[1], /open for another 7 h 30 min/); assert.match(shut.news.lines[1], /closed for the night/);
   assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.some(l => /not open yet/.test(l)));
   assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map"]);
+});
+
+test("you see what is in front of you: the cone is 38 degrees either side of where you face", () => {
+  assert.ok(inView(0, 0, 0, 0, -10), "yaw 0 faces -z"); assert.ok(!inView(0, 0, 0, 0, 10), "behind you"); assert.ok(inView(0, 0, Math.PI, 0, 10), "yaw PI faces +z");
+  assert.ok(inView(0, 0, 0, 5, -10) && !inView(0, 0, 0, 10, -5), "inside and outside the cone");
+});
+test("the stalker appears out of view behind you, on the road, never close", () => {
+  const at = stalkerSpawn(0, -60, Math.PI);                       // facing +z: behind is -z
+  assert.ok(at && at.z < -60 && Math.abs(at.x) <= 4 && Math.hypot(at.x, at.z + 60) >= STALKER.minSpawn && !inView(0, -60, Math.PI, at.x, at.z));
+  const edge = stalkerSpawn(0, ROAD.z0 + 5, 0);                   // at the north end facing north: behind is south, room enough
+  assert.ok(edge && edge.z > ROAD.z0 + 5);
+  assert.equal(stalkerSpawn(0, 0, 0), null, "at the south end facing north there is no room behind you and ahead is in view: no spawn yet");
+  const side = stalkerSpawn(0, 0, Math.PI); assert.ok(side && side.z < 0 && !inView(0, 0, Math.PI, side.x, side.z), "turn round and it can appear up the street, behind your new back");
+});
+test("it waits, appears, freezes when seen, creeps when not, and catches you", () => {
+  const base = {px: 0, pz: -60, yaw: Math.PI, seen: false, danger: true};
+  let s = {active: false, x: 0, z: 0, wait: STALKER.firstWait};
+  for (let i = 0; i < 100 && !s.active; i++) s = stalkerStep(s, 0.1, base);
+  assert.ok(s.active, "it appeared after its wait (about 6 s)");
+  const z0 = s.z; let t = stalkerStep(s, 1, {...base, seen: true}); assert.equal(t.z, z0, "seen: it does not move"); assert.equal(t.caught, false);
+  t = stalkerStep(s, 1, base); assert.ok(Math.abs(Math.abs(t.z - z0) - STALKER.speed) < 1e-9, "unseen: it moves 5.5 m in a second");
+  assert.ok(STALKER.speed > 4.0 && STALKER.speed < 7.5, "faster than a walk, slower than a run");
+  let c = {active: true, x: 0, z: -60 - 3, wait: 0}; let caught = false;
+  for (let i = 0; i < 20 && !caught; i++) { c = stalkerStep(c, 0.1, base); caught = c.caught; }
+  assert.ok(caught, "within 1.5 m it has you");
+  const gone = stalkerStep(c, 0.1, {...base, danger: false}); assert.equal(gone.active, false); assert.equal(gone.wait, STALKER.firstWait, "by day or indoors it is gone and its wait starts again");
+});
+test("sleeping or a blackout lands on 06:00 of the next morning", () => {
+  assert.equal(hourAt(nextMorning(secondsAt(22))), 6); assert.equal(dayAt(nextMorning(secondsAt(22))), 2);          // 22:00 day 1 -> 06:00 day 2
+  assert.equal(hourAt(nextMorning(secondsAt(2, 2))), 6); assert.equal(dayAt(nextMorning(secondsAt(2, 2))), 2);      // 02:00 day 2 -> 06:00 the same day
+  assert.ok(nextMorning(secondsAt(12)) > secondsAt(12));
 });
