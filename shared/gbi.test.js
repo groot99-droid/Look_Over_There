@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
-import {wavePlan, startWave} from "./gbi.js";
+import {wavePlan, startWave, killed} from "./gbi.js";
 import {REGISTRY} from "./registry.js";
 import {worldFromDoc} from "./world.js";
 
@@ -30,9 +30,14 @@ test("an unknown monster kind is an error, not an empty wave", () => {
   assert.throws(() => wavePlan({nav: new Uint8Array(0)}, monCfg, {id: "x", wave: {kind: "nope", monsters: 1}}), /no monster kind nope/);
 });
 test("a wave starts with the chamber's number and size", () => {
-  assert.deepEqual(startWave(REGISTRY.chamber("gbi_L4_4"), 12), {chamber: "gbi_L4_4", no: 4, monsters: 3, t0: 12});
+  assert.deepEqual(startWave(REGISTRY.chamber("gbi_L4_4"), 12), {chamber: "gbi_L4_4", no: 4, monsters: 3, t0: 12, kills: 0, cleared: false});
 });
 test("the sealed L4 chamber puts no wave in the parking lot", () => {
   const ch = REGISTRY.chamber("gbi_L4_4"), W = worldOf("gbi_L4_4");
   assert.ok(wavePlan(W, monCfg, ch).every(p => p.z <= 27.6));
+});
+test("kills clear a wave when they reach its size", () => {
+  let w = startWave(REGISTRY.chamber("gbi_L4_4"), 0); assert.deepEqual([w.kills, w.cleared], [0, false]);
+  w = killed(killed(w)); assert.deepEqual([w.kills, w.cleared], [2, false]);
+  assert.equal(killed(w).cleared, true);
 });

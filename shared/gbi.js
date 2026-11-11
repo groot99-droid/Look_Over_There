@@ -11,4 +11,6 @@ export function wavePlan(W, monCfg, chamber, avoid = []) {
   return pickSpots(W, chamber.wave.monsters, rng32(seed), avoid).map(([x, z]) => ({cfg, x, z}));
 }
 // The state of a chamber's wave: null before you enter. `no` is the wave's number in the run (1 to 20).
-export const startWave = (chamber, now) => ({chamber: chamber.id, no: chamber.wave.no, monsters: chamber.wave.monsters, t0: now});
+export const startWave = (chamber, now) => ({chamber: chamber.id, no: chamber.wave.no, monsters: chamber.wave.monsters, t0: now, kills: 0, cleared: false});
+// a monster of the wave was killed (a lethal weapon; the ray only banishes): the wave is cleared when all of them are. Only the kill count is a clear rule so far.
+export const killed = w => { const kills = w.kills + 1; return {...w, kills, cleared: kills >= w.monsters}; };
