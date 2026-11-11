@@ -3,7 +3,7 @@
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
 import {REGISTRY} from "../shared/registry.js";
-import {secondsAt, DAY_S, APARTMENT, TOWER_FRONT} from "../shared/city.js";
+import {secondsAt, DAY_S, APARTMENT, TOWER_FRONT, bedUse, STALKER} from "../shared/city.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
@@ -129,6 +129,55 @@ try {
   check("by night the sky is dark, the apartment tower stays open and the stores stay shut", noon.light > late.light * 4 && dusk < noon.light && /STORES CLOSED/.test(late.sub), JSON.stringify({noon, dusk, late}));
   await page.evaluate(([a]) => { window.__game.CITY.t = a; }, [secondsAt(9.02, 2)]); await frames(10);
   check("the next morning at 09:00 they open again, on day 2", (await closedDoors()).length === 0 && (await st()).day === 2, JSON.stringify(await st()));
+  // slice 2b, the night danger: from midnight the stalker walks the street. It freezes when you look at it, creeps when you do not, cannot be killed, and a blackout wakes you at 06:00.
+  const stk = () => page.evaluate(() => { const g = window.__game, s = g.CITY.st; return {active: s.active, x: s.x, z: s.z, d: Math.hypot(s.x - g.P.p.x, s.z - g.P.p.z), id: g.S.id, mon: g.monsters.length, mesh: !!(g.CITY.mesh && g.CITY.mesh.visible)}; });
+  const setT = h => page.evaluate(([a]) => { window.__game.CITY.t = a; }, [secondsAt(h, 2)]);
+  await setT(12); await stand(0, 0.02, -60, Math.PI); await frames(250);
+  check("by day there is no stalker", !(await stk()).active);
+  await setT(23); await frames(250);
+  check("in the grace period (23:00) there is still no stalker", !(await stk()).active);
+  await setT(0.05); await stand(0, 0.02, -60, Math.PI); await frames(10);
+  check("at midnight the warning shows and the clock says to get home", /GET HOME/.test((await st()).sub) && /Midnight/.test(await page.evaluate(() => document.getElementById("toast").textContent)), (await st()).sub);
+  check("it does not appear at once", !(await stk()).active);
+  await frames(140);                                                                                   // 7 s: past its 6 s wait
+  let k = await stk();
+  check("after a few seconds it appears up the street behind you, out of your sight, and it is not one of the floor's monsters", k.active && k.id === "street" && k.z < -60 && k.d >= 14 && k.d <= 30 && k.mon === 0 && k.mesh, JSON.stringify(k));
+  const d0 = k.d; await frames(20);                                                                    // 1 s with your back to it
+  k = await stk();
+  check("with your back to it, it creeps closer (about 5.5 m a second)", d0 - k.d > 4 && d0 - k.d < 6.5, `${d0} -> ${k.d}`);
+  await page.evaluate(() => { const g = window.__game; g.P.yaw = Math.atan2(-(g.CITY.st.x - g.P.p.x), -(g.CITY.st.z - g.P.p.z)); });   // turn and face it
+  await new Promise(r => setTimeout(r, 400)); await shot("stalker");
+  const dSeen = (await stk()).d; await frames(60);
+  check("while you look at it, it does not move", Math.abs((await stk()).d - dSeen) < 1e-6, `${dSeen} -> ${(await stk()).d}`);
+  await page.evaluate(() => { window.__game.P.yaw += Math.PI; });                                       // look away
+  await frames(20);
+  check("look away and it moves again", dSeen - (await stk()).d > 3);
+  // night: no bus, apartment safe, bed
+  await stand(3.6, 0.02, 4.0, 0); await page.evaluate(() => { const g = window.__game; g.CITY.st = {active: false, x: 0, z: 0, wait: 99}; }); await frames(5);
+  check("by the bus stop at night: the bus does not run", /does not run at night/.test(await prompt()), await prompt());
+  await page.keyboard.press("KeyF"); await frames(5);
+  check("F does not ride it", (await stk()).id === "street" && /does not run at night/.test(await page.evaluate(() => document.getElementById("toast").textContent)));
+  // caught: put it next to you with your back turned
+  await stand(0, 0.02, -60, Math.PI); await frames(2);
+  await page.evaluate(() => { const g = window.__game; g.CITY.st = {active: true, x: 0, z: -62, wait: 0}; });
+  await frames(12);
+  await settled("apartment");
+  const woke = await page.evaluate(() => { const g = window.__game, s = g.cityState(); return {id: g.S.id, hour: s.hour, day: s.day, p: g.P.p.toArray(), active: g.CITY.st.active}; });
+  check("caught: you wake in your apartment at 06:00 on the same day, and it is gone", woke.id === "apartment" && Math.abs(woke.hour - 6) < 0.05 && woke.day === 2 && !woke.active && Math.abs(woke.p[0] - APARTMENT.arrive[0]) < 0.01, JSON.stringify(woke));
+  await page.waitForFunction(() => /dark|Dawn/.test(document.getElementById("toast").textContent));
+  await setT(1); await frames(250);
+  check("in the apartment at 01:00 you are safe: nothing appears, and the clock says so", !(await stk()).active && /SAFE INSIDE/.test((await st()).sub));
+  // the bed
+  await stand(bedUse.at[0], 0.02, bedUse.at[1], 0); await frames(5);
+  check("by the bed you are offered sleep", /sleep until morning/.test(await prompt()), await prompt());
+  await page.keyboard.press("KeyF"); await frames(5);
+  s = await st();
+  check("at 01:00 the bed skips to 06:00, still day 2", Math.abs(s.hour - 6) < 0.1 && s.day === 2, JSON.stringify(s));
+  await setT(12); await frames(5); await page.keyboard.press("KeyF");
+  check("by day you are not tired, and the clock did not move", /not tired/.test(await page.evaluate(() => document.getElementById("toast").textContent)) && Math.abs((await st()).hour - 12) < 0.1);
+  await setT(22); await frames(5); await page.keyboard.press("KeyF"); await frames(5);
+  s = await st();
+  check("at 22:00 on day 2 the bed skips to 06:00 on day 3", Math.abs(s.hour - 6) < 0.1 && s.day === 3, JSON.stringify(s));
   check("no page errors", errors.length === 0, errors.join(" | "));
 } finally { await browser.close(); await srv.close(); }
 process.exit(failed ? 1 : 0);

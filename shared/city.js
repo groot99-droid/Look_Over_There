@@ -108,3 +108,36 @@ export function computerPages(st) {
     map: {title: "MAP", lines: ["HALLAM ROW", "West side: apartment tower, 41, 214, 666", "East side: grocery, 108, mall, 330", "The bus stop is at the south end."]},
   };
 }
+
+// ---- the night danger (slice 2b). From midnight to 06:00 (`dangerous`) one stalker walks Hallam Row. It is the City's creature: it never moves while you are looking at it, it creeps toward you when you
+// are not, it cannot be killed (it is not one of the floor's monsters, so no gun or beacon touches it), and if it reaches you, you black out and wake in your apartment at 06:00. The apartment is safe.
+// It is faster than a walk (4 m/s) and slower than a run (7.5 m/s): you cannot just walk home with your back to it, you have to turn round and look. Pure rules here; index.html draws it and calls them.
+export const STALKER = {speed: 5.5, spawnDist: 28, minSpawn: 14, catchDist: 1.5, fovDeg: 38, seeDist: 80, firstWait: 6};   // m/s, metres, degrees, seconds (the wait after midnight or after you step out before it appears)
+const clampTo = (v, a, b) => Math.min(b, Math.max(a, v));
+// is (sx, sz) inside the cone you are looking along? yaw is the page's: you face (-sin yaw, -cos yaw)
+export function inView(px, pz, yaw, sx, sz, fovDeg = STALKER.fovDeg) {
+  const dx = sx - px, dz = sz - pz, d = Math.hypot(dx, dz); if (d < 1e-6) return true;
+  return (dx * -Math.sin(yaw) + dz * -Math.cos(yaw)) / d >= Math.cos(fovDeg * Math.PI / 180);
+}
+// where it appears: out of view, on the road, 14 to 28 m along the street from you (behind you first); null if there is no such spot (it tries again next tick)
+export function stalkerSpawn(px, pz, yaw) {
+  for (const dz of [-Math.cos(yaw) < 0 ? STALKER.spawnDist : -STALKER.spawnDist, -Math.cos(yaw) < 0 ? -STALKER.spawnDist : STALKER.spawnDist]) {
+    const z = clampTo(pz + dz, ROAD.z0 + 3, ROAD.z1 - 3), x = clampTo(px, -4, 4);
+    if (Math.hypot(x - px, z - pz) >= STALKER.minSpawn && !inView(px, pz, yaw, x, z)) return {x, z};
+  }
+  return null;
+}
+// one step: s is {active, x, z, wait}; o is {px, pz, yaw, seen (it is in view with a clear line), danger (dangerous hour and you are on the street)}. Returns the new state and whether it caught you.
+export function stalkerStep(s, dt, o) {
+  if (!o.danger) return {active: false, x: s.x, z: s.z, wait: STALKER.firstWait, caught: false};          // by day, indoors, or after dawn it is gone, and starts its wait again next time
+  if (!s.active) {
+    const wait = s.wait - dt; if (wait > 0) return {...s, wait, caught: false};
+    const at = stalkerSpawn(o.px, o.pz, o.yaw); return at ? {active: true, x: at.x, z: at.z, wait: 0, caught: false} : {...s, wait: 0, caught: false};
+  }
+  if (o.seen) return {...s, caught: false};                                                                // seen: it does not move
+  const dx = o.px - s.x, dz = o.pz - s.z, d = Math.hypot(dx, dz), k = Math.min(d, STALKER.speed * dt) / (d || 1), x = s.x + dx * k, z = s.z + dz * k;
+  return {...s, x, z, caught: Math.hypot(o.px - x, o.pz - z) <= STALKER.catchDist};
+}
+// the City time (seconds) of the next 06:00 after t: what the bed skips to, and when you wake after a blackout
+export const nextMorning = t => secondsAt(DAWN_H, dayAt(t) + (hourAt(t) >= DAWN_H ? 1 : 0));
+export const bedUse = {at: [-1.4, 0.3], reach: 1.5};            // F here sleeps (from 20:00; by day you are not tired)
