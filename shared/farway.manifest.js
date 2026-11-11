@@ -60,8 +60,8 @@ export const FARWAY = {
       // floor position x chambersPerFloor + index); the 4th chamber of a floor has the stairs down, to the next floor's first. Page scenes only: the server does not run them.
       id: "gbi", name: "Going back in", status: "built", tone: "backrooms",
       scenes: [
-        {id: "gbi_L4_4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
-        {id: "gbi_L3_1", floorY: 6.4, files: ["world/L3.glb", "world/gbi_L3_1.json"], chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
+        {id: "gbi_L4_4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
+        {id: "gbi_L3_1", floorY: 6.4, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
       ],
     },
     stub("dreamcore_forest", "Dreamcore forest and meadow", "planned", ["forest", "meadow"]),
