@@ -16,7 +16,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 7 | Physics: decision and a playground prototype | Next | | **done**, merged (PR #8); `docs/PHYSICS.md` accepted by the owner with cannon-es, visual only in rooms |
 | 4 | Modes and parties | Next | 1 | **done**, merged (PR #7); server and lobby, "go to a friend" is server-side only |
 | 8 | Going back in prototype | Then | 3 and 4 | not started |
-| 9 | City v0 on Hallam Row | Then | 6 | **slice 1 in review** (draft PR, branch `claude/city-v0`): bus, Hallam Row blockout, day clock, stores close. Slices 2 (apartment, night danger) and 3 (the Intern's job) not started |
+| 9 | City v0 on Hallam Row | Then | 6 | **slice 1 in review** (draft PR, branch `claude/city-v0`): bus, Hallam Row blockout, day clock, stores close. Slice 2 in progress on the same branch: the apartment and its computer are built; the night danger and the bed are not. Slice 3 (the Intern's job) not started |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
 | 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
