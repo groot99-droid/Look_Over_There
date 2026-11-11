@@ -72,3 +72,39 @@ export function colliders() {
 }
 export const streetDoc = () => ({scene: "street", colliders: colliders(), doors: [], cameras: [],
   markers: [{name: "Spawn_bus", kind: "Spawn", level: "street", position: BUS_STREET.arrive}, ...DOORS.map(d => ({name: "Door_" + d.id, kind: "Entrance", level: "street", position: [d.x, FLOOR_Y, d.z], width: DOOR_W}))]});
+
+// ---- the apartment (slice 2): your one room, reached from the apartment tower's door on the street. For v0 the tower door opens straight into it (the tower's lobby, atrium and floors are the
+// hotel area, planned); the City's clock keeps running while you are inside. One room, a bed, a desk with the computer, a window onto the street's sky, and a door back out. Blockout, no art.
+export const CITY_SCENES = ["street", "apartment"];            // the scenes where the City's clock runs
+export const APARTMENT = {
+  half: [3, 2.5], h: 2.8,                                      // the room is x in [-3, 3], z in [-2.5, 2.5], 2.8 m high
+  arrive: [1.5, 0, 1.4], face: [0, -1],                        // you come in through the door on the south wall and face the room
+  door: {at: [1.5, 2.1], reach: 1.8},                          // F near here leaves (the door is in the south wall at x = 1.5)
+  bed: {min: [-2.9, 0, -2.4], max: [-0.9, 0.6, -0.4]},
+  desk: {min: [0.9, 0, -2.4], max: [2.7, 0.78, -1.6]}, computer: {at: [1.8, -1.0], reach: 1.6},    // stand in front of the desk to use it
+  window: {x: 2.98, z: [-1.4, 0.6], y: [1.0, 2.2]},            // on the east wall; shows the sky of the hour
+};
+// the tower's door on the street leads to the apartment, and the apartment's door leads back to the tower's front: both are links in the manifest and these are what they say
+export const TOWER_FRONT = {arrive: [-6.2, 0, -19], face: [1, 0]};
+export function apartmentColliders() {
+  const c = [], add = (s, min, max) => c.push({s, min, max}), [hx, hz] = APARTMENT.half, h = APARTMENT.h, t = 0.2;
+  add("Floor_Apartment", [-hx - t, -1, -hz - t], [hx + t, 0, hz + t]); add("Ceiling_Apartment", [-hx - t, h, -hz - t], [hx + t, h + t, hz + t]);
+  add("Wall_N", [-hx - t, 0, -hz - t], [hx + t, h, -hz]); add("Wall_S", [-hx - t, 0, hz], [hx + t, h, hz + t]);
+  add("Wall_W", [-hx - t, 0, -hz], [-hx, h, hz]); add("Wall_E", [hx, 0, -hz], [hx + t, h, hz]);
+  add("Bed", APARTMENT.bed.min, APARTMENT.bed.max); add("Desk", APARTMENT.desk.min, APARTMENT.desk.max);
+  return c;
+}
+export const apartmentDoc = () => ({scene: "apartment", colliders: apartmentColliders(), doors: [], cameras: [],
+  markers: [{name: "Spawn_door", kind: "Spawn", level: "apartment", position: APARTMENT.arrive}, {name: "Computer", kind: "Interact", level: "apartment", position: [APARTMENT.computer.at[0], 0, APARTMENT.computer.at[1]]}]});
+
+// ---- the computer: what its pages say. `st` is {hour, day, clock, open}. Pure, so it is tested; the page only draws the strings. Job search lists the five Hallam Row jobs but applications open later (slice 3).
+export const JOBS = BUILDINGS.filter(b => b.door && b.door.job).map(b => ({address: b.door.label, job: b.door.job}));
+export function computerPages(st) {
+  const left = st.open ? Math.max(0, CLOSE_H - st.hour) : 0, hh = Math.floor(left), mm = Math.round((left - hh) * 60);
+  return {
+    mail: {title: "MAIL", lines: ["No new messages.", "", "(Your inbox is empty. Offers and replies will arrive here once you apply for a job.)"]},
+    news: {title: "NEWS", lines: [`Day ${st.day}, ${st.clock}.`, st.open ? `Hallam Row's stores are open for another ${hh} h ${String(mm).padStart(2, "0")} min.` : st.hour >= CLOSE_H || st.hour < DAWN_H ? "The stores on Hallam Row are closed for the night." : "The stores on Hallam Row are not open yet.", "Residents are reminded to be home before midnight."]},
+    jobs: {title: "JOB SEARCH", lines: [...JOBS.map(j => `${j.address}: ${j.job}`), "", "Applications are not open yet."]},
+    map: {title: "MAP", lines: ["HALLAM ROW", "West side: apartment tower, 41, 214, 666", "East side: grocery, 108, mall, 330", "The bus stop is at the south end."]},
+  };
+}

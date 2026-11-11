@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET} from "./city.js";
+import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET, APARTMENT, TOWER_FRONT, CITY_SCENES, apartmentDoc, computerPages, JOBS} from "./city.js";
+import {REGISTRY} from "./registry.js";
 
 test("a game day is 15 real minutes and starts at 08:00", () => {
   assert.equal(DAY_S, 900); assert.equal(hourAt(0), START_H); assert.equal(fmtClock(hourAt(0)), "08:00");
@@ -25,4 +26,24 @@ test("every shop door has a sidewalk to stand on and no building overlaps anothe
 });
 test("world/street.json is what shared/city.js makes (run node tools/make_street.mjs)", () => {
   assert.deepEqual(JSON.parse(fs.readFileSync(new URL("../world/street.json", import.meta.url), "utf8")), JSON.parse(JSON.stringify(streetDoc())));
+});
+
+test("world/apartment.json is what shared/city.js makes", () => {
+  assert.deepEqual(JSON.parse(fs.readFileSync(new URL("../world/apartment.json", import.meta.url), "utf8")), JSON.parse(JSON.stringify(apartmentDoc())));
+});
+test("the apartment links match the layout, and the clock runs in both City scenes", () => {
+  const into = REGISTRY.linkFrom("street", "tower"), out = REGISTRY.linkFrom("apartment", "front_door");
+  assert.ok(into && into.status === "built" && into.soloOnly && out && out.status === "built" && out.soloOnly);
+  assert.deepEqual(into.to.arrive, APARTMENT.arrive); assert.deepEqual(into.to.face, APARTMENT.face);
+  assert.deepEqual(out.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(out.to.face, TOWER_FRONT.face);
+  assert.deepEqual(CITY_SCENES, ["street", "apartment"]);
+  const [hx, hz] = APARTMENT.half, inside = ([x, z]) => Math.abs(x) < hx && Math.abs(z) < hz, hit = ([x, z], b) => x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2];
+  for (const p of [APARTMENT.arrive.filter((_, i) => i !== 1), APARTMENT.door.at, APARTMENT.computer.at]) { assert.ok(inside(p), "inside the room " + p); assert.ok(!hit(p, APARTMENT.bed) && !hit(p, APARTMENT.desk), "clear of furniture " + p); }
+});
+test("the computer's pages say the day, the store hours and the five jobs", () => {
+  assert.equal(JOBS.length, 5);
+  const open = computerPages({hour: 12.5, day: 1, clock: "12:30", open: true}), shut = computerPages({hour: 22, day: 1, clock: "22:00", open: false});
+  assert.match(open.news.lines[1], /open for another 7 h 30 min/); assert.match(shut.news.lines[1], /closed for the night/);
+  assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.some(l => /not open yet/.test(l)));
+  assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map"]);
 });
