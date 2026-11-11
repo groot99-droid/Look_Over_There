@@ -21,8 +21,8 @@ const lineUp = () => page.evaluate(() => {
     const [x, z] = cells[Math.floor(Math.random() * cells.length)], a = Math.random() * 6.28, fx = -Math.sin(a), fz = -Math.cos(a), qx = x + fx * 6, qz = z + fz * 6;
     const o = [x, g.S.floor + g.P.eye, z], d = [fx, 0, fz];
     if (!g.rayClear(o, d, 6.3) || g.collide({x: qx, y: g.S.floor + 0.02, z: qz}) || g.collide({x, y: g.S.floor + 0.02, z})) continue;
-    g.P.p.set(x, g.S.floor + 0.02, z); g.P.v.set(0, 0, 0); g.P.yaw = a; g.P.pitch = 0;
-    const m = g.monsters[0]; m.pos.x = qx; m.pos.z = qz; m.state = "patrol"; return true;
+    g.P.p.set(x, g.S.floor + 0.02, z); g.P.v.set(0, 0, 0); g.P.yaw = a; g.P.pitch = 0; g.P.imm = 1e9;          // the wave is live: monsters must not catch the test player (a death is tested on purpose below)
+    const m = g.monsters[0]; if (!m) return true; m.pos.x = qx; m.pos.z = qz; m.state = "patrol"; return true;
   }
   return false;
 });
@@ -33,6 +33,7 @@ try {
   check("the Original has no crossbow and no loadout locker", await page.evaluate(() => !window.__game.owned().includes("crossbow") && !window.__game.nearStation() && window.__game.GB.load === null));
 
   await page.evaluate(() => window.__game.startGoingBackIn()); await settled(start);
+  await page.evaluate(() => { window.__game.P.imm = 1e9; });
   let s = await st();
   check("Going back in starts with the ray, the cloak and the crossbow carried, and the crossbow's bolts", ["gun", "cloak", "crossbow"].every(i => s.owned.includes(i)) && s.bolts === 4, JSON.stringify(s));
   check("the crossbow is a fourth thing to hold (key 4)", await page.evaluate(() => { const g = window.__game; g.setHeld("crossbow"); return g.HELD.item === "crossbow"; }));
