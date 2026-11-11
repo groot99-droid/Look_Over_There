@@ -26,7 +26,8 @@ const stand = () => page.evaluate(() => {
   }
   return null;
 });
-const put = (i, x, z) => page.evaluate(([i, x, z]) => { const m = window.__game.monsters[i]; m.pos.x = x; m.pos.z = z; m.stunT = 0; }, [i, x, z]);
+// hold: keep it still (a long stun) so a live monster cannot walk off before the trap arms; the flash test needs it free, to measure the stun itself
+const put = (i, x, z, hold = true) => page.evaluate(([i, x, z, hold]) => { const m = window.__game.monsters[i]; m.pos.x = x; m.pos.z = z; m.stunT = hold ? 99 : 0; }, [i, x, z, hold]);
 try {
   await page.addInitScript(() => { try { localStorage.setItem("original_complete", "1"); } catch (e) {} });
   await page.goto(`http://localhost:${srv.port}/`); await page.click("#l-solo");
@@ -39,10 +40,10 @@ try {
   check("the ammo line shows the Q and E slots", await page.evaluate(() => { const t = document.getElementById("ammo").textContent; return /Q/.test(t) && /E/.test(t); }));
 
   // Q: the flash-vial stuns the monsters near where it lands, kills nothing, and costs one
-  let p = await stand(); await put(0, p.qx + 1, p.qz); await put(1, p.qx - 30 * p.fx, p.qz - 30 * p.fz);
+  let p = await stand(); await put(0, p.qx + 1, p.qz, false); await put(1, p.qx - 30 * p.fx, p.qz - 30 * p.fz, false);
   check("Q throws a flash-vial", await page.evaluate(() => window.__game.useConsumable(0)));
   s = await st();
-  check("it stunned the monster near the landing point, not the far one, and killed nothing", s.stun[0] === true && s.stun[1] === true /* parked: held by the test */ && s.mons === 3 && s.kills === 0 && s.n.flash === 1, JSON.stringify(s));
+  check("it stunned the monster near the landing point, not the far one, and killed nothing", s.stun[0] === true && s.stun[1] === false /* 30 m away: out of the 6 m radius */ && s.mons === 3 && s.kills === 0 && s.n.flash === 1, JSON.stringify(s));
   const stun0 = await page.evaluate(() => window.__game.monsters[0].stunT);
   check("the stun lasts about 6 s", stun0 > 5 && stun0 <= 6.01, String(stun0));
 

@@ -80,7 +80,7 @@ A 20-wave run: 5 floors, 4 chambers each, top down: L4, L3, L2, L1, B1. A chambe
 | GBI-5 | Doors can be closed, trapped or barricaded, and nothing else. Players can crawl into vents. Monsters never use vents. | NEW | |
 | GBI-6 | A safe house on every floor holds a shop, a stash, a save, crafting and a respawn point. | NEW | |
 | GBI-7 | A locker (one per safe house and one per chamber) shows your loadout and lets you change it. After you die it returns your weapons and gear for free. It does not return ammo, consumables or perks. Those are bought back at the Market or a safe house. The existing one-time loot locker on B1 needs a different name. | PART BUILT: one per chamber, solo; no safe house, no Market | `tools/gbi2_test.mjs` dies and checks what the locker returns |
-| GBI-8 | Lethal weapons come from the arsenal (ten weapons, three consumables). Each needs its own ammo rule. The ray, the cloak and the beacon stay non-lethal. Q and E (LB and RB) are consumable slots. | PART BUILT: the hunting crossbow only. Q/E still empty. | `shared/crossbow.test.js`, `tools/gbi2_test.mjs` |
+| GBI-8 | Lethal weapons come from the arsenal (ten weapons, three consumables). Each needs its own ammo rule. The ray, the cloak and the beacon stay non-lethal. Q and E (LB and RB) are consumable slots. | PART BUILT: the hunting crossbow, and the Q/E slots with the three consumables. Seven weapons are not built. | `shared/crossbow.test.js`, `shared/consumables.test.js`, `tools/gbi2_test.mjs`, `tools/gbi3_test.mjs` |
 | GBI-9 | Money comes from clearing chambers and from kills and revives. Level comes from achievements. Money and items are shared with the rest of the game. Progress is its own save. | NEW | |
 | GBI-10 | Per-run score goes to an online leaderboard, with personal and overall bests. | NEW | `docs/BACKEND.md` |
 | GBI-11 | The 20 waves stay 20 when floors are added, by sampling. | NEW | |
@@ -91,7 +91,8 @@ A 20-wave run: 5 floors, 4 chambers each, top down: L4, L3, L2, L1, B1. A chambe
 |---|---|---|
 | 1 | GBI-1 (the mode names its first chamber), GBI-2 (two chambers as manifest scenes, stairs down between them), GBI-3 (the wave starts on entry) | BUILT, solo only: `tools/gbi_test.mjs`, `shared/gbi.test.js` |
 | 2 | GBI-7 (the loadout locker), GBI-8 for one weapon: the hunting crossbow with its own ammo rule | BUILT, solo only: `shared/crossbow.test.js`, `shared/loadout.test.js`, `tools/gbi2_test.mjs`. The Q/E consumable slots are NOT built (they still say empty) |
-| left | GBI-8's other nine weapons and the three consumables (and Q/E), GBI-4 hazards, GBI-5 doors and vents, GBI-6 safe house, GBI-9 to GBI-11, and rooms running the mode (the server still answers `{t:"refused",reason:"soon"}`) | NEW |
+| 3 | GBI-8's consumable slots: Q and E, with the flash-vial, the land mine and the tripwire | BUILT, solo only: `shared/consumables.test.js`, `tools/gbi3_test.mjs` |
+| left | GBI-8's other nine weapons, GBI-4 hazards, GBI-5 doors and vents, GBI-6 safe house, GBI-9 to GBI-11, and rooms running the mode (the server still answers `{t:"refused",reason:"soon"}`) | NEW |
 
 What slice 1 does: from the Overworld's store-doors options screen, "Going back in" loads `gbi_L4_4` (the 4th chamber of L4, which is the L4 model with the store sealed) as wave 4 of 20, and the wave (3 monsters, 16 m or more from you) starts as you land. Its stairs-down door leads to `gbi_L3_1` (the L3 model; wave 5, its own 3 monsters). That chamber's way down and the 14 other chambers are not built. The chamber's wave number is its floor's place in the mode times four plus its index. The stairs are open from the start: there are no clear rules yet (objects, puzzles, kill count, timer), so "cleared" is not checked. Death is the solo rule (respawn at a random spot in the same chamber).
 
@@ -103,6 +104,13 @@ What a room needs to run the mode (not done): the server's `FLOORS` and floor si
 - *Death:* all your gear goes to the locker, and ray rounds, bolts and beacons are gone. Walk to a locker and take the gear back for free; the ammo does not come back. A beacon is counted as charges, so it is lost like ammo (the doc lists it as gear; say if you want the device kept).
 - *Kills:* a kill is counted, and killing every monster of the wave clears it (toast). That is the only clear rule so far.
 - *Name:* the panel and the code call it "the locker" and "the loadout locker". The open question (Decision 2) stands.
+
+**Slice 3 rules (defaults the owner may change).** The doc names the three consumables but not which slot holds what, nor their numbers.
+- *Q (support): the phosphor-core flash-vial.* Thrown up to 6 m ahead (it stops at a wall); every monster within 6 m of where it lands is stunned for 6 s. It kills nothing. Max 3, start 2.
+- *E (combat / objective): the almond water land mine or the nail-bomb tripwire, chosen at the locker (key 4, or the E row with D-pad and A).* The mine is set down where you stand, arms after 1.5 s, and kills the one monster that comes within 1.2 m. Max 3, start 2. The tripwire arms after 0.5 s; a monster within 2 m sets it off and every monster within 3 m dies; the blast is loud, so monsters within 25 m go and look. Max 2, start 1. Both count as kills toward the wave. A trap is yours to walk into too: nothing here hurts the player (monsters are the only target in v1).
+- *Refills:* each ammo pack adds one flash-vial and one of the E item, up to the cap. The Market does not exist yet, so there is no other source.
+- *Death:* all consumables are gone and the locker does not return them (docs/WORLD.md). Traps already set stay until a monster springs them, and are cleared when you change chamber.
+- *Controls:* Q and RB-side E are as `docs/GAMEPLAY.md` says (LB / Q support, RB / E combat). `tools/controls_test.mjs` still passes. In the Original the slots stay empty.
 
 ## Decisions
 
