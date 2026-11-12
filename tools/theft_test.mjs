@@ -28,7 +28,7 @@ try {
 
   await intoStore(); await camAt(secondsAt(12, 2)); await page.evaluate(() => { const g = window.__game; g.NEEDS = {...g.NEEDS, money: 20, pantry: {}, cart: [], hasCart: false}; });
   // the camera sweeps
-  await frames(1); const y0 = await page.evaluate(() => window.__game.CITY.mats.cam.rotation.y), t0 = await page.evaluate(() => window.__game.CITY.t);
+  await frames(1); const [y0, t0] = await page.evaluate(() => { const g = window.__game; g.sim(0.05, 0); return [g.CITY.mats.cam.rotation.y, g.CITY.t]; });   // read in the same call as the step, so the page's own frame loop cannot move the clock in between
   check("there is a camera, turned to where its sweep says", Math.abs(y0 - camYaw(t0) * Math.PI / 180) < 1e-6, String([y0, t0]));
   await frames(40); const y1 = await page.evaluate(() => window.__game.CITY.mats.cam.rotation.y);
   check("and it moves: two seconds later it points somewhere else", Math.abs(y1 - y0) > 0.05, String([y0, y1]));
