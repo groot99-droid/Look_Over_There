@@ -4,8 +4,9 @@ import fs from "node:fs";
 import path from "node:path";
 import {streetDoc, apartmentDoc, groceryDoc, mallDoc} from "../shared/city.js";
 import {museumDoc} from "../shared/museum.js";
+import {factoryDoc} from "../shared/factory.js";
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-for (const [name, doc] of [["street", streetDoc()], ["apartment", apartmentDoc()], ["main_floor", groceryDoc()], ["entrance", mallDoc()], ["galleries", museumDoc()]]) {
+for (const [name, doc] of [["street", streetDoc()], ["apartment", apartmentDoc()], ["main_floor", groceryDoc()], ["entrance", mallDoc()], ["galleries", museumDoc()], ["factory_floor", factoryDoc()]]) {
   fs.writeFileSync(path.join(root, `world/${name}.json`), JSON.stringify(doc));
   console.log(`world/${name}.json: ${doc.colliders.length} colliders`);
 }
