@@ -2073,7 +2073,7 @@ function startFactory() {
   toast(`Your shift has started. Sort the parts until ${fmtClock(hourAt(fa.end))}.`, 4200);
 }
 function factoryTick(dt) {
-  const fa = CITY.fa; if (!fa.active) return;
+  const fa = CITY.fa; if (!fa.active || loading) return;                      // never mid-load (see museumTick)
   if (S.id !== FACTORY_SCENE) { endFactory("left"); return; }                    // fainting or passing out mid-shift takes you home: the shift is lost
   const before = fa.st.missed; fa.st = stepLine(fa.st, dt); drawParts(); if (fa.st.missed !== before) needsHud();
   if (CITY.t >= fa.end) endFactory("done");
