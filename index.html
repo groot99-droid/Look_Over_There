@@ -218,7 +218,7 @@ import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
 import {SAVE_KEY, makeSave, readSave, NEW_GAME_KEYS} from "./shared/save.js";
 import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, GHOST_WINDOW, ghostLit} from "./shared/anomalies.js";
 import {BINS, TRASH, routeEnds, nearBin, trashPay} from "./shared/trash.js";
-import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds} from "./shared/needs.js";
+import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds, REST, rest as restNeeds, restCrossed, passOut, tired as isTired} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
@@ -1802,12 +1802,25 @@ function cityTick(dt) {
 function needsHud() {
   const el = $("needs"), cart = S.id === GROCERY_SCENE && (NEEDS.cart.length || NEEDS.hasCart) ? ` · ${NEEDS.hasCart ? "CART" : "HANDS"} ${NEEDS.cart.length}/${cartCap(NEEDS)} $${cartTotal(NEEDS)}` : "";
   const route = CITY.tr.active ? ` · ROUTE ${CITY.tr.got.length}/${BINS.length} UNTIL ${fmtClock(hourAt(CITY.tr.end))}` : "";
-  el.style.display = "block"; el.textContent = `HUNGER ${Math.round(NEEDS.hunger)} · $${NEEDS.money}${cart}${route}`; el.classList.toggle("low", NEEDS.hunger <= HUNGER.warn);
+  el.style.display = "block"; el.textContent = `HUNGER ${Math.round(NEEDS.hunger)} · $${NEEDS.money} · REST ${Math.round(NEEDS.rest)}${cart}${route}`; el.classList.toggle("low", NEEDS.hunger <= HUNGER.warn || NEEDS.rest <= REST.warn);
+}
+// slice 12: a rest warning (tired at 30, exhausted at 10) or passing out at 0; true when you passed out (the caller stops there)
+function restWarn(w) {
+  if (w === "tired") toast("You are tired. Your bed is in the apartment tower.", 4200);
+  else if (w === "exhausted") toast("You are exhausted. Get to bed before you drop.", 4200);
+  else if (w === "out") { passOutNow(); return true; }
+  return false;
+}
+async function passOutNow() {
+  NEEDS = passOut(NEEDS); CITY.st = {active: false, x: 0, z: 0, wait: 6}; CITY.t = nextMorning(CITY.t);
+  await loadScene(APT_SCENE, {pos: APARTMENT.arrive, face: APARTMENT.face});
+  toast("You are too tired to go on and pass out. You wake in your apartment at dawn. Sleep in your bed at night.", 5200);
 }
 // hunger drains with the City's clock (24 game hours in DAY_S real seconds); the warnings show once each on the way down; at 0 you faint
 function needsTick(dt) {
   if (loading) return;
-  const before = NEEDS.hunger; NEEDS = drainNeeds(NEEDS, dt * 24 / DAY_S);
+  const before = NEEDS.hunger, beforeR = NEEDS.rest; NEEDS = drainNeeds(NEEDS, dt * 24 / DAY_S);
+  if (restWarn(restCrossed(beforeR, NEEDS.rest))) return;                    // slice 12: rest drains awake too; at 0 you pass out
   const w = hungerCrossed(before, NEEDS.hunger);
   if (w === "hungry") toast("You are hungry. There is food in the grocery, and your fridge is at home.", 4200);
   else if (w === "starving") toast("You are starving. Eat something soon.", 4200);
@@ -1858,7 +1871,7 @@ function stalkerTick(dt) {
 }
 // it has you: you black out and wake in your apartment at 06:00 (no permanent death in v0)
 async function stalkerCaught() {
-  CITY.st = {active: false, x: 0, z: 0, wait: 6};
+  CITY.st = {active: false, x: 0, z: 0, wait: 6}; NEEDS = passOut(NEEDS);
   CITY.t = nextMorning(CITY.t);
   await loadScene(APT_SCENE, {pos: APARTMENT.arrive, face: APARTMENT.face});
   toast("It got you. Everything goes dark. You wake in your apartment. Dawn.", 5200);
@@ -1868,7 +1881,7 @@ const nearCityDoor = () => S.id === CITY_SCENE ? DOORS.find(d => nearXZ(d.x, d.z
 function cityPrompt() {
   if (PC.open) return "";
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return "Press F to take the bus to Hallam Row";
-  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
+  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
   if (S.id === GROCERY_SCENE) {
     if (nearXZ(...GROCERY.door.at, GROCERY.door.reach)) return "Press F to leave";
     if (nearXZ(...GROCERY.cart.at, GROCERY.cart.reach)) return NEEDS.hasCart ? "You have a cart" : "Press F to take a cart";
@@ -2060,10 +2073,11 @@ function workShift() {
   const job = SH.job, s = STUB_SHIFTS[job]; if (!job) return;
   closeShift();
   if (job === "trash") { startTrash(); return; }                                    // slice 11: the trash job is a route, not a stub
-  const before = NEEDS.hunger; NEEDS = drainNeeds(NEEDS, s.hours); CITY.t += s.hours / 24 * DAY_S;
+  const before = NEEDS.hunger, beforeR = NEEDS.rest; NEEDS = drainNeeds(NEEDS, s.hours); CITY.t += s.hours / 24 * DAY_S;
   NEEDS = payNeeds(NEEDS, s.pay, QUIZZES[job].job); cityLook();
   toast(`Shift over (${QUIZZES[job].job}). ${s.hours} hours pass. You are paid $${s.pay}.`, 4200);
   const w = hungerCrossed(before, NEEDS.hunger); if (w === "faint") faintNow(); else if (w) setTimeout(() => toast(w === "hungry" ? "You are hungry." : "You are starving. Eat something soon.", 3600), 4300);
+  else { const r = restCrossed(beforeR, NEEDS.rest); if (r === "out") passOutNow(); else if (r) setTimeout(() => restWarn(r), 4300); }
 }
 addEventListener("keydown", e => { if (SH.open) { e.preventDefault(); e.stopImmediatePropagation(); if (e.code === "Escape") closeShift(); } }, true);
 const PC_ORDER = ["mail", "news", "jobs", "map", "bank", "system"];
@@ -2092,8 +2106,11 @@ function newGame() {
 }
 // the bed: from 20:00 it skips to 06:00 (nothing is saved yet: the game has no save); by day you are not tired
 function sleepNow() {
-  if (phaseAt(hourAt(CITY.t)) === "day") { toast(saveCity() ? "You are not tired, so you only rest a moment. Saved." : "You are not tired. You can sleep from 20:00."); return; }        // by day the bed only saves
-  const t1 = nextMorning(CITY.t); NEEDS = sleepDrain(NEEDS, (t1 - CITY.t) * 24 / DAY_S); CITY.t = t1; CITY.mark = "day"; cityLook(); toast(saveCity() ? "You sleep through the night. Dawn. Saved." : "You sleep through the night. Dawn.", 3600);
+  if (phaseAt(hourAt(CITY.t)) === "day") {
+    if (isTired(NEEDS)) { const h = REST.napHours; NEEDS = restNeeds(sleepDrain(NEEDS, h), h); CITY.t += h / 24 * DAY_S; cityLook(); toast(saveCity() ? `You nap for ${h} hours. Saved.` : `You nap for ${h} hours.`, 3600); return; }   // slice 12: tired by day, you nap
+    toast(saveCity() ? "You are not tired, so you only rest a moment. Saved." : "You are not tired. You can sleep from 20:00."); return;        // by day, rested, the bed only saves
+  }
+  const t1 = nextMorning(CITY.t), slept = (t1 - CITY.t) * 24 / DAY_S; NEEDS = restNeeds(sleepDrain(NEEDS, slept), slept); CITY.t = t1; CITY.mark = "day"; cityLook(); toast(saveCity() ? "You sleep through the night. Dawn. Saved." : "You sleep through the night. Dawn.", 3600);
 }
 function openComputer() { PC.open = true; PC.page = "news"; PC.confirm = false; document.exitPointerLock?.(); $("pc").style.display = "flex"; drawComputer(); $("pc-close").onclick = closeComputer; }
 function closeComputer() { closeQuiz(); if (!PC.open) return; PC.open = false; $("pc").style.display = "none"; }

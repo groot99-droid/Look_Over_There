@@ -49,3 +49,29 @@ test("a shift pays what shared/pay.js says, with a note, and the bank page lists
   assert.deepEqual(pantryLines({pantry: {bread: 2, meal: 0, apple: 1}}), ["Apples: 1", "Bread: 2"]);
   assert.equal(FOODS.every(f => f.price > 0 && f.fill > 0), true);
 });
+
+test("rest (slice 12): starts at 90, drains 5 an hour awake, a full bar lasts 20 waking hours", async () => {
+  const {REST, newNeeds, drain} = await import("./needs.js");
+  const n = newNeeds(); assert.equal(n.rest, 90);
+  assert.ok(Math.abs(drain(n, 2).rest - 80) < 1e-9);
+  assert.ok(Math.abs(drain({...n, rest: 100}, 20).rest) < 1e-9);
+  assert.equal(drain(n, 1000).rest, 0, "never below 0");
+  assert.equal(REST.perHour * 20, REST.max);
+  assert.equal(drain({hunger: 50}, 1).rest, undefined, "a record without rest is left without it");
+});
+test("rest: sleep refills it, 12 an hour, so a night from 20:00 to 06:00 fills it", async () => {
+  const {REST, rest} = await import("./needs.js");
+  assert.equal(rest({rest: 0}, 10).rest, REST.max);
+  assert.equal(rest({rest: 20}, 3).rest, 56);
+  assert.equal(rest({rest: 95}, 5).rest, 100);
+  assert.equal(rest({rest: 40}, -2).rest, 40);
+});
+test("rest: warnings at 30 (tired) and 10 (exhausted), out at 0; passing out or fainting leaves you at least at 60", async () => {
+  const {REST, restCrossed, passOut, faint, tired} = await import("./needs.js");
+  assert.equal(restCrossed(31, 29), "tired"); assert.equal(restCrossed(11, 9), "exhausted"); assert.equal(restCrossed(1, 0), "out");
+  assert.equal(restCrossed(29, 28), null); assert.equal(restCrossed(50, 60), null); assert.equal(restCrossed(0, 0), null);
+  assert.equal(passOut({rest: 0, cart: ["meal"], hasCart: true}).rest, REST.wakeAt);
+  assert.deepEqual(passOut({rest: 80, cart: ["meal"], hasCart: true}), {rest: 80, cart: [], hasCart: false});
+  assert.equal(faint({hunger: 0, rest: 5, cart: [], hasCart: false}).rest, REST.wakeAt);
+  assert.ok(tired({rest: 30}) && !tired({rest: 31}) && !tired({}));
+});
