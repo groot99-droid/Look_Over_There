@@ -8,6 +8,7 @@ import {QUIZZES} from "../shared/application.js";
 import {STUB_SHIFTS} from "../shared/pay.js";
 import {MUSEUM} from "../shared/museum.js";
 import {FACTORY} from "../shared/factory.js";
+import {LAB} from "../shared/lab.js";
 import {HUNGER} from "../shared/needs.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
@@ -120,13 +121,15 @@ try {
   await atDoor("w214", 10, 1);
   check("214 Hallam Row (rejected): still by application only", /214 HALLAM ROW: press F/.test(await prompt()), await prompt());
 
-  // the last stub shift: the lab (rejected on day 1, so apply again on day 2)
+  // the lab (slice 17: its shift is played in the laboratory; no stub shifts are left). Rejected on day 1, so apply again on day 2.
   await setT(9, 2); res = await apply("lab", true);
   check("on day 2 the lab application with right answers is accepted", /ACCEPTED/.test(res) && (await state()).flags.includes("job_lab"), res);
   await atDoor("w214", 10, 2); s0 = await state(); await page.keyboard.press("KeyF");
-  check("the lab's screen says its game is not built yet, 4 hours, $14", /not built yet.*4 hours.*\$14/.test(await page.evaluate(() => document.getElementById("sh-text").textContent)));
-  await page.click("#sh-work"); await frames(2); s1 = await state();
-  check("working the stub: 4 hours pass and $14 is paid with the job's name", Math.abs(s1.hour - (s0.hour + 4)) < 0.1 && s1.needs.money === s0.needs.money + STUB_SHIFTS.lab.pay && s1.needs.lastNote === "Laboratory worker", JSON.stringify([s0.hour, s1.hour, s1.needs.money]));
+  check("the lab's screen offers the shift with the procedure cards", /procedure cards/.test(await page.evaluate(() => document.getElementById("sh-text").textContent)) && await page.evaluate(() => document.getElementById("sh-work").textContent) === "Start the shift");
+  await page.click("#sh-work"); await settled("laboratory"); await frames(2);
+  check("starting it takes you into the laboratory, on shift", await page.evaluate(() => window.__game.CITY.lb.active));
+  await stand(LAB.door.at[0], LAB.door.at[1] - 0.6, Math.PI); await frames(2); await page.keyboard.press("KeyF"); await settled("street"); await frames(2); s1 = await state();
+  check("walking straight out is leaving your post: no pay (the full shift is in lab_test)", s1.needs.money === s0.needs.money && s1.needs.lastNote === "Lab: left early", JSON.stringify(s1.needs));
 
   // a reload keeps the jobs
   await page.reload(); await page.click("#l-solo");
