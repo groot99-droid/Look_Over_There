@@ -218,6 +218,7 @@ import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
 import {SAVE_KEY, makeSave, readSave, NEW_GAME_KEYS} from "./shared/save.js";
 import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, GHOST_WINDOW, ghostLit, SPOT, REPORTS, newSightings, spot, fileReport} from "./shared/anomalies.js";
 import {BINS, TRASH, routeEnds, nearBin, trashPay} from "./shared/trash.js";
+import {FACTORY, KINDS, LINE, shiftEnds as lineEnds, newLine, stepLine, pickUp as pickPart, binNear, drop as dropPart, linePay} from "./shared/factory.js";
 import {MUSEUM, GUARD, shiftEnds as guardEnds, newExhibits, exhibitAt, stepExhibits, setBack, homeCount, guardPay} from "./shared/museum.js";
 import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds, REST, rest as restNeeds, restCrossed, passOut, tired as isTired} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
@@ -430,6 +431,7 @@ async function loadScene(id, arrival) {
   if (id === GROCERY_SCENE) groceryProps(root);
   if (id === MALL_SCENE) mallProps(root);
   if (id === MUSEUM_SCENE) museumProps(root);
+  if (id === FACTORY_SCENE) factoryProps(root);
   closeComputer();                                                                               // a scene change never leaves the computer up
   if (id !== OW_SCENE && OW.open) { OW.open = false; $("options").style.display = "none"; }                 // leaving the lot (the bus, a reload of the scene) must not leave the store-doors screen up
   cityLook(true);                                                                               // the City's sky and clock on arrival; every other scene gets the default look back
@@ -1706,10 +1708,10 @@ async function walkOut(link) {
 // All of it is blockout geometry, no art yet. A game day is 15 real minutes starting at 08:00; the clock (CITY.t, seconds) runs only while you are on the street and is paused
 // everywhere else. Stores open 08:00 to 20:00: after that the shutters come down and the doors will not open. 20:00 to midnight is the grace period; the danger after midnight
 // and the apartment come in slice 2. The apartment (slice 2) is below. Alone only, like the Overworld: a room cannot enter these scenes.
-const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor", MALL_SCENE = "entrance", MUSEUM_SCENE = "galleries";
+const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor", MALL_SCENE = "entrance", MUSEUM_SCENE = "galleries", FACTORY_SCENE = "factory_floor";
 const inCity = () => CITY_SCENES.includes(S.id);
 let NEEDS = newNeeds();                                       // slice 4: hunger, money, the cart and the fridge (rules: shared/needs.js); in memory, like the clock
-const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null, signPasses: 0, lastZ: null, anom: null, tr: {active: false, got: [], t0: 0, end: 0, group: null}, mu: {active: false, ex: [], fixes: 0, end: 0, figs: []}, seen: newSightings(), spotT: 0};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
+const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null, signPasses: 0, lastZ: null, anom: null, tr: {active: false, got: [], t0: 0, end: 0, group: null}, mu: {active: false, ex: [], fixes: 0, end: 0, figs: []}, fa: {active: false, st: null, end: 0, parts: null, held: null}, seen: newSightings(), spotT: 0};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
 const cityState = () => { const h = hourAt(CITY.t); return {t: CITY.t, hour: h, clock: fmtClock(h), day: dayAt(CITY.t), phase: phaseAt(h), open: storesOpen(h)}; };
 const boxMesh = (min, max, color) => { const m = new THREE.Mesh(new THREE.BoxGeometry(max[0] - min[0], max[1] - min[1], max[2] - min[2]), new THREE.MeshLambertMaterial({color})); m.position.set((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2); return m; };
 function signTexture(text) {
@@ -1800,8 +1802,9 @@ function cityLook(force) {
   const clock = $("clock");
   if (!inCity()) { if (force) { scene.background.set(0x0b0b0c); HEMI.intensity = 1.25; HEMI.color.set(0xfff2d0); clock.style.display = "none"; $("needs").style.display = "none"; } return; }
   const st = cityState(), sky = skyAt(st.hour);
-  clock.style.display = "block"; clock.firstChild.textContent = st.clock; clock.lastChild.textContent = `DAY ${st.day} · ${S.id === MUSEUM_SCENE && CITY.mu.active ? `ON SHIFT UNTIL ${fmtClock(hourAt(CITY.mu.end))}` : S.id === MALL_SCENE && mallLocked(st.hour) ? "LOCKED IN UNTIL 06:00" : st.phase === "night" ? (S.id === APT_SCENE ? "NIGHT · SAFE INSIDE" : "NIGHT · GET HOME") : st.open ? "STORES OPEN" : "STORES CLOSED"}`;
+  clock.style.display = "block"; clock.firstChild.textContent = st.clock; clock.lastChild.textContent = `DAY ${st.day} · ${S.id === FACTORY_SCENE && CITY.fa.active ? `ON SHIFT UNTIL ${fmtClock(hourAt(CITY.fa.end))}` : S.id === MUSEUM_SCENE && CITY.mu.active ? `ON SHIFT UNTIL ${fmtClock(hourAt(CITY.mu.end))}` : S.id === MALL_SCENE && mallLocked(st.hour) ? "LOCKED IN UNTIL 06:00" : st.phase === "night" ? (S.id === APT_SCENE ? "NIGHT · SAFE INSIDE" : "NIGHT · GET HOME") : st.open ? "STORES OPEN" : "STORES CLOSED"}`;
   needsHud();
+  if (S.id === FACTORY_SCENE) { scene.background.set(0x060606); HEMI.intensity = 1.3; HEMI.color.set(0xf0f4ff); return; }   // slice 16: the factory's work lights
   if (S.id === MUSEUM_SCENE) { scene.background.set(0x030305); HEMI.intensity = 0.5; HEMI.color.set(0x9aa8d0); return; }   // slice 14: the museum after hours
   if (S.id === MALL_SCENE) { const lk = mallLocked(st.hour); scene.background.set(0x050505); HEMI.intensity = lk ? 0.32 : 1.25; HEMI.color.set(lk ? 0x8090c0 : 0xfff4e4); if (CITY.mats.mallLamp) CITY.mats.mallLamp.intensity = lk ? 0.6 : 6; return; }   // slice 13: by night only the emergency lights
   if (S.id === GROCERY_SCENE) { scene.background.set(0x050505); HEMI.intensity = 1.35; HEMI.color.set(0xf4f8ff); return; }                         // the grocery's strip lights
@@ -1814,11 +1817,11 @@ function cityLook(force) {
 function cityTick(dt) {
   if (!inCity() || loading || PC.open || SH.open) return;                      // elsewhere, while a scene loads and while the computer or a shift screen is up, the clock is paused
   CITY.t += dt; CITY.ui -= dt; if (CITY.ui <= 0) { CITY.ui = 0.2; cityLook(); }
-  cityPhase(); mallTick(); stalkerTick(dt); needsTick(dt); anomalyTick(); trashTick(); museumTick(dt);
+  cityPhase(); mallTick(); stalkerTick(dt); needsTick(dt); anomalyTick(); trashTick(); museumTick(dt); factoryTick(dt);
 }
 function needsHud() {
   const el = $("needs"), cart = S.id === GROCERY_SCENE && (NEEDS.cart.length || NEEDS.hasCart) ? ` · ${NEEDS.hasCart ? "CART" : "HANDS"} ${NEEDS.cart.length}/${cartCap(NEEDS)} $${cartTotal(NEEDS)}` : "";
-  const route = CITY.tr.active ? ` · ROUTE ${CITY.tr.got.length}/${BINS.length} UNTIL ${fmtClock(hourAt(CITY.tr.end))}` : CITY.mu.active ? ` · STATUES HOME ${homeCount(CITY.mu.ex)}/${MUSEUM.homes.length}` : "";
+  const route = CITY.tr.active ? ` · ROUTE ${CITY.tr.got.length}/${BINS.length} UNTIL ${fmtClock(hourAt(CITY.tr.end))}` : CITY.mu.active ? ` · STATUES HOME ${homeCount(CITY.mu.ex)}/${MUSEUM.homes.length}` : CITY.fa.active ? ` · SORTED ${CITY.fa.st.right} · WRONG ${CITY.fa.st.wrong}${CITY.fa.st.held ? " · HOLDING " + KINDS[CITY.fa.st.held.kind].label : ""}` : "";
   el.style.display = "block"; el.textContent = `HUNGER ${Math.round(NEEDS.hunger)} · $${NEEDS.money} · REST ${Math.round(NEEDS.rest)}${cart}${route}`; el.classList.toggle("low", NEEDS.hunger <= HUNGER.warn || NEEDS.rest <= REST.warn);
 }
 // slice 12: a rest warning (tired at 30, exhausted at 10) or passing out at 0; true when you passed out (the caller stops there)
@@ -1899,6 +1902,15 @@ function cityPrompt() {
   if (PC.open) return "";
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return "Press F to take the bus to Hallam Row";
   if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
+  if (S.id === FACTORY_SCENE) {
+    const fa = CITY.fa;
+    if (nearXZ(...FACTORY.door.at, FACTORY.door.reach)) return fa.active ? "Press F to leave your post early (no pay)" : "Press F to leave";
+    if (!fa.active) return "";
+    const bi = binNear(P.p.x, P.p.z);
+    if (fa.st.held && bi >= 0) return `Press F to put the ${KINDS[fa.st.held.kind].label} in the ${KINDS[FACTORY.bins[bi].kind].label} bin`;
+    if (!fa.st.held) { const r = pickPart(fa.st, P.p.x, P.p.z); if (r.got) return `Press F to pick up the ${KINDS[r.got].label}`; }
+    return "";
+  }
   if (S.id === MUSEUM_SCENE) {
     if (nearXZ(...MUSEUM.door.at, MUSEUM.door.reach)) return CITY.mu.active ? "Press F to leave your post early (no pay)" : "Press F to leave";
     const i = CITY.mu.active ? setBack(CITY.mu.ex, P.p.x, P.p.z).fixed : -1; if (i >= 0) return `Press F to set ${MUSEUM.names[i]} back on its plinth`;
@@ -1937,6 +1949,15 @@ function tryCity() {
     if (nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach)) { openComputer(); return true; }
     if (nearXZ(...bedUse.at, bedUse.reach)) { sleepNow(); return true; }
     if (nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach)) { const r = eatFood(NEEDS); NEEDS = r.n; needsHud(); toast(r.ok ? `You eat: ${FOODS.find(f => f.id === r.ate).label}.` : r.reason); return true; }
+    return false;
+  }
+  if (S.id === FACTORY_SCENE) {
+    const fa = CITY.fa;
+    if (nearXZ(...FACTORY.door.at, FACTORY.door.reach)) { if (fa.active) endFactory("left"); else ride(FACTORY_SCENE, "front_door"); return true; }
+    if (!fa.active) return false;
+    const bi = binNear(P.p.x, P.p.z);
+    if (fa.st.held && bi >= 0) { const r = dropPart(fa.st, bi), k = KINDS[FACTORY.bins[bi].kind].label; fa.st = r.st; drawParts(); needsHud(); toast(r.ok ? `Into the ${k} bin. Right.` : `Into the ${k} bin. Wrong bin.`); return true; }
+    if (!fa.st.held) { const r = pickPart(fa.st, P.p.x, P.p.z); if (r.got) { fa.st = r.st; drawParts(); needsHud(); return true; } }
     return false;
   }
   if (S.id === MUSEUM_SCENE) {
@@ -2018,6 +2039,50 @@ function groceryProps(root) {
   const ca = GROCERY.cart; for (let i = 0; i < 3; i++) { const z0 = ca.min[2] + 0.05 + i * 0.05, x0 = ca.min[0] + i * 0.12; slab([x0, 0.35, z0], [x0 + 0.9, 0.85, z0 + 0.55], 0xc83a32); slab([x0 + 0.85, 0.85, z0], [x0 + 0.9, 1.05, z0 + 0.55], 0x8a8a8a); }   // red carts in the corral
   const lamp = new THREE.PointLight(0xf4f8ff, 5, 20, 1.4); lamp.position.set(0, h - 0.5, 0); g.add(lamp);
   root.add(g);
+}
+// ---- the factory floor (slice 16; rules in shared/factory.js): a belt of parts, three bins, and you sorting them by hand.
+function factoryProps(root) {
+  const g = new THREE.Group(), [hx, hz] = FACTORY.half, h = FACTORY.h, B = FACTORY.belt, M = c => new THREE.MeshLambertMaterial({color: c});
+  CITY.doors = []; CITY.mats = {};
+  const slab = (min, max, c) => { const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
+  slab([-hx, -0.05, -hz], [hx, 0, hz], 0x5a5a58); slab([-hx, h, -hz], [hx, h + 0.05, hz], 0x3a3a3c);
+  for (const [a, b] of [[[-hx, 0, -hz - 0.05], [hx, h, -hz]], [[-hx, 0, hz], [hx, h, hz + 0.05]], [[-hx - 0.05, 0, -hz], [-hx, h, hz]], [[hx, 0, -hz], [hx + 0.05, h, hz]]]) slab(a, b, 0x7a7a70);
+  slab([-1.2, 0, hz - 0.06], [1.2, 2.6, hz - 0.01], 0x4a4a50);                                                                   // the door
+  slab([B.x0 - 0.5, 0, B.z - B.w / 2], [B.x1 + 0.5, B.top - 0.06, B.z + B.w / 2], 0x3a3a40); slab([B.x0 - 0.5, B.top - 0.06, B.z - B.w / 2 + 0.05], [B.x1 + 0.5, B.top, B.z + B.w / 2 - 0.05], 0x1e1e22);   // the belt
+  slab([B.x1 + 0.5, 0, B.z - 0.8], [B.x1 + 1.6, 0.5, B.z + 0.8], 0x6a2a2a);                                                    // the reject chute
+  for (const b of FACTORY.bins) {
+    slab([b.x - b.half, 0, b.z - b.half], [b.x + b.half, 1.0, b.z + b.half], KINDS[b.kind].color);
+    const s = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.36), new THREE.MeshBasicMaterial({map: signTexture(KINDS[b.kind].label)})); s.position.set(b.x, 1.5, b.z); g.add(s);
+  }
+  CITY.fa.parts = new THREE.Group(); g.add(CITY.fa.parts);
+  for (let x = -6; x <= 6; x += 6) { const l = new THREE.PointLight(0xf0f4ff, 3, 16, 1.4); l.position.set(x, h - 0.4, 0); g.add(l); }
+  root.add(g); drawParts();
+}
+// the parts on the belt, and the one in your hands (held in front of you)
+function drawParts() {
+  const fa = CITY.fa, grp = fa.parts; if (!grp || S.id !== FACTORY_SCENE || !fa.st) return;
+  while (grp.children.length) grp.remove(grp.children[0]);
+  const PM = drawParts.m || (drawParts.m = {geo: new THREE.BoxGeometry(0.4, 0.3, 0.4), mat: Object.fromEntries(Object.entries(KINDS).map(([k, v]) => [k, new THREE.MeshLambertMaterial({color: v.color})]))});   // one geometry and one material per kind, shared: nothing to free each frame
+  const box = (kind, x, y, z) => { const m = new THREE.Mesh(PM.geo, PM.mat[kind]); m.position.set(x, y, z); grp.add(m); };
+  for (const p of fa.st.parts) box(p.kind, p.x, FACTORY.belt.top + 0.15, FACTORY.belt.z);
+  if (fa.st.held) box(fa.st.held.kind, P.p.x - Math.sin(P.yaw) * 0.6, P.p.y + 1.0, P.p.z - Math.cos(P.yaw) * 0.6);
+}
+function startFactory() {
+  const fa = CITY.fa; fa.active = true; fa.st = stepLine(newLine(), 0); fa.end = lineEnds(CITY.t);
+  const l = REGISTRY.linkFrom(CITY_SCENE, "e330"); loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face});
+  toast(`Your shift has started. Sort the parts until ${fmtClock(hourAt(fa.end))}.`, 4200);
+}
+function factoryTick(dt) {
+  const fa = CITY.fa; if (!fa.active || loading) return;                      // never mid-load (see museumTick)
+  if (S.id !== FACTORY_SCENE) { endFactory("left"); return; }                    // fainting or passing out mid-shift takes you home: the shift is lost
+  const before = fa.st.missed; fa.st = stepLine(fa.st, dt); drawParts(); if (fa.st.missed !== before) needsHud();
+  if (CITY.t >= fa.end) endFactory("done");
+}
+function endFactory(how) {
+  const fa = CITY.fa; if (!fa.active) return;
+  const p = linePay(fa.st, how); fa.active = false; NEEDS = payNeeds(NEEDS, p.pay, p.note);
+  if (S.id === FACTORY_SCENE) rideLink(FACTORY_SCENE, "front_door");
+  toast(`Shift over (Factory floor worker). ${p.lines.join(". ")}.`, 5200);
 }
 // ---- the museum night guard (slice 14; rules in shared/museum.js): one gallery hall, six statues on plinths that move only while nobody looks at them.
 function museumProps(root) {
@@ -2161,10 +2226,11 @@ const stubJob = d => d && d.quiz && STUB_SHIFTS[d.quiz] && heldFlags().includes(
 function openShift(job, d) {
   const s = STUB_SHIFTS[job]; SH.open = true; SH.job = job; document.exitPointerLock?.();
   $("sh-title").textContent = `${d.label} · ${d.job.toUpperCase()}`;
-  $("sh-text").textContent = job === "museum" ? `Watch the ${MUSEUM.homes.length} statues until ${fmtClock(hourAt(guardEnds(CITY.t)))}. They only move while no one is looking at them. F next to a moved statue sets it back. $${GUARD.perHome} for each statue on its plinth at the end of the night, $${GUARD.perFix} for each one you set back. Leaving early pays nothing.`
+  $("sh-text").textContent = job === "factory" ? `Parts come down the belt until ${fmtClock(hourAt(lineEnds(CITY.t)))}: gears, bolts and springs. F by the belt picks one up, F at a bin puts it in. $1 for each part in the right bin, $1 off for each in the wrong one (up to $${LINE.maxPay}). What reaches the end of the belt is lost. Leaving early pays nothing.`
+    : job === "museum" ? `Watch the ${MUSEUM.homes.length} statues until ${fmtClock(hourAt(guardEnds(CITY.t)))}. They only move while no one is looking at them. F next to a moved statue sets it back. $${GUARD.perHome} for each statue on its plinth at the end of the night, $${GUARD.perFix} for each one you set back. Leaving early pays nothing.`
     : job === "trash" ? `Your route is Hallam Row: empty the ${BINS.length} bins at the kerb (F at each), then clock out at this door. You have ${TRASH.hours} hours. $${TRASH.perBin} a bin, $${TRASH.allBonus} more for the whole route.`
     : `This job's game is not built yet. Working the shift takes ${s.hours} hours and pays $${s.pay}.`;
-  $("sh-work").textContent = job === "trash" ? "Start the route" : job === "museum" ? "Start the shift" : "Work the shift";
+  $("sh-work").textContent = job === "trash" ? "Start the route" : (job === "museum" || job === "factory") ? "Start the shift" : "Work the shift";
   $("sh-work").onclick = workShift; $("sh-close").onclick = closeShift; $("shift").style.display = "flex";
 }
 function closeShift() { SH.open = false; SH.job = null; $("shift").style.display = "none"; }
@@ -2194,7 +2260,8 @@ function workShift() {
   const job = SH.job, s = STUB_SHIFTS[job]; if (!job) return;
   closeShift();
   if (job === "trash") { startTrash(); return; }
-  if (job === "museum") { startMuseum(); return; }                                 // slice 14: the museum guard's shift is played in the galleries                                    // slice 11: the trash job is a route, not a stub
+  if (job === "museum") { startMuseum(); return; }
+  if (job === "factory") { startFactory(); return; }                               // slice 16: the factory shift is played on the factory floor                                 // slice 14: the museum guard's shift is played in the galleries                                    // slice 11: the trash job is a route, not a stub
   const before = NEEDS.hunger, beforeR = NEEDS.rest; NEEDS = drainNeeds(NEEDS, s.hours); CITY.t += s.hours / 24 * DAY_S;
   NEEDS = payNeeds(NEEDS, s.pay, QUIZZES[job].job); cityLook();
   toast(`Shift over (${QUIZZES[job].job}). ${s.hours} hours pass. You are paid $${s.pay}.`, 4200);
