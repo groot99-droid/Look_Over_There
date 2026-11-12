@@ -1984,7 +1984,7 @@ function tryCity() {
     const b = nearBin(P.p.x, P.p.z, CITY.tr.got); if (b >= 0) { emptyBin(b); return true; }
     const dd = nearCityDoor(); if (dd && dd.id === TRASH.depot) { endTrash("done"); return true; }
   }
-  if (nearXZ(BUS_STREET.at[0], BUS_STREET.at[1], BUS_STREET.radius)) { if (dangerous(hourAt(CITY.t))) { toast("The bus does not run at night."); return true; } return ride(CITY_SCENE, "bus_stop"); }
+  if (nearXZ(BUS_STREET.at[0], BUS_STREET.at[1], BUS_STREET.radius)) { if (dangerous(hourAt(CITY.t))) { toast("The bus does not run at night."); return true; } if (CITY.tr.active) endTrash("left"); return ride(CITY_SCENE, "bus_stop"); }   // the City's tick stops outside the City, so the bus ends the route itself
   const d = nearCityDoor(); if (!d) return false;
   if (d.kind === "tower") return ride(CITY_SCENE, "tower");
   if (d.id === "mall" && storesOpen(hourAt(CITY.t))) return ride(CITY_SCENE, "mall");                    // slice 13: in by day; it locks at 20:00
