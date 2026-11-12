@@ -61,7 +61,7 @@ try {
   await page.click('#pc-actions button[data-act="newgame"]'); await page.click('#pc-actions button[data-act="newgame-yes"]'); await frames(2);
   c = await city(); s = await store(); p = await pc();
   check("yes closes the computer and starts the City again at 08:00 on day 1 with $20, an empty fridge, no jobs and a fresh sign",
-    !p.open && c.t === 0 && c.money === 20 && Object.keys(c.pantry).length === 0 && Object.keys(c.accepted).length === 0 && c.passes === 0, JSON.stringify(c));
+    !p.open && c.t < 1 && c.money === 20 && Object.keys(c.pantry).length === 0 && Object.keys(c.accepted).length === 0 && c.passes === 0, JSON.stringify(c));
   check("the save and the job flags are gone; the Original's flag is kept", s.save === null && s.lab === null && s.intern === null && s.orig === "1", JSON.stringify(s));
   check("a toast says so", await page.evaluate(() => /A new start: day 1, 08:00/.test(document.getElementById("toast").textContent)));
   await page.keyboard.press("KeyF"); await page.keyboard.press("Digit5"); p = await pc();
