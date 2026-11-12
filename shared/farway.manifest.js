@@ -19,7 +19,7 @@ const stub = (id, name, status, scenes) => ({id, name, status, scenes: scenes.ma
 export const FARWAY = {
   manifestVersion: 1,
   world: "Farway",
-  flags: ["original_complete", "keycard_tier_1", "keycard_tier_2", "admin_access"],
+  flags: ["original_complete", "job_intern", "keycard_tier_1", "keycard_tier_2", "admin_access"],
   connectors: ["stair_door", "gate", "doors", "walk", "elevator", "stairs", "bus", "pool_dive", "pool_route", "service_corridor", "one_way"],
 
   // a mode is a way to play a round; `players.max` is the room size the server enforces
@@ -72,7 +72,11 @@ export const FARWAY = {
     },
     stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
     stub("mall", "Liminal mall", "planned", ["entrance"]),
-    stub("grocery", "Grocery", "planned", ["main_floor", "back_of_house"]),
+    {
+      // slice 4 (session 9): the grocery's main floor, a blockout behind the street's grocery door; open by day like the other stores. The back of house stays planned.
+      id: "grocery", name: "Grocery", status: "built", tone: "liminal",
+      scenes: [{id: "main_floor", floorY: 0, files: ["world/main_floor.json"]}, {id: "back_of_house"}],
+    },
     stub("jobs", "Hallam Row (street of jobs)", "planned", ["street_of_jobs"]),
     stub("secret_ops", "Secret Operations (Project Never Land)", "planned", ["service_entry", "hidden_entry"]),
     {id: "future_addon_shed", name: "Reserved for the shed", status: "reserved"},
@@ -112,6 +116,10 @@ export const FARWAY = {
     {id: "city.tower>apartment", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "tower"}, to: {area: "city", scene: "apartment", arrive: [1.5, 0.0, 1.4], face: [0.0, -1.0]},
      note: "The tower's lobby is not built yet: the door opens into your apartment."},
     {id: "city.apartment>street", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "apartment", door: "front_door"}, to: {area: "city", scene: "street", arrive: [-6.2, 0.0, -19.0], face: [1.0, 0.0]}},
+    // slice 3: once the Intern's application is accepted (the quiz in shared/application.js; the flag is kept in the browser), 666 Hallam Row's door starts your shift: the Intern game, solo only.
+    // returnTo carries where you stand when you come back out. Open store hours still apply (the street's doors shut at 20:00).
+    {id: "city.666>intern", status: "built", connector: "doors", soloOnly: true, requires: ["job_intern"], from: {area: "city", scene: "street", door: "w666"}, to: {area: "intern"},
+     returnTo: {area: "city", scene: "street", arrive: [-6.2, 0.0, -127.0], face: [1.0, 0.0]}, note: "A shift at The Intern. Needs the accepted application."},
     plan("overworld.road>forest", {area: "overworld", scene: "road"}, {area: "dreamcore_forest", scene: "forest"}, "walk"),
     plan("forest.house>rdwe", {area: "dreamcore_forest", scene: "meadow", door: "house_door"}, {area: "rdwe", room: "dining"}, "gate", {soloOnly: true}),
     plan("forest.shed>addon", {area: "dreamcore_forest", scene: "meadow", door: "shed"}, {area: "future_addon_shed"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
@@ -123,7 +131,10 @@ export const FARWAY = {
     plan("hotel.atrium>maze", {area: "hotel", scene: "atrium"}, {area: "hotel", scene: "anomaly_maze"}, "one_way", {note: "Also reached when the elevator glitches. You leave only by solving it."}),
     plan("hotel.sub_pools>lot.B1", {area: "hotel", scene: "sub_pools"}, {area: "lot", scene: "B1"}, "pool_route", {note: "Separate pools connected underwater, a long way with many levels between."}),
     plan("city.street>mall", {area: "city", scene: "street"}, {area: "mall", scene: "entrance"}, "doors"),
-    plan("city.street>grocery", {area: "city", scene: "street"}, {area: "grocery", scene: "main_floor"}, "doors", {note: "Open by day, abandoned by night."}),
+    // slice 4: the street's grocery door and back. Open 08:00 to 20:00 (at closing you are shown out); solo only.
+    {id: "city.street>grocery", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "grocery"}, to: {area: "grocery", scene: "main_floor", arrive: [0.0, 0.0, 7.4], face: [0.0, -1.0]},
+     note: "Open by day, abandoned by night."},
+    {id: "grocery.main_floor>street", status: "built", connector: "doors", soloOnly: true, from: {area: "grocery", scene: "main_floor", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -17.0], face: [-1.0, 0.0]}},
     plan("city.street>jobs", {area: "city", scene: "street"}, {area: "jobs", scene: "street_of_jobs"}, "doors"),
     plan("grocery.backhouse>secret_ops", {area: "grocery", scene: "back_of_house"}, {area: "secret_ops", scene: "service_entry"}, "service_corridor", {requires: ["keycard_tier_1"]}),
     plan("rdwe.repeating_room>secret_ops", {area: "rdwe", room: "repeating_room"}, {area: "secret_ops", scene: "hidden_entry"}, "gate", {note: "The only entrance with no clearance. Hinted by a room that repeats or a door seen from one angle."}),
