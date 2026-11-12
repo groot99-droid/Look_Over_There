@@ -1800,7 +1800,7 @@ function spotTick() {
   if (CITY.signPasses > 0 && sees(sx, S.floor + SIGN.y, SIGN.z, SPOT.signDist)) found.push("sign");
   if (pedsOut(h) && CITY.peds.filter((p, i) => { const [x, z] = pedAt(i, p.s); return sees(x, S.floor + 1.5, z, SPOT.pedDist); }).length >= SPOT.pedCount) found.push("peds");
   if (ghostLit(h) && sees(GHOST_WINDOW.at[0], S.floor + GHOST_WINDOW.at[1], GHOST_WINDOW.at[2], SPOT.windowDist)) found.push("window");
-  if (watchersOut(h) && WATCHERS.some(w => { const p = watcherAt(w); return Math.hypot(p.x - P.p.x, p.z - P.p.z) < SPOT.watcherDist && inView(P.p.x, P.p.z, P.yaw, p.x, p.z); })) found.push("watchers");   // through the glass: no wall test
+  if (watchersOut(h) && WATCHERS.some(w => { const p = watcherAt(w); return sees(p.x, S.floor + p.y - 0.35, p.z, SPOT.watcherDist); })) found.push("watchers");   // its chest, against the pane: in view with a clear line
   for (const id of found) if (!CITY.seen.spotted[id]) { CITY.seen = spot(CITY.seen, id); toast(SPOT_SAYS[id], 3600); }
 }
 function anomalyLook(hour) {

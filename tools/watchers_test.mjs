@@ -28,6 +28,9 @@ try {
   check("by day there is nobody in the windows", s.n === WATCHERS.length && !s.on, JSON.stringify(s));
   await setT(22); await frames(3); s = await w();
   check("after dark three figures stand in lit windows", s.on && s.n === 3, JSON.stringify(s));
+  // and they can be seen: none is buried in its building (the street's buildings are solid boxes; the figure stands against the outside of the lit pane)
+  const clear = await page.evaluate(ws => { const g = window.__game; return ws.map(p => g.segClear(0, g.S.floor + 1.6, p.z + 6, p.x, g.S.floor + p.y - 0.35, p.z, 0.3)); }, WATCHERS.map(watcherAt));
+  check("each figure is outside its wall: a clear line reaches it from the street", clear.every(Boolean), JSON.stringify(clear));
   // they turn to follow you as you move
   const t = watcherAt(WATCHERS[1]);                                                    // in a window of 330 Hallam Row, east side
   await stand(-3, t.z + 12, 0); await frames(2); s = await w();

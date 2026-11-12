@@ -110,7 +110,7 @@ test("routines: unwatched pedestrians walk their beat and turn at its ends; a wa
   const big = stepPeds(newPeds(), 100, none); assert.ok(big.every(p => Math.abs(p.s) <= PED_ROUTE), "even a long step stays on the beat");
 });
 
-test("watchers (slice 21): each stands just inside one of the windows the street draws, above the ground floor, on three different buildings", async () => {
+test("watchers (slice 21): each stands against one of the windows the street draws, above the ground floor, on three different buildings", async () => {
   const {WATCHERS, watcherAt} = await import("./anomalies.js");
   const {windowSlots} = await import("./city.js");
   assert.equal(WATCHERS.length, 3); assert.equal(new Set(WATCHERS.map(w => w.building)).size, 3);
@@ -118,7 +118,8 @@ test("watchers (slice 21): each stands just inside one of the windows the street
     const b = BUILDINGS.find(x => x.id === w.building), s = windowSlots(b).find(x => x.f === w.f && x.k === w.k), p = watcherAt(w);
     assert.ok(s && p, `a drawn window for ${w.building}`); assert.ok(w.f >= 2, "above the ground floor");
     assert.ok(Math.abs(p.z - s.z) < 1e-9 && Math.abs(p.y - s.y) < 1e-9);
-    const bx = buildingBox(b); assert.ok(p.x > bx.min[0] && p.x < bx.max[0], "inside the building, behind the glass");
+    const bx = buildingBox(b); assert.ok(p.x < bx.min[0] || p.x > bx.max[0], "outside the solid building box, so it can be seen");
+    assert.ok((p.x - s.x) * s.dir > 0.1 && (p.x - s.x) * s.dir < 0.2, "on the street side of the pane, close against it");
   }
 });
 test("watchers: out only at night, and they turn to face you", async () => {

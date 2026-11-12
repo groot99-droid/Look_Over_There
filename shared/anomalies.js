@@ -46,9 +46,10 @@ export const GHOST_WINDOW = {at: [12, 14, -142], w: 1.6, h: 1.3};
 export const ghostLit = hour => skyAt(hour).night;
 
 // 4. the watchers (slice 21): "The lit windows are a mix of decoration, NPC apartments, apartments you can visit and things watching you" (docs/WORLD.md). At night three of the
-// street's lit windows have a dark figure standing just inside the glass, which turns to follow you. Each is one of the windows the street draws (windowSlots).
+// street's lit windows have a dark figure against the glass, which turns to follow you. Each is one of the windows the street draws (windowSlots). The buildings are solid
+// blockout boxes and a pane is a lit plane on the face, so the figure stands just in front of the pane (0.14 m out) to show as a silhouette on it; a figure behind it would be hidden.
 export const WATCHERS = [{building: "wfill1", f: 2, k: 1}, {building: "e330", f: 2, k: 2}, {building: "tower", f: 5, k: 2}];
-export function watcherAt(w) { const b = BUILDINGS.find(x => x.id === w.building), s = windowSlots(b).find(x => x.f === w.f && x.k === w.k); return s && {x: s.x - s.dir * 0.25, y: s.y, z: s.z, dir: s.dir}; }
+export function watcherAt(w) { const b = BUILDINGS.find(x => x.id === w.building), s = windowSlots(b).find(x => x.f === w.f && x.k === w.k); return s && {x: s.x + s.dir * 0.14, y: s.y, z: s.z, dir: s.dir}; }
 export const watchersOut = hour => skyAt(hour).night;
 // the yaw (the page's: 0 looks down -z) that turns a figure at (wx, wz) to face (px, pz)
 export const watcherYaw = (wx, wz, px, pz) => Math.atan2(px - wx, pz - wz) + Math.PI;
