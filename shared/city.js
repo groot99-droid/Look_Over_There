@@ -111,6 +111,16 @@ export const GROCERY = {
   checkout: {at: [6.5, 5.6], reach: 1.7, min: [5.5, 0, 6.4], max: [9.5, 0.95, 7.2]},
   shelves: FOODS.map((f, i) => { const x = -8 + i * 5; return {food: f.id, min: [x - 0.6, 0, -6], max: [x + 0.6, 1.9, 2], at: [x + 1.4, -2], reach: 1.6}; }),   // aisles run north-south; stand on the east side of a unit
 };
+// slice 19: the security camera, high on the north wall, sweeping to and fro across the store. Its angle follows the City's clock: 0 looks straight down the hall at the door,
+// and it swings `sweep` degrees each way over `period` seconds. It sees a point inside its `fov` cone, within `range`. It watches the door about a third of the time.
+export const CAMERA = {at: [0, 3.4, -8.7], period: 12, sweep: 40, fov: 40, range: 25};
+export const camYaw = t => CAMERA.sweep * Math.sin(2 * Math.PI * t / CAMERA.period);            // degrees; + turns toward +x
+export function camSees(t, x, z) {
+  const dx = x - CAMERA.at[0], dz = z - CAMERA.at[2]; if (Math.hypot(dx, dz) > CAMERA.range) return false;
+  return Math.abs(Math.atan2(dx, dz) * 180 / Math.PI - camYaw(t)) <= CAMERA.fov / 2;
+}
+// the first City time at or after t when the camera does (or does not) see (x, z): for the tests, and for anyone timing a dash for the door
+export function nextCam(t, x, z, want) { for (let k = 0; k <= CAMERA.period * 20; k++) { const u = t + k / 20; if (camSees(u, x, z) === want) return u; } return null; }
 export const GROCERY_FRONT = {arrive: [6.2, 0, -17], face: [-1, 0]};            // where you stand on the street when you come out (the grocery door is on the east side at z = -17)
 export function groceryColliders() {
   const c = [], add = (s, min, max) => c.push({s, min, max}), [hx, hz] = GROCERY.half, h = GROCERY.h, t = 0.2;
