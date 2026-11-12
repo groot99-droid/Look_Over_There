@@ -35,7 +35,7 @@ async function stand(page, x, z, label, code = "TEST") {
   const onPage = await page.waitForFunction(([x, z]) => { const g = window.__game, p = g.P.p; return !g.loading && g.P.ground && Math.abs(p.y - g.S.floor) < 0.1 && Math.hypot(p.x - x, p.z - z) < 0.05; }, [x, z], {timeout: 60000, polling: 100}).then(() => true, () => false);
   const onServer = onPage && await serverHas(r.id, x, z, {code, y: r.floor});
   const where = () => page.evaluate(() => { const g = window.__game; return `page at (${g.P.p.x.toFixed(2)}, ${g.P.p.y.toFixed(2)}, ${g.P.p.z.toFixed(2)}) floor ${g.S.floor} ground ${g.P.ground} loading ${g.loading}`; });
-  return check(`${label}: the page and the server have the player standing there`, onPage && onServer, onPage && onServer ? "" : `${await where()}; ${xzOf(playerOf(r.id, code))}`);
+  return check(`${label}: the page and the server have the player standing there`, onPage && onServer, onPage && onServer ? "" : `${await where()}; ${xzOf(playerOf(r.id, code))}; teleports on the page: ${await jumpsOf(page)}`);
 }
 // a spot about 8 m from (x, z) from which a monster has a walkable path to it: a monster told of a noise it cannot reach has an empty path and stops searching after SEARCH_S
 function earshot(floor, x, z) {
@@ -60,7 +60,15 @@ async function open(name, char) {                                  // joins the 
 }
 // wait (up to 40 s: the headless browser renders in software and may run at a few frames a second) for a condition in the page, and record it as a check
 const until = (name, page, fn, arg, why = () => "") => page.waitForFunction(fn, arg, {timeout: 60000, polling: 200}).then(() => (check(name, true), true), () => (check(name, false, why()), false));          // true when it passed; why() says what the server saw
-const inGame = p => p.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 180000});
+// Once a page is in the game, record every teleport of its player: a jump of more than 3 m, or one below the floor, with the stack that made it. The game moves the
+// player that way in only a few places (a scene's arrival spawn, the fall catch, the respawn after being downed, and this test), so when a player is not where the
+// test put them, jumpsOf() names which one moved them. Keeps the last 20.
+const TRACE_JUMPS = () => { const g = window.__game, p = g.P.p; if (window.__jumps) return; window.__jumps = []; const set = p.set.bind(p), t0 = performance.now();
+  p.set = function (x, y, z) {
+    if (Math.hypot(x - this.x, z - this.z) > 3 || y < g.S.floor - 3) { window.__jumps.push({ms: Math.round(performance.now() - t0), from: [this.x, this.y, this.z].map(v => +v.toFixed(2)), to: [x, y, z].map(v => +v.toFixed(2)), scene: g.S.id, loading: g.loading, dead: g.dead, by: new Error().stack.split("\n").slice(2, 6).map(l => l.trim().replace(/\(?https?:\/\/[^)]*\)?/g, "").replace(/^at /, "")).join(" < ")}); if (window.__jumps.length > 20) window.__jumps.shift(); }
+    return set(x, y, z); }; };
+const jumpsOf = page => page.evaluate(() => JSON.stringify(window.__jumps || null)).catch(e => `(no trace: ${e.message})`);
+const inGame = p => p.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 180000}).then(() => p.evaluate(TRACE_JUMPS));
 try {
   const a = await open("Ann", 0), b = await open("Bob", 3);
   await sleep(300);
@@ -320,7 +328,7 @@ try {
   const nearAtPress = await solo2.evaluate(() => window.__game.nearPower());
   await solo2.keyboard.press("KeyX");
   const powerView = () => `the page was ${nearAtPress ? "" : "not "}near the switch at the press; server power ${JSON.stringify(roomOf("OTHER").power)}; ${xzOf(cy)}`;
-  await until("the L4 far switch powers it through the server", solo2, () => window.__game.POWER.on && window.__game.POWER.by === "L4" && !!window.__game.S.shutter.off, undefined, powerView);
+  if (!await until("the L4 far switch powers it through the server", solo2, () => window.__game.POWER.on && window.__game.POWER.by === "L4" && !!window.__game.S.shutter.off, undefined, powerView)) console.log("  why: teleports on Cy's page: " + await jumpsOf(solo2));
   check("the room's state is its own", srv.rooms.get("OTHER").power.by === "L4" && srv.rooms.get("TEST").power.by === "L3", `OTHER ${JSON.stringify(roomOf("OTHER").power)}, TEST ${JSON.stringify(roomOf("TEST").power)}`);
 
   // ---- the finale in a third room: the alarm for both, the first out is place 1, the results come when the second is out
