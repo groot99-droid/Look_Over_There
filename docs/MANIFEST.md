@@ -85,6 +85,8 @@ The area `gbi` holds the chambers. A chamber is a scene with a `chamber: {floor,
 
 **The museum (slice 14).** A new built area, `museum`, with one scene, `galleries` (`world/galleries.json`, made by `tools/make_street.mjs` from `museumDoc` in `shared/museum.js`). `city.e108>museum` requires `job_museum` (the page also checks the shift's hours) and `museum.galleries>street` brings you back to 108's door. Both are solo only. Only the lab and the factory are still stub shifts.
 
+**Reports (slice 15).** No manifest change. `city_save` gains `seen` (`spotted` and `reported`, real anomaly ids only); it stays version 1, since a save without it reads as having seen nothing.
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.

@@ -49,3 +49,13 @@ test("rest is saved and read back, clamped; a save from before rest existed star
   const old = JSON.parse(JSON.stringify(s)); delete old.needs.rest;
   assert.equal(readSave(JSON.stringify(old)).needs.rest, REST.start);
 });
+
+test("what you have spotted and reported is saved; a tampered or old save is cleaned (slice 15)", async () => {
+  const s = makeSave({t: 5, needs: newNeeds(), apps: newApplications(), seen: {spotted: {sign: true, peds: true}, reported: {sign: true}}});
+  assert.deepEqual(readSave(JSON.stringify(s)).seen, {spotted: {sign: true, peds: true}, reported: {sign: true}});
+  const bad = readSave(JSON.stringify({...s, seen: {spotted: {lamp: true, peds: "yes"}, reported: {window: true, bus: true}}}));
+  assert.deepEqual(bad.seen, {spotted: {window: true}, reported: {window: true}}, "unreal ids dropped, non-true dropped, a reported one counts as spotted");
+  const old = JSON.parse(JSON.stringify(s)); delete old.seen;
+  assert.deepEqual(readSave(JSON.stringify(old)).seen, {spotted: {}, reported: {}});
+  assert.deepEqual(makeSave({t: 1, needs: newNeeds(), apps: newApplications()}).seen, {spotted: {}, reported: {}});
+});
