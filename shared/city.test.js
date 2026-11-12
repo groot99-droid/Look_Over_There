@@ -1,8 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET, APARTMENT, TOWER_FRONT, CITY_SCENES, apartmentDoc, computerPages, JOBS, inView, stalkerSpawn, stalkerStep, STALKER, nextMorning, ROAD} from "./city.js";
+import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET, APARTMENT, TOWER_FRONT, CITY_SCENES, apartmentDoc, computerPages, JOBS, JOB_FRONT, inView, stalkerSpawn, stalkerStep, STALKER, nextMorning, ROAD} from "./city.js";
 import {REGISTRY} from "./registry.js";
+import {newApplications, begin, finish} from "./application.js";
+import {requirementsMet} from "./manifest.js";
 
 test("a game day is 15 real minutes and starts at 08:00", () => {
   assert.equal(DAY_S, 900); assert.equal(hourAt(0), START_H); assert.equal(fmtClock(hourAt(0)), "08:00");
@@ -44,7 +46,7 @@ test("the computer's pages say the day, the store hours and the five jobs", () =
   assert.equal(JOBS.length, 5);
   const open = computerPages({hour: 12.5, day: 1, clock: "12:30", open: true}), shut = computerPages({hour: 22, day: 1, clock: "22:00", open: false});
   assert.match(open.news.lines[1], /open for another 7 h 30 min/); assert.match(shut.news.lines[1], /closed for the night/);
-  assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.some(l => /not open yet/.test(l)));
+  assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.some(l => /not hiring yet/.test(l)));
   assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map"]);
 });
 
@@ -77,4 +79,22 @@ test("sleeping or a blackout lands on 06:00 of the next morning", () => {
   assert.equal(hourAt(nextMorning(secondsAt(22))), 6); assert.equal(dayAt(nextMorning(secondsAt(22))), 2);          // 22:00 day 1 -> 06:00 day 2
   assert.equal(hourAt(nextMorning(secondsAt(2, 2))), 6); assert.equal(dayAt(nextMorning(secondsAt(2, 2))), 2);      // 02:00 day 2 -> 06:00 the same day
   assert.ok(nextMorning(secondsAt(12)) > secondsAt(12));
+});
+
+test("only the Intern is hiring, the job search says so, and the mail follows your application", () => {
+  assert.deepEqual(JOBS.filter(j => j.quiz).map(j => j.id), ["w666"]); assert.equal(JOBS.find(j => j.id === "w666").quiz, "intern");
+  const st = {hour: 12, day: 1, clock: "12:00", open: true}, none = computerPages(st, newApplications());
+  assert.ok(none.jobs.lines.some(l => /666 HALLAM ROW: The Intern \(hiring: apply below\)/.test(l)) && none.jobs.lines.filter(l => /not hiring yet/.test(l)).length === 4);
+  assert.match(none.mail.lines[0], /No new messages/);
+  const rej = finish(begin(newApplications(), "intern", 1), "intern", {pass: false}, 1);
+  assert.ok(computerPages(st, rej).jobs.lines.some(l => /rejected: try again tomorrow/.test(l))); assert.match(computerPages(st, rej).mail.lines[0], /REJECTED/);
+  assert.ok(computerPages({...st, day: 2}, rej).jobs.lines.some(l => /hiring: apply below/.test(l)));
+  const acc = finish(begin(newApplications(), "intern", 1), "intern", {pass: true}, 1);
+  assert.ok(computerPages(st, acc).jobs.lines.some(l => /\(ACCEPTED\)/.test(l))); assert.match(computerPages(st, acc).mail.lines[0], /ACCEPTED/);
+});
+test("the shift link needs job_intern, starts at 666 Hallam Row, and returns to its front door", () => {
+  const l = REGISTRY.linkFrom("street", "w666"); assert.ok(l && l.status === "built" && l.soloOnly && l.to.area === "intern");
+  assert.equal(requirementsMet(l, []).ok, false); assert.equal(requirementsMet(l, ["original_complete"]).ok, false); assert.equal(requirementsMet(l, ["job_intern"]).ok, true);
+  const d = DOORS.find(x => x.id === "w666"); assert.deepEqual(l.returnTo.arrive, JOB_FRONT.arrive); assert.deepEqual(l.returnTo.face, JOB_FRONT.face);
+  assert.ok(Math.abs(JOB_FRONT.arrive[2] - d.z) < 1e-9 && Math.abs(JOB_FRONT.arrive[0] - d.x) < 2, "just outside the door");
 });
