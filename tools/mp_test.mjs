@@ -17,6 +17,19 @@ const parkMonsters = (floor, except = -1) => floor.monsters.forEach((m, i) => { 
 const guard = code => { for (const p of roomOf(code).players.values()) p.ps.immUntil = 1e15; };                    // the server's immunity: monsters ignore the players (tests that want a hit lift it)
 const serverDown = id => { const p = playerOf(id), now = Date.now() / 1000; p.ps.hp = {hp: 0, hurtAt: now}; p.ps.downAt = now; };          // the server downs a player: their client hears it
 const serverUntil = async (name, fn, ms = 30000) => { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return check(name, true); await sleep(100); } check(name, false); };
+// The server judges a switch's clunk, a wrong code, a door and a revive by where it last heard the player was (their 15-a-second state message), and a page
+// rendering a few frames a second sends that late. After a test teleports a player, wait until the server has the new spot before the action, or the
+// action is judged from the old one. Returns the gap (m) for a failing check to print.
+const atServer = async (page, code = "TEST", ms = 30000) => {
+  const end = Date.now() + ms; let gap = null;
+  for (;;) {
+    const c = await page.evaluate(() => { const g = window.__game; return {id: g.net.id, x: g.P.p.x, z: g.P.p.z, scene: g.S.id}; }), q = playerOf(c.id, code);
+    gap = q && q.st && q.scene === c.scene ? Math.hypot(q.st.x - c.x, q.st.z - c.z) : null;
+    if (gap !== null && gap < 0.3) return gap;
+    if (Date.now() > end) { console.log("WARN the server never caught up with", c, "server has", q && {scene: q.scene, st: q.st}); return gap; }
+    await sleep(100);
+  }
+};
 const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
 async function open(name, char) {                                  // joins the room and stops in the waiting room
   const page = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage();          // one window each: a background tab's animation is paused, which would stall that player's game clock
@@ -49,10 +62,13 @@ try {
   check("characters match the picks and their models loaded", A.peers[0].char === 3 && B.peers[0].char === 0 && A.peers[0].model && B.peers[0].model);
   check("the server runs B1's monsters, so neither page does", !A.host && !B.host && !!floorOf("B1") && floorOf("B1").monsters.length === A.mons.length, `(${A.mons.length} monsters)`);
   check("same monster count", A.mons.length > 0 && A.mons.length === B.mons.length, `(${A.mons.length})`);
-  await sleep(1500);
-  A = await info(a); B = await info(b);
-  const maxd = Math.max(...A.mons.map((m, i) => Math.hypot(m[0] - B.mons[i][0], m[1] - B.mons[i][1])));
-  check("monsters agree across clients", maxd < 1.5, `(max gap ${maxd.toFixed(2)} m)`);
+  // the two pages are read one after the other, and on a slow page a read can take a second or two, in which a walking monster moves 1-3 m: stop the
+  // server's monsters where they stand (they are parked right after this anyway), then compare once both pages have the server's latest snapshot
+  for (const m of floorOf("B1").monsters) { m.cfg = {...m.cfg, patrol: 0, alert: 0, chase: 0}; m.path = []; m.wait = 99; }
+  let maxd = Infinity; const settle = Date.now() + 15000;
+  do { await sleep(500); A = await info(a); B = await info(b); maxd = Math.max(...A.mons.map((m, i) => Math.hypot(m[0] - B.mons[i][0], m[1] - B.mons[i][1]))); } while (maxd >= 1.5 && Date.now() < settle);
+  const srvMons = floorOf("B1").monsters.map(m => [m.pos.x, m.pos.z]), offA = Math.max(...A.mons.map((m, i) => Math.hypot(m[0] - srvMons[i][0], m[1] - srvMons[i][1])));
+  check("monsters agree across clients", maxd < 1.5, `(max gap ${maxd.toFixed(2)} m; page A to the server ${offA.toFixed(2)} m)`);
   parkMonsters(floorOf("B1")); guard("TEST");                                                           // from here the test is about guns, fuses and doors: the monsters stand still, far away, and the players are safe
 
   // ---- guns: one gun each from the B1 lockers, shared state, and a leaver's locker opens again
@@ -134,11 +150,11 @@ try {
   check("the L1 stair door starts locked", await a.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
   const goSw = (page, xz) => page.evaluate(t => { const g = window.__game; g.P.p.set(t[0], g.S.floor + 0.02, t[1]); g.P.v.set(0, 0, 0); }, xz);
   parkMonsters(floorOf("L1"), 0); { const m = floorOf("L1").monsters[0]; m.pos.set(swSpots[1][0] + 8, m.fy, swSpots[1][1]); m.state = "patrol"; m.path = []; }     // a monster within earshot of switch 1
-  await goSw(guest, swSpots[1]); await guest.keyboard.press("KeyX");
+  await goSw(guest, swSpots[1]); await atServer(guest); await guest.keyboard.press("KeyX");
   await until("the guest flips switch 2 (the host sees it)", host, () => { const st = window.__game.SW.st.L1; return !!st && st[1].on && !st[0].on; });
   check("one switch is not enough", await host.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
   await serverUntil("the server's monster went to look at the clunk", () => { const m = floorOf("L1").monsters[0]; return m.state === "search" || m.state === "chase"; });
-  await goSw(host, swSpots[0]); await host.keyboard.press("KeyX");
+  await goSw(host, swSpots[0]); await atServer(host); await host.keyboard.press("KeyX");
   await until("the host flips the other switch; the guest sees the door powered", guest, () => { const st = window.__game.SW.st.L1; return !!st && st.every(x => x.on) && !window.__game.isLocked(window.__game.upDoor()); });
 
   // ---- L2 keypad: notes read by different players are shared; the code stays on the server; a wrong code locks it for everyone
@@ -157,7 +173,7 @@ try {
   const wrongCode = code.map(d => (d + 1) % 10).join("");
   const typist = await guest.evaluate(() => [window.__game.P.p.x, window.__game.P.p.z]);
   parkMonsters(floorOf("L2"), 0); { const m = floorOf("L2").monsters[0]; m.pos.set(typist[0] + 8, m.fy, typist[1]); m.state = "patrol"; m.path = []; }      // a monster within earshot of the keypad
-  await guest.evaluate(w => window.__game.kpAct({a: "try", code: w}), wrongCode);
+  await atServer(guest); await guest.evaluate(w => window.__game.kpAct({a: "try", code: w}), wrongCode);
   await until("a wrong code locks the keypad for both", host, () => { const v = window.__game.KP.st.L2; return v.fails === 1 && v.lockMs > 7000; });
   await until("the guest sees the lock too", guest, () => window.__game.KP.st.L2.fails === 1);
   await serverUntil("the wrong code sent the server's monster to the door", () => { const m = floorOf("L2").monsters[0]; return m.state === "search" || m.state === "chase"; });
@@ -188,7 +204,7 @@ try {
 
   // doors: opened by the guest, open for the host; then shut by the guest, shut for the host
   const door = await guest.evaluate(() => { const g = window.__game, d = g.doors.find(x => !x.link && x.target === 0); if (!d) return null; g.P.p.set(d.cx + 2, d.cy + 0.02, d.cz); g.P.v.set(0, 0, 0); return d.d.name; });      // the server only opens a door for someone near it
-  await sleep(600); if (door) await guest.evaluate(n => { const g = window.__game; g.openDoor(g.doors.find(x => x.d.name === n), true); }, door);
+  if (door) await atServer(guest); if (door) await guest.evaluate(n => { const g = window.__game; g.openDoor(g.doors.find(x => x.d.name === n), true); }, door);
   if (door) await until("door opened by one is open for the other", host, n => window.__game.doors.find(x => x.d.name === n).target === 1, door); else check("door opened by one is open for the other", false, "no door found");
   const closedOk = await guest.evaluate(n => { const g = window.__game; return g.closeDoor(g.doors.find(x => x.d.name === n)); }, door);
   await sleep(600);
@@ -207,6 +223,7 @@ try {
   let steps = 0;
   for (let attempt = 1; attempt <= 3 && steps < 78; attempt++) {
     await host.evaluate(b => { const g = window.__game; g.P.p.set(b.x, g.S.floor + 0.02, b.z); g.P.v.set(0, 0, 0); g.P.yaw = Math.PI / 2; }, body);
+    await atServer(host);
     await until("host is offered the revive", host, () => !!window.__game.reviveTarget());
     // hold E and advance the host's game clock by hand (software rendering is too slow to wait for 4 s of frames)
     steps = await host.evaluate(() => { const g = window.__game; g.keys.KeyX = true; let n = 0; while (g.reviveTarget() && n < 400) { g.update(0.05); n++; } g.keys.KeyX = false; return n; });
@@ -249,9 +266,12 @@ try {
   check("a room that did not use the L3 box finds L4 shut", await solo2.evaluate(() => { const g = window.__game; return !g.POWER.on && !g.S.shutter.off && !!g.collide({x: 0, y: g.S.floor + 0.3, z: 27.2}); }));
   await serverUntil("the server runs L4 for the other room", () => !!floorOf("L4", "OTHER")); parkMonsters(floorOf("L4", "OTHER"));
   await solo2.evaluate(() => { const g = window.__game, sp = g.S.pw.spot; g.P.p.set(sp[0] + 1.2, g.S.floor + 0.02, sp[1]); g.P.v.set(0, 0, 0); });
-  await solo2.keyboard.press("KeyX");
-  await until("the L4 far switch powers it through the server", solo2, () => window.__game.POWER.on && window.__game.POWER.by === "L4" && !window.__game.S.shutter.off === false);
-  check("the room's state is its own", srv.rooms.get("OTHER").power.by === "L4" && srv.rooms.get("TEST").power.by === "L3");
+  await atServer(solo2, "OTHER"); await solo2.keyboard.press("KeyX");
+  const farOk = await solo2.waitForFunction(() => window.__game.POWER.on && window.__game.POWER.by === "L4" && !window.__game.S.shutter.off === false, null, {timeout: 60000, polling: 200}).then(() => true, () => false);
+  const farWhy = farOk ? "" : JSON.stringify({client: await solo2.evaluate(() => { const g = window.__game; return {near: g.nearPower(), at: [g.P.p.x, g.P.p.y, g.P.p.z].map(v => +v.toFixed(2)), power: g.POWER, shutter: g.S.shutter && g.S.shutter.off, dead: g.dead, loading: g.loading, scene: g.S.id}; }),
+    server: [...srv.rooms.get("OTHER").players.values()].map(q => ({scene: q.scene, st: q.st && [q.st.x, q.st.y, q.st.z]})), power: srv.rooms.get("OTHER").power});
+  check("the L4 far switch powers it through the server", farOk, farWhy);
+  check("the room's state is its own", srv.rooms.get("OTHER").power.by === "L4" && srv.rooms.get("TEST").power.by === "L3", JSON.stringify({other: srv.rooms.get("OTHER").power, test: srv.rooms.get("TEST").power}));
 
   // ---- the finale in a third room: the alarm for both, the first out is place 1, the results come when the second is out
   for (const pg of [a, b, solo2]) await pg.close().catch(() => {});             // software rendering: free the CPU for the last room
