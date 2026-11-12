@@ -139,3 +139,27 @@ test("the bank and the system page say when the City was last saved (slice 9)", 
   const old = computerPages(st, null, newNeeds());
   assert.ok(!old.bank.lines.some(l => /saved/i.test(l)), "callers that do not pass a save time get no line");
 });
+
+test("the stalker waits outside the tower door, 14 m along the street on the side it was (slice 10)", async () => {
+  const {stalkerWaitAt, STALKER_WAIT, TOWER_FRONT, ROAD, BUILDINGS, buildingBox} = await import("./city.js");
+  const [ax, , az] = TOWER_FRONT.arrive;
+  for (const [sx, sz] of [[0, -40], [3, -100], [-2, 5], [-6, -19.5], [9, -18]]) {
+    const w = stalkerWaitAt(sx, sz);
+    assert.ok(Math.hypot(w.x - ax, w.z - az) >= STALKER_WAIT - 1e-9, `${sx},${sz} -> ${JSON.stringify(w)}`);
+    assert.ok(Math.abs(w.x) <= 4 && w.z >= ROAD.z0 && w.z <= ROAD.z1, "on the road");
+    for (const b of BUILDINGS) { const bx = buildingBox(b); assert.ok(!(w.x > bx.min[0] && w.x < bx.max[0] && w.z > bx.min[2] && w.z < bx.max[2]), b.id); }
+  }
+  assert.ok(stalkerWaitAt(0, -60).z < az && stalkerWaitAt(0, 0).z > az, "it stays on the side of the door it came from");
+});
+test("only a stalker that is out at night follows, and only between the street and the apartment (slice 10)", async () => {
+  const {carryStalker, STALKER} = await import("./city.js");
+  const out = {active: true, x: 1, z: -50, wait: 0};
+  const inside = carryStalker(out, 1.5, "apartment");
+  assert.ok(inside.active && inside.waited && inside.wait === 0);
+  const back = carryStalker(inside, 2, "street");
+  assert.ok(back.active && back.waited && back.x === inside.x && back.z === inside.z, "it is where it waited");
+  for (const [s, h, to] of [[out, 7, "apartment"], [out, 12, "street"], [{...out, active: false, wait: 2}, 1, "apartment"], [out, 1, "parking_lot"], [out, 1, "main_floor"], [null, 1, "street"]]) {
+    const r = carryStalker(s, h, to);
+    assert.deepEqual(r, {active: false, x: 0, z: 0, wait: STALKER.firstWait}, JSON.stringify([s, h, to]));
+  }
+});

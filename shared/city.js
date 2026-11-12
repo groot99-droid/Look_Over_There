@@ -173,5 +173,21 @@ export function stalkerStep(s, dt, o) {
   return {...s, x, z, caught: Math.hypot(o.px - x, o.pz - z) <= STALKER.catchDist};
 }
 // the City time (seconds) of the next 06:00 after t: what the bed skips to, and when you wake after a blackout
+// ---- the stalker follows you (slice 10): "It is the only monster that follows between areas" (docs/WORLD.md). At night the only places open are the street and your apartment,
+// so following means it does not go away when you go in: it waits outside the tower's door, 14 m up or down the street (the side it was on), and is there when you step out.
+// The apartment stays safe. It is still gone at dawn, after you sleep and after a blackout, and it does not follow you anywhere but between the street and the apartment.
+export const STALKER_WAIT = STALKER.minSpawn;                                              // metres from the tower door's arrival spot
+export function stalkerWaitAt(sx, sz, front = TOWER_FRONT.arrive) {
+  const side = sz > front[2] ? 1 : -1;                                                     // down the street (toward the bus stop) or up it
+  return {x: clampTo(sx, -4, 4), z: clampTo(front[2] + side * STALKER_WAIT, ROAD.z0 + 3, ROAD.z1 - 3)};
+}
+// what a scene change does to the stalker: s is its state, hour the City's hour, to the scene you are going to
+export function carryStalker(s, hour, to) {
+  const fresh = {active: false, x: 0, z: 0, wait: STALKER.firstWait};
+  if (!s || !s.active || !dangerous(hour)) return fresh;
+  if (to === "apartment") return {active: true, ...stalkerWaitAt(s.x, s.z), wait: 0, waited: true};
+  if (to === "street") return {active: true, x: s.x, z: s.z, wait: 0, waited: !!s.waited};
+  return fresh;
+}
 export const nextMorning = t => secondsAt(DAWN_H, dayAt(t) + (hourAt(t) >= DAWN_H ? 1 : 0));
 export const bedUse = {at: [-1.4, 0.3], reach: 1.5};            // F here sleeps (from 20:00; by day you are not tired)

@@ -222,7 +222,7 @@ import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
 import {GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
-import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse} from "./shared/city.js";
+import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker} from "./shared/city.js";
 
 const MON_URL = "world/monsters.json";
 // one scene is resident at a time; the floors are joined by doors at the top of the stairs (doors carry a "link" to the scene they open)
@@ -422,7 +422,7 @@ async function loadScene(id, arrival) {
   S.shutter = null;
   if (id === "L4") { S.shutter = {n: [-2.7, 9.6, 27.0], x: [2.7, 13.0, 27.5], off: POWER.on}; boxes.push(S.shutter); }       // the store's glass doors: shut until the power is on (the opening has no collider in the model)
   if (id === OW_SCENE) { overworldProps(root); busStopLotProps(root); }
-  CITY.st = {active: false, x: 0, z: 0, wait: 6}; CITY.mesh = null;                                // the stalker belongs to one visit to the street
+  CITY.st = carryStalker(CITY.st, hourAt(CITY.t), id); CITY.mesh = null;                          // slice 10: at night it waits outside your apartment; otherwise it belongs to one visit to the street
   if (id === CITY_SCENE) cityProps(root);
   if (id === APT_SCENE) apartmentProps(root);
   if (id === GROCERY_SCENE) groceryProps(root);
@@ -1842,6 +1842,8 @@ function stalkerMesh() {
 }
 function stalkerTick(dt) {
   const on = S.id === CITY_SCENE && dangerous(hourAt(CITY.t)) && !dead;
+  if (!on && CITY.st.active && dangerous(hourAt(CITY.t)) && S.id === APT_SCENE) return;          // slice 10: you are inside; it stands where it is, outside your door, until you come out or dawn
+  if (on && CITY.st.waited) { CITY.st = {...CITY.st, waited: false}; toast("It waited for you. It is out here, by your door.", 4200); }
   let seen = false;
   if (CITY.st.active && on) {                                                    // in view: inside your cone and nothing solid between your eyes and its chest
     const d = Math.hypot(CITY.st.x - P.p.x, CITY.st.z - P.p.z);
