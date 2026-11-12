@@ -40,7 +40,7 @@ test("the apartment links match the layout, and the clock runs in both City scen
   assert.ok(into && into.status === "built" && into.soloOnly && out && out.status === "built" && out.soloOnly);
   assert.deepEqual(into.to.arrive, APARTMENT.arrive); assert.deepEqual(into.to.face, APARTMENT.face);
   assert.deepEqual(out.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(out.to.face, TOWER_FRONT.face);
-  assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor"]);
+  assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor", "entrance"]);
   const [hx, hz] = APARTMENT.half, inside = ([x, z]) => Math.abs(x) < hx && Math.abs(z) < hz, hit = ([x, z], b) => x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2];
   for (const p of [APARTMENT.arrive.filter((_, i) => i !== 1), APARTMENT.door.at, APARTMENT.computer.at]) { assert.ok(inside(p), "inside the room " + p); assert.ok(!hit(p, APARTMENT.bed) && !hit(p, APARTMENT.desk), "clear of furniture " + p); }
 });
@@ -162,4 +162,30 @@ test("only a stalker that is out at night follows, and only between the street a
     const r = carryStalker(s, h, to);
     assert.deepEqual(r, {active: false, x: 0, z: 0, wait: STALKER.firstWait}, JSON.stringify([s, h, to]));
   }
+});
+
+test("the mall (slice 13): world/entrance.json is what shared/city.js makes, and the links match the layout", async () => {
+  const {MALL, MALL_FRONT, mallDoc, DOORS} = await import("./city.js");
+  assert.deepEqual(JSON.parse(fs.readFileSync(new URL("../world/entrance.json", import.meta.url), "utf8")), JSON.parse(JSON.stringify(mallDoc())));
+  const {REGISTRY} = await import("./registry.js");
+  const into = REGISTRY.linkFrom("street", "mall"), out = REGISTRY.linkFrom("entrance", "front_door");
+  assert.ok(into && out && into.soloOnly && out.soloOnly);
+  assert.deepEqual(into.to.arrive, MALL.arrive); assert.deepEqual(into.to.face, MALL.face);
+  assert.deepEqual(out.to.arrive, MALL_FRONT.arrive); assert.deepEqual(out.to.face, MALL_FRONT.face);
+  const door = DOORS.find(d => d.id === "mall");
+  assert.ok(Math.hypot(door.x - MALL_FRONT.arrive[0], door.z - MALL_FRONT.arrive[2]) < door.reach, "you come out at the MALL door");
+  const [hx, hz] = MALL.half, solid = [MALL.fountain, ...MALL.benches], hit = ([x, z], b) => x > b.min[0] - 0.3 && x < b.max[0] + 0.3 && z > b.min[2] - 0.3 && z < b.max[2] + 0.3;
+  for (const p of [[MALL.arrive[0], MALL.arrive[2]], MALL.door.at, ...MALL.benches.map(b => b.at)]) {
+    assert.ok(Math.abs(p[0]) < hx && Math.abs(p[1]) < hz, `inside: ${p}`);
+    for (const b of solid) assert.ok(!hit(p, b), `${p} clear of a solid`);
+  }
+  assert.ok(Math.hypot(MALL.arrive[0] - MALL.door.at[0], MALL.arrive[2] - MALL.door.at[1]) < MALL.door.reach, "you arrive by the door");
+});
+test("the mall locks from 20:00 to 06:00, and unlocks at the next 06:00", async () => {
+  const {mallLocked, mallUnlocks, storesOpen, secondsAt, hourAt, dayAt} = await import("./city.js");
+  for (const h of [20, 21.5, 23.9, 0, 3, 5.9]) assert.ok(mallLocked(h), `locked at ${h}`);
+  for (const h of [6, 8, 12, 19.9]) assert.ok(!mallLocked(h), `unlocked at ${h}`);
+  assert.ok(!storesOpen(7) && !mallLocked(7), "06:00 to 08:00: you can leave but not go in");
+  const u = mallUnlocks(secondsAt(20.5, 2)); assert.equal(dayAt(u), 3); assert.ok(Math.abs(hourAt(u) - 6) < 1e-9);
+  const v = mallUnlocks(secondsAt(2, 3)); assert.equal(dayAt(v), 3); assert.ok(Math.abs(hourAt(v) - 6) < 1e-9);
 });

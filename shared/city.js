@@ -78,7 +78,7 @@ export const streetDoc = () => ({scene: "street", colliders: colliders(), doors:
 
 // ---- the apartment (slice 2): your one room, reached from the apartment tower's door on the street. For v0 the tower door opens straight into it (the tower's lobby, atrium and floors are the
 // hotel area, planned); the City's clock keeps running while you are inside. One room, a bed, a desk with the computer, a window onto the street's sky, and a door back out. Blockout, no art.
-export const CITY_SCENES = ["street", "apartment", "main_floor"];            // the scenes where the City's clock (and hunger) runs: the street, your apartment, the grocery
+export const CITY_SCENES = ["street", "apartment", "main_floor", "entrance"];      // slice 13: and the mall            // the scenes where the City's clock (and hunger) runs: the street, your apartment, the grocery
 export const APARTMENT = {
   half: [3, 2.5], h: 2.8,                                      // the room is x in [-3, 3], z in [-2.5, 2.5], 2.8 m high
   arrive: [1.5, 0, 1.4], face: [0, -1],                        // you come in through the door on the south wall and face the room
@@ -123,6 +123,33 @@ export function groceryColliders() {
 }
 export const groceryDoc = () => ({scene: "main_floor", colliders: groceryColliders(), doors: [], cameras: [],
   markers: [{name: "Spawn_door", kind: "Spawn", level: "main_floor", position: GROCERY.arrive}, {name: "Checkout", kind: "Interact", level: "main_floor", position: [GROCERY.checkout.at[0], 0, GROCERY.checkout.at[1]]}]});
+
+// ---- the mall (slice 13): "The mall can lock you in" (docs/WORLD.md). The manifest's `mall` area, scene `entrance`, behind the street's MALL door. You can go in while the stores
+// are open (08:00 to 20:00); unlike the grocery, nobody shows you out: at 20:00 the doors lock with you inside, until dawn (06:00). Hunger and rest go on counting. Two benches
+// in the atrium let you sleep through to dawn (they do not save: the bed at home is the only save point). One atrium, x in [-16, 16], z in [-12, 12], 7 m high, a dry fountain
+// in the middle and shuttered shopfronts round the walls. Blockout, no art.
+export const MALL = {
+  half: [16, 12], h: 7,
+  arrive: [0, 0, 10.4], face: [0, -1],
+  door: {at: [0, 11.3], reach: 1.8},
+  fountain: {min: [-2.5, 0, -4.5], max: [2.5, 0.7, 0.5]},
+  benches: [-8, 8].map(x => ({min: [x - 1.2, 0, -1.35], max: [x + 1.2, 0.5, -0.65], at: [x, 0.2], reach: 1.6})),          // stand on the south side of a bench
+  shops: ["SHOES", "PHONES", "FOOD COURT", "CLOSED FOR RENOVATION", "GIFTS", "PHOTO", "OPTICIAN", "TOYS"],                     // shuttered fronts: four on the north wall, two on each side
+};
+export const MALL_FRONT = {arrive: [6.2, 0, -67], face: [-1, 0]};               // where you stand on the street when you come out (the MALL door is on the east side at z = -67)
+export const mallLocked = h => h >= CLOSE_H || h < DAWN_H;                   // locked from 20:00 to 06:00; you can only go in while the stores are open (storesOpen)
+export const mallUnlocks = t => secondsAt(DAWN_H, dayAt(t) + (hourAt(t) >= DAWN_H ? 1 : 0));   // the City time the doors open again: the next 06:00
+export function mallColliders() {
+  const c = [], add = (s, min, max) => c.push({s, min, max}), [hx, hz] = MALL.half, h = MALL.h, t = 0.2;
+  add("Floor_Mall", [-hx - t, -1, -hz - t], [hx + t, 0, hz + t]); add("Ceiling_Mall", [-hx - t, h, -hz - t], [hx + t, h + t, hz + t]);
+  add("Wall_N", [-hx - t, 0, -hz - t], [hx + t, h, -hz]); add("Wall_S", [-hx - t, 0, hz], [hx + t, h, hz + t]);
+  add("Wall_W", [-hx - t, 0, -hz], [-hx, h, hz]); add("Wall_E", [hx, 0, -hz], [hx + t, h, hz]);
+  add("Fountain", MALL.fountain.min, MALL.fountain.max);
+  MALL.benches.forEach((b, i) => add("Bench_" + i, b.min, b.max));
+  return c;
+}
+export const mallDoc = () => ({scene: "entrance", colliders: mallColliders(), doors: [], cameras: [],
+  markers: [{name: "Spawn_door", kind: "Spawn", level: "entrance", position: MALL.arrive}]});
 
 // ---- the computer: what its pages say. `st` is {hour, day, clock, open}; `apps` is the applications state of shared/application.js (optional). Pure, so it is tested; the page only draws the strings. Job search lists the five Hallam Row jobs but applications open later (slice 3).
 export const JOBS = BUILDINGS.filter(b => b.door && b.door.job).map(b => ({id: b.id, address: b.door.label, job: b.door.job, quiz: b.door.quiz || null}));      // quiz: the key in shared/application.js (only the Intern has one so far)
