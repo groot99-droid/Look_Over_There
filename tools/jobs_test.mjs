@@ -76,7 +76,7 @@ try {
   await page.keyboard.press("KeyF");
   let s0 = await state();
   const shown = await page.evaluate(() => ({title: document.getElementById("sh-title").textContent, text: document.getElementById("sh-text").textContent}));
-  check("F opens the shift screen: the job, that its game is not built yet, the hours and the pay", s0.sh && /41 HALLAM ROW · TRASH TRUCK WORKER/.test(shown.title) && /not built yet.*4 hours.*\$10/.test(shown.text), JSON.stringify(shown));
+  check("F opens the shift screen: the job, the route, the hours and the pay (slice 11: the trash job is a route)", s0.sh && /41 HALLAM ROW · TRASH TRUCK WORKER/.test(shown.title) && /8 bins.*4 hours.*\$2 a bin/.test(shown.text), JSON.stringify(shown));
   const pBefore = await page.evaluate(() => window.__game.P.p.toArray());
   await page.evaluate(() => { window.__game.keys.KeyW = true; }); await frames(30); await page.evaluate(() => { window.__game.keys.KeyW = false; });
   check("while the screen is up you do not walk", (await page.evaluate(() => window.__game.P.p.toArray())).every((v, i) => Math.abs(v - pBefore[i]) < 1e-6));
@@ -84,7 +84,9 @@ try {
   check("Esc closes it and nothing happened", !(await state()).sh && Math.abs((await state()).hour - s0.hour) < 0.05 && (await state()).needs.money === s0.needs.money);
   await page.keyboard.press("KeyF"); await page.click("#sh-work"); await frames(2);
   let s1 = await state();
-  check("working it: 4 hours pass, $10 paid with the job's name, hunger drains for those hours", !s1.sh && Math.abs(s1.hour - (s0.hour + 4)) < 0.1 && s1.needs.money === s0.needs.money + STUB_SHIFTS.trash.pay && s1.needs.lastNote === "Trash truck worker" && Math.abs((s0.needs.hunger - s1.needs.hunger) - 4 * HUNGER.perHour) < 0.5 && /paid \$10/.test(await toast()), JSON.stringify({s0: [s0.hour, s0.needs], s1: [s1.hour, s1.needs]}));
+  check("starting it puts you on the route (the clock does not jump)", !s1.sh && Math.abs(s1.hour - s0.hour) < 0.1 && await page.evaluate(() => window.__game.CITY.tr.active), JSON.stringify([s0.hour, s1.hour]));
+  await page.keyboard.press("KeyF"); await frames(2); s1 = await state();
+  check("clocking out straight away at the depot pays $0 for 0 bins (the whole route is in trash_test)", !(await page.evaluate(() => window.__game.CITY.tr.active)) && s1.needs.money === s0.needs.money && s1.needs.lastNote === "Trash route 0/8" && /Paid: \$0/.test(await toast()), JSON.stringify(s1.needs));
   await atDoor("w41", 17);
   check("after 16:00 the trash shift says when shifts start", /Shifts start between 08:00 and 16:00/.test(await prompt()), await prompt());
   await page.keyboard.press("KeyF"); await frames(2);
