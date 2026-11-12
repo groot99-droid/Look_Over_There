@@ -5,7 +5,7 @@
 import {REGISTRY} from "./registry.js";
 export const LOOT = REGISTRY.loot;                      // lockers and packs per floor: from the world manifest
 export const GUN_ROUNDS = 3, PACK_ROUNDS = 3, MAX_ROUNDS = 9, BEACONS = 2, MAX_BEACONS = 2;
-export const LOOT_FLOORS = Object.keys(LOOT);
+export const LOOT_FLOORS = Object.keys(LOOT).filter(f => f in REGISTRY.floors);          // the floors a room runs: a page-only scene (a Going back in chamber) has loot on the page but none on the server
 export const newLoot = scene => LOOT[scene] ? {lockers: Array(LOOT[scene].lockers).fill(0), packs: Array(LOOT[scene].packs).fill(0), beacons: Array(BEACONS).fill(0)} : null;
 const ok = (st, kind, i) => !!st && Array.isArray(st[kind]) && Number.isInteger(i) && i >= 0 && i < st[kind].length && st[kind][i] === 0;
 // Each returns the new floor state, or null when it is not allowed. They never mutate st.

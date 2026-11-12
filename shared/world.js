@@ -22,8 +22,8 @@ export function near(W, x, z, r) {
   return out;
 }
 // a world from world/<id>.json (the server's way; the page builds the same boxes itself and adds its doors' leaves): colliders, doors and the L4 shutter
-export function worldFromDoc(doc, id, {powerOn = false} = {}) {
-  const W = newWorld(id);
+export function worldFromDoc(doc, id, {powerOn = false, floor, art} = {}) {          // floor and art: for a Going back in chamber, whose id is not a floor (art = the floor whose model it reuses)
+  const W = newWorld(id, floor); if (art) W.art = art;
   for (const c of doc.colliders) W.boxes.push({n: c.min, x: c.max});
   for (const d of doc.doors || []) {
     const th = d.closed_yaw_deg * Math.PI / 180, dir = [Math.cos(th), -Math.sin(th)];
@@ -57,7 +57,7 @@ export function buildNav(W, fy) {
       if (x >= b.n[0] && x <= b.x[0] && z >= b.n[2] && z <= b.x[2] && b.x[1] >= fy - 0.15 && b.x[1] <= fy + 0.15 && b.n[1] < fy) ground = true;
       if (x + 0.4 > b.n[0] && x - 0.4 < b.x[0] && z + 0.4 > b.n[2] && z - 0.4 < b.x[2] && b.n[1] < fy + 1.7 && b.x[1] > fy + 0.35) { blocked = true; break; }
     }
-    walk[j * NW + i] = ground && !blocked && !(W.id === "L4" && z > 27.6) ? 1 : 0;       // the parking lot is safe: monsters do not leave the store
+    walk[j * NW + i] = ground && !blocked && !((W.art || W.id) === "L4" && z > 27.6) ? 1 : 0;       // the parking lot is safe: monsters do not leave the store
   }
   return walk;
 }
