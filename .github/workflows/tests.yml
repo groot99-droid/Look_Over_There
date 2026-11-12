@@ -1,0 +1,47 @@
+name: Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:                          # the fast checks: shared rules, the server, the world manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Shared rules
+        run: node --test shared/*.test.js
+      - name: Server
+        run: npm ci && npm test
+        working-directory: server
+      - name: World manifest
+        run: node tools/manifest.mjs check
+
+  mp_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30          # a full run takes about 7 minutes: the two pages render in software
+    steps:
+      - uses: actions/checkout@v4          # the .blend is in Git LFS and the test does not need it
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the server's dependencies
+        run: npm ci
+        working-directory: server
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.63.0
+          npx playwright install --with-deps chromium
+      - name: Run tools/mp_test.mjs          # two clients in one room against server/server.js (needs internet for three.js from unpkg)
+        run: node tools/mp_test.mjs
