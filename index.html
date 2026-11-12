@@ -215,7 +215,7 @@ import {REGISTRY} from "./shared/registry.js";
 import {requirementsMet} from "./shared/manifest.js";
 import {QUIZZES, grade as gradeQuiz, newApplications, canApply, begin as beginApp, abandon as abandonApp, finish as finishApp} from "./shared/application.js";
 import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
-import {SAVE_KEY, makeSave, readSave} from "./shared/save.js";
+import {SAVE_KEY, makeSave, readSave, NEW_GAME_KEYS} from "./shared/save.js";
 import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, GHOST_WINDOW, ghostLit} from "./shared/anomalies.js";
 import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
@@ -1915,7 +1915,7 @@ function tryCity() {
 }
 
 // ---- the apartment (slice 2): one room off the tower's door, a bed, a desk with the computer, a window onto the sky of the hour, and a door back to the street. Blockout, no art.
-const PC = {open: false, page: "news"};
+const PC = {open: false, page: "news", confirm: false};               // confirm: the New Game button has been pressed once (slice 9)
 function apartmentProps(root) {
   const g = new THREE.Group(), [hx, hz] = APARTMENT.half, h = APARTMENT.h, wall = 0xd8cfc0, M = (c, o = {}) => new THREE.MeshLambertMaterial({color: c, ...o});
   CITY.doors = []; CITY.mats = {window: new THREE.MeshBasicMaterial({color: 0x9ec8ee}), screen: new THREE.MeshLambertMaterial({color: 0x102030, emissive: 0x4a9ad8, emissiveIntensity: 0.9})};
@@ -2029,31 +2029,43 @@ function workShift() {
   const w = hungerCrossed(before, NEEDS.hunger); if (w === "faint") faintNow(); else if (w) setTimeout(() => toast(w === "hungry" ? "You are hungry." : "You are starving. Eat something soon.", 3600), 4300);
 }
 addEventListener("keydown", e => { if (SH.open) { e.preventDefault(); e.stopImmediatePropagation(); if (e.code === "Escape") closeShift(); } }, true);
-const PC_ORDER = ["mail", "news", "jobs", "map", "bank"];
+const PC_ORDER = ["mail", "news", "jobs", "map", "bank", "system"];
+const savedT = () => { try { const s = readSave(localStorage.getItem(SAVE_KEY)); return s ? s.t : null; } catch (e) { return null; } };      // the saved City time, or null
 function drawComputer() {
-  const pages = computerPages(cityState(), APP.st, NEEDS), pg = pages[PC.page];
+  const pages = computerPages(cityState(), APP.st, NEEDS, savedT()), pg = pages[PC.page];
   $("pc-tabs").innerHTML = PC_ORDER.map((k, i) => `<button type="button" data-p="${k}" class="${k === PC.page ? "on" : ""}">${i + 1} ${pages[k].title}</button>`).join("");
-  $("pc-tabs").querySelectorAll("button").forEach(b => { b.onclick = () => { PC.page = b.dataset.p; drawComputer(); }; });
+  $("pc-tabs").querySelectorAll("button").forEach(b => { b.onclick = () => { PC.page = b.dataset.p; PC.confirm = false; drawComputer(); }; });
   $("pc-title").textContent = pg.title; $("pc-body").textContent = pg.lines.join("\n");
   const act = $("pc-actions"); act.innerHTML = "";
   if (PC.page === "jobs") for (const j of JOBS.filter(j => j.quiz)) {                      // one button per job that has an application: shut with its reason when you cannot apply
     const can = canApply(APP.st, j.quiz, cityState().day), b = document.createElement("button"); b.type = "button"; b.dataset.job = j.quiz;
     b.textContent = can.ok ? `Apply: ${j.job} (${j.address})` : `${j.job}: ${can.reason}`; b.disabled = !can.ok; b.onclick = () => openQuiz(j.quiz); act.appendChild(b);
   }
+  if (PC.page === "system") {                                                               // New Game asks twice
+    const btn = (label, a, fn) => { const b = document.createElement("button"); b.type = "button"; b.dataset.act = a; b.textContent = label; b.onclick = fn; act.appendChild(b); };
+    if (!PC.confirm) btn("New Game", "newgame", () => { PC.confirm = true; drawComputer(); });
+    else { btn("Yes: forget the City and start over", "newgame-yes", newGame); btn("Cancel", "newgame-no", () => { PC.confirm = false; drawComputer(); }); }
+  }
+}
+// New Game (slice 9): forget the City (the save and the five job flags) and start it again at 08:00 on day 1 with $20. The Original's flag and the Overworld are not the City's: kept.
+function newGame() {
+  let cleared = true; try { for (const k of NEW_GAME_KEYS) localStorage.removeItem(k); } catch (e) { cleared = false; }
+  CITY.t = 0; CITY.mark = null; CITY.st = {active: false, x: 0, z: 0, wait: 6}; CITY.signPasses = 0; NEEDS = newNeeds(); APP.st = newApplications();
+  closeComputer(); cityLook(); toast(cleared ? "A new start: day 1, 08:00. Nothing is saved yet." : "A new start: day 1, 08:00. (This browser blocks storage, so an old save may come back on a reload.)", 4200);
 }
 // the bed: from 20:00 it skips to 06:00 (nothing is saved yet: the game has no save); by day you are not tired
 function sleepNow() {
   if (phaseAt(hourAt(CITY.t)) === "day") { toast(saveCity() ? "You are not tired, so you only rest a moment. Saved." : "You are not tired. You can sleep from 20:00."); return; }        // by day the bed only saves
   const t1 = nextMorning(CITY.t); NEEDS = sleepDrain(NEEDS, (t1 - CITY.t) * 24 / DAY_S); CITY.t = t1; CITY.mark = "day"; cityLook(); toast(saveCity() ? "You sleep through the night. Dawn. Saved." : "You sleep through the night. Dawn.", 3600);
 }
-function openComputer() { PC.open = true; PC.page = "news"; document.exitPointerLock?.(); $("pc").style.display = "flex"; drawComputer(); $("pc-close").onclick = closeComputer; }
+function openComputer() { PC.open = true; PC.page = "news"; PC.confirm = false; document.exitPointerLock?.(); $("pc").style.display = "flex"; drawComputer(); $("pc-close").onclick = closeComputer; }
 function closeComputer() { closeQuiz(); if (!PC.open) return; PC.open = false; $("pc").style.display = "none"; }
 addEventListener("keydown", e => {                                                           // the computer takes the keyboard while it is up
   if (!PC.open) return;
   e.preventDefault(); e.stopImmediatePropagation();
   if (QZ.open) { if (e.code === "Escape") closeQuiz(); return; }                             // the quiz is on top of the computer: Esc closes it first
   if (e.code === "Escape" || e.code === "KeyF" || e.code === "KeyX") closeComputer();
-  else if (/^Digit[1-5]$/.test(e.code)) { PC.page = PC_ORDER[+e.code.slice(5) - 1]; drawComputer(); }
+  else if (/^Digit[1-6]$/.test(e.code)) { PC.page = PC_ORDER[+e.code.slice(5) - 1]; PC.confirm = false; drawComputer(); }
 }, true);
 
 // ---------------------------------------------------------------- multiplayer: a room of up to 8; server/server.js relays everything and only picks each scene's host

@@ -49,7 +49,7 @@ test("the computer's pages say the day, the store hours and the five jobs", () =
   const open = computerPages({hour: 12.5, day: 1, clock: "12:30", open: true}), shut = computerPages({hour: 22, day: 1, clock: "22:00", open: false});
   assert.match(open.news.lines[1], /open for another 7 h 30 min/); assert.match(shut.news.lines[1], /closed for the night/);
   assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.every(l => !/not hiring yet/.test(l)));
-  assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map", "bank"]);
+  assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map", "bank", "system"]);
 });
 
 test("you see what is in front of you: the cone is 38 degrees either side of where you face", () => {
@@ -122,4 +122,20 @@ test("the bank page shows your money, the last pay and the fridge", () => {
   const st = {hour: 12, day: 1, clock: "12:00", open: true};
   assert.match(computerPages(st, null, newNeeds()).bank.lines.join("\n"), /Balance: \$20[\s\S]*No pay yet[\s\S]*Nothing\./);
   assert.match(computerPages(st, null, {...newNeeds(), money: 31, lastPay: 10, lastNote: "PENDING", pantry: {soup: 2}}).bank.lines.join("\n"), /Balance: \$31[\s\S]*\+\$10 \(PENDING\)[\s\S]*Canned soup: 2/);
+});
+
+test("the bank and the system page say when the City was last saved (slice 9)", async () => {
+  const {computerPages, savedLine, secondsAt} = await import("./city.js");
+  const {newNeeds} = await import("./needs.js");
+  const st = {hour: 10, clock: "10:00", day: 2, open: true, phase: "day"};
+  assert.equal(savedLine(null), "Not saved yet. The bed in your apartment saves.");
+  assert.equal(savedLine(secondsAt(14.5, 3)), "Last saved: Day 3, 14:30.");
+  const p = computerPages(st, null, newNeeds(), secondsAt(6, 2));
+  assert.ok(p.bank.lines.includes("Last saved: Day 2, 06:00."), p.bank.lines.join("|"));
+  assert.ok(p.system.lines.includes("Last saved: Day 2, 06:00."));
+  assert.match(p.system.lines.join(" "), /NEW GAME/);
+  const none = computerPages(st, null, newNeeds(), null);
+  assert.ok(none.bank.lines.includes("Not saved yet. The bed in your apartment saves."));
+  const old = computerPages(st, null, newNeeds());
+  assert.ok(!old.bank.lines.some(l => /saved/i.test(l)), "callers that do not pass a save time get no line");
 });
