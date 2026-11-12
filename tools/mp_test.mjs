@@ -11,7 +11,7 @@ const {chromium} = createRequire(import.meta.url)("playwright");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const CPU_SLOW = Number(process.env.MP_CPU_SLOW) || 1;
 let failed = 0;
-const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
+const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; return !!ok; };
 
 const srv = await createServer({port: 0, countdownMs: 400});
 // the server runs the monsters and owns health: tests reach into it (it runs in this process)
@@ -20,16 +20,34 @@ const parkMonsters = (floor, except = -1) => floor.monsters.forEach((m, i) => { 
 const guard = code => { for (const p of roomOf(code).players.values()) p.ps.immUntil = 1e15; };                    // the server's immunity: monsters ignore the players (tests that want a hit lift it)
 const serverDown = id => { const p = playerOf(id), now = Date.now() / 1000; p.ps.hp = {hp: 0, hurtAt: now}; p.ps.downAt = now; };          // the server downs a player: their client hears it
 const serverUntil = async (name, fn, ms = 30000, why = () => "") => { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return check(name, true); await sleep(100); } check(name, false, why()); };
-// waits until the server has player `id` within 0.5 m of (x, z). The server judges a door, and centres a switch's noise, on the position it last heard from that
-// player, so a test that moves a player and acts at once races the page's next position report; a slow page loses that race.
-const serverHas = async (id, x, z, ms = 30000, code = "TEST") => { const end = Date.now() + ms; while (Date.now() < end) { const s = playerOf(id, code)?.st; if (s && Math.hypot(s.x - x, s.z - z) < 0.5) return true; await sleep(50); } return false; };
-const xzOf = p => p && p.st ? `server sees ${p.name} on ${p.scene} at (${p.st.x.toFixed(1)}, ${p.st.z.toFixed(1)})` : "server has no position yet";
+// waits until the server has player `id` within 0.5 m of (x, z), and (given y) within 0.3 m of that height. The server judges a door, and centres a switch's noise,
+// on the position it last heard from that player, so a test that moves a player and acts at once races the page's next position report; a slow page loses that race.
+const serverHas = async (id, x, z, {ms = 30000, code = "TEST", y = null} = {}) => { const end = Date.now() + ms; while (Date.now() < end) { const s = playerOf(id, code)?.st; if (s && Math.hypot(s.x - x, s.z - z) < 0.5 && (y === null || Math.abs(s.y - y) < 0.3)) return true; await sleep(50); } return false; };
+const xzOf = p => p && p.st ? `server sees ${p.name} on ${p.scene} at (${p.st.x.toFixed(1)}, ${p.st.y.toFixed(1)}, ${p.st.z.toFixed(1)})` : "server has no position yet";
+// puts a player on the floor at (x, z) and waits until they stand there: on the page (on the ground, at floor height, not moved off) and on the server (which judges
+// doors, switches and noise on what it last heard). A spot inside a collider (a wall) is refused up front: the physics would lift the player onto it or drop them
+// through the floor, the fall catch would then put them on a random spawn, and every check that depends on where they are would fail far from the cause.
+async function stand(page, x, z, label, code = "TEST") {
+  const r = await page.evaluate(([x, z]) => { const g = window.__game, y = g.S.floor + 0.02;
+    if (g.collide({x, y, z})) return {free: false};
+    g.P.p.set(x, y, z); g.P.v.set(0, 0, 0); return {free: true, id: g.net.id, floor: g.S.floor}; }, [x, z]);
+  if (!r.free) return check(`${label}: the spot is open floor`, false, `(${x.toFixed(2)}, ${z.toFixed(2)}) is inside a collider`);
+  const onPage = await page.waitForFunction(([x, z]) => { const g = window.__game, p = g.P.p; return !g.loading && g.P.ground && Math.abs(p.y - g.S.floor) < 0.1 && Math.hypot(p.x - x, p.z - z) < 0.05; }, [x, z], {timeout: 60000, polling: 100}).then(() => true, () => false);
+  const onServer = onPage && await serverHas(r.id, x, z, {code, y: r.floor});
+  const where = () => page.evaluate(() => { const g = window.__game; return `page at (${g.P.p.x.toFixed(2)}, ${g.P.p.y.toFixed(2)}, ${g.P.p.z.toFixed(2)}) floor ${g.S.floor} ground ${g.P.ground} loading ${g.loading}`; });
+  return check(`${label}: the page and the server have the player standing there`, onPage && onServer, onPage && onServer ? "" : `${await where()}; ${xzOf(playerOf(r.id, code))}`);
+}
 // a spot about 8 m from (x, z) from which a monster has a walkable path to it: a monster told of a noise it cannot reach has an empty path and stops searching after SEARCH_S
 function earshot(floor, x, z) {
   const walk = floor.monsters[0].walk, b = nearestWalk(walk, x, z);
   for (let k = 0; k < 32; k++) { const ang = k * Math.PI / 16, px = x + Math.cos(ang) * 8, pz = z + Math.sin(ang) * 8, c = cellOf(px, pz), path = c >= 0 && walk[c] && astar(walk, c, b); if (path && path.length > 4) return [px, pz]; }
   return null;
 }
+// a monster set idle just before a noise: watch the server's monster 0 on `scene` from now on and remember when it first goes to look (search or chase). Its search
+// ends SEARCH_S after it reaches the spot (or at once, if it cannot), and a slow page can take longer than that to show the cause, so a look that started and
+// ended meanwhile still counts. Players are immune and the monster stands still and idle until the noise, so nothing else sends it. Returns () => ms or null.
+const watchLook = (scene, code = "TEST") => { const t0 = Date.now(); let at = null; const tick = setInterval(() => { const m = roomOf(code)?.floors[scene]?.monsters[0]; if (m && (m.state === "search" || m.state === "chase")) { at = Date.now() - t0; clearInterval(tick); } else if (Date.now() - t0 > 90000) clearInterval(tick); }, 20); return () => at; };
+const idle = (m, x, z) => { m.pos.set(x, m.fy, z); m.state = "patrol"; m.path = []; m.target = null; m.last = null; m.lost = 0; m.wait = 99; };          // a monster standing still at (x, z), with nothing on its mind
 const monView = m => `server monster: ${m.state} at (${m.pos.x.toFixed(1)}, ${m.pos.z.toFixed(1)}), path ${m.path.length}, searched ${(m.lost || 0).toFixed(1)} s`;
 const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
 async function open(name, char) {                                  // joins the room and stops in the waiting room
@@ -158,12 +176,16 @@ try {
   check("the L1 stair door starts locked", await a.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
   const goSw = (page, xz) => page.evaluate(t => { const g = window.__game; g.P.p.set(t[0], g.S.floor + 0.02, t[1]); g.P.v.set(0, 0, 0); }, xz);
   const ear = earshot(floorOf("L1"), ...swSpots[1]); check("a spot within earshot of switch 2 with a path to it", !!ear);
-  parkMonsters(floorOf("L1"), 0); { const m = floorOf("L1").monsters[0]; m.pos.set(ear[0], m.fy, ear[1]); m.state = "patrol"; m.path = []; }     // a monster within earshot of switch 2 (it stands still: its speeds are 0)
-  const swGuest = (await info(guest)).id;
-  await goSw(guest, swSpots[1]); await serverHas(swGuest, swSpots[1][0], swSpots[1][1]); await guest.keyboard.press("KeyX");          // the noise is centred where the server has her: wait until it has her at the switch
+  parkMonsters(floorOf("L1"), 0);
+  // the noise is centred where the server has the guest: she must be standing at the switch on the page and on the server before she presses
+  await stand(guest, swSpots[1][0], swSpots[1][1], "the guest at switch 2");
+  // then, right before the press, a monster within earshot of switch 2, idle and standing still (its speeds are 0 and it waits): what follows is the noise's doing
+  idle(floorOf("L1").monsters[0], ...ear);
+  const heard = watchLook("L1");
+  await guest.keyboard.press("KeyX");
   await until("the guest flips switch 2 (the host sees it)", host, () => { const st = window.__game.SW.st.L1; return !!st && st[1].on && !st[0].on; });
   check("one switch is not enough", await host.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
-  await serverUntil("the server's monster went to look at the clunk", () => { const m = floorOf("L1").monsters[0]; return m.state === "search" || m.state === "chase"; }, 30000, () => monView(floorOf("L1").monsters[0]));
+  await serverUntil("the server's monster went to look at the clunk", () => heard() !== null, 30000, () => monView(floorOf("L1").monsters[0]));
   await goSw(host, swSpots[0]); await host.keyboard.press("KeyX");
   await until("the host flips the other switch; the guest sees the door powered", guest, () => { const st = window.__game.SW.st.L1; return !!st && st.every(x => x.on) && !window.__game.isLocked(window.__game.upDoor()); });
 
@@ -183,12 +205,13 @@ try {
   const wrongCode = code.map(d => (d + 1) % 10).join("");
   const typist = await guest.evaluate(() => [window.__game.P.p.x, window.__game.P.p.z]);
   const ear2 = earshot(floorOf("L2"), ...typist); check("a spot within earshot of the keypad with a path to it", !!ear2);
-  parkMonsters(floorOf("L2"), 0); { const m = floorOf("L2").monsters[0]; m.pos.set(ear2[0], m.fy, ear2[1]); m.state = "patrol"; m.path = []; }      // a monster within earshot of the keypad
+  parkMonsters(floorOf("L2"), 0);
   await serverHas(B.id, typist[0], typist[1]);                                                 // the wrong code is loud where the server has the typist
+  idle(floorOf("L2").monsters[0], ...ear2); const heard2 = watchLook("L2");                   // right before the try: a monster within earshot of the keypad, idle
   await guest.evaluate(w => window.__game.kpAct({a: "try", code: w}), wrongCode);
   await until("a wrong code locks the keypad for both", host, () => { const v = window.__game.KP.st.L2; return v.fails === 1 && v.lockMs > 7000; });
   await until("the guest sees the lock too", guest, () => window.__game.KP.st.L2.fails === 1);
-  await serverUntil("the wrong code sent the server's monster to the door", () => { const m = floorOf("L2").monsters[0]; return m.state === "search" || m.state === "chase"; }, 30000, () => monView(floorOf("L2").monsters[0]));
+  await serverUntil("the wrong code sent the server's monster to the door", () => heard2() !== null, 30000, () => monView(floorOf("L2").monsters[0]));
   srv.rooms.get("TEST").keypads.L2.lockUntil = Date.now() + 60000;                         // hold the lock open: this slow browser can take more than its 8 s to get here
   await host.evaluate(c => window.__game.kpAct({a: "try", code: c}), code.join(""));
   await new Promise(r => setTimeout(r, 600));
@@ -214,17 +237,30 @@ try {
   A = await info(a); B = await info(b);
   parkMonsters(floorOf("L2"));
 
-  // doors: opened by the guest, open for the host; then shut by the guest, shut for the host
-  const doorAt = await guest.evaluate(() => { const g = window.__game, d = g.doors.find(x => !x.link && x.target === 0); if (!d) return null; g.P.p.set(d.cx + 2, d.cy + 0.02, d.cz); g.P.v.set(0, 0, 0); return {name: d.d.name, x: d.cx + 2, z: d.cz}; });      // the server only opens a door for someone near it
+  // doors: opened by the guest, open for the host; then shut by the guest, shut for the host. The server only opens or shuts a door for someone standing within 4 m
+  // of it, so the guest stands on open floor beside a door that is shut for everyone. (The first shut door in the list depends on which doors the monsters opened
+  // before they were parked, and 2 m east of many of them is a wall: a player put inside a wall falls through the floor and the fall catch moves them away.)
+  const cands = await guest.evaluate(() => { const g = window.__game, out = [], host = [...g.net.peers.values()][0];
+    for (const d of g.doors) { if (d.link || d.target !== 0 || d.p !== 0 || (host && Math.hypot(host.tx - d.cx, host.tz - d.cz) < 2)) continue;
+      for (const [ox, oz] of [[2, 0], [-2, 0], [0, 2], [0, -2]]) { const x = d.cx + ox, z = d.cz + oz, c = g.cellOf(x, z); if (c >= 0 && g.S.nav[c] && !g.collide({x, y: g.S.floor + 0.02, z})) { out.push({name: d.d.name, x, z}); break; } }
+      if (out.length >= 30) break; }
+    return out; });
+  const doorAt = cands.find(c => { const d = floorOf("L2").W.doors.find(x => x.d.name === c.name); return d && d.target === 0 && d.p === 0; });          // shut on the server too
   const door = doorAt && doorAt.name, guestSid = (await info(guest)).id;
   const sDoor = door && floorOf("L2").W.doors.find(d => d.d.name === door), doorView = () => `server door ${sDoor ? (sDoor.target ? "open" : "shut") : "?"}; ${xzOf(playerOf(guestSid))}`;
-  // wait until the server has the guest by the door (a fixed 600 ms was a race: a slow page sends its position late, and the server refuses the open)
-  if (door) await serverHas(guestSid, doorAt.x, doorAt.z);
+  check("a shut door with open floor beside it", !!door, `(${cands.length} candidates on the page)`);
+  if (door) await stand(guest, doorAt.x, doorAt.z, "the guest beside the door");
+  // the guest's page opens its door at once and tells the server, which sends the floor its list of open doors once a second. For 1.5 s the page keeps its own word
+  // over that list; a list sent before the server took the open (a slow page can read it later than that) would shut the guest's door again. Tap the guest's socket
+  // so the test knows when the guest has the server's word that the door is open: after that list no earlier one can arrive.
+  await guest.evaluate(() => { const g = window.__game; window.__openDoors = null; if (!window.__doorTap) { window.__doorTap = true; g.net.ws.addEventListener("message", e => { try { const m = JSON.parse(e.data); if (m.t === "m" && m.d && m.scene === g.S.id) window.__openDoors = m.d; } catch (err) {} }); } });
   if (door) await guest.evaluate(n => { const g = window.__game; g.openDoor(g.doors.find(x => x.d.name === n), true); }, door);
   if (door) await until("door opened by one is open for the other", host, n => window.__game.doors.find(x => x.d.name === n).target === 1, door, doorView); else check("door opened by one is open for the other", false, "no door found");
+  const guestDoor = () => guest.evaluate(n => { const g = window.__game, d = g.doors.find(x => x.d.name === n); return `the guest's door: target ${d.target}, ${(d.p * 100).toFixed(0)}% open, busy ${g.doorBusy(d)}; the last list the guest had: ${JSON.stringify(window.__openDoors && window.__openDoors.includes(n))}`; }, door);
+  if (!await until("the guest's door is fully open, as the server has it", guest, n => { const d = window.__game.doors.find(x => x.d.name === n); return d.target === 1 && d.p === 1 && !!window.__openDoors && window.__openDoors.includes(n); }, door, doorView)) console.log("  why: " + await guestDoor());
   const closedOk = await guest.evaluate(n => { const g = window.__game, d = g.doors.find(x => x.d.name === n); return {ok: g.closeDoor(d), target: d.target, busy: g.doorBusy(d)}; }, door);
-  await until("a door shut by one is shut for the other", host, n => window.__game.doors.find(x => x.d.name === n).target === 0, door, doorView);
   check("closeDoor reported success", closedOk.ok, closedOk.ok ? "" : `the guest's door was ${closedOk.target ? "open" : "shut"}${closedOk.busy ? " and busy" : ""}; ${doorView()}`);
+  if (!await until("a door shut by one is shut for the other", host, n => window.__game.doors.find(x => x.d.name === n).target === 0, door, doorView)) console.log("  why: " + await guestDoor());
   const blocked = await guest.evaluate(n => { const g = window.__game, d = g.doors.find(x => x.d.name === n); g.openDoor(d, true); d.p = 1; g.P.p.set(d.cx, d.cy + 0.02, d.cz); return g.closeDoor(d); }, door);
   check("a door will not shut on someone standing in it", blocked === false);
   await guest.evaluate(() => { const g = window.__game; g.teleport(g.randomSpawn(g.S.id)); });
@@ -279,9 +315,8 @@ try {
   await solo2.evaluate(() => window.__game.loadScene("L4")); await solo2.waitForFunction(() => window.__game.S.id === "L4" && !window.__game.loading, null, {timeout: 60000});
   check("a room that did not use the L3 box finds L4 shut", await solo2.evaluate(() => { const g = window.__game; return !g.POWER.on && !g.S.shutter.off && !!g.collide({x: 0, y: g.S.floor + 0.3, z: 27.2}); }));
   await serverUntil("the server runs L4 for the other room", () => !!floorOf("L4", "OTHER")); parkMonsters(floorOf("L4", "OTHER"));
-  await solo2.evaluate(() => { const g = window.__game, sp = g.S.pw.spot; g.P.p.set(sp[0] + 1.2, g.S.floor + 0.02, sp[1]); g.P.v.set(0, 0, 0); });
-  const cy = [...roomOf("OTHER").players.values()][0], spot = await solo2.evaluate(() => [window.__game.P.p.x, window.__game.P.p.z]);
-  await serverHas(cy.id, spot[0], spot[1], 30000, "OTHER");                                            // the far switch is loud where the server thinks Cy is
+  const cy = [...roomOf("OTHER").players.values()][0], sw4 = await solo2.evaluate(() => window.__game.S.pw.spot);
+  await stand(solo2, sw4[0] + 1.2, sw4[1], "Cy at the L4 far switch", "OTHER");                     // the far switch is loud where the server thinks Cy is
   const nearAtPress = await solo2.evaluate(() => window.__game.nearPower());
   await solo2.keyboard.press("KeyX");
   const powerView = () => `the page was ${nearAtPress ? "" : "not "}near the switch at the press; server power ${JSON.stringify(roomOf("OTHER").power)}; ${xzOf(cy)}`;
