@@ -73,6 +73,8 @@ The area `gbi` holds the chambers. A chamber is a scene with a `chamber: {floor,
 
 **City anomalies (slice 8).** No manifest change: the three anomalies are props of the `street` scene (`shared/anomalies.js`, pure, tested), drawn by the page and absent from `world/street.json`, so they collide with nothing and the world-file check is unchanged. The sign's pass count lives for the page only.
 
+**New Game (slice 9).** New Game, on the apartment computer's SYSTEM page, removes `city_save` and the five job flags (`job_intern`, `job_trash`, `job_museum`, `job_lab`, `job_factory`: `NEW_GAME_KEYS` in `shared/save.js`), so every link that `requires` a job is shut again until you are hired anew. It never removes `original_complete`, which belongs to the Original.
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.

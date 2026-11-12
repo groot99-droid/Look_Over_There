@@ -127,7 +127,10 @@ export const groceryDoc = () => ({scene: "main_floor", colliders: groceryCollide
 // ---- the computer: what its pages say. `st` is {hour, day, clock, open}; `apps` is the applications state of shared/application.js (optional). Pure, so it is tested; the page only draws the strings. Job search lists the five Hallam Row jobs but applications open later (slice 3).
 export const JOBS = BUILDINGS.filter(b => b.door && b.door.job).map(b => ({id: b.id, address: b.door.label, job: b.door.job, quiz: b.door.quiz || null}));      // quiz: the key in shared/application.js (only the Intern has one so far)
 export const JOB_FRONT = {arrive: [-6.2, 0, -127], face: [1, 0]};            // where you stand when you come back out of your shift at 666 Hallam Row
-export function computerPages(st, apps = null, needs = null) {
+// the save's time as the computer shows it (slice 9): `t` is the saved City time, or null when nothing is saved
+export const savedLine = t => t === null || t === undefined ? "Not saved yet. The bed in your apartment saves." : `Last saved: Day ${dayAt(t)}, ${fmtClock(hourAt(t))}.`;
+// savedT (slice 9): the saved City time, null for no save, undefined when the caller does not say (then the bank and system pages leave the line out)
+export function computerPages(st, apps = null, needs = null, savedT = undefined) {
   const left = st.open ? Math.max(0, CLOSE_H - st.hour) : 0, hh = Math.floor(left), mm = Math.round((left - hh) * 60), mine = apps ? mailLines(apps, st.day) : [];
   const tag = j => !j.quiz ? " (not hiring yet)" : apps && apps.accepted[j.quiz] ? " (ACCEPTED)" : apps && apps.rejectedOn[j.quiz] !== undefined && apps.rejectedOn[j.quiz] >= st.day ? " (rejected: try again tomorrow)" : " (hiring: apply below)";
   return {
@@ -135,7 +138,8 @@ export function computerPages(st, apps = null, needs = null) {
     news: {title: "NEWS", lines: [`Day ${st.day}, ${st.clock}.`, st.open ? `Hallam Row's stores are open for another ${hh} h ${String(mm).padStart(2, "0")} min.` : st.hour >= CLOSE_H || st.hour < DAWN_H ? "The stores on Hallam Row are closed for the night." : "The stores on Hallam Row are not open yet.", "Residents are reminded to be home before midnight."]},
     jobs: {title: "JOB SEARCH", lines: [...JOBS.map(j => `${j.address}: ${j.job}${tag(j)}`), "", "One application at a time."]},
     map: {title: "MAP", lines: ["HALLAM ROW", "West side: apartment tower, 41, 214, 666", "East side: grocery, 108, mall, 330", "The bus stop is at the south end."]},
-    bank: {title: "BANK", lines: needs ? ["Balance: $" + needs.money, needs.lastPay !== null && needs.lastPay !== undefined ? "Last shift: +$" + needs.lastPay + (needs.lastNote ? " (" + needs.lastNote + ")" : "") : "No pay yet. A shift at your job pays.", "", "IN YOUR FRIDGE", ...(pantryLines(needs).length ? pantryLines(needs) : ["Nothing."])] : ["Balance unknown."]},
+    bank: {title: "BANK", lines: needs ? ["Balance: $" + needs.money, ...(savedT === undefined ? [] : [savedLine(savedT)]), needs.lastPay !== null && needs.lastPay !== undefined ? "Last shift: +$" + needs.lastPay + (needs.lastNote ? " (" + needs.lastNote + ")" : "") : "No pay yet. A shift at your job pays.", "", "IN YOUR FRIDGE", ...(pantryLines(needs).length ? pantryLines(needs) : ["Nothing."])] : ["Balance unknown."]},
+    system: {title: "SYSTEM", lines: [...(savedT === undefined ? [] : [savedLine(savedT), ""]), "NEW GAME forgets the City: the save, your jobs, your money, the fridge and the clock.", "The Original and the Overworld are kept."]},
   };
 }
 
