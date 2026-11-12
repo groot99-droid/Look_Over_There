@@ -101,6 +101,13 @@
   #options h2{margin:0;font:700 20px/1.1 Georgia,serif;letter-spacing:.18em}
   #options p{margin:0 0 6px;color:#9a9a86}
   #options button:disabled{opacity:.45;cursor:default}
+  #station{position:fixed;inset:0;z-index:7;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);color:#d8d8c4;font:14px/1.5 system-ui,sans-serif}
+  #station .card{width:min(420px,92vw);display:flex;flex-direction:column;gap:10px;text-align:center}
+  #station h2{margin:0;font:700 20px/1.1 Georgia,serif;letter-spacing:.18em}
+  #station p,#station small{margin:0;color:#9a9a86;letter-spacing:.04em}
+  #station button{font:600 14px/1 system-ui,sans-serif;letter-spacing:.12em;padding:11px 14px;color:#d8d8c4;background:#1c1c16;border:1px solid #4a4a3c;border-radius:3px;cursor:pointer;display:flex;justify-content:space-between}
+  #station button:hover,#station button.sel{background:#2a2a20;border-color:#e0a040}
+  #station button.in{border-color:#9ccc65;color:#fff}
   #options small{display:block;margin-top:4px;font-weight:400;letter-spacing:.08em;color:#8a8a78}
   #results #r-best{text-align:center;color:#9ccc65;letter-spacing:.08em}
   #gamemount{position:fixed;inset:0;display:none;z-index:2;background:#000}
@@ -127,9 +134,10 @@
 <div id="hud"></div>
 <div id="camhud"></div><div id="buzz"></div><div id="cloak"><b>CLOAK · V</b><i></i></div><div id="cloakfx"></div><div id="beacons"></div><div id="hp"><b>HP</b><i></i></div><div id="hurt"></div><div id="stam"><i></i></div><div id="alarm"></div><div id="redpulse"></div>
 <div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-walk" type="button" hidden>Walk out to the parking lot</button><button id="r-again" type="button">Play again</button></div></div>
+<div id="station"><div class="card"><h2>LOCKER</h2><p>Your loadout. Click a piece (or press 1 to 3) to carry it or leave it here. Key 4 swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
 <div id="pc"><div class="card"><div id="pc-tabs"></div><h2 id="pc-title"></h2><pre id="pc-body"></pre><button id="pc-close" type="button">Close (Esc or F)</button></div></div>
 <div id="clock"><span></span><small></small></div>
-<div id="options"><div class="card"><h2>LOOK OVER THERE</h2><p>The doors are open. Where to?</p><button id="o-original" type="button">Original</button><button id="o-back" type="button" disabled>Going back in<small>soon</small></button><button id="o-close" type="button">Not yet</button></div></div>
+<div id="options"><div class="card"><h2>LOOK OVER THERE</h2><p>The doors are open. Where to?</p><button id="o-original" type="button">Original</button><button id="o-back" type="button">Going back in<small>alone, for now</small></button><button id="o-close" type="button">Not yet</button></div></div>
 <div id="help"><div class="card"><h2>CONTROLS</h2><div class="cols"><div>
 <div><b>WASD</b>move</div><div><b>Mouse</b>look</div><div><b>Space</b>jump</div><div><b>Shift</b>crouch (press again to walk)</div><div><b>R (hold)</b>run, loud</div><div><b>X / F</b>action: doors, fuses, switches, loot (hold to lift a teammate)</div><div><b>Y</b>take out what you carry; tap again to rotate; hold for the wheel (arrows or mouse wheel)</div><div><b>1 2 3</b>ray gun, cloak, beacon</div></div><div>
 <div><b>Left click</b>use what you hold: fire, cloak on/off, roll a beacon</div><div><b>Right click</b>gun: aim. Cloak: short circuit (stuns monsters near you, cloak dead 5 min). Beacon: reverse it (monsters run away, then group up)</div><div><b>Q / E</b>support / combat consumable (none yet)</div><div><b>Tab / M</b>handheld map</div><div><b>N</b>sound on / off</div><div><b>H</b>this list</div></div></div>
@@ -178,6 +186,10 @@ import {levelMix, stepInterval, stepGain} from "./shared/mix.js";
 import {POWER_SOURCES, newPower, throwPower} from "./shared/power.js";
 import {REGISTRY} from "./shared/registry.js";
 import {requirementsMet} from "./shared/manifest.js";
+import {wavePlan, startWave, killed} from "./shared/gbi.js";
+import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
+import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
+import {GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
 import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, computerPages, dangerous, inView, stalkerStep, nextMorning, bedUse} from "./shared/city.js";
 
 const MON_URL = "world/monsters.json";
@@ -358,7 +370,8 @@ async function loadScene(id, arrival) {
   if (passage) id = "T";
   for (const g of gl) { g.scene.traverse(o => { if (o.isMesh) { o.matrixAutoUpdate = false; o.updateMatrix(); } }); root.add(g.scene); }
   scene.add(root);
-  Object.assign(S, {id, floor: cfg.floor, root, grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
+  const chamber = passage ? null : REGISTRY.chamber(id);
+  Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
   applySky(id, root);
   boxes.length = 0; doors.length = 0;
   for (const c of doc.colliders) boxes.push({n: c.min, x: c.max});
@@ -395,6 +408,7 @@ async function loadScene(id, arrival) {
   buildFuseVisuals();
   buildPowerVisuals();
   buildLootVisuals();
+  buildStation(chamber);
   if (arrival && arrival.door) {                              // the door you came through stays open behind you
     const dr = doors.find(x => x.d.name === arrival.door);
     if (dr) {
@@ -405,6 +419,7 @@ async function loadScene(id, arrival) {
   if (arrival && arrival.pos) { teleport(arrival.pos); P.yaw = arrival.face ? Math.atan2(-arrival.face[0], -arrival.face[1]) : P.yaw; P.pitch = 0; }
   else { teleport(spawnFor(id)); P.yaw = Math.random() * Math.PI * 2; }                      // everyone gets their own spot, leaning toward what the floor still needs
   S.arrive = [P.p.x, S.floor, P.p.z];
+  startChamber(chamber);                                       // Going back in: the wave begins as you step in (nothing for an Original floor)
   armedFall = true; loading = false; net.t = 0;                 // tell the room which floor you are on right away
   fade.style.opacity = 0;
   AUD.clearMonsters(); AUD.setLevel(id);
@@ -748,14 +763,14 @@ function useDoor() {
 //   move: WASD / left stick · look: mouse / right stick · jump: Space / A · crouch (toggle): Shift / left-stick click · run (hold): R / right-stick click
 //   X (or F): the action button: doors, fuses, switches, notes, the power, the keypad, loot, lifting a teammate (hold)
 //   Y: tap to take out what you carry (tap again to rotate), hold for the wheel · RT / left click: use what you hold (fire / cloak on-off / roll a beacon)
-//   LT / right click: the gun aims; with the cloak or a beacon in hand it is the secondary ability · LB / RB (Q / E): support and combat/objective consumables (none yet)
+//   LT / right click: the gun aims; with the cloak or a beacon in hand it is the secondary ability · LB / RB (Q / E): the flash-vial, and the land mine or tripwire (Going back in only; empty in the Original) · 4: the hunting crossbow (Going back in only)
 //   D-pad up / View / Tab / M: the handheld map (the camera feeds have no controls for now)
 const HELD = {item: null, yAt: 0, yDown: false, wheel: false, sel: 0, aimBtn: false, padAim: false};
 const AIM = {on: false, fov: 75, fovAim: 42};
 let crouchLatch = false;
-const ITEM_NAMES = {gun: "RAY GUN", cloak: "CLOAK", beacon: "AFK BEACON"};
-const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT / click: on/off · LT / right click: short circuit (5 min offline, stuns monsters near you)", beacon: "RT / click: roll it · LT / right click: reverse the frequency"};
-const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon"].filter(Boolean);
+const ITEM_NAMES = {gun: "RAY GUN", cloak: "CLOAK", beacon: "AFK BEACON", crossbow: "HUNTING CROSSBOW"};
+const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT / click: on/off · LT / right click: short circuit (5 min offline, stuns monsters near you)", beacon: "RT / click: roll it · LT / right click: reverse the frequency", crossbow: "RT / click: shoot a bolt (it kills; slow reload)"};
+const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon", GB.load && carries(GB.load, "crossbow") && "crossbow"].filter(Boolean);
 function setHeld(it) {
   HELD.item = it || null; AIM.on = false;
   toast(HELD.item ? `Holding: ${ITEM_NAMES[it]}   ${ITEM_HINT[it]}` : "Hands empty", 2600);
@@ -779,10 +794,19 @@ function yTick() {
   if (HELD.yDown && !HELD.wheel && performance.now() - HELD.yAt > 350) { HELD.wheel = true; const k = wheelEntries().indexOf(HELD.item || "hands"); HELD.sel = k < 0 ? 0 : k; renderWheel(); }
 }
 const wheelMove = d => { if (HELD.wheel) { const n = wheelEntries().length; HELD.sel = (HELD.sel + d + n) % n; renderWheel(); } };
-const usePrimary = () => HELD.item === "gun" ? fire() : HELD.item === "cloak" ? toggleCloak() : HELD.item === "beacon" ? throwBeacon() : (toast("Nothing in your hands: tap Y"), false);
+const usePrimary = () => HELD.item === "gun" ? fire() : HELD.item === "cloak" ? toggleCloak() : HELD.item === "beacon" ? throwBeacon() : HELD.item === "crossbow" ? fireBow() : (toast("Nothing in your hands: tap Y"), false);
 const useSecondary = () => HELD.item === "cloak" ? cloakShortCircuit() : HELD.item === "beacon" ? reverseBeacon() : false;
-const useConsumable = slot => toast(slot === 0 ? "Your support slot (LB / Q) is empty" : "Your combat / objective slot (RB / E) is empty");
-const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryLoot() && !tryCity()) useDoor(); };
+function useConsumable(slot) {
+  if (!GB.kit) { toast(slot === 0 ? "Your support slot (LB / Q) is empty" : "Your combat / objective slot (RB / E) is empty"); return false; }       // the Original has no consumables
+  if (dead || loading || FIN.out || KPUI.open || devOn.v || STN.open || myCarry() >= 0) return false;
+  const r = useSlot(GB.kit, slot);
+  if (!r.ok) { toast(slot === 0 ? "No flash-vials left (LB / Q)" : `No ${KIT_NAMES[GB.kit.e]} left (RB / E)`); AUD.play("gun_dry"); return false; }
+  GB.kit = r.kit;
+  if (r.kind === "flash") throwFlash();
+  else { const t = placeTrap(r.kind, P.p.x, P.p.z, TRAPS.t); t.mesh = trapMesh(r.kind, t); TRAPS.list.push(t); toast(`${KIT_NAMES[r.kind]} set down: ${r.kind === "mine" ? "armed in a moment" : "armed almost at once, and loud"}`); }
+  return true;
+}
+const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryStation() && !tryLoot() && !tryCity()) useDoor(); };
 const crouchToggle = () => { crouchLatch = !crouchLatch; };
 addEventListener("keydown", e => {
   if (inGame) return;
@@ -792,6 +816,11 @@ addEventListener("keydown", e => {
     else if (e.code === "Backspace") { KPUI.buf = KPUI.buf.slice(0, -1); renderKp(); }
     else if (e.code === "Enter" || e.code === "NumpadEnter") kpPress("OK");
     else if (e.code === "Escape" || e.code === "KeyX" || e.code === "KeyF") closeKeypad();
+    return;
+  }
+  if (STN.open) {                                                            // the locker panel takes the keyboard while it is up
+    e.preventDefault();
+    if (/^Digit[1-4]$/.test(e.code)) stationToggle(+e.code.slice(5) - 1); else if (e.code === "Escape" || e.code === "KeyX" || e.code === "KeyF") closeStation();
     return;
   }
   keys[e.code] = true;
@@ -804,7 +833,7 @@ addEventListener("keydown", e => {
   if (e.code === "Tab" || e.code === "KeyM") toggleDevice();
   if (e.code === "KeyQ") useConsumable(0);
   if (e.code === "KeyE") useConsumable(1);
-  if (/^Digit[1-3]$/.test(e.code)) { const it = ["gun", "cloak", "beacon"][+e.code.slice(5) - 1]; if (owned().includes(it)) setHeld(it); else toast(`You do not have the ${ITEM_NAMES[it].toLowerCase()}`); }
+  if (/^Digit[1-4]$/.test(e.code)) { const it = ["gun", "cloak", "beacon", "crossbow"][+e.code.slice(5) - 1]; if (owned().includes(it)) setHeld(it); else toast(`You do not have the ${ITEM_NAMES[it].toLowerCase()}`); }
   if (e.code === "KeyH") document.getElementById("help").classList.toggle("on");
   if (e.code === "KeyN") toast(AUD.toggleMute() ? "Sound off" : "Sound on");
 });
@@ -832,6 +861,11 @@ function pad() {
   if (!gp) { HELD.padAim = false; return {mx: 0, mz: 0, lx: 0, ly: 0, jump: false, use: false, run: false}; }
   const a = gp.axes, b = gp.buttons, down = i => !!(b[i] && (b[i].pressed || b[i].value > 0.5));
   const edge = i => { const now = down(i), was = padPrev[i]; padPrev[i] = now; return now && !was; };
+  if (STN.open) {                                           // the locker panel: D-pad up / down chooses, A takes or leaves, B or X closes
+    const rowsN = GEAR.length + (GB.kit ? 1 : 0); if (edge(12)) STN.sel = (STN.sel + rowsN - 1) % rowsN; if (edge(13)) STN.sel = (STN.sel + 1) % rowsN;
+    if (edge(0)) stationToggle(STN.sel); if (edge(1) || edge(2)) closeStation(); renderStation();
+    return {mx: 0, mz: 0, lx: 0, ly: 0, jump: false, use: false, run: false};
+  }
   const yNow = down(3), yWas = padPrev[3]; padPrev[3] = yNow;
   if (!dead) {
     if (yNow && !yWas) yPress(); else if (!yNow && yWas) yRelease();                // Y: tap = take out / rotate, hold = the wheel
@@ -953,7 +987,8 @@ function animateLoot() {
     v.packs.forEach((it, i) => { const gone = st.packs[i] !== 0; it.o.visible = !gone; if (gone) return; const k = fade(it); it.o.userData.halo.material.opacity = 0.6 * k; it.o.userData.beacon.material.opacity = 0.3 * k; });
   }
   const eb = $("beacons"); eb.style.display = BC.have ? "block" : "none"; if (BC.have) eb.textContent = `BEACON ×${BC.have}  [G]`;
-  const el = $("ammo"); el.style.display = LT.gun ? "block" : "none"; if (LT.gun) el.textContent = `RAY  ${"● ".repeat(LT.rounds)}${"○ ".repeat(Math.max(0, 3 - LT.rounds))}${LT.rounds}/${MAX_ROUNDS}`;
+  const el = $("ammo"), bow = GB.load && carries(GB.load, "crossbow"), kit = GB.kit; el.style.display = LT.gun || bow || kit ? "block" : "none";
+  if (LT.gun || bow || kit) el.innerHTML = (kit ? `Q ${KIT_NAMES.flash} ×${kit.n.flash}   E ${KIT_NAMES[kit.e]} ×${kit.n[kit.e]}<br>` : "") + (LT.gun ? `RAY  ${"● ".repeat(LT.rounds)}${"○ ".repeat(Math.max(0, 3 - LT.rounds))}${LT.rounds}/${MAX_ROUNDS}` : "") + (LT.gun && bow ? "<br>" : "") + (bow ? `BOW  ${BOW.st.bolts}/${MAX_BOLTS}${BOW.st.cool > 0 ? "  reloading" : ""}` : "");
 }
 // ---------------------------------------------------------------- the Error Deletion Ray (models/gun.glb): held bottom right, fired with the left mouse button, F or the right trigger.
 // A hit does not kill: the floor's host (it runs the monsters) deletes the monster and puts it somewhere far away and out of sight. A shot is as quiet as a run.
@@ -1004,16 +1039,19 @@ function heldHud(dt) {
   for (const it of [...heldSeen]) if (!o.includes(it)) heldSeen.delete(it);
   if (HELD.item && !o.includes(HELD.item)) HELD.item = null;
   const el = $("held"), show = !loading && !dead && !FIN.results && !!HELD.item;
-  el.style.display = show ? "block" : "none"; if (show) el.innerHTML = `<b>${ITEM_NAMES[HELD.item]}${HELD.item === "gun" ? " · " + LT.rounds : HELD.item === "beacon" ? " ×" + BC.have : ""}</b>${ITEM_HINT[HELD.item]}`;
+  el.style.display = show ? "block" : "none"; if (show) el.innerHTML = `<b>${ITEM_NAMES[HELD.item]}${HELD.item === "gun" ? " · " + LT.rounds : HELD.item === "beacon" ? " ×" + BC.have : HELD.item === "crossbow" ? " · " + BOW.st.bolts : ""}</b>${ITEM_HINT[HELD.item]}`;
   $("reticle").style.display = AIM.on ? "block" : "none";
   stunFx = Math.max(0, stunFx - dt * 1.6); $("stunfx").style.opacity = stunFx;
 }
 function animateGun(dt) {
   heldHud(dt);
+  BOW.st = bowTick(BOW.st, dt); BOW.kick = Math.max(0, BOW.kick - dt * 5);
   GUN.cool = Math.max(0, GUN.cool - dt); P.shotT = Math.max(0, P.shotT - dt); GUN.kick = Math.max(0, GUN.kick - dt * 7);
   if (net.on) for (const p of net.peers.values()) if (p.shotT > 0) p.shotT -= dt;
   GUN.pivot.visible = !!LT.gun && HELD.item === "gun" && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
   if (GUN.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; GUN.pivot.position.set(0.22, -0.3 + bob, -0.5 + GUN.kick * 0.07); GUN.pivot.rotation.x = GUN.kick * 0.12; }
+  BOW.pivot.visible = HELD.item === "crossbow" && !!GB.load && carries(GB.load, "crossbow") && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
+  if (BOW.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; BOW.pivot.position.set(0.22, -0.3 + bob, -0.5 + BOW.kick * 0.09); BOW.pivot.rotation.x = BOW.kick * 0.1; }
   GUN.flash.material.opacity = GUN.kick > 0.6 ? (GUN.kick - 0.6) * 2.5 : 0;
   for (const list of [GUN.beams, GUN.fx]) for (let i = list.length - 1; i >= 0; i--) {
     const f = list[i]; f.t += dt; const life = list === GUN.beams ? 0.15 : GLITCH_S, k = Math.min(1, f.t / life);
@@ -1140,7 +1178,11 @@ function setLoot(scene, st, by, k) {
     AUD.play(k === "locker" ? "locker" : "pickup");
     if (k === "locker") { LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); toast(`You take the Error Deletion Ray (${GUN_ROUNDS} rounds) and a cloak: V toggles it`); }
     else if (k === "beacon") { BC.have = Math.min(MAX_BEACONS, BC.have + 1); toast(`AFK Beacon ×${BC.have}: G rolls one ahead, monsters nearby swarm it for ${LURE_S} s`); }
-    else if (k === "pack") { LT.rounds = roundsAfterPack(LT.rounds); toast(`Ammo: ${LT.rounds} rounds`); }
+    else if (k === "pack") {
+      LT.rounds = roundsAfterPack(LT.rounds);
+      if (GB.kit) GB.kit = kitPack(GB.kit);                                                                       // a pack also refills the Q and E items
+      if (GB.load && carries(GB.load, "crossbow")) { BOW.st = addBolts(BOW.st, PACK_BOLTS); toast(`Ammo: ${LT.rounds} rounds, ${BOW.st.bolts} bolts`); } else toast(`Ammo: ${LT.rounds} rounds`);
+    }
   }
 }
 function glowTexture() {
@@ -1338,6 +1380,7 @@ function updatePrompt() {
     }
   }
   if (!pz && !dead && !loading && !reviveTarget() && nearPower()) msg = "Press E to switch on the power";
+  if (!msg && !dead && !loading && !reviveTarget() && nearStation()) msg = "Press E to open the locker";
   if (!msg && !dead && !loading && !reviveTarget()) msg = cityPrompt();
   if (!msg && !dead && !loading && !reviveTarget()) { const n = nearLoot(); if (n) msg = n.k === "locker" ? (LT.gun ? "You already carry a gun" : "Press E to open the locker") : n.k === "beacon" ? (BC.have >= MAX_BEACONS ? "You cannot carry more beacons" : "Press E to take the AFK Beacon") : (LT.rounds >= MAX_ROUNDS ? "You cannot carry more ammo" : "Press E to take the ammo pack (+3)"); }
   el.textContent = msg; el.style.display = msg ? "block" : "none";
@@ -1468,6 +1511,113 @@ function showResults(rows) {
   $("results").style.display = "flex";
 }
 
+// ---------------------------------------------------------------- Going back in, slice 1 (session 8): chambers, one wave on entry, the stairs down. Alone only: rooms cannot run the mode yet.
+// A chamber is a scene of the manifest (REGISTRY.chamber(id)): an existing floor's model with its own world file (tools/make_chambers.mjs). The wave is shared/gbi.js: as many
+// monsters as the manifest says, placed far from where you stand. After that it is quiet time; the stairs-down door is open from the start (clearing rules come with the objectives).
+const GB = {mode: null, wave: null, load: null, kit: null};                       // load: the loadout (shared/loadout.js), only inside the mode
+const GBI = REGISTRY.modes.going_back_in;
+function startChamber(ch) {
+  GB.mode = ch ? "going_back_in" : null; GB.wave = null; if (!ch) { GB.load = null; GB.kit = null; STN.spot = null; }
+  TRAPS.list.length = 0; TRAPS.flashes.length = 0;                      // traps stay in the chamber they were set in
+  if (!ch || net.on) return;
+  GB.wave = startWave(ch, performance.now());
+  for (const p of wavePlan(S, monCfg, ch, [[P.p.x, P.p.z]])) monsters.push(new Monster(p.cfg, S.id, p.x, p.z));
+  toast(`WAVE ${GB.wave.no} of ${GBI.waves}: ${monsters.length} of them are in here with you`, 4200);
+}
+async function startGoingBackIn() {                                    // from the options screen at the store doors
+  closeOptions();
+  GB.load = newLoadout(); LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); BC.have = 0; BOW.st = newBow(START_BOLTS); GB.kit = newKit();          // starting gear: the Market does not exist yet, so the crossbow starts in your hands (default; the owner may change it)
+  await loadScene(GBI.startChamber);
+}
+
+// ---- the hunting crossbow (shared/crossbow.js): bolts are its own ammo, a hit kills, a slow reload. The ray only banishes.
+const BOW = {st: newBow(0), kick: 0, pivot: new THREE.Group()};
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .8}), stock = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.07, 0.5), mat(0x5a4632));
+  const limb = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.03, 0.04), mat(0x2d2d2a)); limb.position.set(0, 0.02, -0.2);
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.4), mat(0x9a9a86)); rail.position.set(0, 0.05, -0.05);
+  BOW.pivot.add(stock, limb, rail); BOW.pivot.position.set(0.22, -0.3, -0.5); BOW.pivot.visible = false; camera.add(BOW.pivot); }
+function fireBow() {
+  if (!GB.load || !carries(GB.load, "crossbow") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
+  if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
+  const r = bowShoot(BOW.st);
+  if (!r.ok) { if (r.why === "empty") { toast("Out of bolts"); AUD.play("gun_dry"); } return false; }             // reloading: nothing happens
+  BOW.st = r.bow; BOW.kick = 1; P.shotT = BOW_NOISE_S;
+  const o = [P.p.x, P.p.y + P.eye, P.p.z], cp = Math.cos(P.pitch), d = [-Math.sin(P.yaw) * cp, Math.sin(P.pitch), -Math.cos(P.yaw) * cp];
+  const m = killShot(S, monsters, o, d), t = m ? Math.hypot(m.pos.x - o[0], m.pos.z - o[2]) : rayLength(o, d);
+  beam(o, [o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t]); AUD.play("gun", {rate: .7 + Math.random() * .08, priority: true});
+  if (m) killMonster(m);
+  return true;
+}
+// a monster is dead for good (a bolt, a mine, a blast): gone from the floor, and counted toward the wave
+function killMonster(m) {
+  const i = monsters.indexOf(m); if (i < 0) return; m.dispose(); monsters.splice(i, 1);
+  if (GB.wave) { GB.wave = killed(GB.wave); toast(GB.wave.cleared ? "Wave cleared" : `${GB.wave.kills} of ${GB.wave.monsters} down`, 2400); }
+}
+// ---- the Q and E consumables (shared/consumables.js): Q a flash-vial that stuns, E a land mine or a tripwire that kills. Traps stay where they are set until a monster springs them.
+const KIT_NAMES = {flash: "Flash-vial", mine: "Land mine", wire: "Tripwire"};
+const TRAPS = {t: 0, list: [], flashes: []};
+function trapMesh(kind, t) {
+  const g = new THREE.Group(), mat = c => new THREE.MeshBasicMaterial({color: c});
+  if (kind === "mine") { const d = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.06, 14), mat(0x7a7a5a)); d.position.y = 0.03; const l = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 0.06), mat(0xff3a2a)); l.position.y = 0.08; g.add(d, l); g.userData.lamp = l; }
+  else { for (const a of [0, 1.05, 2.1]) { const w = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.012, 0.012), mat(0xb8b8a0)); w.position.y = 0.12; w.rotation.y = a; g.add(w); } const c = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.1, 0.14), mat(0x5a5a40)); c.position.y = 0.05; g.add(c); }
+  g.position.set(t.x, S.floor, t.z); S.root.add(g); return g;
+}
+function throwFlash() {
+  const dx = -Math.sin(P.yaw), dz = -Math.cos(P.yaw), ahead = rayLength([P.p.x, P.p.y + P.eye, P.p.z], [dx, 0, dz]);
+  const [lx, lz] = flashLanding(P.p.x, P.p.z, dx, dz, Math.max(0.5, Math.min(FLASH_THROW_M, ahead - 0.3)));          // it stops at a wall
+  const n = stunNear(monsters, lx, S.floor, lz, FLASH_STUN_S, FLASH_R).length;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), depthWrite: false, transparent: true, opacity: 1})); sp.scale.set(2, 2, 1); sp.position.set(lx, S.floor + 1.2, lz); S.root.add(sp); TRAPS.flashes.push({o: sp, t: 0});
+  AUD.play("beacon_end", {pos: [lx, S.floor + 1, lz]}); toast(n ? `The flash-vial bursts: ${n} stunned for ${FLASH_STUN_S} s` : "The flash-vial bursts: nothing near it");
+}
+function trapTick(dt) {
+  TRAPS.t += dt;
+  for (const t of TRAPS.list) {
+    if (t.done) continue;
+    if (t.mesh && t.mesh.userData.lamp) t.mesh.userData.lamp.visible = TRAPS.t >= t.armAt && Math.floor(TRAPS.t * 3) % 2 === 0;           // the mine blinks once it is armed
+    const r = springs(t, TRAPS.t, monsters); if (!r) continue;
+    t.done = true; if (t.mesh) t.mesh.visible = false;
+    AUD.play("beacon_end", {pos: [t.x, S.floor + 0.5, t.z], loud: true});
+    for (const m of r.kills) killMonster(m);
+    if (r.loud) for (const m of monsters) if (Math.hypot(m.pos.x - t.x, m.pos.z - t.z) <= WIRE_NOISE_R) m.alert(t.x, t.z);
+  }
+  for (let i = TRAPS.flashes.length - 1; i >= 0; i--) { const f = TRAPS.flashes[i]; f.t += dt; f.o.material.opacity = Math.max(0, 1 - f.t / 0.6); f.o.scale.setScalar(2 + f.t * 8); if (f.t > 0.6) { S.root.remove(f.o); TRAPS.flashes.splice(i, 1); } }
+}
+// ---- the loadout locker (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is. (Name still open: docs/WORLD.md.)
+const STN = {open: false, spot: null, mesh: null, sel: 0};
+const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow"};
+function buildStation(ch) {
+  STN.spot = null; STN.mesh = null; if (!ch || net.on) return;
+  const home = floorSpots(1, 9910, [[8, 6, 4], [4, 2, 2], [2, 1, 0]])[0]; if (!home) return;
+  const o = lockerMesh(); o.position.set(home[0], S.floor, home[1]); o.userData.lamp.material.color.setHex(0xffc040); S.root.add(o); STN.spot = home; STN.mesh = o;
+  boxes.push({n: [home[0] - 0.3, S.floor, home[1] - 0.3], x: [home[0] + 0.3, S.floor + 1.8, home[1] + 0.3]}); indexBoxes(S);
+}
+const nearStation = () => STN.spot && !dead && !loading && !STN.open && Math.abs(S.floor - P.p.y) < 1.5 && Math.hypot(STN.spot[0] - P.p.x, STN.spot[1] - P.p.z) < 1.8 ? STN.spot : null;
+function tryStation() { if (!nearStation()) return false; openStation(); return true; }
+function openStation() { STN.open = true; STN.sel = 0; document.exitPointerLock?.(); renderStation(); $("station").style.display = "flex"; }
+function closeStation() { STN.open = false; $("station").style.display = "none"; }
+function renderStation() {
+  const rows = $("st-rows"); rows.innerHTML = GEAR.map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i + 1}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>4  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
+  rows.querySelectorAll("button").forEach(b => { b.onclick = () => stationToggle(b.dataset.slot ? GEAR.length : GEAR.indexOf(b.dataset.gear)); });
+  $("st-close").onclick = closeStation;
+}
+function stationToggle(i) {
+  if (i === GEAR.length && GB.kit) { GB.kit = setE(GB.kit, GB.kit.e === "mine" ? "wire" : "mine"); renderStation(); return; }          // the E slot: land mine or tripwire
+  const g = GEAR[i]; if (!g || !GB.load) return;
+  GB.load = carries(GB.load, g) ? lockerLeave(GB.load, g) : lockerTake(GB.load, g); syncGear(); renderStation();
+}
+// the loadout decides what you hold: the page's own flags follow it (ammo is not part of it)
+function syncGear() {
+  if (!GB.load) return;
+  LT.gun = carries(GB.load, "gun"); if (CL.have !== carries(GB.load, "cloak")) { CL.have = carries(GB.load, "cloak"); CL.st = newCloak(); }
+  if (HELD.item && !owned().includes(HELD.item)) setHeld(null);
+}
+// a death in the mode: the gear is in the locker; ammo, rays, bolts and beacons are gone (docs/WORLD.md, "Death in Going back in")
+function gbDeath() {
+  if (!GB.load) return;
+  GB.load = lockerDied(GB.load); if (GB.kit) GB.kit = kitLost(GB.kit); LT.rounds = 0; BOW.st = newBow(0); BC.have = 0; syncGear();
+  toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
+}
+
 // ---------------------------------------------------------------- the Overworld, v0: the parking lot after the Original (session 6)
 // One scene, `parking_lot` (world/parking_lot.json, built by tools/make_parking_lot.mjs, over the store and lot models). The results screen offers the walk out once
 // `original_complete` is held; you arrive at the table and chairs facing the store, and walking up to the glass doors opens the options screen (Original, or Going back
@@ -1494,7 +1644,8 @@ function overworldProps(root) {
 }
 function openOptions() {
   OW.open = true; document.exitPointerLock?.(); $("options").style.display = "flex";
-  $("o-original").onclick = () => location.reload();                                         // a fresh round starts from the start screen, as Play again does
+  $("o-original").onclick = () => location.reload();
+  $("o-back").onclick = startGoingBackIn;                                         // a fresh round starts from the start screen, as Play again does
   $("o-close").onclick = closeOptions;
 }
 function closeOptions() { OW.open = false; OW.armed = false; $("options").style.display = "none"; }            // not offered again until you have walked away from the doors
@@ -1945,6 +2096,7 @@ function die() {
   closeKeypad();
   if (myCarry() >= 0) fuseAct({a: "drop", x: P.p.x, z: P.p.z});                      // it stays where you fell
   if (!net.on) { SOLO.downs++; SOLO.deaths++; }
+  gbDeath();
   AUD.stinger("st_down"); dead = true; deadT = 0; deathLevel = S.id; devOn.v = false; P.reviveT = 0; $("revive").style.display = "none";
   $("death").style.opacity = 1; $("fear").style.opacity = 1;
   if (net.on) { $("death").textContent = "DOWNED"; $("death").style.background = "rgba(0,0,0,.55)"; }       // in a room you can be lifted, so you may still look around
@@ -1979,7 +2131,7 @@ function simMonsters(dt) {
   } else monsters.forEach((m, i) => m.follow(dt, net.snap && net.snap.l[i]));
 }
 function update(dt) {
-  if (loading || OW.open || PC.open) return;
+  if (loading || OW.open || STN.open || PC.open) return;
   updateDoors(dt);
   if (dead) {
     deadT += dt;
@@ -2022,6 +2174,7 @@ function update(dt) {
   checkFall();
   P.eye += ((P.crouch ? 0.95 : EYE) - P.eye) * Math.min(1, dt * 10);
   simMonsters(dt);
+  trapTick(dt);
   let closest = 99;                                                        // fear: the nearest monster that is chasing and on your floor, whoever it chases
   for (const m of monsters) if (m.state === "chase" && m.onFloorY(P.p.y)) closest = Math.min(closest, Math.hypot(P.p.x - m.pos.x, P.p.z - m.pos.z));
   const fear = Math.max(Math.max(0, 1 - closest / 16), HP.h.hp < 36 ? (36 - HP.h.hp) / 36 * 0.7 : 0);
@@ -2083,7 +2236,7 @@ FIN.t0 = performance.now();
 await loadScene("B1");
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, sleepNow, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, sleepNow, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
