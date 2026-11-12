@@ -83,7 +83,7 @@ Wrong Exit maze, keycard doors everywhere else, hardest boss (The Registrar), Ad
 ## 4. Places
 
 ### Overworld [SETTLED unless tagged]
-- v0 is built (session 6): finish the Original alone, press "Walk out" on the results screen, and you arrive at a table and chairs in the parking lot, facing the store, under a clear sky. Walking up to the glass doors opens the options screen: Original (starts a fresh round) or Going back in (shown, disabled, "soon"). Rooms stay in the store for now. [BUILT]
+- v0 is built (session 6): finish the Original alone, press "Walk out" on the results screen, and you arrive at a table and chairs in the parking lot, facing the store, under a clear sky. Walking up to the glass doors opens the options screen: Original (starts a fresh round) or Going back in (alone only; session 8: it lands you in the first chamber, with its wave starting). Rooms stay in the store for now. [BUILT]
 - Walking out of Look Over There onto the parking lot ends the Original. The results screen already shows place, time and your best time on this browser. [BUILT] Still to add: deaths (downs nobody revived), revives, a score that counts revives, an online ranking, a congratulations and a welcome to Farway. [SETTLED]
 - A first-time player sees the whole Overworld at once, and new facades appear as things are added.
 - The Market sells weapons, gear, food, keycards and cosmetics. It is also where lost ammo, consumables and perks are bought back (section 5).

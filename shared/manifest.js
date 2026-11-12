@@ -3,9 +3,9 @@
 //
 // A manifest is {manifestVersion: 1, flags, connectors, modes, areas, links}.
 //   area  {id, name, status: "built" | "planned" | "reserved", soloOnly?, scenes?: [scene], ...}
-//   scene {id, floorY?, files?, multiplayer?, puzzle?: "fuses" | "switches" | "keypad", powerSource?, loot?: {lockers, packs}}
+//   scene {id, floorY?, files?, multiplayer?, puzzle?: "fuses" | "switches" | "keypad", powerSource?, loot?: {lockers, packs}, chamber?: {floor, index, wave: {monsters, kind}, stairsDown?, next?}}
 //   link  {id, from: {area, scene?, door?}, to: {area, scene?, room?, door?, arrive?, face?}, connector, status, requires?: [flag], soloOnly?, returnTo?, note?}
-//   mode  {status, area, floors, players: {min, max}, finish?: {scene, ...}, ...}
+//   mode  {status, area, floors, players: {min, max}, finish?: {scene, ...}, chambersPerFloor?, waves?, startChamber?}
 // A scene id is unique across the whole manifest (the server's messages name a scene by its bare id).
 // An addon is the same shape ({areas, links, flags?, connectors?, modes?}) and is added with mergeAddon.
 
@@ -26,7 +26,7 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
   if (doc.manifestVersion !== 1) err(`manifestVersion must be 1 (got ${JSON.stringify(doc.manifestVersion)})`);
   if (!Array.isArray(doc.areas)) { err("areas must be an array"); return {errors, warnings}; }
   const flags = new Set(Array.isArray(doc.flags) ? doc.flags : []), connectors = new Set(Array.isArray(doc.connectors) ? doc.connectors : []);
-  const areas = new Map(), sceneArea = new Map(), scenesOf = new Map();
+  const areas = new Map(), sceneArea = new Map(), scenesOf = new Map(), chambers = [];
 
   for (const a of doc.areas) {
     if (!isObj(a) || !isId(a.id)) { err(`an area needs an id of letters, digits and underscores (got ${JSON.stringify(a && a.id)})`); continue; }
@@ -44,6 +44,12 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
       if (s.puzzle !== undefined && !PUZZLES.includes(s.puzzle)) err(`${at}: puzzle must be one of ${PUZZLES.join(", ")}`);
       if (s.loot !== undefined && !(isObj(s.loot) && isCount(s.loot.lockers) && isCount(s.loot.packs))) err(`${at}: loot needs whole-number lockers and packs`);
       if (s.files !== undefined && !(Array.isArray(s.files) && s.files.every(isFile))) err(`${at}: files must be relative paths without ..`);
+      if (s.chamber !== undefined) {                                                                 // Going back in: a chamber is a scene with a wave (checked against the modes below)
+        const c = s.chamber;
+        if (!(isObj(c) && isId(c.floor) && Number.isInteger(c.index) && c.index >= 1 && isObj(c.wave) && isCount(c.wave.monsters) && c.wave.monsters >= 1 && isId(c.wave.kind))) err(`${at}: chamber needs a floor, an index from 1, and a wave with monsters and kind`);
+        else if (c.stairsDown !== undefined && typeof c.stairsDown !== "string") err(`${at}: chamber.stairsDown must be a door name`);
+        chambers.push(s);
+      }
       if (a.status === "built") {
         if (s.files !== undefined && s.files.length === 0) err(`${at}: a built scene needs at least one file`);
         if (s.multiplayer && typeof s.floorY !== "number") err(`${at}: a multiplayer scene needs a floorY`);
@@ -79,6 +85,19 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
     if (m.players !== undefined && !(isObj(m.players) && Number.isInteger(m.players.min) && Number.isInteger(m.players.max) && m.players.min >= 1 && m.players.min <= m.players.max)) err(`${at}: players needs 1 <= min <= max`);
     if (m.finish !== undefined && Array.isArray(m.floors) && !m.floors.includes(m.finish.scene)) err(`${at}: finish.scene must be one of its floors`);
   }
+
+  const gbi = (doc.modes || {}).going_back_in;                                                       // chambers: each one sits on a floor of the mode, its `next` is another chamber, and the start is one
+  const chamberIds = new Set(chambers.map(c => c.id));
+  for (const c of chambers) {
+    const at = `scene ${c.id}`, ch = c.chamber;
+    if (!isObj(ch) || !gbi) continue;
+    if (!gbi.floors.includes(ch.floor)) err(`${at}: chamber floor ${ch.floor} is not a floor of going_back_in`);
+    if (gbi.chambersPerFloor !== undefined && ch.index > gbi.chambersPerFloor) err(`${at}: chamber index ${ch.index} is past chambersPerFloor ${gbi.chambersPerFloor}`);
+    if (ch.next !== undefined && !chamberIds.has(ch.next)) err(`${at}: chamber.next ${ch.next} is not a chamber`);
+    if (ch.next !== undefined && ch.stairsDown === undefined) err(`${at}: chamber.next needs chamber.stairsDown`);
+  }
+  if (gbi && gbi.startChamber !== undefined && !chamberIds.has(gbi.startChamber)) err(`mode going_back_in: startChamber ${gbi.startChamber} is not a chamber`);
+  if (gbi && gbi.status === "built" && !chambers.length) err("mode going_back_in: built without any chamber");
 
   if (worldDocs) compareWorldDocs(doc, worldDocs, err, m => warnings.push(m));
   return {errors, warnings};
@@ -126,8 +145,15 @@ export function buildRegistry(doc) {
     if (s.files) pageScenes[s.id] = {glbs: s.files.filter(f => f.endsWith(".glb")), floor: s.floorY};
     if (s.loot) loot[s.id] = {lockers: s.loot.lockers, packs: s.loot.packs};
   }
-  const links = doc.links || [];
+  const links = doc.links || [], modeGbi = (doc.modes || {}).going_back_in, chamberScenes = new Map(builtScenes.filter(s => s.chamber).map(s => [s.id, s]));
+  // a chamber with its place in the run: wave number = (position of its floor in the mode) x chambersPerFloor + index, 1-based (20 waves = 5 floors x 4 chambers)
+  const chamber = id => {
+    const s = chamberScenes.get(id); if (!s || !modeGbi) return null;
+    const no = modeGbi.floors.indexOf(s.chamber.floor) * (modeGbi.chambersPerFloor || 4) + s.chamber.index;
+    return {id, floorY: s.floorY, ...s.chamber, wave: {...s.chamber.wave, no}};
+  };
   return deepFreeze({
+    chamber, chambers: [...chamberScenes.keys()],
     manifest: structuredClone(doc),
     floors, pageScenes, loot,
     powerSources: builtScenes.filter(s => s.powerSource).map(s => s.id),
