@@ -3,7 +3,7 @@
 //  2. Pedestrians who all face the same way: up the street, toward 666 Hallam Row. They stand on the sidewalks by day and are gone when the stores close.
 //  3. A lit window, at night, in a building that is not there.
 // Blockout only. None of them collides with anything (they are drawn, not in world/street.json), and none of them is saved: a reload puts the sign back.
-import {storesOpen, skyAt, FRONT} from "./city.js";
+import {storesOpen, skyAt, FRONT, BUILDINGS, windowSlots} from "./city.js";
 
 // 1. the sign: on the filler building on the west side (wfill1, z -52 to -82), which has no door. Passing = crossing the line z = SIGN.z while on the street.
 export const SIGN = {text: "PHARMACY", side: "w", z: -67, y: 4.2};
@@ -45,11 +45,19 @@ export function stepPeds(ps, dt, seen) {
 export const GHOST_WINDOW = {at: [12, 14, -142], w: 1.6, h: 1.3};
 export const ghostLit = hour => skyAt(hour).night;
 
+// 4. the watchers (slice 21): "The lit windows are a mix of decoration, NPC apartments, apartments you can visit and things watching you" (docs/WORLD.md). At night three of the
+// street's lit windows have a dark figure standing just inside the glass, which turns to follow you. Each is one of the windows the street draws (windowSlots).
+export const WATCHERS = [{building: "wfill1", f: 2, k: 1}, {building: "e330", f: 2, k: 2}, {building: "tower", f: 5, k: 2}];
+export function watcherAt(w) { const b = BUILDINGS.find(x => x.id === w.building), s = windowSlots(b).find(x => x.f === w.f && x.k === w.k); return s && {x: s.x - s.dir * 0.25, y: s.y, z: s.z, dir: s.dir}; }
+export const watchersOut = hour => skyAt(hour).night;
+// the yaw (the page's: 0 looks down -z) that turns a figure at (wx, wz) to face (px, pz)
+export const watcherYaw = (wx, wz, px, pz) => Math.atan2(px - wx, pz - wz) + Math.PI;
+
 // ---- reporting them (slice 15): "Anomalies are both spot-and-report and avoid" (docs/WORLD.md). You spot an anomaly by seeing it for yourself (`SPOT`: the sign once it has
 // changed, two or more of the pedestrians at once, the window at night, each in view with a clear line). The computer's REPORT page lists six things people report on Hallam Row:
 // three are real, three are not. A true report of something you have spotted pays $5, once each. A report of something that is not real, or of a real thing you have not seen
 // yourself, is a false report and costs $2 (never below $0). What you have spotted and reported is saved.
-export const SPOT = {signDist: 25, pedDist: 40, pedCount: 2, windowDist: 95};
+export const SPOT = {signDist: 25, pedDist: 40, pedCount: 2, windowDist: 95, watcherDist: 30};
 export const REPORT = {reward: 5, falseCost: 2};
 export const REPORTS = [
   {id: "sign", label: "A shop sign that changes its letters", real: true},
@@ -58,6 +66,7 @@ export const REPORTS = [
   {id: "door", label: "A door that was not there yesterday", real: false},
   {id: "window", label: "A lit window where there is no building", real: true},
   {id: "bus", label: "A bus driver with no face", real: false},
+  {id: "watchers", label: "Someone in a lit window who turns to watch you", real: true},          // slice 21
 ];
 export const REAL_IDS = REPORTS.filter(r => r.real).map(r => r.id);
 export const newSightings = () => ({spotted: {}, reported: {}});

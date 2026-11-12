@@ -56,6 +56,12 @@ export const LAMP_ZS = [0, -20, -40, -60, -80, -100, -120];
 export const DOOR_W = 1.8, DOOR_H = 2.5, WORLD = {x: 60, z0: -150, z1: 30};
 
 export const sideX = side => side === "w" ? -FRONT : FRONT;
+// the window panes on a building's street face (lit at night): floor f from 1, slot k along the front; none on the ground floor beside a door. Slice 21 shares this with the watchers.
+export function windowSlots(b) {
+  const out = [], fx = sideX(b.side), dir = b.side === "w" ? 1 : -1, zl = Math.min(b.z0, b.z1), zh = Math.max(b.z0, b.z1);
+  for (let f = 1; f * 3.6 < b.h - 1; f++) { let k = 0; for (let z = zl + 1.5; z < zh - 1.2; z += 3.4, k++) { if (b.door && f === 1 && Math.abs(z + 0.8 - b.door.z) < 2.4) continue; out.push({f, k, x: fx + dir * 0.02, y: f * 3.6, z: z + 0.8, dir}); } }
+  return out;
+}
 // every door of the street with where it is: the front plane is x = +-8, and you press E within `reach` of its centre
 export const DOORS = BUILDINGS.filter(b => b.door).map(b => ({id: b.id, ...b.door, side: b.side, x: sideX(b.side), reach: 2.8}));
 export const buildingBox = b => { const x = sideX(b.side), x0 = b.side === "w" ? x - b.depth : x, x1 = b.side === "w" ? x : x + b.depth; return {min: [x0, FLOOR_Y, Math.min(b.z0, b.z1)], max: [x1, FLOOR_Y + b.h, Math.max(b.z0, b.z1)]}; };

@@ -58,9 +58,9 @@ test("the window is lit only at night, and there is no building where it hangs",
 
 test("reports (slice 15): six on the list, three real (the slice 8 anomalies) and three not", async () => {
   const {REPORTS, REAL_IDS} = await import("./anomalies.js");
-  assert.equal(REPORTS.length, 6);
-  assert.deepEqual([...REAL_IDS].sort(), ["peds", "sign", "window"]);
-  assert.equal(new Set(REPORTS.map(r => r.id)).size, 6);
+  assert.equal(REPORTS.length, 7);                                    // slice 21 added the watchers
+  assert.deepEqual([...REAL_IDS].sort(), ["peds", "sign", "watchers", "window"]);
+  assert.equal(new Set(REPORTS.map(r => r.id)).size, 7);
 });
 test("spotting: only the real anomalies, and only once", async () => {
   const {newSightings, spot} = await import("./anomalies.js");
@@ -108,4 +108,27 @@ test("routines: unwatched pedestrians walk their beat and turn at its ends; a wa
   const one = ps.map((_, i) => i === 2), before = ps[2].s; ps = stepPeds(ps, 3, one);
   assert.equal(ps[2].s, before, "the one you watch stays put"); assert.notEqual(ps[0].s, stepPeds(ps, 0, one)[0].s + 1, "others go on");
   const big = stepPeds(newPeds(), 100, none); assert.ok(big.every(p => Math.abs(p.s) <= PED_ROUTE), "even a long step stays on the beat");
+});
+
+test("watchers (slice 21): each stands just inside one of the windows the street draws, above the ground floor, on three different buildings", async () => {
+  const {WATCHERS, watcherAt} = await import("./anomalies.js");
+  const {windowSlots} = await import("./city.js");
+  assert.equal(WATCHERS.length, 3); assert.equal(new Set(WATCHERS.map(w => w.building)).size, 3);
+  for (const w of WATCHERS) {
+    const b = BUILDINGS.find(x => x.id === w.building), s = windowSlots(b).find(x => x.f === w.f && x.k === w.k), p = watcherAt(w);
+    assert.ok(s && p, `a drawn window for ${w.building}`); assert.ok(w.f >= 2, "above the ground floor");
+    assert.ok(Math.abs(p.z - s.z) < 1e-9 && Math.abs(p.y - s.y) < 1e-9);
+    const bx = buildingBox(b); assert.ok(p.x > bx.min[0] && p.x < bx.max[0], "inside the building, behind the glass");
+  }
+});
+test("watchers: out only at night, and they turn to face you", async () => {
+  const {watchersOut, watcherYaw} = await import("./anomalies.js");
+  assert.ok(watchersOut(22) && watchersOut(2) && !watchersOut(12));
+  const yaw = watcherYaw(0, 0, 3, 4), fx = -Math.sin(yaw), fz = -Math.cos(yaw);                      // the page's facing for a yaw is (-sin, -cos)
+  assert.ok(Math.abs(fx - 0.6) < 1e-9 && Math.abs(fz - 0.8) < 1e-9, "faces the point");
+});
+test("the street's windows: windowSlots never puts one beside a ground-floor door", async () => {
+  const {windowSlots} = await import("./city.js");
+  for (const b of BUILDINGS) for (const s of windowSlots(b)) if (b.door && s.f === 1) assert.ok(Math.abs(s.z - b.door.z) >= 2.4, `${b.id} ${s.z}`);
+  assert.ok(windowSlots(BUILDINGS.find(b => b.id === "tower")).length > 20);
 });

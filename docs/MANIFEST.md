@@ -95,6 +95,8 @@ The area `gbi` holds the chambers. A chamber is a scene with a `chamber: {floor,
 
 **Stealing (slice 19).** No manifest change: the camera is a prop of `main_floor` (`CAMERA`, `camYaw`, `camSees` in `shared/city.js`; `steal`, `caught` in `shared/needs.js`, pure, tested). Nothing new is saved: a fine is just money, and stolen food is in the fridge.
 
+**Watchers (slice 21).** No manifest change: the figures are props of `street` (`WATCHERS`, `watcherAt`, `watcherYaw` in `shared/anomalies.js`; the window grid is `windowSlots` in `shared/city.js`, which the street now draws from too). The save's `seen` accepts the new real id, `watchers`.
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.
