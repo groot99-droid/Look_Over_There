@@ -81,6 +81,8 @@ The area `gbi` holds the chambers. A chamber is a scene with a `chamber: {floor,
 
 **Rest (slice 12).** No manifest change. `city_save` gains `needs.rest`; it stays version 1, because a save without it reads as rested (`readSave` fills the default), so saves from slice 7 still load.
 
+**The mall (slice 13).** The `mall` area is built, with one scene, `entrance` (`world/entrance.json`, made by `tools/make_street.mjs` from `mallDoc` in `shared/city.js`). `city.street>mall` is now built (door `mall`, by day) and `mall.entrance>street` (door `front_door`) leads back to the street at the MALL door. Both are solo only. From 20:00 to 06:00 the page keeps the way out shut (the lock is the page's rule, `mallLocked`, not a link requirement). `shared/manifest.test.js` used the planned mall as its example of a planned area and link; it now uses the hotel and `city.street>jobs`.
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.

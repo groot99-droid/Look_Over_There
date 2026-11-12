@@ -223,7 +223,7 @@ import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
 import {GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
-import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker} from "./shared/city.js";
+import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
 
 const MON_URL = "world/monsters.json";
 // one scene is resident at a time; the floors are joined by doors at the top of the stairs (doors carry a "link" to the scene they open)
@@ -427,6 +427,7 @@ async function loadScene(id, arrival) {
   if (id === CITY_SCENE) cityProps(root);
   if (id === APT_SCENE) apartmentProps(root);
   if (id === GROCERY_SCENE) groceryProps(root);
+  if (id === MALL_SCENE) mallProps(root);
   closeComputer();                                                                               // a scene change never leaves the computer up
   if (id !== OW_SCENE && OW.open) { OW.open = false; $("options").style.display = "none"; }                 // leaving the lot (the bus, a reload of the scene) must not leave the store-doors screen up
   cityLook(true);                                                                               // the City's sky and clock on arrival; every other scene gets the default look back
@@ -1703,7 +1704,7 @@ async function walkOut(link) {
 // All of it is blockout geometry, no art yet. A game day is 15 real minutes starting at 08:00; the clock (CITY.t, seconds) runs only while you are on the street and is paused
 // everywhere else. Stores open 08:00 to 20:00: after that the shutters come down and the doors will not open. 20:00 to midnight is the grace period; the danger after midnight
 // and the apartment come in slice 2. The apartment (slice 2) is below. Alone only, like the Overworld: a room cannot enter these scenes.
-const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor";
+const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor", MALL_SCENE = "entrance";
 const inCity = () => CITY_SCENES.includes(S.id);
 let NEEDS = newNeeds();                                       // slice 4: hunger, money, the cart and the fridge (rules: shared/needs.js); in memory, like the clock
 const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null, signPasses: 0, lastZ: null, anom: null, tr: {active: false, got: [], t0: 0, end: 0, group: null}};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
@@ -1785,8 +1786,9 @@ function cityLook(force) {
   const clock = $("clock");
   if (!inCity()) { if (force) { scene.background.set(0x0b0b0c); HEMI.intensity = 1.25; HEMI.color.set(0xfff2d0); clock.style.display = "none"; $("needs").style.display = "none"; } return; }
   const st = cityState(), sky = skyAt(st.hour);
-  clock.style.display = "block"; clock.firstChild.textContent = st.clock; clock.lastChild.textContent = `DAY ${st.day} · ${st.phase === "night" ? (S.id === APT_SCENE ? "NIGHT · SAFE INSIDE" : "NIGHT · GET HOME") : st.open ? "STORES OPEN" : "STORES CLOSED"}`;
+  clock.style.display = "block"; clock.firstChild.textContent = st.clock; clock.lastChild.textContent = `DAY ${st.day} · ${S.id === MALL_SCENE && mallLocked(st.hour) ? "LOCKED IN UNTIL 06:00" : st.phase === "night" ? (S.id === APT_SCENE ? "NIGHT · SAFE INSIDE" : "NIGHT · GET HOME") : st.open ? "STORES OPEN" : "STORES CLOSED"}`;
   needsHud();
+  if (S.id === MALL_SCENE) { const lk = mallLocked(st.hour); scene.background.set(0x050505); HEMI.intensity = lk ? 0.32 : 1.25; HEMI.color.set(lk ? 0x8090c0 : 0xfff4e4); if (CITY.mats.mallLamp) CITY.mats.mallLamp.intensity = lk ? 0.6 : 6; return; }   // slice 13: by night only the emergency lights
   if (S.id === GROCERY_SCENE) { scene.background.set(0x050505); HEMI.intensity = 1.35; HEMI.color.set(0xf4f8ff); return; }                         // the grocery's strip lights
   if (S.id === APT_SCENE) { scene.background.set(0x050505); HEMI.intensity = 1.05; HEMI.color.set(0xffe8c8); if (CITY.mats.window) CITY.mats.window.color.set(sky.bg); if (CITY.mats.screen) CITY.mats.screen.emissiveIntensity = 0.9; return; }       // indoors the light is the room's own; the window shows the sky
   scene.background.set(sky.bg); HEMI.intensity = sky.light; HEMI.color.set(sky.lightColor);
@@ -1797,7 +1799,7 @@ function cityLook(force) {
 function cityTick(dt) {
   if (!inCity() || loading || PC.open || SH.open) return;                      // elsewhere, while a scene loads and while the computer or a shift screen is up, the clock is paused
   CITY.t += dt; CITY.ui -= dt; if (CITY.ui <= 0) { CITY.ui = 0.2; cityLook(); }
-  cityPhase(); stalkerTick(dt); needsTick(dt); anomalyTick(); trashTick();
+  cityPhase(); mallTick(); stalkerTick(dt); needsTick(dt); anomalyTick(); trashTick();
 }
 function needsHud() {
   const el = $("needs"), cart = S.id === GROCERY_SCENE && (NEEDS.cart.length || NEEDS.hasCart) ? ` · ${NEEDS.hasCart ? "CART" : "HANDS"} ${NEEDS.cart.length}/${cartCap(NEEDS)} $${cartTotal(NEEDS)}` : "";
@@ -1844,7 +1846,7 @@ function leaveGrocery(msg) {
 function cityPhase() {
   const ph = phaseAt(hourAt(CITY.t)), was = CITY.mark; CITY.mark = ph; if (!was || was === ph) return;
   if (ph === "evening") toast("The stores are closing. Be home before midnight.", 4200);
-  else if (ph === "night") toast(S.id === APT_SCENE ? "Past midnight. Stay inside until dawn." : "Midnight. Get to your apartment. Do not turn your back on it.", 5200);
+  else if (ph === "night") toast(S.id === APT_SCENE ? "Past midnight. Stay inside until dawn." : S.id === MALL_SCENE ? "Past midnight. The mall is locked; nothing comes in here." : "Midnight. Get to your apartment. Do not turn your back on it.", 5200);
   else if (was === "night") toast("Dawn.", 2800);
 }
 // the stalker (rules: shared/city.js): only on the street, only between midnight and 06:00. Blockout figure: tall, grey, red eyes. It is not in `monsters`, so nothing you carry touches it.
@@ -1882,6 +1884,12 @@ function cityPrompt() {
   if (PC.open) return "";
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return "Press F to take the bus to Hallam Row";
   if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
+  if (S.id === MALL_SCENE) {
+    const lk = mallLocked(hourAt(CITY.t));
+    if (nearXZ(...MALL.door.at, MALL.door.reach)) return lk ? "The doors are locked until 06:00" : "Press F to leave";
+    if (lk && MALL.benches.some(b => nearXZ(...b.at, b.reach))) return "Press F to sleep on the bench until 06:00";
+    return "";
+  }
   if (S.id === GROCERY_SCENE) {
     if (nearXZ(...GROCERY.door.at, GROCERY.door.reach)) return "Press F to leave";
     if (nearXZ(...GROCERY.cart.at, GROCERY.cart.reach)) return NEEDS.hasCart ? "You have a cart" : "Press F to take a cart";
@@ -1897,7 +1905,7 @@ function cityPrompt() {
   if (nearXZ(BUS_STREET.at[0], BUS_STREET.at[1], BUS_STREET.radius)) return dangerous(hourAt(CITY.t)) ? "The bus does not run at night" : CITY.tr.active ? "Press F to take the bus back (it ends your shift)" : "Press F to take the bus back";
   const d = nearCityDoor(); if (!d) return "";
   const stub = stubJob(d); if (stub) { const can = canStartStub(stub, hourAt(CITY.t)); return can.ok ? `Press F to start your shift (${d.job})` : `${d.label} (${d.job}): ${can.reason}`; }
-  return d.kind === "tower" ? "Press F to go up to your apartment" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
+  return d.kind === "tower" ? "Press F to go up to your apartment" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.id === "mall" ? "Press F to go into the mall" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
 }
 // F at a bus stop rides the bus (a fade through loadScene); F at a door says what is behind it. Nothing is built inside yet.
 function tryCity() {
@@ -1909,6 +1917,12 @@ function tryCity() {
     if (nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach)) { openComputer(); return true; }
     if (nearXZ(...bedUse.at, bedUse.reach)) { sleepNow(); return true; }
     if (nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach)) { const r = eatFood(NEEDS); NEEDS = r.n; needsHud(); toast(r.ok ? `You eat: ${FOODS.find(f => f.id === r.ate).label}.` : r.reason); return true; }
+    return false;
+  }
+  if (S.id === MALL_SCENE) {
+    const lk = mallLocked(hourAt(CITY.t));
+    if (nearXZ(...MALL.door.at, MALL.door.reach)) { if (lk) { toast("The doors are locked. They open at 06:00."); return true; } return ride(MALL_SCENE, "front_door"); }
+    if (lk && MALL.benches.some(b => nearXZ(...b.at, b.reach))) { benchSleep(); return true; }
     return false;
   }
   if (S.id === GROCERY_SCENE) {
@@ -1927,6 +1941,7 @@ function tryCity() {
   if (nearXZ(BUS_STREET.at[0], BUS_STREET.at[1], BUS_STREET.radius)) { if (dangerous(hourAt(CITY.t))) { toast("The bus does not run at night."); return true; } if (CITY.tr.active) endTrash("left"); return ride(CITY_SCENE, "bus_stop"); }   // the City's tick stops outside the City, so the bus ends the route itself
   const d = nearCityDoor(); if (!d) return false;
   if (d.kind === "tower") return ride(CITY_SCENE, "tower");
+  if (d.id === "mall" && storesOpen(hourAt(CITY.t))) return ride(CITY_SCENE, "mall");                    // slice 13: in by day; it locks at 20:00
   if (d.id === "grocery" && storesOpen(hourAt(CITY.t))) return ride(CITY_SCENE, "grocery");              // slice 4: the grocery is open by day                    // the tower is always open: its door opens into your apartment (the lobby is the planned hotel)
   const stub = stubJob(d);
   if (stub) { const can = canStartStub(stub, hourAt(CITY.t)); if (can.ok) openShift(stub, d); else toast(`${d.label} (${d.job}): ${can.reason}`); return true; }
@@ -1978,6 +1993,40 @@ function groceryProps(root) {
   const ca = GROCERY.cart; for (let i = 0; i < 3; i++) { const z0 = ca.min[2] + 0.05 + i * 0.05, x0 = ca.min[0] + i * 0.12; slab([x0, 0.35, z0], [x0 + 0.9, 0.85, z0 + 0.55], 0xc83a32); slab([x0 + 0.85, 0.85, z0], [x0 + 0.9, 1.05, z0 + 0.55], 0x8a8a8a); }   // red carts in the corral
   const lamp = new THREE.PointLight(0xf4f8ff, 5, 20, 1.4); lamp.position.set(0, h - 0.5, 0); g.add(lamp);
   root.add(g);
+}
+// ---- the mall (slice 13; layout in shared/city.js): an atrium with a dry fountain, two benches and shuttered shopfronts. At 20:00 it locks you in until 06:00.
+function mallProps(root) {
+  const g = new THREE.Group(), [hx, hz] = MALL.half, h = MALL.h, M = c => new THREE.MeshLambertMaterial({color: c});
+  CITY.doors = []; CITY.mats = {}; CITY.mallLocked = mallLocked(hourAt(CITY.t));
+  const slab = (min, max, c) => { const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
+  slab([-hx, -0.05, -hz], [hx, 0, hz], 0xcfc8b8); slab([-hx, h, -hz], [hx, h + 0.05, hz], 0xe0dcd4);
+  for (const [a, b] of [[[-hx, 0, -hz - 0.05], [hx, h, -hz]], [[-hx, 0, hz], [hx, h, hz + 0.05]], [[-hx - 0.05, 0, -hz], [-hx, h, hz]], [[hx, 0, -hz], [hx + 0.05, h, hz]]]) slab(a, b, 0xd8d0c4);
+  slab([-1.6, 0, hz - 0.06], [1.6, 2.8, hz - 0.01], 0x8ab8c8);                                                                     // the glass doors
+  const f = MALL.fountain; slab(f.min, f.max, 0xa8a49c); slab([f.min[0] + 0.3, f.max[1] - 0.05, f.min[2] + 0.3], [f.max[0] - 0.3, f.max[1], f.max[2] - 0.3], 0x6a6860);   // a dry fountain
+  for (const b of MALL.benches) { slab(b.min, b.max, 0x6a5440); slab([b.min[0], 0.5, b.min[2] - 0.12], [b.max[0], 1.0, b.min[2]], 0x6a5440); }
+  const front = (label, x, z, ry) => {                                                                // a shuttered shopfront: shutter, frame and sign on a wall
+    const p = new THREE.Group(); p.position.set(x, 0, z); p.rotation.y = ry; g.add(p);
+    const sh = boxMesh([-2.4, 0, 0], [2.4, 3.2, 0.08], 0x5a5c62); p.add(sh);
+    for (let y = 0.3; y < 3.2; y += 0.35) p.add(boxMesh([-2.4, y, 0.08], [2.4, y + 0.04, 0.1], 0x4a4c52));
+    const s = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.6), new THREE.MeshBasicMaterial({map: signTexture(label)})); s.position.set(0, 3.7, 0.06); p.add(s);
+  };
+  const L = MALL.shops;
+  [-11, -4, 4, 11].forEach((x, i) => front(L[i], x, -hz + 0.02, 0));                                       // north wall
+  [-6, 4].forEach((z, i) => { front(L[4 + i], -hx + 0.02, z, Math.PI / 2); front(L[6 + i], hx - 0.02, z, -Math.PI / 2); });
+  const lamp = new THREE.PointLight(0xfff4e4, 6, 34, 1.2); lamp.position.set(0, h - 0.6, 0); g.add(lamp); CITY.mats.mallLamp = lamp;
+  root.add(g);
+}
+function mallTick() {
+  if (S.id !== MALL_SCENE) return;
+  const lk = mallLocked(hourAt(CITY.t)), was = CITY.mallLocked; CITY.mallLocked = lk;
+  if (lk && !was) { toast("The lights dim. The doors lock behind the last shoppers. You are locked in until 06:00.", 5200); cityLook(); }
+  else if (!lk && was) { toast("06:00. The doors unlock.", 3600); cityLook(); }
+}
+// a bench in the locked mall: sleep until the doors open at 06:00. Rest refills and hunger drains as in the bed, but nothing is saved (only the bed at home saves).
+function benchSleep() {
+  const t1 = mallUnlocks(CITY.t), slept = (t1 - CITY.t) * 24 / DAY_S;
+  NEEDS = restNeeds(sleepDrain(NEEDS, slept), slept); CITY.t = t1; CITY.mark = "day"; mallTick(); cityLook();
+  toast("You sleep on a bench. At 06:00 the doors unlock. (Only the bed at home saves.)", 4200);
 }
 // ---- the application quiz (slice 3; rules in shared/application.js): drag each item to a bin (or click an item, then a bin), then Next. Wrong in a graded round is a rejection. One application at a time.
 const APP = {st: (() => { const a = newApplications(), held = heldFlags(); for (const [job, q] of Object.entries(QUIZZES)) if (held.includes(q.flag)) a.accepted[job] = true; return a; })()};
