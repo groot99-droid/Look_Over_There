@@ -29,7 +29,8 @@ try {
   let s = await st();
   check("rest is on the HUD after the money, starting near 90", /HUNGER \d+ · \$20 · REST (89|90)\b/.test(s.hud) && s.rest > 89 && s.rest <= 90, JSON.stringify(s));
   const r0 = s.rest; await frames(100); s = await st();
-  check("awake in the City it drains: 5 an hour of City time", Math.abs((r0 - s.rest) - 5 * 100 * 0.05 * 24 / 900) < 0.01, JSON.stringify([r0, s.rest]));
+  const want = 5 * 100 * 0.05 * 24 / 900;                                             // the page's own frame loop also runs between steps, so allow 10%
+  check("awake in the City it drains: 5 an hour of City time", Math.abs((r0 - s.rest) - want) < want * 0.1, JSON.stringify([r0, s.rest, want]));
   await setRest(30.1); await frames(40); s = await st();
   check("crossing 30: you are told you are tired, and the HUD turns red", /You are tired/.test(await toast()) && s.low && s.rest < 30, JSON.stringify(s));
   await setRest(10.1); await frames(40);
