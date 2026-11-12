@@ -2,7 +2,7 @@
 // Hunger runs 0..100 and only drains while the City's clock runs (so it waits outside the City, during a shift and while you read the computer). At 0 you faint and wake at home.
 // Defaults for the owner to change: the numbers below. There is no save yet, so a reload starts again at these values.
 export const HUNGER = {max: 100, start: 80, perHour: 100 / 36, sleepFactor: 0.5, sleepFloor: 5, warn: 30, starve: 10, wakeAt: 25, full: 95};
-export const MONEY = {start: 20, shiftPay: 10};
+export const MONEY = {start: 20};                 // a shift's pay is in shared/pay.js: it scales with how the shift went
 export const CARRY = {hands: 2, cart: 8};
 export const FOODS = [
   {id: "apple", label: "Apples", price: 1, fill: 12},
@@ -12,7 +12,7 @@ export const FOODS = [
 ];
 const food = id => FOODS.find(f => f.id === id);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-export const newNeeds = () => ({hunger: HUNGER.start, money: MONEY.start, pantry: {}, cart: [], hasCart: false, lastPay: 0});
+export const newNeeds = () => ({hunger: HUNGER.start, money: MONEY.start, pantry: {}, cart: [], hasCart: false, lastPay: null, lastNote: ""});
 
 // hunger after `hours` game hours awake; and after `hours` asleep (half the rate, and sleep never takes you below 5: you wake hungry, not fainted)
 export const drain = (n, hours) => ({...n, hunger: clamp(n.hunger - Math.max(0, hours) * HUNGER.perHour, 0, HUNGER.max)});
@@ -52,5 +52,5 @@ export function eat(n) {
   const f = have[0], pantry = {...n.pantry, [f.id]: n.pantry[f.id] - 1};
   return {n: {...n, hunger: clamp(n.hunger + f.fill, 0, HUNGER.max), pantry}, ok: true, ate: f.id, reason: ""};
 }
-export const pay = (n, amount) => ({...n, money: n.money + amount, lastPay: amount});
+export const pay = (n, amount, note = "") => ({...n, money: n.money + amount, lastPay: amount, lastNote: note});        // note: what the pay was for (the shift's ending)
 export const pantryLines = n => FOODS.filter(f => n.pantry[f.id]).map(f => `${f.label}: ${n.pantry[f.id]}`);
