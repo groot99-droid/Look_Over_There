@@ -221,12 +221,12 @@ import {BINS, TRASH, routeEnds, nearBin, trashPay} from "./shared/trash.js";
 import {LAB, BENCH, shiftEnds as benchEnds, newBench, stationNear, useStation, labelOf, cardText, benchPay} from "./shared/lab.js";
 import {FACTORY, KINDS, LINE, shiftEnds as lineEnds, newLine, stepLine, pickUp as pickPart, binNear, drop as dropPart, linePay} from "./shared/factory.js";
 import {MUSEUM, GUARD, shiftEnds as guardEnds, newExhibits, exhibitAt, stepExhibits, setBack, homeCount, guardPay} from "./shared/museum.js";
-import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds, REST, rest as restNeeds, restCrossed, passOut, tired as isTired} from "./shared/needs.js";
+import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds, REST, rest as restNeeds, restCrossed, passOut, tired as isTired, steal as stealCart, caught as caughtStealing} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
 import {GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
-import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
+import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, CAMERA, camYaw, camSees, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
 
 const MON_URL = "world/monsters.json";
 // one scene is resident at a time; the floors are joined by doors at the top of the stairs (doors carry a "link" to the scene they open)
@@ -1827,7 +1827,8 @@ function cityLook(force) {
 function cityTick(dt) {
   if (!inCity() || loading || PC.open || SH.open) return;                      // elsewhere, while a scene loads and while the computer or a shift screen is up, the clock is paused
   CITY.t += dt; CITY.ui -= dt; if (CITY.ui <= 0) { CITY.ui = 0.2; cityLook(); }
-  cityPhase(); mallTick(); stalkerTick(dt); needsTick(dt); anomalyTick(dt); trashTick(); museumTick(dt); factoryTick(dt); labTick();
+  cityPhase(); mallTick(); if (S.id === GROCERY_SCENE && CITY.mats.cam) CITY.mats.cam.rotation.y = camYaw(CITY.t) * Math.PI / 180;   // slice 19: the camera sweeps
+  stalkerTick(dt); needsTick(dt); anomalyTick(dt); trashTick(); museumTick(dt); factoryTick(dt); labTick();
 }
 function needsHud() {
   const el = $("needs"), cart = S.id === GROCERY_SCENE && (NEEDS.cart.length || NEEDS.hasCart) ? ` · ${NEEDS.hasCart ? "CART" : "HANDS"} ${NEEDS.cart.length}/${cartCap(NEEDS)} $${cartTotal(NEEDS)}` : "";
@@ -1865,6 +1866,12 @@ async function faintNow() {
 }
 const rideLink = (scene, door) => { const l = REGISTRY.linkFrom(scene, door); loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face}); return true; };
 // out of the grocery (by the door, or shown out at closing): what is not paid for goes back on the shelves
+// slice 19: out of the door with what you have not paid for. The camera decides: seen, you are fined and it goes back; unseen, you keep it (it is in your fridge at home).
+function leaveByDoor() {
+  if (!NEEDS.cart.length) { leaveGrocery(""); return; }
+  if (camSees(CITY.t, P.p.x, P.p.z)) { const r = caughtStealing(NEEDS); NEEDS = r.n; rideLink(GROCERY_SCENE, "front_door"); toast(`The camera saw you. You are fined $${r.fine}, and the goods go back on the shelves.`, 4800); }
+  else { const k = NEEDS.cart.length; NEEDS = stealCart(NEEDS); rideLink(GROCERY_SCENE, "front_door"); toast(`Nobody stopped you. The ${k} item${k > 1 ? "s" : ""} you walked out with ${k > 1 ? "are" : "is"} in your fridge at home.`, 4800); }
+}
 function leaveGrocery(msg) {
   const had = NEEDS.cart.length > 0; NEEDS = putBack(NEEDS);
   rideLink(GROCERY_SCENE, "front_door");
@@ -1939,7 +1946,7 @@ function cityPrompt() {
     return "";
   }
   if (S.id === GROCERY_SCENE) {
-    if (nearXZ(...GROCERY.door.at, GROCERY.door.reach)) return "Press F to leave";
+    if (nearXZ(...GROCERY.door.at, GROCERY.door.reach)) return NEEDS.cart.length ? `Press F to leave (you have not paid for ${NEEDS.cart.length} item${NEEDS.cart.length > 1 ? "s" : ""})` : "Press F to leave";
     if (nearXZ(...GROCERY.cart.at, GROCERY.cart.reach)) return NEEDS.hasCart ? "You have a cart" : "Press F to take a cart";
     if (nearXZ(...GROCERY.checkout.at, GROCERY.checkout.reach)) return NEEDS.cart.length ? `Press F to pay: $${cartTotal(NEEDS)} for ${NEEDS.cart.length} item${NEEDS.cart.length > 1 ? "s" : ""}` : "Checkout: your cart is empty";
     const sh = GROCERY.shelves.find(x => nearXZ(...x.at, x.reach)); if (sh) { const f = FOODS.find(f => f.id === sh.food); return `Press F to take ${f.label} ($${f.price})`; }
@@ -1998,7 +2005,7 @@ function tryCity() {
     return false;
   }
   if (S.id === GROCERY_SCENE) {
-    if (nearXZ(...GROCERY.door.at, GROCERY.door.reach)) { leaveGrocery(""); return true; }
+    if (nearXZ(...GROCERY.door.at, GROCERY.door.reach)) { leaveByDoor(); return true; }
     if (nearXZ(...GROCERY.cart.at, GROCERY.cart.reach)) { const r = takeCart(NEEDS); NEEDS = r.n; toast(r.ok ? "You take a cart. It holds 8." : r.reason); needsHud(); return true; }
     if (nearXZ(...GROCERY.checkout.at, GROCERY.checkout.reach)) { const r = checkoutCart(NEEDS); NEEDS = r.n; toast(r.ok ? `You pay $${r.paid}. It is in your fridge at home.` : r.reason, 3600); needsHud(); return true; }
     const sh = GROCERY.shelves.find(x => nearXZ(...x.at, x.reach));
@@ -2063,6 +2070,10 @@ function groceryProps(root) {
   }
   const co = GROCERY.checkout; slab(co.min, co.max, 0x5a6a5a); slab([co.max[0] - 0.9, co.max[1], co.min[2] + 0.1], [co.max[0] - 0.3, co.max[1] + 0.35, co.min[2] + 0.6], 0x2a2a2e);   // counter and till
   const ca = GROCERY.cart; for (let i = 0; i < 3; i++) { const z0 = ca.min[2] + 0.05 + i * 0.05, x0 = ca.min[0] + i * 0.12; slab([x0, 0.35, z0], [x0 + 0.9, 0.85, z0 + 0.55], 0xc83a32); slab([x0 + 0.85, 0.85, z0], [x0 + 0.9, 1.05, z0 + 0.55], 0x8a8a8a); }   // red carts in the corral
+  const cam = new THREE.Group(); cam.position.set(...CAMERA.at);                                        // slice 19: the security camera; its body points along +z, and it swings with camYaw
+  { const body = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.2, 0.5), M(0xd8d8d8)); body.position.z = 0.15; cam.add(body); const led = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.02), new THREE.MeshBasicMaterial({color: 0xff2020})); led.position.set(0.07, 0.06, 0.41); cam.add(led);
+    const mount = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.06), M(0x808080)); mount.position.set(0, 0.25, 0); cam.add(mount); }
+  g.add(cam); CITY.mats.cam = cam;
   const lamp = new THREE.PointLight(0xf4f8ff, 5, 20, 1.4); lamp.position.set(0, h - 0.5, 0); g.add(lamp);
   root.add(g);
 }

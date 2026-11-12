@@ -75,3 +75,13 @@ test("rest: warnings at 30 (tired) and 10 (exhausted), out at 0; passing out or 
   assert.equal(faint({hunger: 0, rest: 5, cart: [], hasCart: false}).rest, REST.wakeAt);
   assert.ok(tired({rest: 30}) && !tired({rest: 31}) && !tired({}));
 });
+
+test("stealing (slice 19): unseen you keep what you carried out; seen, you are fined $5 plus its price, never more than you have, and it goes back", async () => {
+  const {steal, caught, fineFor, THEFT, newNeeds} = await import("./needs.js");
+  const n = {...newNeeds(), money: 20, pantry: {apple: 1}, cart: ["apple", "meal"], hasCart: true};
+  const s = steal(n);
+  assert.deepEqual(s.pantry, {apple: 2, meal: 1}); assert.deepEqual(s.cart, []); assert.equal(s.hasCart, false); assert.equal(s.money, 20);
+  assert.equal(fineFor(n), THEFT.fineBase + 1 + 6);
+  const c = caught(n); assert.equal(c.fine, 12); assert.equal(c.n.money, 8); assert.deepEqual(c.n.pantry, {apple: 1}); assert.deepEqual(c.n.cart, []);
+  const poor = caught({...n, money: 3}); assert.equal(poor.fine, 3); assert.equal(poor.n.money, 0);
+});
