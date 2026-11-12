@@ -231,7 +231,7 @@ import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
 import {GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
-import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, CAMERA, camYaw, camSees, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
+import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, CAMERA, camYaw, camSees as shopCamSees, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
 
 const MON_URL = "world/monsters.json";
 // one scene is resident at a time; the floors are joined by doors at the top of the stairs (doors carry a "link" to the scene they open)
@@ -1876,7 +1876,8 @@ const rideLink = (scene, door) => { const l = REGISTRY.linkFrom(scene, door); lo
 // slice 19: out of the door with what you have not paid for. The camera decides: seen, you are fined and it goes back; unseen, you keep it (it is in your fridge at home).
 function leaveByDoor() {
   if (!NEEDS.cart.length) { leaveGrocery(""); return; }
-  if (camSees(CITY.t, P.p.x, P.p.z)) { const r = caughtStealing(NEEDS); NEEDS = r.n; rideLink(GROCERY_SCENE, "front_door"); toast(`The camera saw you. You are fined $${r.fine}, and the goods go back on the shelves.`, 4800); }
+  if (shopCamSees(CITY.t, P.p.x, P.p.z)) { const r = caughtStealing(NEEDS);   // (named apart from the Original's own camSees)
+    NEEDS = r.n; rideLink(GROCERY_SCENE, "front_door"); toast(`The camera saw you. You are fined $${r.fine}, and the goods go back on the shelves.`, 4800); }
   else { const k = NEEDS.cart.length; NEEDS = stealCart(NEEDS); rideLink(GROCERY_SCENE, "front_door"); toast(`Nobody stopped you. The ${k} item${k > 1 ? "s" : ""} you walked out with ${k > 1 ? "are" : "is"} in your fridge at home.`, 4800); }
 }
 function leaveGrocery(msg) {
