@@ -19,7 +19,7 @@ const stub = (id, name, status, scenes) => ({id, name, status, scenes: scenes.ma
 export const FARWAY = {
   manifestVersion: 1,
   world: "Farway",
-  flags: ["original_complete", "keycard_tier_1", "keycard_tier_2", "admin_access"],
+  flags: ["original_complete", "job_intern", "keycard_tier_1", "keycard_tier_2", "admin_access"],
   connectors: ["stair_door", "gate", "doors", "walk", "elevator", "stairs", "bus", "pool_dive", "pool_route", "service_corridor", "one_way"],
 
   // a mode is a way to play a round; `players.max` is the room size the server enforces
@@ -112,6 +112,10 @@ export const FARWAY = {
     {id: "city.tower>apartment", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "tower"}, to: {area: "city", scene: "apartment", arrive: [1.5, 0.0, 1.4], face: [0.0, -1.0]},
      note: "The tower's lobby is not built yet: the door opens into your apartment."},
     {id: "city.apartment>street", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "apartment", door: "front_door"}, to: {area: "city", scene: "street", arrive: [-6.2, 0.0, -19.0], face: [1.0, 0.0]}},
+    // slice 3: once the Intern's application is accepted (the quiz in shared/application.js; the flag is kept in the browser), 666 Hallam Row's door starts your shift: the Intern game, solo only.
+    // returnTo carries where you stand when you come back out. Open store hours still apply (the street's doors shut at 20:00).
+    {id: "city.666>intern", status: "built", connector: "doors", soloOnly: true, requires: ["job_intern"], from: {area: "city", scene: "street", door: "w666"}, to: {area: "intern"},
+     returnTo: {area: "city", scene: "street", arrive: [-6.2, 0.0, -127.0], face: [1.0, 0.0]}, note: "A shift at The Intern. Needs the accepted application."},
     plan("overworld.road>forest", {area: "overworld", scene: "road"}, {area: "dreamcore_forest", scene: "forest"}, "walk"),
     plan("forest.house>rdwe", {area: "dreamcore_forest", scene: "meadow", door: "house_door"}, {area: "rdwe", room: "dining"}, "gate", {soloOnly: true}),
     plan("forest.shed>addon", {area: "dreamcore_forest", scene: "meadow", door: "shed"}, {area: "future_addon_shed"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
