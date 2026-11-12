@@ -12,6 +12,7 @@ export const LEVELS = {
   L4: {score: "m_l4", bed: "m_l4_bed", danger: true, dark: 0.7, rate: 1, step: "step_floor", alarm: true},
   street: {score: "m_l3", bed: "m_l3_bed", danger: false, dark: 0.8, rate: 0.98, step: "step_floor"},               // the City's street: the quiet piece, no hunt (the night danger comes in a later slice)
   apartment: {score: "m_l3", bed: "m_l3_bed", danger: false, dark: 1, rate: 0.96, step: "step_floor"},               // your room: the quietest piece
+  main_floor: {score: "m_l3", bed: "m_l3_bed", danger: false, dark: 0.9, rate: 1.0, step: "step_floor"},              // the grocery: the quiet piece under the lights
   parking_lot: {score: "m_l4", bed: "m_l4_bed", danger: false, dark: 0.9, rate: 1.02, step: "step_floor"},          // the Overworld: the same music, bright and with no hunt
 };
 export const levelMix = id => LEVELS[id] || LEVELS.B1;
