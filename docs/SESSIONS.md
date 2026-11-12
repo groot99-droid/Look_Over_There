@@ -17,6 +17,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 4 | Modes and parties | Next | 1 | **done**, merged (PR #7); server and lobby, "go to a friend" is server-side only |
 | 8 | Going back in prototype | Then | 3 and 4 | not started |
 | 9 | City v0 on Hallam Row | Then | 6 | **slice 1 in review** (draft PR, branch `claude/city-v0`): bus, Hallam Row blockout, day clock, stores close. Slice 2 done on the same branch: the apartment and its computer, the night danger (a stalker from midnight to 06:00) and a bed that skips the night. Slice 3 (the Intern's job) not started |
+| 13 | Make `tools/solo_test.mjs` deterministic | Now | | **done** (draft PR): the flaky checks needed room around a random respawn spot; the test now stages a spot that has it. No game change |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
 | 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
