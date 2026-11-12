@@ -215,6 +215,7 @@ import {REGISTRY} from "./shared/registry.js";
 import {requirementsMet} from "./shared/manifest.js";
 import {QUIZZES, grade as gradeQuiz, newApplications, canApply, begin as beginApp, abandon as abandonApp, finish as finishApp} from "./shared/application.js";
 import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
+import {SAVE_KEY, makeSave, readSave} from "./shared/save.js";
 import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
@@ -1832,7 +1833,7 @@ const nearCityDoor = () => S.id === CITY_SCENE ? DOORS.find(d => nearXZ(d.x, d.z
 function cityPrompt() {
   if (PC.open) return "";
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return "Press F to take the bus to Hallam Row";
-  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? "Press F to sleep until morning" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
+  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
   if (S.id === GROCERY_SCENE) {
     if (nearXZ(...GROCERY.door.at, GROCERY.door.reach)) return "Press F to leave";
     if (nearXZ(...GROCERY.cart.at, GROCERY.cart.reach)) return NEEDS.hasCart ? "You have a cart" : "Press F to take a cart";
@@ -1925,6 +1926,16 @@ function groceryProps(root) {
 // ---- the application quiz (slice 3; rules in shared/application.js): drag each item to a bin (or click an item, then a bin), then Next. Wrong in a graded round is a rejection. One application at a time.
 const APP = {st: (() => { const a = newApplications(), held = heldFlags(); for (const [job, q] of Object.entries(QUIZZES)) if (held.includes(q.flag)) a.accepted[job] = true; return a; })()};
 const QZ = {open: false, job: null, round: 0, answers: {}, sel: null, done: null};
+// ---- saving (slice 7): "A bed saves and skips the night." The bed writes the City to the browser (rules: shared/save.js); at start the last save, if one is worth
+// trusting, is where the City resumes. Anything since the last save is lost on a reload. The jobs you hold still come from their flags, which are kept on acceptance.
+function saveCity() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(makeSave({t: CITY.t, needs: NEEDS, apps: APP.st}))); return true; } catch (e) { return false; } }
+function restoreCity() {
+  let s = null; try { s = readSave(localStorage.getItem(SAVE_KEY)); } catch (e) { s = null; }
+  if (!s) return false;
+  CITY.t = s.t; NEEDS = s.needs; APP.st = {...s.apps, accepted: {...s.apps.accepted, ...APP.st.accepted}}; CITY.mark = null;
+  return true;
+}
+restoreCity();
 function openQuiz(job) {
   const day = cityState().day; if (!canApply(APP.st, job, day).ok) return;
   APP.st = beginApp(APP.st, job, day); Object.assign(QZ, {open: true, job, round: 0, answers: {}, sel: null, done: null}); $("qz").style.display = "flex"; $("qz-cancel").onclick = closeQuiz; drawQuiz();
@@ -2001,8 +2012,8 @@ function drawComputer() {
 }
 // the bed: from 20:00 it skips to 06:00 (nothing is saved yet: the game has no save); by day you are not tired
 function sleepNow() {
-  if (phaseAt(hourAt(CITY.t)) === "day") { toast("You are not tired. You can sleep from 20:00."); return; }
-  const t1 = nextMorning(CITY.t); NEEDS = sleepDrain(NEEDS, (t1 - CITY.t) * 24 / DAY_S); CITY.t = t1; CITY.mark = "day"; cityLook(); toast("You sleep through the night. Dawn.", 3600);
+  if (phaseAt(hourAt(CITY.t)) === "day") { toast(saveCity() ? "You are not tired, so you only rest a moment. Saved." : "You are not tired. You can sleep from 20:00."); return; }        // by day the bed only saves
+  const t1 = nextMorning(CITY.t); NEEDS = sleepDrain(NEEDS, (t1 - CITY.t) * 24 / DAY_S); CITY.t = t1; CITY.mark = "day"; cityLook(); toast(saveCity() ? "You sleep through the night. Dawn. Saved." : "You sleep through the night. Dawn.", 3600);
 }
 function openComputer() { PC.open = true; PC.page = "news"; document.exitPointerLock?.(); $("pc").style.display = "flex"; drawComputer(); $("pc-close").onclick = closeComputer; }
 function closeComputer() { closeQuiz(); if (!PC.open) return; PC.open = false; $("pc").style.display = "none"; }
@@ -2416,7 +2427,7 @@ FIN.t0 = performance.now();
 await loadScene("B1");
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
