@@ -135,7 +135,7 @@ export function computerPages(st, apps = null, needs = null) {
     news: {title: "NEWS", lines: [`Day ${st.day}, ${st.clock}.`, st.open ? `Hallam Row's stores are open for another ${hh} h ${String(mm).padStart(2, "0")} min.` : st.hour >= CLOSE_H || st.hour < DAWN_H ? "The stores on Hallam Row are closed for the night." : "The stores on Hallam Row are not open yet.", "Residents are reminded to be home before midnight."]},
     jobs: {title: "JOB SEARCH", lines: [...JOBS.map(j => `${j.address}: ${j.job}${tag(j)}`), "", "One application at a time."]},
     map: {title: "MAP", lines: ["HALLAM ROW", "West side: apartment tower, 41, 214, 666", "East side: grocery, 108, mall, 330", "The bus stop is at the south end."]},
-    bank: {title: "BANK", lines: needs ? ["Balance: $" + needs.money, needs.lastPay ? "Last shift: +$" + needs.lastPay : "No pay yet. A shift at your job pays.", "", "IN YOUR FRIDGE", ...(pantryLines(needs).length ? pantryLines(needs) : ["Nothing."])] : ["Balance unknown."]},
+    bank: {title: "BANK", lines: needs ? ["Balance: $" + needs.money, needs.lastPay !== null && needs.lastPay !== undefined ? "Last shift: +$" + needs.lastPay + (needs.lastNote ? " (" + needs.lastNote + ")" : "") : "No pay yet. A shift at your job pays.", "", "IN YOUR FRIDGE", ...(pantryLines(needs).length ? pantryLines(needs) : ["Nothing."])] : ["Balance unknown."]},
   };
 }
 
