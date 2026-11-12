@@ -22,7 +22,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
     gbi_L4_4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
-    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0}, main_floor: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
+    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0}, main_floor: {glbs: [], floor: 0}, entrance: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
@@ -70,19 +70,19 @@ test("the two game gates are solo only and say where to return to", () => {
 test("each kind of mistake is reported", () => {
   bad(d => { d.manifestVersion = 2; }, /manifestVersion/);
   bad(d => { d.areas.push({...d.areas[0]}); }, /duplicate area id lot/);
-  bad(d => { d.areas.find(a => a.id === "mall").scenes.push({id: "B1"}); }, /duplicate scene id B1/);
+  bad(d => { d.areas.find(a => a.id === "hotel").scenes.push({id: "B1"}); }, /duplicate scene id B1/);          // the hotel is still planned (the mall was built in slice 13)
   bad(d => { d.areas[0].scenes[0].puzzle = "lasers"; }, /puzzle must be one of/);
   bad(d => { d.areas[0].scenes[0].files = []; }, /at least one file/);
   bad(d => { d.areas[0].scenes[0].files = ["../secret"]; }, /relative paths/);
   bad(d => { delete d.areas[0].scenes[0].floorY; }, /needs a floorY/);
   bad(d => { d.areas[0].scenes[0].loot = {lockers: -1, packs: 3}; }, /loot needs/);
-  bad(d => { d.areas.find(a => a.id === "mall").scenes[0].multiplayer = true; }, /only a built scene can be multiplayer/);
+  bad(d => { d.areas.find(a => a.id === "hotel").scenes[0].multiplayer = true; }, /only a built scene can be multiplayer/);
   bad(d => { d.links[0].to.area = "nowhere"; }, /not an area/);
   bad(d => { d.links[0].to.scene = "L9"; }, /not a scene of lot/);
   bad(d => { d.links[0].connector = "teleport"; }, /unknown connector/);
   bad(d => { d.links[0].requires = ["no_such_flag"]; }, /undeclared flag/);
   bad(d => { d.links[1].id = d.links[0].id; }, /duplicate link id/);
-  bad(d => { d.links[0].to.area = "mall"; delete d.links[0].to.scene; }, /built link cannot touch the planned area/);
+  bad(d => { d.links[0].to.area = "hotel"; delete d.links[0].to.scene; }, /built link cannot touch the planned area/);
   bad(d => { d.links[0].returnTo = {area: "lot", scene: "nope"}; }, /returnTo is not a place/);
   bad(d => { d.modes.original.floors.push("L9"); }, /floor L9 is not a scene/);
   bad(d => { d.modes.original.players = {min: 5, max: 2}; }, /players needs/);
@@ -111,7 +111,7 @@ test("a planned scene never reaches the page or the server", () => {
   for (const id of ["lobby", "playground", "bus_station"]) { assert.equal(REGISTRY.floors[id], undefined); assert.equal(REGISTRY.pageScenes[id], undefined); }
   assert.equal(REGISTRY.linkFrom("L4", "front_doors").id, "lot.L4.front_doors>overworld", "the built link is found by its door name");
   assert.equal(REGISTRY.linkFrom("lot", "overworld.bus>city"), undefined);
-  assert.ok(REGISTRY.links.some(l => l.id === "city.street>mall" && l.status === "planned"), "planned links are listed");
+  assert.ok(REGISTRY.links.some(l => l.id === "city.street>jobs" && l.status === "planned"), "planned links are listed");
 });
 test("the Overworld's parking lot is on the page but never a floor the server runs", () => {
   assert.equal(REGISTRY.floors.parking_lot, undefined, "a room cannot enter it yet");
