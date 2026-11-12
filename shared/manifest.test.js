@@ -6,6 +6,7 @@ import {fileURLToPath} from "node:url";
 import {checkManifest, validateManifest, buildRegistry, mergeAddon, requirementsMet} from "./manifest.js";
 import {FARWAY} from "./farway.manifest.js";
 import {REGISTRY} from "./registry.js";
+import {BUS_STREET} from "./city.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const clone = o => structuredClone(o);
@@ -20,12 +21,14 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     B1: {glbs: ["world/B1.glb"], floor: -3.0}, L1: {glbs: ["world/L1.glb"], floor: 0}, L2: {glbs: ["world/L2.glb"], floor: 3.2},
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
+    gbi_L4_4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
+    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
   assert.deepEqual(REGISTRY.scenesWith("keypad"), ["L2"]);
   assert.deepEqual(REGISTRY.powerSources, ["L3", "L4"]);
-  assert.deepEqual(REGISTRY.loot, {B1: {lockers: 8, packs: 6}, L1: {lockers: 0, packs: 3}, L2: {lockers: 0, packs: 3}, L3: {lockers: 0, packs: 4}, L4: {lockers: 0, packs: 3}});
+  assert.deepEqual(REGISTRY.loot, {B1: {lockers: 8, packs: 6}, L1: {lockers: 0, packs: 3}, L2: {lockers: 0, packs: 3}, L3: {lockers: 0, packs: 4}, L4: {lockers: 0, packs: 3}, gbi_L4_4: {lockers: 0, packs: 3}, gbi_L3_1: {lockers: 0, packs: 3}});          // the chambers (session 8) carry ammo packs
   assert.equal(REGISTRY.maxPlayers("original"), 10);
 });
 
@@ -36,11 +39,14 @@ test("the shipped manifest has no errors and no warnings (both gates name their 
 });
 
 test("every door link in world/*.json is in the manifest, with the same arrival, and the other way round", () => {
-  const docs = worldDocs(), built = REGISTRY.links.filter(l => l.status === "built" && ["stair_door", "gate"].includes(l.connector));          // walking out of the store is not a door in the file
+  const docs = worldDocs(), built = REGISTRY.links.filter(l => l.status === "built" && ["stair_door", "gate"].includes(l.connector) && l.from.area === "lot");          // walking out of the store is not a door in the file
   let n = 0;
   for (const [scene, doc] of Object.entries(docs)) for (const d of doc.doors) if (d.link) { n++; assert.ok(REGISTRY.linkFrom(scene, d.name), `${scene}/${d.name}`); }
   assert.equal(built.length, n, "same count");
   assert.equal(n, 10);
+  const gdocs = Object.fromEntries(["gbi_L4_4", "gbi_L3_1"].map(id => [id, JSON.parse(fs.readFileSync(path.join(ROOT, `world/${id}.json`), "utf8"))]));          // the chambers' files: one link, from gbi_L4_4 down
+  assert.deepEqual(checkManifest(FARWAY, {worldDocs: gdocs}).errors, []);
+  assert.equal(Object.values(gdocs).flatMap(d => d.doors).filter(d => d.link).length, REGISTRY.links.filter(l => l.status === "built" && l.from.area === "gbi").length);
 });
 
 test("a drifted door link is caught", () => {
@@ -64,19 +70,19 @@ test("the two game gates are solo only and say where to return to", () => {
 test("each kind of mistake is reported", () => {
   bad(d => { d.manifestVersion = 2; }, /manifestVersion/);
   bad(d => { d.areas.push({...d.areas[0]}); }, /duplicate area id lot/);
-  bad(d => { d.areas.find(a => a.id === "city").scenes.push({id: "B1"}); }, /duplicate scene id B1/);
+  bad(d => { d.areas.find(a => a.id === "mall").scenes.push({id: "B1"}); }, /duplicate scene id B1/);
   bad(d => { d.areas[0].scenes[0].puzzle = "lasers"; }, /puzzle must be one of/);
   bad(d => { d.areas[0].scenes[0].files = []; }, /at least one file/);
   bad(d => { d.areas[0].scenes[0].files = ["../secret"]; }, /relative paths/);
   bad(d => { delete d.areas[0].scenes[0].floorY; }, /needs a floorY/);
   bad(d => { d.areas[0].scenes[0].loot = {lockers: -1, packs: 3}; }, /loot needs/);
-  bad(d => { d.areas.find(a => a.id === "city").scenes[0].multiplayer = true; }, /only a built scene can be multiplayer/);
+  bad(d => { d.areas.find(a => a.id === "mall").scenes[0].multiplayer = true; }, /only a built scene can be multiplayer/);
   bad(d => { d.links[0].to.area = "nowhere"; }, /not an area/);
   bad(d => { d.links[0].to.scene = "L9"; }, /not a scene of lot/);
   bad(d => { d.links[0].connector = "teleport"; }, /unknown connector/);
   bad(d => { d.links[0].requires = ["no_such_flag"]; }, /undeclared flag/);
   bad(d => { d.links[1].id = d.links[0].id; }, /duplicate link id/);
-  bad(d => { d.links[0].to.area = "city"; delete d.links[0].to.scene; }, /built link cannot touch the planned area/);
+  bad(d => { d.links[0].to.area = "mall"; delete d.links[0].to.scene; }, /built link cannot touch the planned area/);
   bad(d => { d.links[0].returnTo = {area: "lot", scene: "nope"}; }, /returnTo is not a place/);
   bad(d => { d.modes.original.floors.push("L9"); }, /floor L9 is not a scene/);
   bad(d => { d.modes.original.players = {min: 5, max: 2}; }, /players needs/);
@@ -102,10 +108,10 @@ test("the registry is frozen, so nothing can edit the floors at run time", () =>
 });
 
 test("a planned scene never reaches the page or the server", () => {
-  for (const id of ["lobby", "street", "playground", "bus_station"]) { assert.equal(REGISTRY.floors[id], undefined); assert.equal(REGISTRY.pageScenes[id], undefined); }
+  for (const id of ["lobby", "playground", "bus_station"]) { assert.equal(REGISTRY.floors[id], undefined); assert.equal(REGISTRY.pageScenes[id], undefined); }
   assert.equal(REGISTRY.linkFrom("L4", "front_doors").id, "lot.L4.front_doors>overworld", "the built link is found by its door name");
   assert.equal(REGISTRY.linkFrom("lot", "overworld.bus>city"), undefined);
-  assert.ok(REGISTRY.links.some(l => l.id === "overworld.bus>city" && l.status === "planned"), "planned links are listed");
+  assert.ok(REGISTRY.links.some(l => l.id === "city.street>mall" && l.status === "planned"), "planned links are listed");
 });
 test("the Overworld's parking lot is on the page but never a floor the server runs", () => {
   assert.equal(REGISTRY.floors.parking_lot, undefined, "a room cannot enter it yet");
@@ -160,4 +166,27 @@ test("an addon cannot reuse ids, redefine a base mode, or add a link between bas
   const e = addon(); e.links[0].requires = ["undeclared"];
   assert.throws(() => mergeAddon(FARWAY, e), /undeclared flag/);
   assert.throws(() => mergeAddon(FARWAY, {}), /at least one area/);
+});
+
+// ---- Going back in chambers (session 8)
+test("the chambers: wave numbers follow the run (4th chamber of L4 is wave 4, 1st of L3 is wave 5), and the start is a built chamber", () => {
+  const c = REGISTRY.chamber("gbi_L4_4"), n = REGISTRY.chamber("gbi_L3_1");
+  assert.equal(c.wave.no, 4); assert.equal(n.wave.no, 5); assert.equal(c.next, "gbi_L3_1"); assert.equal(c.stairsDown, "DoorLeaf_Stair_L3_L4_down");
+  assert.equal(REGISTRY.modes.going_back_in.startChamber, "gbi_L4_4");
+  assert.equal(REGISTRY.chamber("L3"), null, "an Original floor is not a chamber");
+  assert.equal(REGISTRY.modes.going_back_in.status, "planned", "rooms cannot run the mode yet");
+});
+test("a bad chamber is caught", () => {
+  bad(d => { d.modes.going_back_in.startChamber = "L3"; }, /startChamber L3 is not a chamber/);
+  bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.floor = "L9"; }, /not a floor of going_back_in/);
+  bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.index = 5; }, /past chambersPerFloor/);
+  bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.next = "nope"; }, /is not a chamber/);
+  bad(d => { delete d.areas.find(a => a.id === "gbi").scenes[0].chamber.wave; }, /chamber needs a floor/);
+});
+test("the City's street is on the page, never a floor the server runs, and the bus links join it to the lot", () => {
+  assert.equal(REGISTRY.floors.street, undefined);
+  assert.deepEqual(REGISTRY.pageScenes.street, {glbs: [], floor: 0});
+  const there = REGISTRY.linkFrom("parking_lot", "bus_stop"), back = REGISTRY.linkFrom("street", "bus_stop");
+  assert.ok(there && there.status === "built" && there.soloOnly && there.to.scene === "street" && back && back.to.scene === "parking_lot");
+  assert.deepEqual(there.to.arrive, BUS_STREET.arrive, "the arrival is the street's spawn point"); assert.deepEqual(there.to.face, BUS_STREET.face);
 });
