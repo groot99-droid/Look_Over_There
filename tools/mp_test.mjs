@@ -64,10 +64,15 @@ try {
   check("characters match the picks and their models loaded", A.peers[0].char === 3 && B.peers[0].char === 0 && A.peers[0].model && B.peers[0].model);
   check("the server runs B1's monsters, so neither page does", !A.host && !B.host && !!floorOf("B1") && floorOf("B1").monsters.length === A.mons.length, `(${A.mons.length} monsters)`);
   check("same monster count", A.mons.length > 0 && A.mons.length === B.mons.length, `(${A.mons.length})`);
-  await sleep(1500);
+  // the pages are read one after the other, and a moving monster can cover a metre between the reads on this slow browser: stop the server's monsters where they
+  // stand, wait until both pages show the server's positions, then compare the pages
+  const b1 = floorOf("B1"); b1.monsters.forEach(m => { m.cfg = {...m.cfg, patrol: 0, alert: 0, chase: 0}; m.wait = 99; });
+  const at = b1.monsters.map(m => [m.pos.x, m.pos.z]), follows = (sv) => window.__game.monsters.every((m, i) => Math.hypot(m.pos.x - sv[i][0], m.pos.z - sv[i][1]) < 0.5);
+  await Promise.all([a, b].map(pg => pg.waitForFunction(follows, at, {timeout: 60000, polling: 200}).catch(() => {})));
   A = await info(a); B = await info(b);
   const maxd = Math.max(...A.mons.map((m, i) => Math.hypot(m[0] - B.mons[i][0], m[1] - B.mons[i][1])));
-  check("monsters agree across clients", maxd < 1.5, `(max gap ${maxd.toFixed(2)} m)`);
+  const gap = M => Math.max(...M.mons.map((m, i) => Math.hypot(m[0] - at[i][0], m[1] - at[i][1]))).toFixed(2);
+  check("monsters agree across clients", maxd < 1.5, `(max gap ${maxd.toFixed(2)} m; from the server's: Ann ${gap(A)} m, Bob ${gap(B)} m)`);
   parkMonsters(floorOf("B1")); guard("TEST");                                                           // from here the test is about guns, fuses and doors: the monsters stand still, far away, and the players are safe
 
   // ---- guns: one gun each from the B1 lockers, shared state, and a leaver's locker opens again
@@ -268,9 +273,13 @@ try {
   check("a room that did not use the L3 box finds L4 shut", await solo2.evaluate(() => { const g = window.__game; return !g.POWER.on && !g.S.shutter.off && !!g.collide({x: 0, y: g.S.floor + 0.3, z: 27.2}); }));
   await serverUntil("the server runs L4 for the other room", () => !!floorOf("L4", "OTHER")); parkMonsters(floorOf("L4", "OTHER"));
   await solo2.evaluate(() => { const g = window.__game, sp = g.S.pw.spot; g.P.p.set(sp[0] + 1.2, g.S.floor + 0.02, sp[1]); g.P.v.set(0, 0, 0); });
+  const cy = [...roomOf("OTHER").players.values()][0], spot = await solo2.evaluate(() => [window.__game.P.p.x, window.__game.P.p.z]);
+  await serverSees(cy.id, "L4", spot, 1, "OTHER");                                              // the far switch is loud where the server thinks Cy is
+  const nearAtPress = await solo2.evaluate(() => window.__game.nearPower());
   await solo2.keyboard.press("KeyX");
-  await until("the L4 far switch powers it through the server", solo2, () => window.__game.POWER.on && window.__game.POWER.by === "L4" && !window.__game.S.shutter.off === false);
-  check("the room's state is its own", srv.rooms.get("OTHER").power.by === "L4" && srv.rooms.get("TEST").power.by === "L3");
+  const powerView = () => `the page was ${nearAtPress ? "" : "not "}near the switch at the press; server power ${JSON.stringify(roomOf("OTHER").power)}; ${xzOf(cy)}`;
+  await until("the L4 far switch powers it through the server", solo2, () => window.__game.POWER.on && window.__game.POWER.by === "L4" && !!window.__game.S.shutter.off, undefined, powerView);
+  check("the room's state is its own", srv.rooms.get("OTHER").power.by === "L4" && srv.rooms.get("TEST").power.by === "L3", `OTHER ${JSON.stringify(roomOf("OTHER").power)}, TEST ${JSON.stringify(roomOf("TEST").power)}`);
 
   // ---- the finale in a third room: the alarm for both, the first out is place 1, the results come when the second is out
   for (const pg of [a, b, solo2]) await pg.close().catch(() => {});             // software rendering: free the CPU for the last room
