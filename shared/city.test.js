@@ -40,7 +40,7 @@ test("the apartment links match the layout, and the clock runs in both City scen
   assert.ok(into && into.status === "built" && into.soloOnly && out && out.status === "built" && out.soloOnly);
   assert.deepEqual(into.to.arrive, APARTMENT.arrive); assert.deepEqual(into.to.face, APARTMENT.face);
   assert.deepEqual(out.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(out.to.face, TOWER_FRONT.face);
-  assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor", "entrance", "galleries"]);
+  assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor", "entrance", "galleries", "factory_floor"]);
   const [hx, hz] = APARTMENT.half, inside = ([x, z]) => Math.abs(x) < hx && Math.abs(z) < hz, hit = ([x, z], b) => x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2];
   for (const p of [APARTMENT.arrive.filter((_, i) => i !== 1), APARTMENT.door.at, APARTMENT.computer.at]) { assert.ok(inside(p), "inside the room " + p); assert.ok(!hit(p, APARTMENT.bed) && !hit(p, APARTMENT.desk), "clear of furniture " + p); }
 });

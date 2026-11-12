@@ -22,7 +22,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
     gbi_L4_4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
-    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0}, main_floor: {glbs: [], floor: 0}, entrance: {glbs: [], floor: 0}, galleries: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
+    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0}, main_floor: {glbs: [], floor: 0}, entrance: {glbs: [], floor: 0}, galleries: {glbs: [], floor: 0}, factory_floor: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
