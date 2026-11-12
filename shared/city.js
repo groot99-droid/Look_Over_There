@@ -78,7 +78,7 @@ export const streetDoc = () => ({scene: "street", colliders: colliders(), doors:
 
 // ---- the apartment (slice 2): your one room, reached from the apartment tower's door on the street. For v0 the tower door opens straight into it (the tower's lobby, atrium and floors are the
 // hotel area, planned); the City's clock keeps running while you are inside. One room, a bed, a desk with the computer, a window onto the street's sky, and a door back out. Blockout, no art.
-export const CITY_SCENES = ["street", "apartment", "main_floor", "entrance", "galleries", "factory_floor"];      // slice 13: and the mall; slice 14: the museum; slice 16: the factory            // the scenes where the City's clock (and hunger) runs: the street, your apartment, the grocery
+export const CITY_SCENES = ["street", "apartment", "main_floor", "entrance", "galleries", "factory_floor", "laboratory"];      // slice 13: and the mall; slice 14: the museum; slice 16: the factory; slice 17: the lab            // the scenes where the City's clock (and hunger) runs: the street, your apartment, the grocery
 export const APARTMENT = {
   half: [3, 2.5], h: 2.8,                                      // the room is x in [-3, 3], z in [-2.5, 2.5], 2.8 m high
   arrive: [1.5, 0, 1.4], face: [0, -1],                        // you come in through the door on the south wall and face the room
