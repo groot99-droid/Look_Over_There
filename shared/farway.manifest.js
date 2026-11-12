@@ -86,6 +86,11 @@ export const FARWAY = {
       id: "museum", name: "Museum (108 Hallam Row)", status: "built", tone: "liminal",
       scenes: [{id: "galleries", floorY: 0, files: ["world/galleries.json"]}],
     },
+    {
+      // slice 16 (session 9): the factory floor worker's shift, behind 330 Hallam Row. One hall with a conveyor belt, blockout; you are only in it during your shift.
+      id: "factory", name: "Factory (330 Hallam Row)", status: "built", tone: "liminal",
+      scenes: [{id: "factory_floor", floorY: 0, files: ["world/factory_floor.json"]}],
+    },
     stub("jobs", "Hallam Row (street of jobs)", "planned", ["street_of_jobs"]),
     stub("secret_ops", "Secret Operations (Project Never Land)", "planned", ["service_entry", "hidden_entry"]),
     {id: "future_addon_shed", name: "Reserved for the shed", status: "reserved"},
@@ -151,6 +156,9 @@ export const FARWAY = {
     // slice 14: 108's door starts the museum guard's shift (20:00 to 21:00, the page checks the hours) and the hall's door ends it, back by 108; solo only.
     {id: "city.e108>museum", status: "built", connector: "doors", soloOnly: true, requires: ["job_museum"], from: {area: "city", scene: "street", door: "e108"}, to: {area: "museum", scene: "galleries", arrive: [0.0, 0.0, 4.4], face: [0.0, -1.0]},
      note: "Everything comes alive at night."},
+    // slice 16: 330's door starts the factory shift (08:00 to 16:00, the page checks the hours) and the hall's door ends it, back by 330; solo only.
+    {id: "city.e330>factory", status: "built", connector: "doors", soloOnly: true, requires: ["job_factory"], from: {area: "city", scene: "street", door: "e330"}, to: {area: "factory", scene: "factory_floor", arrive: [0.0, 0.0, 5.4], face: [0.0, -1.0]}},
+    {id: "factory.factory_floor>street", status: "built", connector: "doors", soloOnly: true, from: {area: "factory", scene: "factory_floor", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -95.0], face: [-1.0, 0.0]}},
     {id: "museum.galleries>street", status: "built", connector: "doors", soloOnly: true, from: {area: "museum", scene: "galleries", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -41.0], face: [-1.0, 0.0]}},
     plan("grocery.backhouse>secret_ops", {area: "grocery", scene: "back_of_house"}, {area: "secret_ops", scene: "service_entry"}, "service_corridor", {requires: ["keycard_tier_1"]}),
     plan("rdwe.repeating_room>secret_ops", {area: "rdwe", room: "repeating_room"}, {area: "secret_ops", scene: "hidden_entry"}, "gate", {note: "The only entrance with no clearance. Hinted by a room that repeats or a door seen from one angle."}),

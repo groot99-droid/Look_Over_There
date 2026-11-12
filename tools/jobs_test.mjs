@@ -7,6 +7,7 @@ import {secondsAt, APARTMENT, DOORS} from "../shared/city.js";
 import {QUIZZES} from "../shared/application.js";
 import {STUB_SHIFTS} from "../shared/pay.js";
 import {MUSEUM} from "../shared/museum.js";
+import {FACTORY} from "../shared/factory.js";
 import {HUNGER} from "../shared/needs.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
@@ -105,22 +106,32 @@ try {
   await stand(MUSEUM.door.at[0], MUSEUM.door.at[1] - 0.6, Math.PI); await frames(2); await page.keyboard.press("KeyF"); await settled("street"); await frames(2); s1 = await state();
   check("walking straight out is leaving your post: no pay (the full shift is in museum_test)", s1.needs.money === s0.needs.money && s1.needs.lastNote === "Museum: left early" && !(await page.evaluate(() => window.__game.CITY.mu.active)), JSON.stringify(s1.needs));
 
-  // a stub shift (lab and factory are still stubs): the factory, by day
+  // the factory (slice 16: its shift is played on the factory floor)
   res = await apply("factory", true);
   check("the factory application with right answers is accepted", /ACCEPTED/.test(res) && (await state()).flags.includes("job_factory"), res);
   await atDoor("e330", 10); s0 = await state(); await page.keyboard.press("KeyF");
-  check("the factory's screen says its game is not built yet, 4 hours, $12", /not built yet.*4 hours.*\$12/.test(await page.evaluate(() => document.getElementById("sh-text").textContent)));
-  await page.click("#sh-work"); await frames(2); s1 = await state();
-  check("working the stub: 4 hours pass and $12 is paid with the job's name", Math.abs(s1.hour - (s0.hour + 4)) < 0.1 && s1.needs.money === s0.needs.money + STUB_SHIFTS.factory.pay && s1.needs.lastNote === "Factory floor worker", JSON.stringify([s0.hour, s1.hour, s1.needs.money]));
+  check("the factory's screen offers the shift on the belt", /Parts come down the belt/.test(await page.evaluate(() => document.getElementById("sh-text").textContent)) && await page.evaluate(() => document.getElementById("sh-work").textContent) === "Start the shift");
+  await page.click("#sh-work"); await settled("factory_floor"); await frames(2);
+  check("starting it takes you onto the factory floor, on shift", await page.evaluate(() => window.__game.CITY.fa.active));
+  await stand(FACTORY.door.at[0], FACTORY.door.at[1] - 0.6, Math.PI); await frames(2); await page.keyboard.press("KeyF"); await settled("street"); await frames(2); s1 = await state();
+  check("walking straight out is leaving your post: no pay (the full shift is in factory_test)", s1.needs.money === s0.needs.money && s1.needs.lastNote === "Factory: left early", JSON.stringify(s1.needs));
 
   // the lab: rejected today, so still by application only
   await atDoor("w214", 10, 1);
   check("214 Hallam Row (rejected): still by application only", /214 HALLAM ROW: press F/.test(await prompt()), await prompt());
 
+  // the last stub shift: the lab (rejected on day 1, so apply again on day 2)
+  await setT(9, 2); res = await apply("lab", true);
+  check("on day 2 the lab application with right answers is accepted", /ACCEPTED/.test(res) && (await state()).flags.includes("job_lab"), res);
+  await atDoor("w214", 10, 2); s0 = await state(); await page.keyboard.press("KeyF");
+  check("the lab's screen says its game is not built yet, 4 hours, $14", /not built yet.*4 hours.*\$14/.test(await page.evaluate(() => document.getElementById("sh-text").textContent)));
+  await page.click("#sh-work"); await frames(2); s1 = await state();
+  check("working the stub: 4 hours pass and $14 is paid with the job's name", Math.abs(s1.hour - (s0.hour + 4)) < 0.1 && s1.needs.money === s0.needs.money + STUB_SHIFTS.lab.pay && s1.needs.lastNote === "Laboratory worker", JSON.stringify([s0.hour, s1.hour, s1.needs.money]));
+
   // a reload keeps the jobs
   await page.reload(); await page.click("#l-solo");
   await page.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 240000});
-  check("a reload keeps job_trash and job_museum, and they are accepted on the computer", await page.evaluate(() => { const g = window.__game, f = g.heldFlags(); return f.includes("job_trash") && f.includes("job_museum") && !f.includes("job_lab") && g.APP.st.accepted.trash && g.APP.st.accepted.museum && !g.APP.st.accepted.lab; }));
+  check("a reload keeps every job held (trash, museum, factory, lab), and they are accepted on the computer", await page.evaluate(() => { const g = window.__game, f = g.heldFlags(); return ["job_trash", "job_museum", "job_factory", "job_lab"].every(k => f.includes(k)) && g.APP.st.accepted.trash && g.APP.st.accepted.museum && g.APP.st.accepted.factory && g.APP.st.accepted.lab; }));
   check("no page errors", errors.length === 0, errors.join(" | "));
 } finally { await browser.close(); await srv.close(); }
 process.exit(failed ? 1 : 0);
