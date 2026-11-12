@@ -216,7 +216,7 @@ import {requirementsMet} from "./shared/manifest.js";
 import {QUIZZES, grade as gradeQuiz, newApplications, canApply, begin as beginApp, abandon as abandonApp, finish as finishApp} from "./shared/application.js";
 import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
 import {SAVE_KEY, makeSave, readSave, NEW_GAME_KEYS} from "./shared/save.js";
-import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, GHOST_WINDOW, ghostLit, SPOT, REPORTS, newSightings, spot, fileReport} from "./shared/anomalies.js";
+import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, newPeds, pedAt, stepPeds, GHOST_WINDOW, ghostLit, SPOT, REPORTS, newSightings, spot, fileReport} from "./shared/anomalies.js";
 import {BINS, TRASH, routeEnds, nearBin, trashPay} from "./shared/trash.js";
 import {LAB, BENCH, shiftEnds as benchEnds, newBench, stationNear, useStation, labelOf, cardText, benchPay} from "./shared/lab.js";
 import {FACTORY, KINDS, LINE, shiftEnds as lineEnds, newLine, stepLine, pickUp as pickPart, binNear, drop as dropPart, linePay} from "./shared/factory.js";
@@ -1713,7 +1713,7 @@ async function walkOut(link) {
 const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor", MALL_SCENE = "entrance", MUSEUM_SCENE = "galleries", FACTORY_SCENE = "factory_floor", LAB_SCENE = "laboratory";
 const inCity = () => CITY_SCENES.includes(S.id);
 let NEEDS = newNeeds();                                       // slice 4: hunger, money, the cart and the fridge (rules: shared/needs.js); in memory, like the clock
-const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null, signPasses: 0, lastZ: null, anom: null, tr: {active: false, got: [], t0: 0, end: 0, group: null}, mu: {active: false, ex: [], fixes: 0, end: 0, figs: []}, fa: {active: false, st: null, end: 0, parts: null, held: null}, lb: {active: false, b: null, end: 0}, seen: newSightings(), spotT: 0};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
+const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null, signPasses: 0, lastZ: null, anom: null, tr: {active: false, got: [], t0: 0, end: 0, group: null}, mu: {active: false, ex: [], fixes: 0, end: 0, figs: []}, fa: {active: false, st: null, end: 0, parts: null, held: null}, lb: {active: false, b: null, end: 0}, seen: newSightings(), spotT: 0, peds: newPeds()};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
 const cityState = () => { const h = hourAt(CITY.t); return {t: CITY.t, hour: h, clock: fmtClock(h), day: dayAt(CITY.t), phase: phaseAt(h), open: storesOpen(h)}; };
 const boxMesh = (min, max, color) => { const m = new THREE.Mesh(new THREE.BoxGeometry(max[0] - min[0], max[1] - min[1], max[2] - min[2]), new THREE.MeshLambertMaterial({color})); m.position.set((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2); return m; };
 function signTexture(text) {
@@ -1769,12 +1769,19 @@ function anomalyProps(g, y) {
     const part = (w, h, d, ox, oy, oz, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(ox, oy, oz); f.add(o); };
     part(0.46, 0.8, 0.28, 0, 1.0, 0, coat); part(0.16, 0.6, 0.16, -0.12, 0.3, 0, dark); part(0.16, 0.6, 0.16, 0.12, 0.3, 0, dark); part(0.12, 0.62, 0.12, -0.3, 1.02, 0, coat); part(0.12, 0.62, 0.12, 0.3, 1.02, 0, coat);
     part(0.26, 0.3, 0.26, 0, 1.6, 0, skin); part(0.05, 0.04, 0.02, -0.06, 1.64, -0.135, dark); part(0.05, 0.04, 0.02, 0.06, 1.64, -0.135, dark);
-    f.position.set(px, y, pz); f.rotation.y = 0; f.userData.ped = true; peds.add(f);
+    const [rx, rz] = pedAt(i, CITY.peds[i].s); f.position.set(rx, y, rz); f.rotation.y = 0; f.userData.ped = true; peds.add(f);   // slice 18: where its routine has got to
   });
   g.add(peds);
   const glow = new THREE.MeshLambertMaterial({color: 0x20262c, emissive: 0xffd890, emissiveIntensity: 0}), [wx, wy, wz] = GHOST_WINDOW.at;
   const ghost = new THREE.Mesh(new THREE.PlaneGeometry(GHOST_WINDOW.w, GHOST_WINDOW.h), glow); ghost.position.set(wx, y + wy, wz); g.add(ghost);   // faces +z: back down the street
   CITY.anom = {sign, peds, ghost}; CITY.lastZ = null;
+}
+// slice 18: the pedestrians' routines (rules: shared/anomalies.js). By day, each one you cannot see walks its beat; each one in your view stands still. All face up the street.
+function pedTick(dt) {
+  const a = CITY.anom; if (!a || !pedsOut(hourAt(CITY.t))) return;
+  const ey = P.p.y + P.eye, seen = CITY.peds.map((p, i) => { const [x, z] = pedAt(i, p.s); return Math.hypot(x - P.p.x, z - P.p.z) < 90 && inView(P.p.x, P.p.z, P.yaw, x, z) && segClear(P.p.x, ey, P.p.z, x, S.floor + 1.5, z, 0.3); });
+  CITY.peds = stepPeds(CITY.peds, dt, seen);
+  a.peds.children.forEach((f, i) => { const [x, z] = pedAt(i, CITY.peds[i].s); f.position.x = x; f.position.z = z; f.rotation.y = 0; });
 }
 // slice 15: spotting an anomaly is seeing it yourself, in view with a clear line (rules: SPOT in shared/anomalies.js). Checked a few times a second.
 const SPOT_SAYS = {sign: "Did that sign just change?", peds: "They are all facing the same way.", window: "A lit window, up there. There is no building."};
@@ -1783,7 +1790,7 @@ function spotTick() {
   const h = hourAt(CITY.t), ey = P.p.y + P.eye, sees = (x, y, z, d) => Math.hypot(x - P.p.x, z - P.p.z) < d && inView(P.p.x, P.p.z, P.yaw, x, z) && segClear(P.p.x, ey, P.p.z, x, y, z, 0.3);
   const sx = sideX(SIGN.side) + (SIGN.side === "w" ? 0.1 : -0.1), found = [];
   if (CITY.signPasses > 0 && sees(sx, S.floor + SIGN.y, SIGN.z, SPOT.signDist)) found.push("sign");
-  if (pedsOut(h) && PEDESTRIANS.filter(([x, z]) => sees(x, S.floor + 1.5, z, SPOT.pedDist)).length >= SPOT.pedCount) found.push("peds");
+  if (pedsOut(h) && CITY.peds.filter((p, i) => { const [x, z] = pedAt(i, p.s); return sees(x, S.floor + 1.5, z, SPOT.pedDist); }).length >= SPOT.pedCount) found.push("peds");
   if (ghostLit(h) && sees(GHOST_WINDOW.at[0], S.floor + GHOST_WINDOW.at[1], GHOST_WINDOW.at[2], SPOT.windowDist)) found.push("window");
   for (const id of found) if (!CITY.seen.spotted[id]) { CITY.seen = spot(CITY.seen, id); toast(SPOT_SAYS[id], 3600); }
 }
@@ -1792,9 +1799,9 @@ function anomalyLook(hour) {
   a.peds.visible = pedsOut(hour);
   const lit = ghostLit(hour); a.ghost.visible = lit; a.ghost.material.emissiveIntensity = lit ? 1.1 : 0;
 }
-function anomalyTick() {
+function anomalyTick(dt = 1 / 60) {
   if (S.id !== CITY_SCENE || !CITY.anom) { CITY.lastZ = null; return; }
-  spotTick();
+  spotTick(); pedTick(dt);
   const z0 = CITY.lastZ; CITY.lastZ = P.p.z;
   if (z0 === null || !passedSign(z0, P.p.z, P.p.x)) return;
   CITY.signPasses++; const m = CITY.anom.sign.material; m.map.dispose(); m.map = signTexture(signText(CITY.signPasses)); m.needsUpdate = true;
@@ -1820,7 +1827,7 @@ function cityLook(force) {
 function cityTick(dt) {
   if (!inCity() || loading || PC.open || SH.open) return;                      // elsewhere, while a scene loads and while the computer or a shift screen is up, the clock is paused
   CITY.t += dt; CITY.ui -= dt; if (CITY.ui <= 0) { CITY.ui = 0.2; cityLook(); }
-  cityPhase(); mallTick(); stalkerTick(dt); needsTick(dt); anomalyTick(); trashTick(); museumTick(dt); factoryTick(dt); labTick();
+  cityPhase(); mallTick(); stalkerTick(dt); needsTick(dt); anomalyTick(dt); trashTick(); museumTick(dt); factoryTick(dt); labTick();
 }
 function needsHud() {
   const el = $("needs"), cart = S.id === GROCERY_SCENE && (NEEDS.cart.length || NEEDS.hasCart) ? ` · ${NEEDS.hasCart ? "CART" : "HANDS"} ${NEEDS.cart.length}/${cartCap(NEEDS)} $${cartTotal(NEEDS)}` : "";
