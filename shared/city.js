@@ -3,6 +3,8 @@
 // No art exists for the street yet: it is blockout geometry (boxes), and the owner will direct the art.
 
 // ---- the clock. A game day is 15 real minutes. It starts at 08:00 on day 1, runs only while you are in the City (leaving pauses it), and is kept in memory (a reload starts at 08:00).
+import {mailLines} from "./application.js";
+
 export const DAY_S = 900;                       // real seconds per game day
 export const START_H = 8;                       // the hour the first day starts at
 export const OPEN_H = 8, CLOSE_H = 20;          // stores are open from 08:00 (when the day starts) until 20:00
@@ -42,7 +44,7 @@ export const BUILDINGS = [
   {id: "wfill1", side: "w", z0: -52, z1: -82, depth: 14, h: 11, color: 0x6a7480},
   {id: "w214", side: "w", z0: -88, z1: -102, depth: 16, h: 10, color: 0x7a8a86, door: {kind: "store", label: "214 HALLAM ROW", z: -95, job: "Laboratory worker"}},
   {id: "wfill2", side: "w", z0: -106, z1: -116, depth: 14, h: 8, color: 0x80726a},
-  {id: "w666", side: "w", z0: -120, z1: -134, depth: 18, h: 13, color: 0x5a4a52, door: {kind: "store", label: "666 HALLAM ROW", z: -127, job: "The Intern"}},
+  {id: "w666", side: "w", z0: -120, z1: -134, depth: 18, h: 13, color: 0x5a4a52, door: {kind: "store", label: "666 HALLAM ROW", z: -127, job: "The Intern", quiz: "intern"}},
   {id: "grocery", side: "e", z0: -8, z1: -26, depth: 24, h: 7, color: 0x7a9a78, door: {kind: "store", label: "GROCERY", z: -17}},
   {id: "e108", side: "e", z0: -34, z1: -48, depth: 16, h: 9, color: 0x8a6e7a, door: {kind: "store", label: "108 HALLAM ROW", z: -41, job: "Museum night guard"}},
   {id: "mall", side: "e", z0: -52, z1: -82, depth: 30, h: 12, color: 0x6a6a8a, door: {kind: "store", label: "MALL", z: -67}},
@@ -97,14 +99,16 @@ export function apartmentColliders() {
 export const apartmentDoc = () => ({scene: "apartment", colliders: apartmentColliders(), doors: [], cameras: [],
   markers: [{name: "Spawn_door", kind: "Spawn", level: "apartment", position: APARTMENT.arrive}, {name: "Computer", kind: "Interact", level: "apartment", position: [APARTMENT.computer.at[0], 0, APARTMENT.computer.at[1]]}]});
 
-// ---- the computer: what its pages say. `st` is {hour, day, clock, open}. Pure, so it is tested; the page only draws the strings. Job search lists the five Hallam Row jobs but applications open later (slice 3).
-export const JOBS = BUILDINGS.filter(b => b.door && b.door.job).map(b => ({address: b.door.label, job: b.door.job}));
-export function computerPages(st) {
-  const left = st.open ? Math.max(0, CLOSE_H - st.hour) : 0, hh = Math.floor(left), mm = Math.round((left - hh) * 60);
+// ---- the computer: what its pages say. `st` is {hour, day, clock, open}; `apps` is the applications state of shared/application.js (optional). Pure, so it is tested; the page only draws the strings. Job search lists the five Hallam Row jobs but applications open later (slice 3).
+export const JOBS = BUILDINGS.filter(b => b.door && b.door.job).map(b => ({id: b.id, address: b.door.label, job: b.door.job, quiz: b.door.quiz || null}));      // quiz: the key in shared/application.js (only the Intern has one so far)
+export const JOB_FRONT = {arrive: [-6.2, 0, -127], face: [1, 0]};            // where you stand when you come back out of your shift at 666 Hallam Row
+export function computerPages(st, apps = null) {
+  const left = st.open ? Math.max(0, CLOSE_H - st.hour) : 0, hh = Math.floor(left), mm = Math.round((left - hh) * 60), mine = apps ? mailLines(apps, st.day) : [];
+  const tag = j => !j.quiz ? " (not hiring yet)" : apps && apps.accepted[j.quiz] ? " (ACCEPTED)" : apps && apps.rejectedOn[j.quiz] !== undefined && apps.rejectedOn[j.quiz] >= st.day ? " (rejected: try again tomorrow)" : " (hiring: apply below)";
   return {
-    mail: {title: "MAIL", lines: ["No new messages.", "", "(Your inbox is empty. Offers and replies will arrive here once you apply for a job.)"]},
+    mail: {title: "MAIL", lines: mine.length ? mine : ["No new messages.", "", "(Your inbox is empty. Offers and replies will arrive here once you apply for a job.)"]},
     news: {title: "NEWS", lines: [`Day ${st.day}, ${st.clock}.`, st.open ? `Hallam Row's stores are open for another ${hh} h ${String(mm).padStart(2, "0")} min.` : st.hour >= CLOSE_H || st.hour < DAWN_H ? "The stores on Hallam Row are closed for the night." : "The stores on Hallam Row are not open yet.", "Residents are reminded to be home before midnight."]},
-    jobs: {title: "JOB SEARCH", lines: [...JOBS.map(j => `${j.address}: ${j.job}`), "", "Applications are not open yet."]},
+    jobs: {title: "JOB SEARCH", lines: [...JOBS.map(j => `${j.address}: ${j.job}${tag(j)}`), "", "One application at a time."]},
     map: {title: "MAP", lines: ["HALLAM ROW", "West side: apartment tower, 41, 214, 666", "East side: grocery, 108, mall, 330", "The bus stop is at the south end."]},
   };
 }
