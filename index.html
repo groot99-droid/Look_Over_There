@@ -2091,7 +2091,7 @@ function startLab() {
   toast(`Your shift has started. Follow the cards until ${fmtClock(hourAt(lb.end))}. The first card is on your screen.`, 4200);
 }
 function labTick() {
-  const lb = CITY.lb; if (!lb.active) return;
+  const lb = CITY.lb; if (!lb.active || loading) return;                      // never mid-load (see museumTick)
   if (S.id !== LAB_SCENE) { endLab("left"); return; }                            // fainting or passing out mid-shift takes you home: the shift is lost
   if (CITY.t >= lb.end) endLab("done");
 }
@@ -2134,7 +2134,7 @@ function startFactory() {
   toast(`Your shift has started. Sort the parts until ${fmtClock(hourAt(fa.end))}.`, 4200);
 }
 function factoryTick(dt) {
-  const fa = CITY.fa; if (!fa.active) return;
+  const fa = CITY.fa; if (!fa.active || loading) return;                      // never mid-load (see museumTick)
   if (S.id !== FACTORY_SCENE) { endFactory("left"); return; }                    // fainting or passing out mid-shift takes you home: the shift is lost
   const before = fa.st.missed; fa.st = stepLine(fa.st, dt); drawParts(); if (fa.st.missed !== before) needsHud();
   if (CITY.t >= fa.end) endFactory("done");
@@ -2179,7 +2179,7 @@ function startMuseum() {
   toast(`Your shift has started. Keep the statues on their plinths until ${fmtClock(hourAt(mu.end))}.`, 4200);
 }
 function museumTick(dt) {
-  const mu = CITY.mu; if (!mu.active) return;
+  const mu = CITY.mu; if (!mu.active || loading) return;                      // never mid-load: passing out jumps the clock to 06:00 before the apartment loads, which must not end the shift as done
   if (S.id !== MUSEUM_SCENE) { endMuseum("left"); return; }                      // fainting or passing out mid-shift takes you home: the shift is lost
   const seen = mu.figs.map((f, i) => { const [x, z] = exhibitAt(i, mu.ex[i].off); return Math.hypot(x - P.p.x, z - P.p.z) < 60 && inView(P.p.x, P.p.z, P.yaw, x, z) && segClear(P.p.x, P.p.y + P.eye, P.p.z, x, S.floor + 1.0, z, 0.2); });
   const before = homeCount(mu.ex); mu.ex = stepExhibits(mu.ex, dt, seen); placeStatues(); if (homeCount(mu.ex) !== before) needsHud();
@@ -2315,7 +2315,7 @@ function endTrash(how) {
   toast(`Shift over (Trash truck worker). ${p.lines.join(". ")}.`, 5200);
 }
 function trashTick() {
-  const tr = CITY.tr; if (!tr.active) return;
+  const tr = CITY.tr; if (!tr.active || loading) return;                     // never mid-load: passing out moves the clock first (slice 14 fix)
   if (S.id !== CITY_SCENE) endTrash("left"); else if (CITY.t >= tr.end) endTrash("time");
 }
 function workShift() {
