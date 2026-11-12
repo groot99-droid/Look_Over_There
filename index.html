@@ -216,6 +216,7 @@ import {requirementsMet} from "./shared/manifest.js";
 import {QUIZZES, grade as gradeQuiz, newApplications, canApply, begin as beginApp, abandon as abandonApp, finish as finishApp} from "./shared/application.js";
 import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
 import {SAVE_KEY, makeSave, readSave} from "./shared/save.js";
+import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, GHOST_WINDOW, ghostLit} from "./shared/anomalies.js";
 import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
@@ -1704,7 +1705,7 @@ async function walkOut(link) {
 const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor";
 const inCity = () => CITY_SCENES.includes(S.id);
 let NEEDS = newNeeds();                                       // slice 4: hunger, money, the cart and the fridge (rules: shared/needs.js); in memory, like the clock
-const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
+const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null, signPasses: 0, lastZ: null, anom: null};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
 const cityState = () => { const h = hourAt(CITY.t); return {t: CITY.t, hour: h, clock: fmtClock(h), day: dayAt(CITY.t), phase: phaseAt(h), open: storesOpen(h)}; };
 const boxMesh = (min, max, color) => { const m = new THREE.Mesh(new THREE.BoxGeometry(max[0] - min[0], max[1] - min[1], max[2] - min[2]), new THREE.MeshLambertMaterial({color})); m.position.set((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2); return m; };
 function signTexture(text) {
@@ -1747,7 +1748,36 @@ function cityProps(root) {
     shutter.visible = false; g.add(shutter); CITY.doors.push({d, shutter, lamp});
   }
   for (const z of LAMP_ZS) for (const s of [-1, 1]) { g.add(boxMesh([s * 5.5 - 0.07, y, z - 0.07], [s * 5.5 + 0.07, y + 4.2, z + 0.07], 0x3c3c40)); const l = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.5), CITY.mats.lamp); l.position.set(s * 5.5, y + 4.25, z); g.add(l); }
-  shelter(g, BUS_STREET.shelter, y); root.add(g);
+  anomalyProps(g, y); shelter(g, BUS_STREET.shelter, y); root.add(g);
+}
+// the City's anomalies (rules: shared/anomalies.js, slice 8): a sign that changes a letter each time you pass it, pedestrians who all face up the street, and a lit window
+// with no building round it. Drawn only: nothing here collides, and nothing is saved (a reload puts the sign back). CITY.signPasses lasts for the page's life.
+function anomalyProps(g, y) {
+  const x = sideX(SIGN.side) + (SIGN.side === "w" ? 0.06 : -0.06), mat = new THREE.MeshBasicMaterial({map: signTexture(signText(CITY.signPasses))});
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.64), mat); sign.position.set(x, y + SIGN.y, SIGN.z); sign.rotation.y = SIGN.side === "w" ? Math.PI / 2 : -Math.PI / 2; g.add(sign);
+  const peds = new THREE.Group(), coats = [0x4a4a58, 0x5a4a40, 0x3c4a44, 0x584a52, 0x404040, 0x4c5060];
+  PEDESTRIANS.forEach(([px, pz], i) => {                                       // a plain figure; the face (a pale front and dark eyes) is on its -z side, so all of them look up the street
+    const f = new THREE.Group(), coat = new THREE.MeshLambertMaterial({color: coats[i % coats.length]}), skin = new THREE.MeshLambertMaterial({color: 0xc8b8a8}), dark = new THREE.MeshLambertMaterial({color: 0x202024});
+    const part = (w, h, d, ox, oy, oz, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(ox, oy, oz); f.add(o); };
+    part(0.46, 0.8, 0.28, 0, 1.0, 0, coat); part(0.16, 0.6, 0.16, -0.12, 0.3, 0, dark); part(0.16, 0.6, 0.16, 0.12, 0.3, 0, dark); part(0.12, 0.62, 0.12, -0.3, 1.02, 0, coat); part(0.12, 0.62, 0.12, 0.3, 1.02, 0, coat);
+    part(0.26, 0.3, 0.26, 0, 1.6, 0, skin); part(0.05, 0.04, 0.02, -0.06, 1.64, -0.135, dark); part(0.05, 0.04, 0.02, 0.06, 1.64, -0.135, dark);
+    f.position.set(px, y, pz); f.rotation.y = 0; f.userData.ped = true; peds.add(f);
+  });
+  g.add(peds);
+  const glow = new THREE.MeshLambertMaterial({color: 0x20262c, emissive: 0xffd890, emissiveIntensity: 0}), [wx, wy, wz] = GHOST_WINDOW.at;
+  const ghost = new THREE.Mesh(new THREE.PlaneGeometry(GHOST_WINDOW.w, GHOST_WINDOW.h), glow); ghost.position.set(wx, y + wy, wz); g.add(ghost);   // faces +z: back down the street
+  CITY.anom = {sign, peds, ghost}; CITY.lastZ = null;
+}
+function anomalyLook(hour) {
+  const a = CITY.anom; if (!a) return;
+  a.peds.visible = pedsOut(hour);
+  const lit = ghostLit(hour); a.ghost.visible = lit; a.ghost.material.emissiveIntensity = lit ? 1.1 : 0;
+}
+function anomalyTick() {
+  if (S.id !== CITY_SCENE || !CITY.anom) { CITY.lastZ = null; return; }
+  const z0 = CITY.lastZ; CITY.lastZ = P.p.z;
+  if (z0 === null || !passedSign(z0, P.p.z, P.p.x)) return;
+  CITY.signPasses++; const m = CITY.anom.sign.material; m.map.dispose(); m.map = signTexture(signText(CITY.signPasses)); m.needsUpdate = true;
 }
 // the sky, lights, signs and clock for the time of day; `force` also puts the default look back when you are not in the City
 function cityLook(force) {
@@ -1761,11 +1791,12 @@ function cityLook(force) {
   scene.background.set(sky.bg); HEMI.intensity = sky.light; HEMI.color.set(sky.lightColor);
   if (CITY.mats.win) { CITY.mats.win.emissiveIntensity = sky.night ? 0.9 : 0; CITY.mats.lamp.emissiveIntensity = sky.light < 0.8 ? 1.2 : 0; }
   for (const c of CITY.doors) { const open = c.d.kind === "tower" || st.open; c.shutter.visible = !open; c.lamp.material.color.set(open ? 0x40e060 : 0xe04040); }
+  anomalyLook(st.hour);
 }
 function cityTick(dt) {
   if (!inCity() || loading || PC.open || SH.open) return;                      // elsewhere, while a scene loads and while the computer or a shift screen is up, the clock is paused
   CITY.t += dt; CITY.ui -= dt; if (CITY.ui <= 0) { CITY.ui = 0.2; cityLook(); }
-  cityPhase(); stalkerTick(dt); needsTick(dt);
+  cityPhase(); stalkerTick(dt); needsTick(dt); anomalyTick();
 }
 function needsHud() {
   const el = $("needs"), cart = S.id === GROCERY_SCENE && (NEEDS.cart.length || NEEDS.hasCart) ? ` · ${NEEDS.hasCart ? "CART" : "HANDS"} ${NEEDS.cart.length}/${cartCap(NEEDS)} $${cartTotal(NEEDS)}` : "";
