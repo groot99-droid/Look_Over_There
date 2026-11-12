@@ -2084,7 +2084,7 @@ function startLab() {
   toast(`Your shift has started. Follow the cards until ${fmtClock(hourAt(lb.end))}. The first card is on your screen.`, 4200);
 }
 function labTick() {
-  const lb = CITY.lb; if (!lb.active) return;
+  const lb = CITY.lb; if (!lb.active || loading) return;                      // never mid-load (see museumTick)
   if (S.id !== LAB_SCENE) { endLab("left"); return; }                            // fainting or passing out mid-shift takes you home: the shift is lost
   if (CITY.t >= lb.end) endLab("done");
 }
