@@ -32,7 +32,7 @@ async function open(name, char) {                                  // joins the 
   return page;
 }
 // wait (up to 40 s: the headless browser renders in software and may run at a few frames a second) for a condition in the page, and record it as a check
-const until = (name, page, fn, arg) => page.waitForFunction(fn, arg, {timeout: 60000, polling: 200}).then(() => check(name, true), () => check(name, false));
+const until = (name, page, fn, arg) => page.waitForFunction(fn, arg, {timeout: 60000, polling: 200}).then(() => (check(name, true), true), () => (check(name, false), false));          // true when it passed
 const inGame = p => p.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 180000});
 try {
   const a = await open("Ann", 0), b = await open("Bob", 3);
@@ -48,6 +48,10 @@ try {
   const info = p => p.evaluate(() => { const g = window.__game, n = g.net; return {id: n.id, on: n.on, scene: g.S.id, host: n.host(), pos: [g.P.p.x, g.P.p.z],
     peers: [...n.peers.values()].map(q => ({name: q.name, scene: q.scene, char: q.char, model: !!q.mixer})),
     mons: g.monsters.map(m => [m.pos.x, m.pos.z])}; });
+  // what a page and the server say about one player, printed when a check about that player fails (to tell a race from a real bug)
+  const why = async (pg, label) => { const c = await pg.evaluate(() => { const g = window.__game; return {id: g.net.id, scene: g.S.id, dead: g.dead, loading: g.loading, pos: [+g.P.p.x.toFixed(2), +g.P.p.z.toFixed(2)], gun: g.LT.gun, nearLoot: g.nearLoot(), nearNote: g.nearNote(), kpOpen: g.KPUI.open}; });
+    const sp = playerOf(c.id), sv = sp && {scene: sp.scene, at: sp.st && [+sp.st.x.toFixed(2), +sp.st.z.toFixed(2)], down: PS.isDown(sp.ps), gun: !!sp.ps.gun};
+    console.log(`  why (${label}): page ${JSON.stringify(c)} server ${JSON.stringify(sv)}`); };
   let A = await info(a), B = await info(b);
   check("both connected", A.on && B.on && A.id !== B.id);
   check("each player spawns on their own spot", Math.hypot(A.pos[0] - B.pos[0], A.pos[1] - B.pos[1]) > 0.5, `(${Math.hypot(A.pos[0] - B.pos[0], A.pos[1] - B.pos[1]).toFixed(1)} m apart)`);
@@ -66,7 +70,7 @@ try {
   await until("the floor's lockers reach both players", a, () => window.__game.LT.vis.lockers.length === 8 && window.__game.LT.st.B1 && window.__game.LT.st.B1.lockers.length === 8);
   await until("and the other", b, () => window.__game.LT.st.B1 && window.__game.LT.st.B1.lockers.length === 8);
   await standBy(a, "lockers", 0);
-  await until("Ann opens a locker and has the gun with 3 rounds", a, () => window.__game.LT.gun && window.__game.LT.rounds === 3);
+  if (!await until("Ann opens a locker and has the gun with 3 rounds", a, () => window.__game.LT.gun && window.__game.LT.rounds === 3)) await why(a, "Ann at locker 0");
   await until("Bob sees that locker taken by Ann", b, id => window.__game.LT.st.B1.lockers[0] === id, A.id);
   check("Bob has no gun yet", await b.evaluate(() => !window.__game.LT.gun));
   await standBy(b, "lockers", 0); await sleep(500);
@@ -159,7 +163,7 @@ try {
   check("no client holds the code", await a.evaluate(() => !window.__game.KP.local.L2) && await b.evaluate(() => !window.__game.KP.local.L2));
   await goSw(guest, noteSpotsA[0]); await guest.keyboard.press("KeyX");
   await goSw(host, noteSpotsA[3]); await host.keyboard.press("KeyX");
-  await until("each player sees both notes that were read", host, c => { const f = window.__game.KP.st.L2.found; return f[0] === c[0] && f[3] === c[3] && f[1] === null && f[2] === null; }, code);
+  if (!await until("each player sees both notes that were read", host, c => { const f = window.__game.KP.st.L2.found; return f[0] === c[0] && f[3] === c[3] && f[1] === null && f[2] === null; }, code)) { await why(guest, "guest at note 0"); await why(host, "host at note 3"); console.log("  why: server found " + JSON.stringify(srv.rooms.get("TEST").keypads.L2.found)); }
   await until("the other player sees them too (and still not the rest)", guest, c => { const f = window.__game.KP.st.L2.found; return f[0] === c[0] && f[3] === c[3] && f[1] === null && f[2] === null; }, code);
   const wrongCode = code.map(d => (d + 1) % 10).join("");
   const typist = await guest.evaluate(() => [window.__game.P.p.x, window.__game.P.p.z]);
