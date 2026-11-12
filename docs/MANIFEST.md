@@ -91,6 +91,8 @@ The area `gbi` holds the chambers. A chamber is a scene with a `chamber: {floor,
 
 **The laboratory (slice 17).** A new built area, `lab`, with one scene, `laboratory` (`world/laboratory.json`, made by `tools/make_street.mjs` from `labDoc` in `shared/lab.js`). `city.w214>lab` requires `job_lab` (the page also checks the shift's hours) and `lab.laboratory>street` brings you back to 214's door. Both are solo only. The room's B2 door is drawn only; the planned links to Secret Operations are unchanged.
 
+**Routines (slice 18).** No manifest change: the pedestrians are still props of `street` (`newPeds`, `stepPeds`, `pedAt` in `shared/anomalies.js`, pure, tested).
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.
