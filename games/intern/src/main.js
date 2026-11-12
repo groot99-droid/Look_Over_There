@@ -90,7 +90,7 @@ async function boot() {
     onEnding(endingId) {
       renderEndingCard(endingId, state, library);
       stage.stop(); // the card is opaque and final: stop drawing the building under it
-      if (window.parent !== window) setTimeout(() => window.parent.postMessage({ type: 'intern-ending', id: endingId }, '*'), 14000); // embedded in Look Over There: hand the player back
+      if (window.parent !== window) { const result = { ending: endingId, conformance: state.conformance, dissonance: state.dissonance, friction: +state.friction.toFixed(3), early: state.flags.has('EARLY_EXIT') }; setTimeout(() => window.parent.postMessage({ type: 'intern-ending', id: endingId, result }, '*'), 14000); } // embedded in Look Over There: hand the player back, with how the shift went (the City pays by it)
     }
   });
 

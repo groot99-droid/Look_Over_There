@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import {shiftPay} from "./pay.js";
 import {HUNGER, MONEY, CARRY, FOODS, newNeeds, drain, sleepDrain, crossed, faint, capacity, takeCart, addToCart, cartTotal, checkout, putBack, eat, pay, pantryLines} from "./needs.js";
 
 test("you start at hunger 80 with $20; hunger empties over 36 game hours awake", () => {
@@ -41,8 +42,10 @@ test("the fridge feeds you the most filling item, and refuses when you are full 
   assert.match(eat({...n, hunger: 96}).reason, /not hungry/); assert.match(eat({...n, pantry: {}}).reason, /fridge is empty/);
   assert.equal(eat({...n, hunger: 90, pantry: {meal: 1}}).n.hunger, 100, "never above 100");
 });
-test("a shift pays, and the bank page lists the pantry", () => {
-  const n = pay(newNeeds(), MONEY.shiftPay); assert.equal(n.money, 30); assert.equal(n.lastPay, 10);
+test("a shift pays what shared/pay.js says, with a note, and the bank page lists the pantry", () => {
+  const p = shiftPay({ending: "ASSIMILATION", conformance: 6, friction: 1.6}), n = pay(newNeeds(), p.pay, p.ending);
+  assert.equal(n.money, 44); assert.equal(n.lastPay, 24); assert.equal(n.lastNote, "ASSIMILATION");
+  const q = pay(newNeeds(), 0, "PENDING"); assert.equal(q.money, 20); assert.equal(q.lastPay, 0, "a shift that paid nothing is still a shift");
   assert.deepEqual(pantryLines({pantry: {bread: 2, meal: 0, apple: 1}}), ["Apples: 1", "Bread: 2"]);
   assert.equal(FOODS.every(f => f.price > 0 && f.fill > 0), true);
 });
