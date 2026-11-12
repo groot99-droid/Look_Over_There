@@ -6,6 +6,7 @@ import {fileURLToPath} from "node:url";
 import {checkManifest, validateManifest, buildRegistry, mergeAddon, requirementsMet} from "./manifest.js";
 import {FARWAY} from "./farway.manifest.js";
 import {REGISTRY} from "./registry.js";
+import {BUS_STREET} from "./city.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const clone = o => structuredClone(o);
@@ -21,6 +22,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
     gbi_L4_4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
+    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
@@ -68,19 +70,19 @@ test("the two game gates are solo only and say where to return to", () => {
 test("each kind of mistake is reported", () => {
   bad(d => { d.manifestVersion = 2; }, /manifestVersion/);
   bad(d => { d.areas.push({...d.areas[0]}); }, /duplicate area id lot/);
-  bad(d => { d.areas.find(a => a.id === "city").scenes.push({id: "B1"}); }, /duplicate scene id B1/);
+  bad(d => { d.areas.find(a => a.id === "mall").scenes.push({id: "B1"}); }, /duplicate scene id B1/);
   bad(d => { d.areas[0].scenes[0].puzzle = "lasers"; }, /puzzle must be one of/);
   bad(d => { d.areas[0].scenes[0].files = []; }, /at least one file/);
   bad(d => { d.areas[0].scenes[0].files = ["../secret"]; }, /relative paths/);
   bad(d => { delete d.areas[0].scenes[0].floorY; }, /needs a floorY/);
   bad(d => { d.areas[0].scenes[0].loot = {lockers: -1, packs: 3}; }, /loot needs/);
-  bad(d => { d.areas.find(a => a.id === "city").scenes[0].multiplayer = true; }, /only a built scene can be multiplayer/);
+  bad(d => { d.areas.find(a => a.id === "mall").scenes[0].multiplayer = true; }, /only a built scene can be multiplayer/);
   bad(d => { d.links[0].to.area = "nowhere"; }, /not an area/);
   bad(d => { d.links[0].to.scene = "L9"; }, /not a scene of lot/);
   bad(d => { d.links[0].connector = "teleport"; }, /unknown connector/);
   bad(d => { d.links[0].requires = ["no_such_flag"]; }, /undeclared flag/);
   bad(d => { d.links[1].id = d.links[0].id; }, /duplicate link id/);
-  bad(d => { d.links[0].to.area = "city"; delete d.links[0].to.scene; }, /built link cannot touch the planned area/);
+  bad(d => { d.links[0].to.area = "mall"; delete d.links[0].to.scene; }, /built link cannot touch the planned area/);
   bad(d => { d.links[0].returnTo = {area: "lot", scene: "nope"}; }, /returnTo is not a place/);
   bad(d => { d.modes.original.floors.push("L9"); }, /floor L9 is not a scene/);
   bad(d => { d.modes.original.players = {min: 5, max: 2}; }, /players needs/);
@@ -106,10 +108,10 @@ test("the registry is frozen, so nothing can edit the floors at run time", () =>
 });
 
 test("a planned scene never reaches the page or the server", () => {
-  for (const id of ["lobby", "street", "playground", "bus_station"]) { assert.equal(REGISTRY.floors[id], undefined); assert.equal(REGISTRY.pageScenes[id], undefined); }
+  for (const id of ["lobby", "playground", "bus_station"]) { assert.equal(REGISTRY.floors[id], undefined); assert.equal(REGISTRY.pageScenes[id], undefined); }
   assert.equal(REGISTRY.linkFrom("L4", "front_doors").id, "lot.L4.front_doors>overworld", "the built link is found by its door name");
   assert.equal(REGISTRY.linkFrom("lot", "overworld.bus>city"), undefined);
-  assert.ok(REGISTRY.links.some(l => l.id === "overworld.bus>city" && l.status === "planned"), "planned links are listed");
+  assert.ok(REGISTRY.links.some(l => l.id === "city.street>mall" && l.status === "planned"), "planned links are listed");
 });
 test("the Overworld's parking lot is on the page but never a floor the server runs", () => {
   assert.equal(REGISTRY.floors.parking_lot, undefined, "a room cannot enter it yet");
@@ -180,4 +182,11 @@ test("a bad chamber is caught", () => {
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.index = 5; }, /past chambersPerFloor/);
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.next = "nope"; }, /is not a chamber/);
   bad(d => { delete d.areas.find(a => a.id === "gbi").scenes[0].chamber.wave; }, /chamber needs a floor/);
+});
+test("the City's street is on the page, never a floor the server runs, and the bus links join it to the lot", () => {
+  assert.equal(REGISTRY.floors.street, undefined);
+  assert.deepEqual(REGISTRY.pageScenes.street, {glbs: [], floor: 0});
+  const there = REGISTRY.linkFrom("parking_lot", "bus_stop"), back = REGISTRY.linkFrom("street", "bus_stop");
+  assert.ok(there && there.status === "built" && there.soloOnly && there.to.scene === "street" && back && back.to.scene === "parking_lot");
+  assert.deepEqual(there.to.arrive, BUS_STREET.arrive, "the arrival is the street's spawn point"); assert.deepEqual(there.to.face, BUS_STREET.face);
 });
