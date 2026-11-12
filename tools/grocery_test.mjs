@@ -133,7 +133,7 @@ try {
   // the bank page
   await setNeeds({money: 1, lastPay: null, pantry: {bread: 2, soup: 1}}); await stand(...APARTMENT.computer.at); await frames(3); await press(); await page.keyboard.press("Digit5");
   let bank = await page.evaluate(() => ({title: document.getElementById("pc-title").textContent, body: document.getElementById("pc-body").textContent, tabs: document.querySelectorAll("#pc-tabs button").length}));
-  check("key 5 is the bank: balance, no pay yet, and what is in the fridge", bank.title === "BANK" && bank.tabs === 6 && /Balance: \$1\n/.test(bank.body) && /No pay yet/.test(bank.body) && /Bread: 2/.test(bank.body) && /Canned soup: 1/.test(bank.body), bank.body);
+  check("key 5 is the bank: balance, no pay yet, and what is in the fridge", bank.title === "BANK" && bank.tabs === 7 && /Balance: \$1\n/.test(bank.body) && /No pay yet/.test(bank.body) && /Bread: 2/.test(bank.body) && /Canned soup: 1/.test(bank.body), bank.body);
   await page.keyboard.press("Escape");
 
   // a shift pays $10

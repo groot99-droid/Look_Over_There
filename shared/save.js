@@ -3,6 +3,7 @@
 // corrupt or older-version save is ignored (you start fresh, as before saving existed), every number is clamped, and unknown foods or jobs are dropped.
 import {FOODS, HUNGER, REST, newNeeds} from "./needs.js";
 import {QUIZZES, newApplications} from "./application.js";
+import {REAL_IDS, newSightings} from "./anomalies.js";
 
 export const SAVE_KEY = "city_save";
 export const SAVE_VERSION = 1;
@@ -13,11 +14,12 @@ const int = (v, lo, hi) => { const n = Number(v); return Number.isFinite(n) ? Ma
 const isObj = v => v !== null && typeof v === "object" && !Array.isArray(v);
 
 // what the bed writes: the clock, the needs (not the cart: you are at home), and the applications
-export function makeSave({t, needs, apps}) {
+export function makeSave({t, needs, apps, seen = null}) {
   return {
     v: SAVE_VERSION, t,
     needs: {hunger: needs.hunger, rest: needs.rest, money: needs.money, pantry: {...needs.pantry}, lastPay: needs.lastPay ?? null, lastNote: needs.lastNote || ""},
     apps: {rejectedOn: {...apps.rejectedOn}, accepted: {...apps.accepted}},
+    seen: seen ? {spotted: {...seen.spotted}, reported: {...seen.reported}} : newSightings(),          // slice 15: the anomalies you have spotted and reported
   };
 }
 
@@ -37,5 +39,8 @@ export function readSave(text) {
   const apps = newApplications();
   if (isObj(a.rejectedOn)) for (const [job, d] of Object.entries(a.rejectedOn)) if (JOB_IDS.has(job)) { const k = int(d, 0, 1e6); if (k >= 1) apps.rejectedOn[job] = k; }      // days start at 1: anything else is dropped, not clamped
   if (isObj(a.accepted)) for (const [job, v] of Object.entries(a.accepted)) if (JOB_IDS.has(job) && v === true) apps.accepted[job] = true;
-  return {t, needs, apps};
+  const seen = newSightings(), w = isObj(s.seen) ? s.seen : {};                                        // slice 15: only the real anomalies, only `true`; an older save has seen nothing
+  for (const k of ["spotted", "reported"]) if (isObj(w[k])) for (const [id, v] of Object.entries(w[k])) if (REAL_IDS.includes(id) && v === true) seen[k][id] = true;
+  for (const id of Object.keys(seen.reported)) seen.spotted[id] = true;                               // you cannot have reported what you did not see
+  return {t, needs, apps, seen};
 }

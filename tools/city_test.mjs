@@ -89,7 +89,7 @@ try {
   check("at the desk you are offered the computer", /use the computer/.test(await prompt()), await prompt());
   await page.keyboard.press("KeyF");
   const pc = await page.evaluate(() => ({open: window.__game.PC.open, shown: getComputedStyle(document.getElementById("pc")).display, title: document.getElementById("pc-title").textContent, body: document.getElementById("pc-body").textContent, tabs: document.querySelectorAll("#pc-tabs button").length}));
-  check("F opens the computer on the news, which says the day and time", pc.open && pc.shown === "flex" && pc.title === "NEWS" && /Day 1, \d\d:\d\d\./.test(pc.body) && pc.tabs === 6, JSON.stringify(pc));
+  check("F opens the computer on the news, which says the day and time", pc.open && pc.shown === "flex" && pc.title === "NEWS" && /Day 1, \d\d:\d\d\./.test(pc.body) && pc.tabs === 7, JSON.stringify(pc));
   await shot("computer");
   const tPc = (await st()).t, pPc = await page.evaluate(() => window.__game.P.p.toArray());
   await page.evaluate(() => { window.__game.keys.KeyW = true; }); await frames(60); await page.evaluate(() => { window.__game.keys.KeyW = false; });
