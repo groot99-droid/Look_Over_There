@@ -1,4 +1,4 @@
-name: Multiplayer browser test
+name: Tests
 
 on:
   pull_request:
@@ -8,10 +8,26 @@ permissions:
   contents: read
 
 concurrency:
-  group: mp-test-${{ github.ref }}
+  group: tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  unit:                          # the fast checks: shared rules, the server, the world manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Shared rules
+        run: node --test shared/*.test.js
+      - name: Server
+        run: npm ci && npm test
+        working-directory: server
+      - name: World manifest
+        run: node tools/manifest.mjs check
+
   mp_test:
     runs-on: ubuntu-latest
     timeout-minutes: 30          # a full run takes about 7 minutes: the two pages render in software
