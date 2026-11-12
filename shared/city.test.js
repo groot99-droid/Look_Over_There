@@ -121,5 +121,5 @@ test("the grocery: links match the layout, one shelf per food, and every spot yo
 test("the bank page shows your money, the last pay and the fridge", () => {
   const st = {hour: 12, day: 1, clock: "12:00", open: true};
   assert.match(computerPages(st, null, newNeeds()).bank.lines.join("\n"), /Balance: \$20[\s\S]*No pay yet[\s\S]*Nothing\./);
-  assert.match(computerPages(st, null, {...newNeeds(), money: 31, lastPay: 10, pantry: {soup: 2}}).bank.lines.join("\n"), /Balance: \$31[\s\S]*\+\$10[\s\S]*Canned soup: 2/);
+  assert.match(computerPages(st, null, {...newNeeds(), money: 31, lastPay: 10, lastNote: "PENDING", pantry: {soup: 2}}).bank.lines.join("\n"), /Balance: \$31[\s\S]*\+\$10 \(PENDING\)[\s\S]*Canned soup: 2/);
 });

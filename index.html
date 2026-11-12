@@ -207,6 +207,7 @@ import {POWER_SOURCES, newPower, throwPower} from "./shared/power.js";
 import {REGISTRY} from "./shared/registry.js";
 import {requirementsMet} from "./shared/manifest.js";
 import {QUIZZES, grade as gradeQuiz, newApplications, canApply, begin as beginApp, abandon as abandonApp, finish as finishApp} from "./shared/application.js";
+import {shiftPay} from "./shared/pay.js";
 import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
@@ -471,7 +472,7 @@ async function enterGame(l) {
   const gf = $("gamefade"); gf.style.opacity = 1; await new Promise(r => setTimeout(r, 650));
   renderer.domElement.style.display = "none"; $("fear").style.opacity = 0;
   const mount = $("gamemount"); mount.style.display = "block";
-  let result = "reached";
+  let result = "reached", ending = null;                                            // ending: the Intern's last message, returned to the caller (the City pays by it)
   if (l.game === "rdwe") {
     const walk = await import("./games/rdwe/walk.js");
     const joy = mkEl(); const knob = mkEl(); knob.className = "knob"; joy.appendChild(knob);
@@ -486,8 +487,8 @@ async function enterGame(l) {
     fr.src = `games/intern/index.html?scale=${INTERN_SCALE}`; fr.allow = "autoplay; gamepad; fullscreen";
     fr.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#000";
     mount.appendChild(fr);
-    await new Promise(res => {
-      const onMsg = e => { if (e.source === fr.contentWindow && e.data && e.data.type === "intern-ending") { removeEventListener("message", onMsg); res(); } };
+    ending = await new Promise(res => {
+      const onMsg = e => { if (e.source === fr.contentWindow && e.data && e.data.type === "intern-ending") { removeEventListener("message", onMsg); res(e.data); } };
       addEventListener("message", onMsg);
       fr.addEventListener("load", () => { const st = fr.contentDocument.createElement("style"); st.textContent = "#sound-toggle{display:none!important}"; fr.contentDocument.head.appendChild(st); fr.contentWindow.focus(); setTimeout(() => { gf.style.opacity = 0; fr.contentWindow.focus(); }, 1800); });
     });
@@ -500,6 +501,7 @@ async function enterGame(l) {
   const ret = (gateEntry(l) || {}).returnTo;
   await loadScene((ret && ret.scene) || l.scene || "L4", {pos: l.arrive, face: l.face});
   gf.style.opacity = 0;
+  return ending;
 }
 const levelOfY = () => S.id;
 
@@ -1864,7 +1866,7 @@ function tryCity() {
   if (!storesOpen(hourAt(CITY.t))) toast(`${d.label} is closed. It opens at ${fmtClock(OPEN_H)}.`);
   else if (d.quiz) {                                                         // a job with an application: accepted, you can start your shift; otherwise it is by application only
     const l = REGISTRY.linkFrom(CITY_SCENE, d.id);
-    if (l && requirementsMet(l, heldFlags()).ok) enterGame({game: "intern", scene: l.returnTo.scene, arrive: l.returnTo.arrive, face: l.returnTo.face}).then(() => { NEEDS = payNeeds(NEEDS, MONEY.shiftPay); toast(`Shift over. You are paid $${MONEY.shiftPay}.`, 3600); });   // a flat pay per shift for now   // the Intern game, then back out to the street door
+    if (l && requirementsMet(l, heldFlags()).ok) enterGame({game: "intern", scene: l.returnTo.scene, arrive: l.returnTo.arrive, face: l.returnTo.face}).then(msg => { const p = shiftPay(msg && msg.result); NEEDS = payNeeds(NEEDS, p.pay, p.ending); toast(`Shift over (${p.ending}). You are paid $${p.pay}.`, 4200); });   // slice 5: pay by how the shift went (shared/pay.js)   // the Intern game, then back out to the street door
     else toast(`${d.label} (${d.job}): by application only. Apply on your computer at home.`);
   } else toast(`${d.label}${d.job ? ` (${d.job})` : ""}: nothing inside yet.`);
   return true;

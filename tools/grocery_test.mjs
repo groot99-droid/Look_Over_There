@@ -7,6 +7,7 @@ import {createServer} from "../server/server.js";
 import {REGISTRY} from "../shared/registry.js";
 import {secondsAt, APARTMENT, GROCERY, GROCERY_FRONT, bedUse} from "../shared/city.js";
 import {HUNGER, MONEY} from "../shared/needs.js";
+import {shiftPay} from "../shared/pay.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
@@ -129,7 +130,7 @@ try {
   check("you never sleep below 5 (the frames after the press drain a little)", Math.abs((await needs()).hunger - 5) < 0.05, String((await needs()).hunger));
 
   // the bank page
-  await setNeeds({money: 1, lastPay: 0, pantry: {bread: 2, soup: 1}}); await stand(...APARTMENT.computer.at); await frames(3); await press(); await page.keyboard.press("Digit5");
+  await setNeeds({money: 1, lastPay: null, pantry: {bread: 2, soup: 1}}); await stand(...APARTMENT.computer.at); await frames(3); await press(); await page.keyboard.press("Digit5");
   let bank = await page.evaluate(() => ({title: document.getElementById("pc-title").textContent, body: document.getElementById("pc-body").textContent, tabs: document.querySelectorAll("#pc-tabs button").length}));
   check("key 5 is the bank: balance, no pay yet, and what is in the fridge", bank.title === "BANK" && bank.tabs === 5 && /Balance: \$1\n/.test(bank.body) && /No pay yet/.test(bank.body) && /Bread: 2/.test(bank.body) && /Canned soup: 1/.test(bank.body), bank.body);
   await page.keyboard.press("Escape");
@@ -141,9 +142,10 @@ try {
   await new Promise(r => setTimeout(r, 4000));                             // a shift lasts: end it after the game has loaded and taken focus, as a player would
   await page.evaluate(() => { const fr = document.querySelector("#gamemount iframe"); fr.contentWindow.eval("parent.postMessage({type: \"intern-ending\"}, \"*\")"); });
   await page.waitForFunction(() => !document.querySelector("#gamemount iframe") && !window.__game.loading && window.__game.S.id === "street", null, {timeout: 120000});
-  await page.waitForFunction(() => window.__game.NEEDS.lastPay === 10, null, {timeout: 10000});
+  await page.waitForFunction(() => window.__game.NEEDS.lastPay !== null, null, {timeout: 10000});
   n = await needs();
-  check("after a shift at the Intern you are paid $10", n.money === 11 && n.lastPay === MONEY.shiftPay && /paid \$10/.test(await toast()), JSON.stringify(n) + " " + await toast());
+  const want = shiftPay(undefined).pay;                                    // this message carries no result (posted by hand, as an older game would): a PENDING shift
+  check(`after a shift with no result you are paid the PENDING base ($${want})`, n.money === 1 + want && n.lastPay === want && n.lastNote === "PENDING" && new RegExp(`paid \\$${want}`).test(await toast()), JSON.stringify(n) + " " + await toast());
   check("no page errors", errors.length === 0, errors.join(" | "));
 } finally { await browser.close(); await srv.close(); }
 process.exit(failed ? 1 : 0);
