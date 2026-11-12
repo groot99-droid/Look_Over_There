@@ -29,7 +29,7 @@ try {
   check("at 01:00 the stalker is out on the street", (await stk()).active);
   await goIn();
   let s = await stk();
-  check("you go in; it does not go away: it waits outside the door, 14 m up the street", s.id === "apartment" && s.active && s.waited && Math.abs(fromDoor(s) - STALKER_WAIT) < 0.01 && s.z < TOWER_FRONT.arrive[2], JSON.stringify(s));
+  check("you go in; it does not go away: it waits outside the door, 14 m up the street (along it, on the road)", s.id === "apartment" && s.active && s.waited && Math.abs((TOWER_FRONT.arrive[2] - s.z) - STALKER_WAIT) < 0.01 && fromDoor(s) >= STALKER_WAIT, JSON.stringify(s));
   const waitSpot = {x: s.x, z: s.z};
   await frames(200);
   s = await stk();
