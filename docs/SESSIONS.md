@@ -16,7 +16,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 7 | Physics: decision and a playground prototype | Next | | **done**, merged (PR #8); `docs/PHYSICS.md` accepted by the owner with cannon-es, visual only in rooms |
 | 4 | Modes and parties | Next | 1 | **done**, merged (PR #7); server and lobby, "go to a friend" is server-side only |
 | 8 | Going back in prototype | Then | 3 and 4 | **slice 1 in draft PR** (solo: the options screen to a chamber, a wave on entry, stairs down to the next chamber); slice 2 (the locker and the hunting crossbow) and slice 3 (the Q/E consumables) on the same branch |
-| 9 | City v0 on Hallam Row | Then | 6 | **slices 1 and 2 merged** (PR #11): bus, Hallam Row blockout, day clock, stores close. Slice 2 done on the same branch: the apartment and its computer, the night danger (a stalker from midnight to 06:00) and a bed that skips the night. Slice 3 (the Intern's job through the application quiz) in review, PR #14 |
+| 9 | City v0 on Hallam Row | Then | 6 | **slices 1 to 4 merged** (PRs #11, #14, #15, solo only): bus, Hallam Row blockout, 15-minute day clock, stores close at night; the apartment and its computer, the night stalker (00:00 to 06:00) and the bed; the Intern's job at 666 Hallam Row through the shared application quiz; hunger, money and the grocery |
 | 13 | Make `tools/solo_test.mjs` deterministic | Now | | **done**, merged (PR #12): the flaky checks needed room around a random respawn spot; the test now stages a spot that has it. No game change |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |

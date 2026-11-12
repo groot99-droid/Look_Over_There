@@ -307,6 +307,7 @@ try {
   check("coming back to L1 the switches are still on", await p.evaluate(() => window.__game.SW.st.L1.every(x => x.on) && !window.__game.isLocked(window.__game.upDoor())));
 
   // a fresh session: the quick way, the box on L3, then L4 is open on arrival and nothing was alarmed
+  await p.close().catch(() => {});                                       // done with the first page: it keeps rendering and slows the second under software GL
   const r = await solo(plain.port);
   const rload = id => r.evaluate(i => window.__game.loadScene(i), id).then(() => r.waitForFunction(i => window.__game.S.id === i && !window.__game.loading, id, {timeout: 180000}));
   await rload("L3");
@@ -322,7 +323,8 @@ try {
   check("L4, which has no stair door, still has its 3 ammo packs", await r.evaluate(() => window.__game.packSpots().length === 3 && window.__game.LT.vis.packs.length === 3));
 
   // the finale: the alarm starts on arrival, the monsters hunt toward the doors, the lot is safe, and walking out ends the round
-  check("the alarm starts when you are in the store with the doors open", await r.evaluate(() => { const g = window.__game; g.step(0.05); return g.FIN.alarmUntil > 0 && /ALARM \d:\d\d/.test(document.getElementById("alarm").textContent); }));
+  // the alarm runs 60 s of wall-clock time from arrival; software rendering can be slow enough to let it run out before the next checks, so hold it open (after seeing it started)
+  check("the alarm starts when you are in the store with the doors open", await r.evaluate(() => { const g = window.__game, started = g.FIN.alarmUntil > 0; g.FIN.alarmUntil = performance.now() + 120000; g.step(0.05); return started && /ALARM \d:\d\d/.test(document.getElementById("alarm").textContent); }));
   check("the monsters head for the doors", await r.evaluate(() => { const g = window.__game; g.P.p.set(16, g.S.floor + 0.02, 7.7); g.P.imm = 99; for (let i = 0; i < 4; i++) g.step(0.05); return g.monsters.length > 0 && g.monsters.every(m => m.state === "search" || m.state === "chase"); }));
   check("the parking lot is off the monsters' map", await r.evaluate(() => { const g = window.__game; let bad = 0; g.S.nav.forEach((v, c) => { if (v && g.cellXZ(c)[1] > 27.6) bad++; }); return bad === 0; }));
   check("not out yet inside the store", await r.evaluate(() => { const g = window.__game; g.P.p.set(0, g.S.floor + 0.02, 26); g.exitCheck(); return !g.FIN.out && !g.FIN.results; }));
