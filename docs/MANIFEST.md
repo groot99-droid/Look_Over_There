@@ -79,6 +79,8 @@ The area `gbi` holds the chambers. A chamber is a scene with a `chamber: {floor,
 
 **The trash route (slice 11).** No manifest change: the trash job's shift is played on the `street` scene itself (`shared/trash.js`, pure, tested), so it needs no link of its own. Leaving `street` by any link ends the shift. The museum, lab and factory shifts are still stubs; each becomes a link (like `city.666>intern`) or a street route when its game is built.
 
+**Rest (slice 12).** No manifest change. `city_save` gains `needs.rest`; it stays version 1, because a save without it reads as rested (`readSave` fills the default), so saves from slice 7 still load.
+
 ## Gate return (fixed)
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.
