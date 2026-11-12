@@ -96,7 +96,7 @@ try {
   check("while you read, you do not walk and the clock waits", Math.abs((await st()).t - tPc) < 0.5 && (await page.evaluate(() => window.__game.P.p.toArray())).every((v, i) => Math.abs(v - pPc[i]) < 1e-6));
   await page.keyboard.press("Digit3");
   const jobs = await page.evaluate(() => ({title: document.getElementById("pc-title").textContent, body: document.getElementById("pc-body").textContent}));
-  check("key 3 shows the job search: the five Hallam Row jobs, applications not open yet", jobs.title === "JOB SEARCH" && /666 HALLAM ROW: The Intern/.test(jobs.body) && /41 HALLAM ROW: Trash truck worker/.test(jobs.body) && /not open yet/.test(jobs.body), jobs.body);
+  check("key 3 shows the job search: the five Hallam Row jobs, four not hiring yet (the Intern is hiring: slice 3)", jobs.title === "JOB SEARCH" && /666 HALLAM ROW: The Intern/.test(jobs.body) && /41 HALLAM ROW: Trash truck worker/.test(jobs.body) && /not hiring yet/.test(jobs.body), jobs.body);
   await page.click('#pc-tabs button[data-p="mail"]');
   check("the tabs can be clicked", await page.evaluate(() => document.getElementById("pc-title").textContent === "MAIL"));
   await page.keyboard.press("Escape");
