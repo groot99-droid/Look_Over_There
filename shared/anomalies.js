@@ -31,3 +31,30 @@ export const pedsOut = hour => storesOpen(hour);
 // 3. the window: past the end of the east side (the last building there, efill, ends at z -134), high over the grass (above the roofline, so it shows from most of the street), facing back down the street. Lit only at night.
 export const GHOST_WINDOW = {at: [12, 14, -142], w: 1.6, h: 1.3};
 export const ghostLit = hour => skyAt(hour).night;
+
+// ---- reporting them (slice 15): "Anomalies are both spot-and-report and avoid" (docs/WORLD.md). You spot an anomaly by seeing it for yourself (`SPOT`: the sign once it has
+// changed, two or more of the pedestrians at once, the window at night, each in view with a clear line). The computer's REPORT page lists six things people report on Hallam Row:
+// three are real, three are not. A true report of something you have spotted pays $5, once each. A report of something that is not real, or of a real thing you have not seen
+// yourself, is a false report and costs $2 (never below $0). What you have spotted and reported is saved.
+export const SPOT = {signDist: 25, pedDist: 40, pedCount: 2, windowDist: 95};
+export const REPORT = {reward: 5, falseCost: 2};
+export const REPORTS = [
+  {id: "sign", label: "A shop sign that changes its letters", real: true},
+  {id: "lamp", label: "A streetlight that follows people home", real: false},
+  {id: "peds", label: "People who all stand facing the same way", real: true},
+  {id: "door", label: "A door that was not there yesterday", real: false},
+  {id: "window", label: "A lit window where there is no building", real: true},
+  {id: "bus", label: "A bus driver with no face", real: false},
+];
+export const REAL_IDS = REPORTS.filter(r => r.real).map(r => r.id);
+export const newSightings = () => ({spotted: {}, reported: {}});
+export const spot = (s, id) => !REAL_IDS.includes(id) || s.spotted[id] ? s : {...s, spotted: {...s.spotted, [id]: true}};
+// file a report: returns the new sightings, the change in money, and what the page says
+export function fileReport(s, id, money) {
+  const r = REPORTS.find(x => x.id === id);
+  if (!r) return {s, delta: 0, ok: false, msg: "There is no such report."};
+  if (s.reported[id]) return {s, delta: 0, ok: false, msg: "You have already reported that."};
+  if (r.real && s.spotted[id]) return {s: {...s, reported: {...s.reported, [id]: true}}, delta: REPORT.reward, ok: true, msg: `Report filed: "${r.label}". Thank you. $${REPORT.reward} has been paid to your account.`};
+  const cost = Math.min(REPORT.falseCost, Math.max(0, money));
+  return {s, delta: cost ? -cost : 0, ok: false, msg: r.real ? `You have not seen that yourself. An unconfirmed report counts as false: $${cost} is taken from your account.` : `There is nothing like that on Hallam Row. A false report costs $${cost}.`};
+}

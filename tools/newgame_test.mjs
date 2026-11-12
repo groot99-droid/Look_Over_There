@@ -33,7 +33,7 @@ try {
   // a fresh browser: the bank says nothing is saved
   await atDesk(); await page.keyboard.press("KeyF"); await page.keyboard.press("Digit5");
   let p = await pc();
-  check("the computer has six pages, and with no save the bank says so", p.tabs === 6 && p.title === "BANK" && /Not saved yet/.test(p.body), JSON.stringify(p));
+  check("the computer has seven pages, and with no save the bank says so", p.tabs === 7 && p.title === "BANK" && /Not saved yet/.test(p.body), JSON.stringify(p));
   await page.keyboard.press("Escape");
 
   // a City worth forgetting: day 3, $77, food, two jobs, a sign passed; saved; and the Original finished
@@ -44,8 +44,8 @@ try {
   await frames(2); await page.keyboard.press("KeyF"); await page.keyboard.press("Digit5");
   p = await pc();
   check("after a save the bank says when", /Last saved: Day 3, 14:00\./.test(p.body), p.body);
-  await page.keyboard.press("Digit6"); p = await pc();
-  check("key 6 is the system page, with the save time and one New Game button", p.title === "SYSTEM" && /Last saved: Day 3, 14:00\./.test(p.body) && /NEW GAME/.test(p.body) && p.acts.join() === "newgame", JSON.stringify(p));
+  await page.keyboard.press("Digit7"); p = await pc();
+  check("key 7 (slice 15: after REPORT) is the system page, with the save time and one New Game button", p.title === "SYSTEM" && /Last saved: Day 3, 14:00\./.test(p.body) && /NEW GAME/.test(p.body) && p.acts.join() === "newgame", JSON.stringify(p));
 
   // New Game asks first; Cancel changes nothing
   await page.click('#pc-actions button[data-act="newgame"]'); p = await pc();
@@ -54,7 +54,7 @@ try {
   let c = await city(), s = await store();
   check("Cancel puts the button back and keeps everything", p.acts.join() === "newgame" && c.money === 77 && c.accepted.lab && s.save !== null && s.lab !== null, JSON.stringify({p, c, s}));
   // leaving the page forgets the half-pressed button
-  await page.click('#pc-actions button[data-act="newgame"]'); await page.keyboard.press("Digit5"); await page.keyboard.press("Digit6"); p = await pc();
+  await page.click('#pc-actions button[data-act="newgame"]'); await page.keyboard.press("Digit5"); await page.keyboard.press("Digit7"); p = await pc();
   check("switching page and back shows the single button again", p.acts.join() === "newgame", JSON.stringify(p));
 
   // yes: the City is forgotten

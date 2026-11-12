@@ -55,3 +55,27 @@ test("the window is lit only at night, and there is no building where it hangs",
   for (const b of BUILDINGS) { const bx = buildingBox(b); assert.ok(!(x >= bx.min[0] - 2 && x <= bx.max[0] + 2 && z >= bx.min[2] - 2 && z <= bx.max[2] + 2), `not on ${b.id}`); }
   assert.ok(y > 6, "high up");
 });
+
+test("reports (slice 15): six on the list, three real (the slice 8 anomalies) and three not", async () => {
+  const {REPORTS, REAL_IDS} = await import("./anomalies.js");
+  assert.equal(REPORTS.length, 6);
+  assert.deepEqual([...REAL_IDS].sort(), ["peds", "sign", "window"]);
+  assert.equal(new Set(REPORTS.map(r => r.id)).size, 6);
+});
+test("spotting: only the real anomalies, and only once", async () => {
+  const {newSightings, spot} = await import("./anomalies.js");
+  let s = spot(newSightings(), "sign"); assert.deepEqual(s.spotted, {sign: true});
+  assert.equal(spot(s, "sign"), s, "spotting it again changes nothing");
+  assert.deepEqual(spot(s, "lamp").spotted, {sign: true}, "there is nothing to spot for an unreal one");
+});
+test("a true report of a spotted anomaly pays $5 once; anything else is false and costs $2, never below $0", async () => {
+  const {newSightings, spot, fileReport, REPORT} = await import("./anomalies.js");
+  const s = spot(newSightings(), "window");
+  let r = fileReport(s, "window", 10);
+  assert.ok(r.ok); assert.equal(r.delta, REPORT.reward); assert.deepEqual(r.s.reported, {window: true});
+  const again = fileReport(r.s, "window", 10); assert.ok(!again.ok); assert.equal(again.delta, 0, "no second reward, no cost");
+  r = fileReport(s, "door", 10); assert.ok(!r.ok); assert.equal(r.delta, -REPORT.falseCost); assert.match(r.msg, /nothing like that/); assert.deepEqual(r.s.reported, {}, "a false report is not filed");
+  r = fileReport(s, "sign", 10); assert.ok(!r.ok); assert.equal(r.delta, -2); assert.match(r.msg, /not seen that yourself/);
+  assert.equal(fileReport(s, "bus", 1).delta, -1); assert.equal(fileReport(s, "bus", 0).delta, 0);
+  assert.ok(!fileReport(s, "ufo", 10).ok);
+});

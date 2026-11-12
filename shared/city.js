@@ -157,7 +157,8 @@ export const JOB_FRONT = {arrive: [-6.2, 0, -127], face: [1, 0]};            // 
 // the save's time as the computer shows it (slice 9): `t` is the saved City time, or null when nothing is saved
 export const savedLine = t => t === null || t === undefined ? "Not saved yet. The bed in your apartment saves." : `Last saved: Day ${dayAt(t)}, ${fmtClock(hourAt(t))}.`;
 // savedT (slice 9): the saved City time, null for no save, undefined when the caller does not say (then the bank and system pages leave the line out)
-export function computerPages(st, apps = null, needs = null, savedT = undefined) {
+// seen (slice 15): the anomalies spotted and reported (shared/anomalies.js), for the REPORT page; the page draws one button per report
+export function computerPages(st, apps = null, needs = null, savedT = undefined, seen = null) {
   const left = st.open ? Math.max(0, CLOSE_H - st.hour) : 0, hh = Math.floor(left), mm = Math.round((left - hh) * 60), mine = apps ? mailLines(apps, st.day) : [];
   const tag = j => !j.quiz ? " (not hiring yet)" : apps && apps.accepted[j.quiz] ? " (ACCEPTED)" : apps && apps.rejectedOn[j.quiz] !== undefined && apps.rejectedOn[j.quiz] >= st.day ? " (rejected: try again tomorrow)" : " (hiring: apply below)";
   return {
@@ -166,6 +167,7 @@ export function computerPages(st, apps = null, needs = null, savedT = undefined)
     jobs: {title: "JOB SEARCH", lines: [...JOBS.map(j => `${j.address}: ${j.job}${tag(j)}`), "", "One application at a time."]},
     map: {title: "MAP", lines: ["HALLAM ROW", "West side: apartment tower, 41, 214, 666", "East side: grocery, 108, mall, 330", "The bus stop is at the south end."]},
     bank: {title: "BANK", lines: needs ? ["Balance: $" + needs.money, ...(savedT === undefined ? [] : [savedLine(savedT)]), needs.lastPay !== null && needs.lastPay !== undefined ? "Last shift: +$" + needs.lastPay + (needs.lastNote ? " (" + needs.lastNote + ")" : "") : "No pay yet. A shift at your job pays.", "", "IN YOUR FRIDGE", ...(pantryLines(needs).length ? pantryLines(needs) : ["Nothing."])] : ["Balance unknown."]},
+    report: {title: "REPORT", lines: ["Seen something on Hallam Row that should not be there? Report it.", "A true report of something you have seen yourself pays $5. A false report costs $2.", "", seen ? `Reports filed: ${Object.keys(seen.reported).length}.` : ""]},
     system: {title: "SYSTEM", lines: [...(savedT === undefined ? [] : [savedLine(savedT), ""]), "NEW GAME forgets the City: the save, your jobs, your money, the fridge and the clock.", "The Original and the Overworld are kept."]},
   };
 }

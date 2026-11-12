@@ -49,7 +49,7 @@ test("the computer's pages say the day, the store hours and the five jobs", () =
   const open = computerPages({hour: 12.5, day: 1, clock: "12:30", open: true}), shut = computerPages({hour: 22, day: 1, clock: "22:00", open: false});
   assert.match(open.news.lines[1], /open for another 7 h 30 min/); assert.match(shut.news.lines[1], /closed for the night/);
   assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.every(l => !/not hiring yet/.test(l)));
-  assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map", "bank", "system"]);
+  assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map", "bank", "report", "system"]);
 });
 
 test("you see what is in front of you: the cone is 38 degrees either side of where you face", () => {
