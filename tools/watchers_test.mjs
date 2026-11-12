@@ -23,7 +23,8 @@ try {
   const face = (fx, fz, tx, tz) => Math.atan2(-(tx - fx), -(tz - fz));
 
   await page.evaluate(() => window.__game.loadScene("street", {pos: [0, 0, 0], face: [0, -1]})); await settled("street");
-  await setT(12); await stand(0, 0, 0); await frames(3);
+  // until the last step you face away from every figure (out of the 38-degree view cone, or behind you), and each step runs 20 frames so the 0.25 s spot check runs there
+  await setT(12); await stand(0, 0, Math.PI); await frames(3);
   let s = await w();
   check("by day there is nobody in the windows", s.n === WATCHERS.length && !s.on, JSON.stringify(s));
   await setT(22); await frames(3); s = await w();
@@ -33,11 +34,11 @@ try {
   check("each figure is outside its wall: a clear line reaches it from the street", clear.every(Boolean), JSON.stringify(clear));
   // they turn to follow you as you move
   const t = watcherAt(WATCHERS[1]);                                                    // in a window of 330 Hallam Row, east side
-  await stand(-3, t.z + 12, 0); await frames(2); s = await w();
+  await stand(-3, t.z + 12, -Math.PI / 2); await frames(20); s = await w();
   check("each one faces you", s.figs.every(f => faces(f, s.p[0], s.p[2])), JSON.stringify(s.figs));
-  await stand(-3, t.z - 12, Math.PI); await frames(2); const s2 = await w();
+  await stand(-3, t.z - 12, -Math.PI / 2); await frames(20); const s2 = await w();
   check("walk past and they have turned to keep facing you", s2.figs.every(f => faces(f, s2.p[0], s2.p[2])) && Math.abs(s2.figs[1][2] - s.figs[1][2]) > 0.5, JSON.stringify([s.figs[1], s2.figs[1]]));
-  check("you have not spotted one yet: it was never in front of you", !s2.seen);
+  check("you have not spotted one yet: it was never in front of you", !s2.seen, JSON.stringify({toast: s2.toast}));
   // look at one: spotted
   await stand(0, t.z + 8, face(0, t.z + 8, t.x, t.z)); await frames(20); s = await w();
   check("looking at one spots it, and you notice it is watching you", s.seen && /watching you/.test(s.toast), JSON.stringify({seen: s.seen, toast: s.toast}));
