@@ -1,8 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET, APARTMENT, TOWER_FRONT, CITY_SCENES, apartmentDoc, computerPages, JOBS, inView, stalkerSpawn, stalkerStep, STALKER, nextMorning, ROAD} from "./city.js";
+import {GROCERY, GROCERY_FRONT, groceryDoc} from "./city.js";
+import {newNeeds, FOODS} from "./needs.js";
+import {DAY_S, START_H, hourAt, dayAt, secondsAt, phaseAt, storesOpen, dangerous, fmtClock, skyAt, DOORS, BUILDINGS, buildingBox, streetDoc, BUS_STREET, APARTMENT, TOWER_FRONT, CITY_SCENES, apartmentDoc, computerPages, JOBS, JOB_FRONT, inView, stalkerSpawn, stalkerStep, STALKER, nextMorning, ROAD} from "./city.js";
 import {REGISTRY} from "./registry.js";
+import {newApplications, begin, finish} from "./application.js";
+import {requirementsMet} from "./manifest.js";
 
 test("a game day is 15 real minutes and starts at 08:00", () => {
   assert.equal(DAY_S, 900); assert.equal(hourAt(0), START_H); assert.equal(fmtClock(hourAt(0)), "08:00");
@@ -36,7 +40,7 @@ test("the apartment links match the layout, and the clock runs in both City scen
   assert.ok(into && into.status === "built" && into.soloOnly && out && out.status === "built" && out.soloOnly);
   assert.deepEqual(into.to.arrive, APARTMENT.arrive); assert.deepEqual(into.to.face, APARTMENT.face);
   assert.deepEqual(out.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(out.to.face, TOWER_FRONT.face);
-  assert.deepEqual(CITY_SCENES, ["street", "apartment"]);
+  assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor"]);
   const [hx, hz] = APARTMENT.half, inside = ([x, z]) => Math.abs(x) < hx && Math.abs(z) < hz, hit = ([x, z], b) => x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2];
   for (const p of [APARTMENT.arrive.filter((_, i) => i !== 1), APARTMENT.door.at, APARTMENT.computer.at]) { assert.ok(inside(p), "inside the room " + p); assert.ok(!hit(p, APARTMENT.bed) && !hit(p, APARTMENT.desk), "clear of furniture " + p); }
 });
@@ -44,8 +48,8 @@ test("the computer's pages say the day, the store hours and the five jobs", () =
   assert.equal(JOBS.length, 5);
   const open = computerPages({hour: 12.5, day: 1, clock: "12:30", open: true}), shut = computerPages({hour: 22, day: 1, clock: "22:00", open: false});
   assert.match(open.news.lines[1], /open for another 7 h 30 min/); assert.match(shut.news.lines[1], /closed for the night/);
-  assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.some(l => /not open yet/.test(l)));
-  assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map"]);
+  assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.some(l => /not hiring yet/.test(l)));
+  assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map", "bank"]);
 });
 
 test("you see what is in front of you: the cone is 38 degrees either side of where you face", () => {
@@ -77,4 +81,45 @@ test("sleeping or a blackout lands on 06:00 of the next morning", () => {
   assert.equal(hourAt(nextMorning(secondsAt(22))), 6); assert.equal(dayAt(nextMorning(secondsAt(22))), 2);          // 22:00 day 1 -> 06:00 day 2
   assert.equal(hourAt(nextMorning(secondsAt(2, 2))), 6); assert.equal(dayAt(nextMorning(secondsAt(2, 2))), 2);      // 02:00 day 2 -> 06:00 the same day
   assert.ok(nextMorning(secondsAt(12)) > secondsAt(12));
+});
+
+test("only the Intern is hiring, the job search says so, and the mail follows your application", () => {
+  assert.deepEqual(JOBS.filter(j => j.quiz).map(j => j.id), ["w666"]); assert.equal(JOBS.find(j => j.id === "w666").quiz, "intern");
+  const st = {hour: 12, day: 1, clock: "12:00", open: true}, none = computerPages(st, newApplications());
+  assert.ok(none.jobs.lines.some(l => /666 HALLAM ROW: The Intern \(hiring: apply below\)/.test(l)) && none.jobs.lines.filter(l => /not hiring yet/.test(l)).length === 4);
+  assert.match(none.mail.lines[0], /No new messages/);
+  const rej = finish(begin(newApplications(), "intern", 1), "intern", {pass: false}, 1);
+  assert.ok(computerPages(st, rej).jobs.lines.some(l => /rejected: try again tomorrow/.test(l))); assert.match(computerPages(st, rej).mail.lines[0], /REJECTED/);
+  assert.ok(computerPages({...st, day: 2}, rej).jobs.lines.some(l => /hiring: apply below/.test(l)));
+  const acc = finish(begin(newApplications(), "intern", 1), "intern", {pass: true}, 1);
+  assert.ok(computerPages(st, acc).jobs.lines.some(l => /\(ACCEPTED\)/.test(l))); assert.match(computerPages(st, acc).mail.lines[0], /ACCEPTED/);
+});
+test("the shift link needs job_intern, starts at 666 Hallam Row, and returns to its front door", () => {
+  const l = REGISTRY.linkFrom("street", "w666"); assert.ok(l && l.status === "built" && l.soloOnly && l.to.area === "intern");
+  assert.equal(requirementsMet(l, []).ok, false); assert.equal(requirementsMet(l, ["original_complete"]).ok, false); assert.equal(requirementsMet(l, ["job_intern"]).ok, true);
+  const d = DOORS.find(x => x.id === "w666"); assert.deepEqual(l.returnTo.arrive, JOB_FRONT.arrive); assert.deepEqual(l.returnTo.face, JOB_FRONT.face);
+  assert.ok(Math.abs(JOB_FRONT.arrive[2] - d.z) < 1e-9 && Math.abs(JOB_FRONT.arrive[0] - d.x) < 2, "just outside the door");
+});
+
+test("world/main_floor.json is what shared/city.js makes", () => {
+  assert.deepEqual(JSON.parse(fs.readFileSync(new URL("../world/main_floor.json", import.meta.url), "utf8")), JSON.parse(JSON.stringify(groceryDoc())));
+});
+test("the grocery: links match the layout, one shelf per food, and every spot you stand on is clear and inside", () => {
+  const into = REGISTRY.linkFrom("street", "grocery"), out = REGISTRY.linkFrom("main_floor", "front_door");
+  assert.ok(into && into.status === "built" && into.soloOnly && out && out.status === "built" && out.soloOnly);
+  assert.deepEqual(into.to.arrive, GROCERY.arrive); assert.deepEqual(into.to.face, GROCERY.face);
+  assert.deepEqual(out.to.arrive, GROCERY_FRONT.arrive); assert.deepEqual(out.to.face, GROCERY_FRONT.face);
+  assert.deepEqual(GROCERY.shelves.map(x => x.food), FOODS.map(f => f.id));
+  const [hx, hz] = GROCERY.half, solid = [...GROCERY.shelves, GROCERY.checkout, GROCERY.cart], hit = ([x, z], b) => x > b.min[0] - 0.3 && x < b.max[0] + 0.3 && z > b.min[2] - 0.3 && z < b.max[2] + 0.3;
+  for (const p of [[GROCERY.arrive[0], GROCERY.arrive[2]], GROCERY.door.at, GROCERY.cart.at, GROCERY.checkout.at, ...GROCERY.shelves.map(x => x.at)]) {
+    assert.ok(Math.abs(p[0]) < hx - 0.3 && Math.abs(p[1]) < hz - 0.3, "inside " + p);
+    assert.ok(!solid.some(b => hit(p, b)), "clear of furniture " + p);
+  }
+  const fr = APARTMENT.fridge.at, bed = APARTMENT.bed, desk = APARTMENT.desk, f = APARTMENT.fridge, inF = ([x, z], b) => x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2];
+  assert.ok(!inF(fr, bed) && !inF(fr, desk) && !inF(fr, f), "the fridge spot is clear");
+});
+test("the bank page shows your money, the last pay and the fridge", () => {
+  const st = {hour: 12, day: 1, clock: "12:00", open: true};
+  assert.match(computerPages(st, null, newNeeds()).bank.lines.join("\n"), /Balance: \$20[\s\S]*No pay yet[\s\S]*Nothing\./);
+  assert.match(computerPages(st, null, {...newNeeds(), money: 31, lastPay: 10, pantry: {soup: 2}}).bank.lines.join("\n"), /Balance: \$31[\s\S]*\+\$10[\s\S]*Canned soup: 2/);
 });
