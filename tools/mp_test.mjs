@@ -2,11 +2,13 @@
 // waiting room, own spawns, character models, presence, the server running each floor's monsters (both pages follow its snapshots),
 // shared doors, downed + revive (the server owns health), a server monster catching a player, the gun and beacons (the server counts rounds), the finale.
 // Usage: node tools/mp_test.mjs      (needs Playwright + Chromium and internet for three.js from unpkg)
+//        MP_CPU_SLOW=4 node tools/mp_test.mjs   slows both pages' CPU 4 times once they are in the room: a stress run for timing races (a slow machine loses them)
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
 import * as PS from "../server/playerstate.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const CPU_SLOW = Number(process.env.MP_CPU_SLOW) || 1;
 let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
 
@@ -17,16 +19,20 @@ const parkMonsters = (floor, except = -1) => floor.monsters.forEach((m, i) => { 
 const guard = code => { for (const p of roomOf(code).players.values()) p.ps.immUntil = 1e15; };                    // the server's immunity: monsters ignore the players (tests that want a hit lift it)
 const serverDown = id => { const p = playerOf(id), now = Date.now() / 1000; p.ps.hp = {hp: 0, hurtAt: now}; p.ps.downAt = now; };          // the server downs a player: their client hears it
 const serverUntil = async (name, fn, ms = 30000) => { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return check(name, true); await sleep(100); } check(name, false); };
+// waits until the server has player `id` within 0.5 m of (x, z). The server judges a door, and centres a switch's noise, on the position it last heard from that
+// player, so a test that moves a player and acts at once races the page's next position report; a slow page loses that race.
+const serverHas = async (id, x, z, ms = 30000) => { const end = Date.now() + ms; while (Date.now() < end) { const s = playerOf(id)?.st; if (s && Math.hypot(s.x - x, s.z - z) < 0.5) return true; await sleep(50); } return false; };
 const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
 async function open(name, char) {                                  // joins the room and stops in the waiting room
   const page = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage();          // one window each: a background tab's animation is paused, which would stall that player's game clock
   page.on("pageerror", e => console.log(`[${name} pageerror]`, e.message));
   await page.goto(`http://localhost:${srv.port}/?room=TEST&name=${name}&char=${char}&auto=1`);
   await page.waitForFunction(() => getComputedStyle(document.getElementById("l-wait")).display === "flex", null, {timeout: 60000});
+  if (CPU_SLOW > 1) await (await page.context().newCDPSession(page)).send("Emulation.setCPUThrottlingRate", {rate: CPU_SLOW});          // stress: slow pages, to shake out timing races
   return page;
 }
 // wait (up to 40 s: the headless browser renders in software and may run at a few frames a second) for a condition in the page, and record it as a check
-const until = (name, page, fn, arg) => page.waitForFunction(fn, arg, {timeout: 60000, polling: 200}).then(() => check(name, true), () => check(name, false));
+const until = (name, page, fn, arg) => page.waitForFunction(fn, arg, {timeout: 60000, polling: 200}).then(() => (check(name, true), true), () => (check(name, false), false));          // true when it passed
 const inGame = p => p.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 180000});
 try {
   const a = await open("Ann", 0), b = await open("Bob", 3);
@@ -42,6 +48,10 @@ try {
   const info = p => p.evaluate(() => { const g = window.__game, n = g.net; return {id: n.id, on: n.on, scene: g.S.id, host: n.host(), pos: [g.P.p.x, g.P.p.z],
     peers: [...n.peers.values()].map(q => ({name: q.name, scene: q.scene, char: q.char, model: !!q.mixer})),
     mons: g.monsters.map(m => [m.pos.x, m.pos.z])}; });
+  // what a page and the server say about one player, printed when a check about that player fails (to tell a race from a real bug)
+  const why = async (pg, label) => { const c = await pg.evaluate(() => { const g = window.__game; return {id: g.net.id, scene: g.S.id, dead: g.dead, loading: g.loading, pos: [+g.P.p.x.toFixed(2), +g.P.p.z.toFixed(2)], gun: g.LT.gun, nearLoot: g.nearLoot(), nearNote: g.nearNote(), kpOpen: g.KPUI.open}; });
+    const sp = playerOf(c.id), sv = sp && {scene: sp.scene, at: sp.st && [+sp.st.x.toFixed(2), +sp.st.z.toFixed(2)], down: PS.isDown(sp.ps), gun: !!sp.ps.gun};
+    console.log(`  why (${label}): page ${JSON.stringify(c)} server ${JSON.stringify(sv)}`); };
   let A = await info(a), B = await info(b);
   check("both connected", A.on && B.on && A.id !== B.id);
   check("each player spawns on their own spot", Math.hypot(A.pos[0] - B.pos[0], A.pos[1] - B.pos[1]) > 0.5, `(${Math.hypot(A.pos[0] - B.pos[0], A.pos[1] - B.pos[1]).toFixed(1)} m apart)`);
@@ -60,7 +70,7 @@ try {
   await until("the floor's lockers reach both players", a, () => window.__game.LT.vis.lockers.length === 8 && window.__game.LT.st.B1 && window.__game.LT.st.B1.lockers.length === 8);
   await until("and the other", b, () => window.__game.LT.st.B1 && window.__game.LT.st.B1.lockers.length === 8);
   await standBy(a, "lockers", 0);
-  await until("Ann opens a locker and has the gun with 3 rounds", a, () => window.__game.LT.gun && window.__game.LT.rounds === 3);
+  if (!await until("Ann opens a locker and has the gun with 3 rounds", a, () => window.__game.LT.gun && window.__game.LT.rounds === 3)) await why(a, "Ann at locker 0");
   await until("Bob sees that locker taken by Ann", b, id => window.__game.LT.st.B1.lockers[0] === id, A.id);
   check("Bob has no gun yet", await b.evaluate(() => !window.__game.LT.gun));
   await standBy(b, "lockers", 0); await sleep(500);
@@ -134,7 +144,8 @@ try {
   check("the L1 stair door starts locked", await a.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
   const goSw = (page, xz) => page.evaluate(t => { const g = window.__game; g.P.p.set(t[0], g.S.floor + 0.02, t[1]); g.P.v.set(0, 0, 0); }, xz);
   parkMonsters(floorOf("L1"), 0); { const m = floorOf("L1").monsters[0]; m.pos.set(swSpots[1][0] + 8, m.fy, swSpots[1][1]); m.state = "patrol"; m.path = []; }     // a monster within earshot of switch 1
-  await goSw(guest, swSpots[1]); await guest.keyboard.press("KeyX");
+  const swGuest = (await info(guest)).id;
+  await goSw(guest, swSpots[1]); await serverHas(swGuest, swSpots[1][0], swSpots[1][1]); await guest.keyboard.press("KeyX");          // the noise is centred where the server has her: wait until it has her at the switch
   await until("the guest flips switch 2 (the host sees it)", host, () => { const st = window.__game.SW.st.L1; return !!st && st[1].on && !st[0].on; });
   check("one switch is not enough", await host.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
   await serverUntil("the server's monster went to look at the clunk", () => { const m = floorOf("L1").monsters[0]; return m.state === "search" || m.state === "chase"; });
@@ -152,7 +163,7 @@ try {
   check("no client holds the code", await a.evaluate(() => !window.__game.KP.local.L2) && await b.evaluate(() => !window.__game.KP.local.L2));
   await goSw(guest, noteSpotsA[0]); await guest.keyboard.press("KeyX");
   await goSw(host, noteSpotsA[3]); await host.keyboard.press("KeyX");
-  await until("each player sees both notes that were read", host, c => { const f = window.__game.KP.st.L2.found; return f[0] === c[0] && f[3] === c[3] && f[1] === null && f[2] === null; }, code);
+  if (!await until("each player sees both notes that were read", host, c => { const f = window.__game.KP.st.L2.found; return f[0] === c[0] && f[3] === c[3] && f[1] === null && f[2] === null; }, code)) { await why(guest, "guest at note 0"); await why(host, "host at note 3"); console.log("  why: server found " + JSON.stringify(srv.rooms.get("TEST").keypads.L2.found)); }
   await until("the other player sees them too (and still not the rest)", guest, c => { const f = window.__game.KP.st.L2.found; return f[0] === c[0] && f[3] === c[3] && f[1] === null && f[2] === null; }, code);
   const wrongCode = code.map(d => (d + 1) % 10).join("");
   const typist = await guest.evaluate(() => [window.__game.P.p.x, window.__game.P.p.z]);
@@ -187,8 +198,11 @@ try {
   parkMonsters(floorOf("L2"));
 
   // doors: opened by the guest, open for the host; then shut by the guest, shut for the host
-  const door = await guest.evaluate(() => { const g = window.__game, d = g.doors.find(x => !x.link && x.target === 0); if (!d) return null; g.P.p.set(d.cx + 2, d.cy + 0.02, d.cz); g.P.v.set(0, 0, 0); return d.d.name; });      // the server only opens a door for someone near it
-  await sleep(600); if (door) await guest.evaluate(n => { const g = window.__game; g.openDoor(g.doors.find(x => x.d.name === n), true); }, door);
+  const doorAt = await guest.evaluate(() => { const g = window.__game, d = g.doors.find(x => !x.link && x.target === 0); if (!d) return null; g.P.p.set(d.cx + 2, d.cy + 0.02, d.cz); g.P.v.set(0, 0, 0); return {name: d.d.name, x: d.cx + 2, z: d.cz}; });      // the server only opens a door for someone near it
+  const door = doorAt && doorAt.name, guestSid = (await info(guest)).id;
+  // wait until the server has the guest by the door (a fixed 600 ms was a race: a slow page sends its position late, and the server refuses the open)
+  if (door) await serverHas(guestSid, doorAt.x, doorAt.z);
+  if (door) await guest.evaluate(n => { const g = window.__game; g.openDoor(g.doors.find(x => x.d.name === n), true); }, door);
   if (door) await until("door opened by one is open for the other", host, n => window.__game.doors.find(x => x.d.name === n).target === 1, door); else check("door opened by one is open for the other", false, "no door found");
   const closedOk = await guest.evaluate(n => { const g = window.__game; return g.closeDoor(g.doors.find(x => x.d.name === n)); }, door);
   await sleep(600);
