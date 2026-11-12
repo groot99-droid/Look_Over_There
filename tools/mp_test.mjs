@@ -2,11 +2,13 @@
 // waiting room, own spawns, character models, presence, the server running each floor's monsters (both pages follow its snapshots),
 // shared doors, downed + revive (the server owns health), a server monster catching a player, the gun and beacons (the server counts rounds), the finale.
 // Usage: node tools/mp_test.mjs      (needs Playwright + Chromium and internet for three.js from unpkg)
+//        MP_CPU_SLOW=4 node tools/mp_test.mjs   slows both pages' CPU 4 times once they are in the room: a stress run for timing races (a slow machine loses them)
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
 import * as PS from "../server/playerstate.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const CPU_SLOW = Number(process.env.MP_CPU_SLOW) || 1;
 let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
 
@@ -17,12 +19,16 @@ const parkMonsters = (floor, except = -1) => floor.monsters.forEach((m, i) => { 
 const guard = code => { for (const p of roomOf(code).players.values()) p.ps.immUntil = 1e15; };                    // the server's immunity: monsters ignore the players (tests that want a hit lift it)
 const serverDown = id => { const p = playerOf(id), now = Date.now() / 1000; p.ps.hp = {hp: 0, hurtAt: now}; p.ps.downAt = now; };          // the server downs a player: their client hears it
 const serverUntil = async (name, fn, ms = 30000) => { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return check(name, true); await sleep(100); } check(name, false); };
+// starts watching the server now and settles true the first time fn holds (within ms). For a state that comes and goes, such as a monster's search (a few seconds),
+// start it before the cause: a slow page can make the test arrive after the state is over, and that is a missed look, not a missing search.
+const serverWatch = (fn, ms = 30000) => new Promise(res => { const end = Date.now() + ms; const tick = () => { if (fn()) return res(true); if (Date.now() > end) return res(false); setTimeout(tick, 50); }; tick(); });
 const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
 async function open(name, char) {                                  // joins the room and stops in the waiting room
   const page = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage();          // one window each: a background tab's animation is paused, which would stall that player's game clock
   page.on("pageerror", e => console.log(`[${name} pageerror]`, e.message));
   await page.goto(`http://localhost:${srv.port}/?room=TEST&name=${name}&char=${char}&auto=1`);
   await page.waitForFunction(() => getComputedStyle(document.getElementById("l-wait")).display === "flex", null, {timeout: 60000});
+  if (CPU_SLOW > 1) await (await page.context().newCDPSession(page)).send("Emulation.setCPUThrottlingRate", {rate: CPU_SLOW});          // stress: slow pages, to shake out timing races
   return page;
 }
 // wait (up to 40 s: the headless browser renders in software and may run at a few frames a second) for a condition in the page, and record it as a check
@@ -134,10 +140,11 @@ try {
   check("the L1 stair door starts locked", await a.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
   const goSw = (page, xz) => page.evaluate(t => { const g = window.__game; g.P.p.set(t[0], g.S.floor + 0.02, t[1]); g.P.v.set(0, 0, 0); }, xz);
   parkMonsters(floorOf("L1"), 0); { const m = floorOf("L1").monsters[0]; m.pos.set(swSpots[1][0] + 8, m.fy, swSpots[1][1]); m.state = "patrol"; m.path = []; }     // a monster within earshot of switch 1
+  const heardL1 = serverWatch(() => { const m = floorOf("L1").monsters[0]; return m.state === "search" || m.state === "chase"; });          // watched from before the flip: the search may end before the host has seen the switch
   await goSw(guest, swSpots[1]); await guest.keyboard.press("KeyX");
   await until("the guest flips switch 2 (the host sees it)", host, () => { const st = window.__game.SW.st.L1; return !!st && st[1].on && !st[0].on; });
   check("one switch is not enough", await host.evaluate(() => window.__game.isLocked(window.__game.upDoor())));
-  await serverUntil("the server's monster went to look at the clunk", () => { const m = floorOf("L1").monsters[0]; return m.state === "search" || m.state === "chase"; });
+  check("the server's monster went to look at the clunk", await heardL1);
   await goSw(host, swSpots[0]); await host.keyboard.press("KeyX");
   await until("the host flips the other switch; the guest sees the door powered", guest, () => { const st = window.__game.SW.st.L1; return !!st && st.every(x => x.on) && !window.__game.isLocked(window.__game.upDoor()); });
 
@@ -157,10 +164,11 @@ try {
   const wrongCode = code.map(d => (d + 1) % 10).join("");
   const typist = await guest.evaluate(() => [window.__game.P.p.x, window.__game.P.p.z]);
   parkMonsters(floorOf("L2"), 0); { const m = floorOf("L2").monsters[0]; m.pos.set(typist[0] + 8, m.fy, typist[1]); m.state = "patrol"; m.path = []; }      // a monster within earshot of the keypad
+  const heardL2 = serverWatch(() => { const m = floorOf("L2").monsters[0]; return m.state === "search" || m.state === "chase"; });          // watched from before the try (as on L1)
   await guest.evaluate(w => window.__game.kpAct({a: "try", code: w}), wrongCode);
   await until("a wrong code locks the keypad for both", host, () => { const v = window.__game.KP.st.L2; return v.fails === 1 && v.lockMs > 7000; });
   await until("the guest sees the lock too", guest, () => window.__game.KP.st.L2.fails === 1);
-  await serverUntil("the wrong code sent the server's monster to the door", () => { const m = floorOf("L2").monsters[0]; return m.state === "search" || m.state === "chase"; });
+  check("the wrong code sent the server's monster to the door", await heardL2);
   srv.rooms.get("TEST").keypads.L2.lockUntil = Date.now() + 60000;                         // hold the lock open: this slow browser can take more than its 8 s to get here
   await host.evaluate(c => window.__game.kpAct({a: "try", code: c}), code.join(""));
   await new Promise(r => setTimeout(r, 600));
@@ -187,8 +195,11 @@ try {
   parkMonsters(floorOf("L2"));
 
   // doors: opened by the guest, open for the host; then shut by the guest, shut for the host
-  const door = await guest.evaluate(() => { const g = window.__game, d = g.doors.find(x => !x.link && x.target === 0); if (!d) return null; g.P.p.set(d.cx + 2, d.cy + 0.02, d.cz); g.P.v.set(0, 0, 0); return d.d.name; });      // the server only opens a door for someone near it
-  await sleep(600); if (door) await guest.evaluate(n => { const g = window.__game; g.openDoor(g.doors.find(x => x.d.name === n), true); }, door);
+  const doorAt = await guest.evaluate(() => { const g = window.__game, d = g.doors.find(x => !x.link && x.target === 0); if (!d) return null; g.P.p.set(d.cx + 2, d.cy + 0.02, d.cz); g.P.v.set(0, 0, 0); return {name: d.d.name, x: d.cx + 2, z: d.cz}; });      // the server only opens a door for someone near it
+  const door = doorAt && doorAt.name, guestSid = (await info(guest)).id;
+  // wait until the server has the guest by the door (a fixed 600 ms was a race: a slow page sends its position late, and the server refuses the open)
+  if (door) await serverWatch(() => { const s = playerOf(guestSid).st; return !!s && Math.hypot(s.x - doorAt.x, s.z - doorAt.z) < 0.5; });
+  if (door) await guest.evaluate(n => { const g = window.__game; g.openDoor(g.doors.find(x => x.d.name === n), true); }, door);
   if (door) await until("door opened by one is open for the other", host, n => window.__game.doors.find(x => x.d.name === n).target === 1, door); else check("door opened by one is open for the other", false, "no door found");
   const closedOk = await guest.evaluate(n => { const g = window.__game; return g.closeDoor(g.doors.find(x => x.d.name === n)); }, door);
   await sleep(600);
