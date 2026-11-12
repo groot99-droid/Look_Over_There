@@ -81,6 +81,11 @@ export const FARWAY = {
       id: "grocery", name: "Grocery", status: "built", tone: "liminal",
       scenes: [{id: "main_floor", floorY: 0, files: ["world/main_floor.json"]}, {id: "back_of_house"}],
     },
+    {
+      // slice 14 (session 9): the museum night guard's shift, behind 108 Hallam Row. One gallery hall, blockout; you are only in it during your shift.
+      id: "museum", name: "Museum (108 Hallam Row)", status: "built", tone: "liminal",
+      scenes: [{id: "galleries", floorY: 0, files: ["world/galleries.json"]}],
+    },
     stub("jobs", "Hallam Row (street of jobs)", "planned", ["street_of_jobs"]),
     stub("secret_ops", "Secret Operations (Project Never Land)", "planned", ["service_entry", "hidden_entry"]),
     {id: "future_addon_shed", name: "Reserved for the shed", status: "reserved"},
@@ -143,6 +148,10 @@ export const FARWAY = {
      note: "Open by day, abandoned by night."},
     {id: "grocery.main_floor>street", status: "built", connector: "doors", soloOnly: true, from: {area: "grocery", scene: "main_floor", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -17.0], face: [-1.0, 0.0]}},
     plan("city.street>jobs", {area: "city", scene: "street"}, {area: "jobs", scene: "street_of_jobs"}, "doors"),
+    // slice 14: 108's door starts the museum guard's shift (20:00 to 21:00, the page checks the hours) and the hall's door ends it, back by 108; solo only.
+    {id: "city.e108>museum", status: "built", connector: "doors", soloOnly: true, requires: ["job_museum"], from: {area: "city", scene: "street", door: "e108"}, to: {area: "museum", scene: "galleries", arrive: [0.0, 0.0, 4.4], face: [0.0, -1.0]},
+     note: "Everything comes alive at night."},
+    {id: "museum.galleries>street", status: "built", connector: "doors", soloOnly: true, from: {area: "museum", scene: "galleries", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -41.0], face: [-1.0, 0.0]}},
     plan("grocery.backhouse>secret_ops", {area: "grocery", scene: "back_of_house"}, {area: "secret_ops", scene: "service_entry"}, "service_corridor", {requires: ["keycard_tier_1"]}),
     plan("rdwe.repeating_room>secret_ops", {area: "rdwe", room: "repeating_room"}, {area: "secret_ops", scene: "hidden_entry"}, "gate", {note: "The only entrance with no clearance. Hinted by a room that repeats or a door seen from one angle."}),
     plan("intern.pool_dive>secret_ops", {area: "intern", room: "S8_H"}, {area: "secret_ops", scene: "service_entry"}, "pool_dive", {note: "The Intern's escape."}),

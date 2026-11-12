@@ -6,6 +6,7 @@ import {createServer} from "../server/server.js";
 import {secondsAt, APARTMENT, DOORS} from "../shared/city.js";
 import {QUIZZES} from "../shared/application.js";
 import {STUB_SHIFTS} from "../shared/pay.js";
+import {MUSEUM} from "../shared/museum.js";
 import {HUNGER} from "../shared/needs.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
@@ -97,8 +98,20 @@ try {
   check("the museum at noon: shifts start between 20:00 and 21:00", /Museum night guard\): Shifts start between 20:00 and 21:00/.test(await prompt()), await prompt());
   await atDoor("e108", 20.5);
   check("at 20:30 (the stores are shut) the museum guard's shift is offered", /start your shift \(Museum night guard\)/.test(await prompt()) && !(await state()).open, await prompt());
-  s0 = await state(); await page.keyboard.press("KeyF"); await page.click("#sh-work"); await frames(2); s1 = await state();
-  check("the night shift: 3 hours, $16, it ends before midnight", Math.abs(s1.hour - 23.5) < 0.1 && s1.needs.money === s0.needs.money + 16 && s1.needs.lastNote === "Museum night guard", JSON.stringify([s1.hour, s1.needs.money]));
+  s0 = await state(); await page.keyboard.press("KeyF");
+  check("the museum's screen offers the shift (slice 14: it is played in the galleries)", /Watch the 6 statues/.test(await page.evaluate(() => document.getElementById("sh-text").textContent)) && await page.evaluate(() => document.getElementById("sh-work").textContent) === "Start the shift");
+  await page.click("#sh-work"); await settled("galleries"); await frames(2);
+  check("starting it takes you into the museum, on shift", await page.evaluate(() => window.__game.CITY.mu.active));
+  await stand(MUSEUM.door.at[0], MUSEUM.door.at[1] - 0.6, Math.PI); await frames(2); await page.keyboard.press("KeyF"); await settled("street"); await frames(2); s1 = await state();
+  check("walking straight out is leaving your post: no pay (the full shift is in museum_test)", s1.needs.money === s0.needs.money && s1.needs.lastNote === "Museum: left early" && !(await page.evaluate(() => window.__game.CITY.mu.active)), JSON.stringify(s1.needs));
+
+  // a stub shift (lab and factory are still stubs): the factory, by day
+  res = await apply("factory", true);
+  check("the factory application with right answers is accepted", /ACCEPTED/.test(res) && (await state()).flags.includes("job_factory"), res);
+  await atDoor("e330", 10); s0 = await state(); await page.keyboard.press("KeyF");
+  check("the factory's screen says its game is not built yet, 4 hours, $12", /not built yet.*4 hours.*\$12/.test(await page.evaluate(() => document.getElementById("sh-text").textContent)));
+  await page.click("#sh-work"); await frames(2); s1 = await state();
+  check("working the stub: 4 hours pass and $12 is paid with the job's name", Math.abs(s1.hour - (s0.hour + 4)) < 0.1 && s1.needs.money === s0.needs.money + STUB_SHIFTS.factory.pay && s1.needs.lastNote === "Factory floor worker", JSON.stringify([s0.hour, s1.hour, s1.needs.money]));
 
   // the lab: rejected today, so still by application only
   await atDoor("w214", 10, 1);
