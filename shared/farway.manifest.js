@@ -71,7 +71,11 @@ export const FARWAY = {
       scenes: [{id: "street", floorY: 0, files: ["world/street.json"]}, {id: "apartment", floorY: 0, files: ["world/apartment.json"]}, {id: "bus_stop"}],
     },
     stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
-    stub("mall", "Liminal mall", "planned", ["entrance"]),
+    {
+      // slice 13 (session 9): the mall's atrium, a blockout behind the street's MALL door. Open to go in by day; at 20:00 it locks you in until dawn.
+      id: "mall", name: "Liminal mall", status: "built", tone: "liminal",
+      scenes: [{id: "entrance", floorY: 0, files: ["world/entrance.json"]}],
+    },
     {
       // slice 4 (session 9): the grocery's main floor, a blockout behind the street's grocery door; open by day like the other stores. The back of house stays planned.
       id: "grocery", name: "Grocery", status: "built", tone: "liminal",
@@ -130,7 +134,10 @@ export const FARWAY = {
     plan("hotel.floor_1_stairs", {area: "hotel", scene: "floor_1_lower"}, {area: "hotel", scene: "floor_1_upper"}, "stairs", {note: "Same on floor 2. Floor 3 has one level, and its upper level is the roof."}),
     plan("hotel.atrium>maze", {area: "hotel", scene: "atrium"}, {area: "hotel", scene: "anomaly_maze"}, "one_way", {note: "Also reached when the elevator glitches. You leave only by solving it."}),
     plan("hotel.sub_pools>lot.B1", {area: "hotel", scene: "sub_pools"}, {area: "lot", scene: "B1"}, "pool_route", {note: "Separate pools connected underwater, a long way with many levels between."}),
-    plan("city.street>mall", {area: "city", scene: "street"}, {area: "mall", scene: "entrance"}, "doors"),
+    // slice 13: the street's MALL door and back. In by day (08:00 to 20:00); at 20:00 the doors lock until 06:00 with you inside; solo only.
+    {id: "city.street>mall", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "mall"}, to: {area: "mall", scene: "entrance", arrive: [0.0, 0.0, 10.4], face: [0.0, -1.0]},
+     note: "The mall can lock you in."},
+    {id: "mall.entrance>street", status: "built", connector: "doors", soloOnly: true, from: {area: "mall", scene: "entrance", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -67.0], face: [-1.0, 0.0]}},
     // slice 4: the street's grocery door and back. Open 08:00 to 20:00 (at closing you are shown out); solo only.
     {id: "city.street>grocery", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "grocery"}, to: {area: "grocery", scene: "main_floor", arrive: [0.0, 0.0, 7.4], face: [0.0, -1.0]},
      note: "Open by day, abandoned by night."},
