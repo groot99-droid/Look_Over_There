@@ -58,7 +58,8 @@ try {
   await stand(APARTMENT.computer.at[0], 0.02, APARTMENT.computer.at[1], 0); await frames(5);
   await page.keyboard.press("KeyF"); await page.keyboard.press("Digit3");
   let jobs = await page.evaluate(() => ({body: document.getElementById("pc-body").textContent, btns: [...document.querySelectorAll("#pc-actions button")].map(b => ({t: b.textContent, off: b.disabled, job: b.dataset.job}))}));
-  check("the job search has one Apply button, for The Intern; the other four say not hiring yet", jobs.btns.length === 1 && jobs.btns[0].job === "intern" && !jobs.btns[0].off && /Apply: The Intern \(666 HALLAM ROW\)/.test(jobs.btns[0].t) && (jobs.body.match(/not hiring yet/g) || []).length === 4, JSON.stringify(jobs));
+  const ib = jobs.btns.find(b => b.job === "intern");
+  check("the job search has an Apply button for The Intern (one of five since slice 6), and every job is hiring", jobs.btns.length === 5 && !!ib && !ib.off && /Apply: The Intern \(666 HALLAM ROW\)/.test(ib.t) && (jobs.body.match(/hiring: apply below/g) || []).length === 5, JSON.stringify(jobs));
 
   // closing the quiz half way counts as nothing
   await page.click('#pc-actions button[data-job="intern"]');
@@ -79,14 +80,14 @@ try {
   check("a wrong answer in a graded round: REJECTED", /REJECTED/.test(q.prompt) && q.next === "Close", q.prompt);
   check("no flag, and the application is recorded for day 1", !(await flag()) && await page.evaluate(() => window.__game.APP.st.rejectedOn.intern === 1 && window.__game.APP.st.active === null));
   await page.click("#qz-next");
-  jobs = await page.evaluate(() => ({body: document.getElementById("pc-body").textContent, btn: document.querySelector("#pc-actions button").textContent, off: document.querySelector("#pc-actions button").disabled}));
+  jobs = await page.evaluate(() => ({body: document.getElementById("pc-body").textContent, btn: document.querySelector('#pc-actions button[data-job="intern"]').textContent, off: document.querySelector('#pc-actions button[data-job="intern"]').disabled}));
   check("the job search now says rejected and the button is shut with its reason", jobs.off && /tomorrow/.test(jobs.btn) && /rejected: try again tomorrow/.test(jobs.body), JSON.stringify(jobs));
   await page.keyboard.press("Digit1");
   check("the mail has the rejection", await page.evaluate(() => /REJECTED: The Intern, 666 HALLAM ROW/.test(document.getElementById("pc-body").textContent)));
 
   // the next day: apply again, all right
   await setT(9, 2); await page.keyboard.press("Digit3");
-  check("the next game day the button is open again", await page.evaluate(() => !document.querySelector("#pc-actions button").disabled), await page.evaluate(() => document.querySelector("#pc-actions button").textContent));
+  check("the next game day the button is open again", await page.evaluate(() => !document.querySelector('#pc-actions button[data-job="intern"]').disabled), await page.evaluate(() => document.querySelector('#pc-actions button[data-job="intern"]').textContent));
   await page.click('#pc-actions button[data-job="intern"]');
   await answer(true);
   q = await qz();
@@ -94,7 +95,7 @@ try {
   if (shots) await page.screenshot({path: `${shots}/quiz_accepted.png`});
   check("the flag job_intern is held", await flag());
   await page.click("#qz-next");
-  jobs = await page.evaluate(() => ({body: document.getElementById("pc-body").textContent, btn: document.querySelector("#pc-actions button").textContent, off: document.querySelector("#pc-actions button").disabled}));
+  jobs = await page.evaluate(() => ({body: document.getElementById("pc-body").textContent, btn: document.querySelector('#pc-actions button[data-job="intern"]').textContent, off: document.querySelector('#pc-actions button[data-job="intern"]').disabled}));
   check("the job search says ACCEPTED and cannot be applied for again", jobs.off && /already accepted/.test(jobs.btn) && /\(ACCEPTED\)/.test(jobs.body), JSON.stringify(jobs));
   await page.keyboard.press("Digit1");
   check("the mail has the offer", await page.evaluate(() => /ACCEPTED: The Intern/.test(document.getElementById("pc-body").textContent)));

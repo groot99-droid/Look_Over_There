@@ -9,6 +9,20 @@ export const PAY = {
   quit: 0,                 // quitting early (the game's bail) pays nothing
   max: 30,
 };
+// slice 6: the jobs whose game is not built yet. A stub shift is a screen, not a game: it takes `hours` game hours, may start between `open` and `lastStart`,
+// and pays a flat amount (there is no game to measure). The museum guard works the evening, before midnight's danger.
+export const STUB_SHIFTS = {
+  trash: {open: 8, lastStart: 16, hours: 4, pay: 10},
+  lab: {open: 8, lastStart: 16, hours: 4, pay: 14},
+  factory: {open: 8, lastStart: 16, hours: 4, pay: 12},
+  museum: {open: 20, lastStart: 21, hours: 3, pay: 16},
+};
+// may a stub shift for `job` start at `hour`? {ok, reason}
+export function canStartStub(job, hour) {
+  const s = STUB_SHIFTS[job]; if (!s) return {ok: false, reason: "no such job"};
+  const hh = h => String(h).padStart(2, "0") + ":00";
+  return hour >= s.open && hour <= s.lastStart ? {ok: true, reason: ""} : {ok: false, reason: `Shifts start between ${hh(s.open)} and ${hh(s.lastStart)}.`};
+}
 const num = (v, lo, hi) => { const n = Number(v); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : 0; };
 
 // What the shift pays and why. `result` is the game's {ending, conformance, dissonance, friction, early}; anything missing or malformed counts as a

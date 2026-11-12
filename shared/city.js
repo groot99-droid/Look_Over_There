@@ -41,15 +41,15 @@ export const BUS_LOT = {at: [-42.4, 44.2], radius: 3.4, shelter: [-43.4, 46.4]};
 // kind: tower = the apartment tower (the way in is slice 2), store = closes at night, filler = no door. `n` is the job number where there is one.
 export const BUILDINGS = [
   {id: "tower", side: "w", z0: -8, z1: -30, depth: 20, h: 38, color: 0x6c6a72, door: {kind: "tower", label: "APARTMENT TOWER", z: -19}},
-  {id: "w41", side: "w", z0: -34, z1: -48, depth: 16, h: 9, color: 0x8a7a6a, door: {kind: "store", label: "41 HALLAM ROW", z: -41, job: "Trash truck worker"}},
+  {id: "w41", side: "w", z0: -34, z1: -48, depth: 16, h: 9, color: 0x8a7a6a, door: {kind: "store", label: "41 HALLAM ROW", z: -41, job: "Trash truck worker", quiz: "trash"}},
   {id: "wfill1", side: "w", z0: -52, z1: -82, depth: 14, h: 11, color: 0x6a7480},
-  {id: "w214", side: "w", z0: -88, z1: -102, depth: 16, h: 10, color: 0x7a8a86, door: {kind: "store", label: "214 HALLAM ROW", z: -95, job: "Laboratory worker"}},
+  {id: "w214", side: "w", z0: -88, z1: -102, depth: 16, h: 10, color: 0x7a8a86, door: {kind: "store", label: "214 HALLAM ROW", z: -95, job: "Laboratory worker", quiz: "lab"}},
   {id: "wfill2", side: "w", z0: -106, z1: -116, depth: 14, h: 8, color: 0x80726a},
   {id: "w666", side: "w", z0: -120, z1: -134, depth: 18, h: 13, color: 0x5a4a52, door: {kind: "store", label: "666 HALLAM ROW", z: -127, job: "The Intern", quiz: "intern"}},
   {id: "grocery", side: "e", z0: -8, z1: -26, depth: 24, h: 7, color: 0x7a9a78, door: {kind: "store", label: "GROCERY", z: -17}},
-  {id: "e108", side: "e", z0: -34, z1: -48, depth: 16, h: 9, color: 0x8a6e7a, door: {kind: "store", label: "108 HALLAM ROW", z: -41, job: "Museum night guard"}},
+  {id: "e108", side: "e", z0: -34, z1: -48, depth: 16, h: 9, color: 0x8a6e7a, door: {kind: "store", label: "108 HALLAM ROW", z: -41, job: "Museum night guard", quiz: "museum"}},
   {id: "mall", side: "e", z0: -52, z1: -82, depth: 30, h: 12, color: 0x6a6a8a, door: {kind: "store", label: "MALL", z: -67}},
-  {id: "e330", side: "e", z0: -88, z1: -102, depth: 16, h: 10, color: 0x8a8a6a, door: {kind: "store", label: "330 HALLAM ROW", z: -95, job: "Factory floor worker"}},
+  {id: "e330", side: "e", z0: -88, z1: -102, depth: 16, h: 10, color: 0x8a8a6a, door: {kind: "store", label: "330 HALLAM ROW", z: -95, job: "Factory floor worker", quiz: "factory"}},
   {id: "efill", side: "e", z0: -106, z1: -134, depth: 14, h: 9, color: 0x707a70},
 ];
 export const LAMP_ZS = [0, -20, -40, -60, -80, -100, -120];

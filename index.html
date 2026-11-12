@@ -115,6 +115,12 @@
   #qz button:not(:disabled):hover{border-color:#e0c070}
   #qz-result{font:700 22px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.2em}
   #pc-actions{display:flex;flex-direction:column;gap:6px}
+  #shift{position:fixed;inset:0;z-index:7;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78);color:#d8d8c4;font:14px/1.5 system-ui,sans-serif}
+  #shift .card{width:min(420px,92vw);display:flex;flex-direction:column;gap:10px;text-align:center}
+  #shift h2{margin:0;font:700 16px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:#e0c070}
+  #shift p{margin:0 0 6px;color:#a8a894}
+  #shift button{font:600 14px/1 system-ui,sans-serif;letter-spacing:.1em;padding:11px 14px;color:#d8d8c4;background:#1c1c16;border:1px solid #4a4a3c;border-radius:3px;cursor:pointer}
+  #shift button:hover{background:#2a2a20;border-color:#e0c070}
   #options{position:fixed;inset:0;z-index:7;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);color:#d8d8c4;font:14px/1.5 system-ui,sans-serif}
   #options .card{width:min(380px,90vw);display:flex;flex-direction:column;gap:10px;text-align:center}
   #options h2{margin:0;font:700 20px/1.1 Georgia,serif;letter-spacing:.18em}
@@ -155,6 +161,7 @@
 <div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-walk" type="button" hidden>Walk out to the parking lot</button><button id="r-again" type="button">Play again</button></div></div>
 <div id="station"><div class="card"><h2>LOCKER</h2><p>Your loadout. Click a piece (or press 1 to 3) to carry it or leave it here. Key 4 swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
 <div id="qz"><div class="card"><div id="qz-title"></div><p id="qz-prompt"></p><div id="qz-tray"></div><div id="qz-bins"></div><div id="qz-foot"><button id="qz-next" type="button"></button><button id="qz-cancel" type="button">Close (Esc)</button></div></div></div>
+<div id="shift"><div class="card"><h2 id="sh-title"></h2><p id="sh-text"></p><button id="sh-work" type="button">Work the shift</button><button id="sh-close" type="button">Not now (Esc)</button></div></div>
 <div id="pc"><div class="card"><div id="pc-tabs"></div><h2 id="pc-title"></h2><pre id="pc-body"></pre><div id="pc-actions"></div><button id="pc-close" type="button">Close (Esc or F)</button></div></div>
 <div id="clock"><span></span><small></small></div><div id="needs"></div>
 <div id="options"><div class="card"><h2>LOOK OVER THERE</h2><p>The doors are open. Where to?</p><button id="o-original" type="button">Original</button><button id="o-back" type="button" disabled>Going back in<small>soon</small></button><button id="o-close" type="button">Not yet</button></div></div>
@@ -207,7 +214,7 @@ import {POWER_SOURCES, newPower, throwPower} from "./shared/power.js";
 import {REGISTRY} from "./shared/registry.js";
 import {requirementsMet} from "./shared/manifest.js";
 import {QUIZZES, grade as gradeQuiz, newApplications, canApply, begin as beginApp, abandon as abandonApp, finish as finishApp} from "./shared/application.js";
-import {shiftPay} from "./shared/pay.js";
+import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
 import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
@@ -1510,7 +1517,7 @@ function bestTime(ms) {                                                    // be
   if (isNew) { best = ms; try { localStorage.setItem("lot-best", String(ms)); } catch (e) {} }
   return {best, isNew};
 }
-const JOB_KEYS = ["job_intern"];                                             // a job flag is stored under its own name, like the Original's (session 9)
+const JOB_KEYS = ["job_intern", "job_trash", "job_museum", "job_lab", "job_factory"];                                             // a job flag is stored under its own name, like the Original's (session 9)
 const heldFlags = () => { try { return [...(localStorage.getItem(ORIGINAL_KEY) ? ["original_complete"] : []), ...JOB_KEYS.filter(k => localStorage.getItem(k))]; } catch (e) { return []; } };          // the flags this browser holds
 // true the first time the Original is finished on this browser (and remembers it). If storage is blocked we cannot know, so we say nothing rather than welcome you every time.
 function firstOriginalFinish() {
@@ -1755,7 +1762,7 @@ function cityLook(force) {
   for (const c of CITY.doors) { const open = c.d.kind === "tower" || st.open; c.shutter.visible = !open; c.lamp.material.color.set(open ? 0x40e060 : 0xe04040); }
 }
 function cityTick(dt) {
-  if (!inCity() || loading || PC.open) return;                                 // elsewhere, while a scene loads and while you read the computer, the clock is paused
+  if (!inCity() || loading || PC.open || SH.open) return;                      // elsewhere, while a scene loads and while the computer or a shift screen is up, the clock is paused
   CITY.t += dt; CITY.ui -= dt; if (CITY.ui <= 0) { CITY.ui = 0.2; cityLook(); }
   cityPhase(); stalkerTick(dt); needsTick(dt);
 }
@@ -1836,6 +1843,7 @@ function cityPrompt() {
   if (S.id !== CITY_SCENE) return "";
   if (nearXZ(BUS_STREET.at[0], BUS_STREET.at[1], BUS_STREET.radius)) return dangerous(hourAt(CITY.t)) ? "The bus does not run at night" : "Press F to take the bus back";
   const d = nearCityDoor(); if (!d) return "";
+  const stub = stubJob(d); if (stub) { const can = canStartStub(stub, hourAt(CITY.t)); return can.ok ? `Press F to start your shift (${d.job})` : `${d.label} (${d.job}): ${can.reason}`; }
   return d.kind === "tower" ? "Press F to go up to your apartment" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
 }
 // F at a bus stop rides the bus (a fade through loadScene); F at a door says what is behind it. Nothing is built inside yet.
@@ -1863,6 +1871,8 @@ function tryCity() {
   const d = nearCityDoor(); if (!d) return false;
   if (d.kind === "tower") return ride(CITY_SCENE, "tower");
   if (d.id === "grocery" && storesOpen(hourAt(CITY.t))) return ride(CITY_SCENE, "grocery");              // slice 4: the grocery is open by day                    // the tower is always open: its door opens into your apartment (the lobby is the planned hotel)
+  const stub = stubJob(d);
+  if (stub) { const can = canStartStub(stub, hourAt(CITY.t)); if (can.ok) openShift(stub, d); else toast(`${d.label} (${d.job}): ${can.reason}`); return true; }
   if (!storesOpen(hourAt(CITY.t))) toast(`${d.label} is closed. It opens at ${fmtClock(OPEN_H)}.`);
   else if (d.quiz) {                                                         // a job with an application: accepted, you can start your shift; otherwise it is by application only
     const l = REGISTRY.linkFrom(CITY_SCENE, d.id);
@@ -1913,7 +1923,7 @@ function groceryProps(root) {
   root.add(g);
 }
 // ---- the application quiz (slice 3; rules in shared/application.js): drag each item to a bin (or click an item, then a bin), then Next. Wrong in a graded round is a rejection. One application at a time.
-const APP = {st: (() => { const a = newApplications(); if (heldFlags().includes("job_intern")) a.accepted.intern = true; return a; })()};
+const APP = {st: (() => { const a = newApplications(), held = heldFlags(); for (const [job, q] of Object.entries(QUIZZES)) if (held.includes(q.flag)) a.accepted[job] = true; return a; })()};
 const QZ = {open: false, job: null, round: 0, answers: {}, sel: null, done: null};
 function openQuiz(job) {
   const day = cityState().day; if (!canApply(APP.st, job, day).ok) return;
@@ -1957,6 +1967,26 @@ function drawQuiz() {
     drawQuiz();
   };
 }
+// ---- the other four jobs (slice 6): their job games are not built, so a shift is a screen (rules: STUB_SHIFTS in shared/pay.js). Accepted and in its hours, the door
+// offers it; working it takes the job's hours off the City's clock, hunger drains for them, and it pays a flat amount. The Intern keeps its real game.
+const SH = {open: false, job: null};
+const stubJob = d => d && d.quiz && STUB_SHIFTS[d.quiz] && heldFlags().includes(QUIZZES[d.quiz].flag) ? d.quiz : null;
+function openShift(job, d) {
+  const s = STUB_SHIFTS[job]; SH.open = true; SH.job = job; document.exitPointerLock?.();
+  $("sh-title").textContent = `${d.label} · ${d.job.toUpperCase()}`;
+  $("sh-text").textContent = `This job's game is not built yet. Working the shift takes ${s.hours} hours and pays $${s.pay}.`;
+  $("sh-work").onclick = workShift; $("sh-close").onclick = closeShift; $("shift").style.display = "flex";
+}
+function closeShift() { SH.open = false; SH.job = null; $("shift").style.display = "none"; }
+function workShift() {
+  const job = SH.job, s = STUB_SHIFTS[job]; if (!job) return;
+  closeShift();
+  const before = NEEDS.hunger; NEEDS = drainNeeds(NEEDS, s.hours); CITY.t += s.hours / 24 * DAY_S;
+  NEEDS = payNeeds(NEEDS, s.pay, QUIZZES[job].job); cityLook();
+  toast(`Shift over (${QUIZZES[job].job}). ${s.hours} hours pass. You are paid $${s.pay}.`, 4200);
+  const w = hungerCrossed(before, NEEDS.hunger); if (w === "faint") faintNow(); else if (w) setTimeout(() => toast(w === "hungry" ? "You are hungry." : "You are starving. Eat something soon.", 3600), 4300);
+}
+addEventListener("keydown", e => { if (SH.open) { e.preventDefault(); e.stopImmediatePropagation(); if (e.code === "Escape") closeShift(); } }, true);
 const PC_ORDER = ["mail", "news", "jobs", "map", "bank"];
 function drawComputer() {
   const pages = computerPages(cityState(), APP.st, NEEDS), pg = pages[PC.page];
@@ -2281,7 +2311,7 @@ function simMonsters(dt) {
   } else monsters.forEach((m, i) => m.follow(dt, net.snap && net.snap.l[i]));
 }
 function update(dt) {
-  if (loading || OW.open || STN.open || PC.open) return;
+  if (loading || OW.open || STN.open || PC.open || SH.open) return;
   updateDoors(dt);
   if (dead) {
     deadT += dt;
@@ -2386,7 +2416,7 @@ FIN.t0 = performance.now();
 await loadScene("B1");
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, sleepNow, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, APP, QZ, openQuiz, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, SH, openShift, workShift, closeShift, sleepNow, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, APP, QZ, openQuiz, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
