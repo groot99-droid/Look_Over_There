@@ -45,13 +45,13 @@ try {
   const sky = await p.evaluate(() => { let v = null; window.__game.S.root.traverse(o => { if (o.name === "Sky_LOT_Exterior") v = o.material.emissiveIntensity; }); return v; });
   check("the Overworld has its clear sky, brighter than the store's", sky > skyL4, `${skyL4} -> ${sky}`);
 
-  // walk to the doors: the options screen opens; Going back in is shown but cannot be chosen
+  // walk to the doors: the options screen opens; Going back in is shown and can be chosen (session 8; tools/gbi_test.mjs drives it)
   await p.evaluate(() => { const g = window.__game; g.P.p.set(0, 9.62, 33); g.P.v.set(0, 0, 0); g.P.yaw = 0; g.P.pitch = 0; g.keys.KeyW = true; });
   for (let i = 0; i < 80 && !(await p.evaluate(() => window.__game.OW.open)); i++) await frames(p, 5);
   await p.evaluate(() => { window.__game.keys.KeyW = false; });
-  const o = await p.evaluate(() => ({open: window.__game.OW.open, shown: getComputedStyle(document.getElementById("options")).display !== "none", orig: !document.getElementById("o-original").disabled, back: document.getElementById("o-back").disabled, soon: document.getElementById("o-back").textContent}));
+  const o = await p.evaluate(() => ({open: window.__game.OW.open, shown: getComputedStyle(document.getElementById("options")).display !== "none", orig: !document.getElementById("o-original").disabled, back: document.getElementById("o-back").disabled, text: document.getElementById("o-back").textContent}));
   check("walking up to the store doors opens the options screen", o.open && o.shown);
-  check("Original can be chosen; Going back in says soon and cannot", o.orig && o.back && /soon/.test(o.soon), JSON.stringify(o));
+  check("Original and Going back in can both be chosen", o.orig && !o.back && /Going back in/.test(o.text), JSON.stringify(o));
   await p.click("#o-close");
   await frames(p, 20);
   check("Not yet closes it, and it does not reopen while you stand there", await p.evaluate(() => !window.__game.OW.open && getComputedStyle(document.getElementById("options")).display === "none"));
