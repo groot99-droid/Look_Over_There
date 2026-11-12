@@ -29,3 +29,12 @@ test("a tampered save is cleaned: numbers clamped, unknown foods and jobs droppe
   const thin = readSave(JSON.stringify({v: SAVE_VERSION, t: 0}));
   assert.equal(thin.needs.hunger, 80); assert.equal(thin.needs.money, 20); assert.deepEqual(thin.apps.accepted, {});
 });
+
+test("New Game forgets the save and every job flag, and keeps the Original's", async () => {
+  const {NEW_GAME_KEYS, SAVE_KEY} = await import("./save.js");
+  const {QUIZZES} = await import("./application.js");
+  assert.ok(NEW_GAME_KEYS.includes(SAVE_KEY));
+  for (const q of Object.values(QUIZZES)) assert.ok(NEW_GAME_KEYS.includes(q.flag), q.flag);
+  assert.equal(NEW_GAME_KEYS.length, 1 + Object.keys(QUIZZES).length);
+  assert.ok(!NEW_GAME_KEYS.includes("original_complete"));
+});

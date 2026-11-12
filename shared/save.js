@@ -6,6 +6,8 @@ import {QUIZZES, newApplications} from "./application.js";
 
 export const SAVE_KEY = "city_save";
 export const SAVE_VERSION = 1;
+// New Game (slice 9) removes these: the save and every job's flag. `original_complete` is the Original's, not the City's, and stays.
+export const NEW_GAME_KEYS = [SAVE_KEY, ...Object.values(QUIZZES).map(q => q.flag)];
 const FOOD_IDS = new Set(FOODS.map(f => f.id)), JOB_IDS = new Set(Object.keys(QUIZZES));
 const int = (v, lo, hi) => { const n = Number(v); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, Math.round(n))) : null; };
 const isObj = v => v !== null && typeof v === "object" && !Array.isArray(v);
