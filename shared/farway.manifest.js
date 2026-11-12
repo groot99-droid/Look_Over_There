@@ -29,7 +29,8 @@ export const FARWAY = {
       finish: {scene: "L4", trigger: "parking_lot", alarmMs: 60000}, results: ["place", "time", "bestOnBrowser"],
     },
     going_back_in: {
-      status: "planned", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20,
+      // status stays planned: rooms cannot run this mode yet (the server answers "soon"). Solo play enters it from the Overworld's options screen (session 8), at `startChamber`.
+      status: "planned", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20, startChamber: "gbi_L4_4",
     },
   },
 
@@ -54,8 +55,21 @@ export const FARWAY = {
         ...["table_and_chairs", "playground", "tree_house", "bus_station", "road", "endless_hills"].map(id => ({id})),
       ],
     },
+    {
+      // Going back in, slice 1: two chambers made from existing floors (tools/make_chambers.mjs writes their world files). `chamber.floor` and `index` place it in the run (wave number =
+      // floor position x chambersPerFloor + index); the 4th chamber of a floor has the stairs down, to the next floor's first. Page scenes only: the server does not run them.
+      id: "gbi", name: "Going back in", status: "built", tone: "backrooms",
+      scenes: [
+        {id: "gbi_L4_4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
+        {id: "gbi_L3_1", floorY: 6.4, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
+      ],
+    },
     stub("dreamcore_forest", "Dreamcore forest and meadow", "planned", ["forest", "meadow"]),
-    stub("city", "City", "planned", ["street", "bus_stop"]),
+    {
+      // v0 (session 9): Hallam Row as a blockout street, reached by the bus. Its layout and the day clock are in shared/city.js; world/street.json is made from it by tools/make_street.mjs.
+      id: "city", name: "City", status: "built", tone: "liminal",
+      scenes: [{id: "street", floorY: 0, files: ["world/street.json"]}, {id: "apartment", floorY: 0, files: ["world/apartment.json"]}, {id: "bus_stop"}],
+    },
     stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
     stub("mall", "Liminal mall", "planned", ["entrance"]),
     stub("grocery", "Grocery", "planned", ["main_floor", "back_of_house"]),
@@ -78,6 +92,10 @@ export const FARWAY = {
     gate("DoorLeaf_Gate_RDW", "rdwe", {room: "dining", arrive: [-121.2, 9.6, 63.6], face: [0.0, 1.0]}, "L4"),
     gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4"),
 
+    // Going back in: the stairs down from the 4th chamber of L4 to the first chamber of L3. One way (the chamber's own `up` door has no link). Arrival is on L3's floor (6.4).
+    {id: "gbi.gbi_L4_4.stairs_down", status: "built", connector: "stair_door", soloOnly: true,
+     from: {area: "gbi", scene: "gbi_L4_4", door: "DoorLeaf_Stair_L3_L4_down"}, to: {area: "gbi", scene: "gbi_L3_1", door: "DoorLeaf_Stair_L3_L4_up", arrive: [16.0, 6.4, 8.0], face: [0.0, 1.0]}},
+
     // ---- planned: from the world bible. None of these reach the game until their area is built.
     // walking out of the store after the Original: the results screen offers it once the flag is held. Not a door in world/L4.json (the glass doors are open once the power is on),
     // and rooms stay on the five floors, so it is solo only for now.
@@ -85,7 +103,15 @@ export const FARWAY = {
      from: {area: "lot", scene: "L4", door: "front_doors"}, to: {area: "overworld", scene: "parking_lot", arrive: [-8.0, 9.6, 43.6], face: [0.0, -1.0]},
      note: "You arrive at the table and chairs in the parking lot, facing the store."},
     plan("overworld.store_doors>lot", {area: "overworld", scene: "parking_lot", door: "store_doors"}, {area: "lot"}, "doors", {requires: ["original_complete"], note: "Options screen: Original or Going back in."}),
-    plan("overworld.bus>city", {area: "overworld", scene: "bus_station"}, {area: "city", scene: "bus_stop"}, "bus", {note: "Just a ride."}),
+    // the bus: a stop in the parking lot (a shelter beside the lot's own bus stop post) takes you to Hallam Row, and the stop on the street brings you back. Solo only (the server runs five floors).
+    {id: "overworld.bus>city", status: "built", connector: "bus", soloOnly: true, from: {area: "overworld", scene: "parking_lot", door: "bus_stop"}, to: {area: "city", scene: "street", arrive: [3.6, 0.0, 4.0], face: [0.0, -1.0]},
+     note: "Just a ride. You arrive on the east sidewalk of Hallam Row, facing up the street."},
+    {id: "city.bus>overworld", status: "built", connector: "bus", soloOnly: true, from: {area: "city", scene: "street", door: "bus_stop"}, to: {area: "overworld", scene: "parking_lot", arrive: [-41.0, 9.6, 43.0], face: [0.0, -1.0]},
+     note: "The ride back. The City's clock pauses while you are away."},
+    // slice 2: the apartment tower's door on the street opens straight into your apartment for now (the tower's lobby and floors belong to the planned hotel area), and its door leads back
+    {id: "city.tower>apartment", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "tower"}, to: {area: "city", scene: "apartment", arrive: [1.5, 0.0, 1.4], face: [0.0, -1.0]},
+     note: "The tower's lobby is not built yet: the door opens into your apartment."},
+    {id: "city.apartment>street", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "apartment", door: "front_door"}, to: {area: "city", scene: "street", arrive: [-6.2, 0.0, -19.0], face: [1.0, 0.0]}},
     plan("overworld.road>forest", {area: "overworld", scene: "road"}, {area: "dreamcore_forest", scene: "forest"}, "walk"),
     plan("forest.house>rdwe", {area: "dreamcore_forest", scene: "meadow", door: "house_door"}, {area: "rdwe", room: "dining"}, "gate", {soloOnly: true}),
     plan("forest.shed>addon", {area: "dreamcore_forest", scene: "meadow", door: "shed"}, {area: "future_addon_shed"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
