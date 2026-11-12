@@ -48,7 +48,7 @@ test("the computer's pages say the day, the store hours and the five jobs", () =
   assert.equal(JOBS.length, 5);
   const open = computerPages({hour: 12.5, day: 1, clock: "12:30", open: true}), shut = computerPages({hour: 22, day: 1, clock: "22:00", open: false});
   assert.match(open.news.lines[1], /open for another 7 h 30 min/); assert.match(shut.news.lines[1], /closed for the night/);
-  assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.some(l => /not hiring yet/.test(l)));
+  assert.ok(open.jobs.lines.some(l => /666 HALLAM ROW: The Intern/.test(l)) && open.jobs.lines.every(l => !/not hiring yet/.test(l)));
   assert.deepEqual(Object.keys(open), ["mail", "news", "jobs", "map", "bank"]);
 });
 
@@ -83,10 +83,10 @@ test("sleeping or a blackout lands on 06:00 of the next morning", () => {
   assert.ok(nextMorning(secondsAt(12)) > secondsAt(12));
 });
 
-test("only the Intern is hiring, the job search says so, and the mail follows your application", () => {
-  assert.deepEqual(JOBS.filter(j => j.quiz).map(j => j.id), ["w666"]); assert.equal(JOBS.find(j => j.id === "w666").quiz, "intern");
+test("every job is hiring (slice 6), the job search says so, and the mail follows your application", () => {
+  assert.deepEqual(Object.fromEntries(JOBS.map(j => [j.id, j.quiz])), {w41: "trash", w214: "lab", w666: "intern", e108: "museum", e330: "factory"});
   const st = {hour: 12, day: 1, clock: "12:00", open: true}, none = computerPages(st, newApplications());
-  assert.ok(none.jobs.lines.some(l => /666 HALLAM ROW: The Intern \(hiring: apply below\)/.test(l)) && none.jobs.lines.filter(l => /not hiring yet/.test(l)).length === 4);
+  assert.ok(none.jobs.lines.some(l => /666 HALLAM ROW: The Intern \(hiring: apply below\)/.test(l)) && none.jobs.lines.filter(l => /hiring: apply below/.test(l)).length === 5);
   assert.match(none.mail.lines[0], /No new messages/);
   const rej = finish(begin(newApplications(), "intern", 1), "intern", {pass: false}, 1);
   assert.ok(computerPages(st, rej).jobs.lines.some(l => /rejected: try again tomorrow/.test(l))); assert.match(computerPages(st, rej).mail.lines[0], /REJECTED/);

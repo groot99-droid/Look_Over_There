@@ -19,7 +19,7 @@ const stub = (id, name, status, scenes) => ({id, name, status, scenes: scenes.ma
 export const FARWAY = {
   manifestVersion: 1,
   world: "Farway",
-  flags: ["original_complete", "job_intern", "keycard_tier_1", "keycard_tier_2", "admin_access"],
+  flags: ["original_complete", "job_intern", "job_trash", "job_museum", "job_lab", "job_factory", "keycard_tier_1", "keycard_tier_2", "admin_access"],
   connectors: ["stair_door", "gate", "doors", "walk", "elevator", "stairs", "bus", "pool_dive", "pool_route", "service_corridor", "one_way"],
 
   // a mode is a way to play a round; `players.max` is the room size the server enforces

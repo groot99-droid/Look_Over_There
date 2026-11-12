@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {PAY, shiftPay} from "./pay.js";
+import {PAY, shiftPay, STUB_SHIFTS, canStartStub} from "./pay.js";
 
 test("the ending sets the base pay", () => {
   for (const [ending, base] of Object.entries(PAY.base)) assert.equal(shiftPay({ending, conformance: 0, friction: 0}).pay, base);
@@ -24,4 +24,12 @@ test("a missing or malformed result is a PENDING shift: the base, no bonus, no d
     assert.equal(r.pay, want, JSON.stringify(bad));
   }
   assert.equal(shiftPay({ending: "PENDING", early: "yes"}).pay, 8, "only a real true counts as quitting");
+});
+
+test("stub shifts (slice 6): day jobs start 08:00 to 16:00, the museum 20:00 to 21:00, and every one ends before its door shuts or before midnight", () => {
+  assert.deepEqual(Object.keys(STUB_SHIFTS).sort(), ["factory", "lab", "museum", "trash"]);
+  for (const job of ["trash", "lab", "factory"]) { assert.equal(canStartStub(job, 8).ok, true); assert.equal(canStartStub(job, 16).ok, true); assert.equal(canStartStub(job, 16.5).ok, false); assert.equal(canStartStub(job, 7.9).ok, false); }
+  assert.equal(canStartStub("museum", 12).ok, false); assert.equal(canStartStub("museum", 20.5).ok, true); assert.match(canStartStub("museum", 22).reason, /20:00 and 21:00/);
+  for (const s of Object.values(STUB_SHIFTS)) { assert.ok(s.lastStart + s.hours <= (s.open >= 20 ? 24 : 20), "ends in time"); assert.ok(s.pay > 0); }
+  assert.equal(canStartStub("intern", 12).ok, false, "the Intern is a real game, not a stub");
 });
