@@ -113,8 +113,9 @@ try {
   check("an empty fridge says so", /fridge is empty/.test(await toast()));
 
   // warnings and fainting
-  await setNeeds({hunger: HUNGER.warn + 0.005}); await frames(4);
-  check("crossing 30: you are told you are hungry, and the number turns red", /You are hungry/.test(await toast()) && await page.evaluate(() => document.getElementById("needs").classList.contains("low")));
+  await setNeeds({hunger: HUNGER.warn + 0.005}); await frames(8);                    // 8 frames: the HUD redraws every 0.2 s of City time, so 4 (exactly 0.2 s) could miss it
+  { const t = await toast(), low = await page.evaluate(() => document.getElementById("needs").classList.contains("low"));
+    check("crossing 30: you are told you are hungry, and the number turns red", /You are hungry/.test(t) && low, JSON.stringify({toast: t, low})); }
   await setNeeds({hunger: HUNGER.starve + 0.005}); await frames(4);
   check("crossing 10: starving", /starving/.test(await toast()));
   await page.evaluate(() => window.__game.loadScene("street", {pos: [0, 0, -60], face: [0, -1]})); await settled("street"); await setT(14, 2); await frames(3);
