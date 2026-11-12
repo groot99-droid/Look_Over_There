@@ -2,6 +2,9 @@
 // Hunger runs 0..100 and only drains while the City's clock runs (so it waits outside the City, during a shift and while you read the computer). At 0 you faint and wake at home.
 // Defaults for the owner to change: the numbers below. There is no save yet, so a reload starts again at these values.
 export const HUNGER = {max: 100, start: 80, perHour: 100 / 36, sleepFactor: 0.5, sleepFloor: 5, warn: 30, starve: 10, wakeAt: 25, full: 95};
+// rest (slice 12): "Needs: hunger and sleep" (docs/WORLD.md). 0..100, drains while you are awake in the City (a full bar lasts 20 waking hours), refills while you sleep
+// (12 an hour: a night from 20:00 to 06:00 fills it). Warnings at 30 (tired) and 10 (exhausted); at 0 you pass out and wake at home at 06:00. Tired by day, the bed lets you nap.
+export const REST = {max: 100, start: 90, perHour: 5, perSleepHour: 12, warn: 30, exhausted: 10, wakeAt: 60, napHours: 3};
 export const MONEY = {start: 20};                 // a shift's pay is in shared/pay.js: it scales with how the shift went
 export const CARRY = {hands: 2, cart: 8};
 export const FOODS = [
@@ -12,10 +15,11 @@ export const FOODS = [
 ];
 const food = id => FOODS.find(f => f.id === id);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-export const newNeeds = () => ({hunger: HUNGER.start, money: MONEY.start, pantry: {}, cart: [], hasCart: false, lastPay: null, lastNote: ""});
+export const newNeeds = () => ({hunger: HUNGER.start, rest: REST.start, money: MONEY.start, pantry: {}, cart: [], hasCart: false, lastPay: null, lastNote: ""});
 
 // hunger after `hours` game hours awake; and after `hours` asleep (half the rate, and sleep never takes you below 5: you wake hungry, not fainted)
-export const drain = (n, hours) => ({...n, hunger: clamp(n.hunger - Math.max(0, hours) * HUNGER.perHour, 0, HUNGER.max)});
+// awake: both needs drain (rest only if the record has it: older callers and saves without it keep working)
+export const drain = (n, hours) => ({...n, hunger: clamp(n.hunger - Math.max(0, hours) * HUNGER.perHour, 0, HUNGER.max), ...(n.rest === undefined ? {} : {rest: clamp(n.rest - Math.max(0, hours) * REST.perHour, 0, REST.max)})});
 export const sleepDrain = (n, hours) => ({...n, hunger: Math.max(Math.min(n.hunger, HUNGER.sleepFloor), n.hunger - Math.max(0, hours) * HUNGER.perHour * HUNGER.sleepFactor)});
 // which warning a change of hunger crosses, if any: "hungry" (30), "starving" (10), "faint" (0)
 export function crossed(before, after) {
@@ -24,7 +28,17 @@ export function crossed(before, after) {
   if (after <= HUNGER.warn && before > HUNGER.warn) return "hungry";
   return null;
 }
-export const faint = n => ({...n, hunger: HUNGER.wakeAt, cart: [], hasCart: false});
+export const faint = n => ({...n, hunger: HUNGER.wakeAt, cart: [], hasCart: false, ...(n.rest === undefined ? {} : {rest: Math.max(n.rest, REST.wakeAt)})});
+// slice 12: sleeping `hours` refills rest; which rest warning a change crosses; passing out (from exhaustion, or knocked out) leaves you at least partly rested
+export const rest = (n, hours) => ({...n, rest: clamp((n.rest ?? REST.start) + Math.max(0, hours) * REST.perSleepHour, 0, REST.max)});
+export function restCrossed(before, after) {
+  if (after <= 0 && before > 0) return "out";
+  if (after <= REST.exhausted && before > REST.exhausted) return "exhausted";
+  if (after <= REST.warn && before > REST.warn) return "tired";
+  return null;
+}
+export const passOut = n => ({...n, rest: Math.max(n.rest ?? 0, REST.wakeAt), cart: [], hasCart: false});
+export const tired = n => (n.rest ?? REST.max) <= REST.warn;
 
 // the grocery: take a cart, put items in it (2 in your hands without one, 8 with), pay at the checkout, and what you paid for goes to the pantry at home
 export const capacity = n => n.hasCart ? CARRY.cart : CARRY.hands;

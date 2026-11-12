@@ -38,3 +38,14 @@ test("New Game forgets the save and every job flag, and keeps the Original's", a
   assert.equal(NEW_GAME_KEYS.length, 1 + Object.keys(QUIZZES).length);
   assert.ok(!NEW_GAME_KEYS.includes("original_complete"));
 });
+
+test("rest is saved and read back, clamped; a save from before rest existed starts rested (slice 12)", async () => {
+  const {REST} = await import("./needs.js");
+  const s = makeSave({t: 10, needs: {...newNeeds(), rest: 37.5}, apps: newApplications()});
+  assert.equal(s.needs.rest, 37.5);
+  assert.equal(readSave(JSON.stringify(s)).needs.rest, 37.5);
+  assert.equal(readSave(JSON.stringify({...s, needs: {...s.needs, rest: 400}})).needs.rest, REST.max);
+  assert.equal(readSave(JSON.stringify({...s, needs: {...s.needs, rest: "x"}})).needs.rest, REST.start);
+  const old = JSON.parse(JSON.stringify(s)); delete old.needs.rest;
+  assert.equal(readSave(JSON.stringify(old)).needs.rest, REST.start);
+});
