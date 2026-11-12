@@ -62,7 +62,11 @@ export const FARWAY = {
     },
     stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
     stub("mall", "Liminal mall", "planned", ["entrance"]),
-    stub("grocery", "Grocery", "planned", ["main_floor", "back_of_house"]),
+    {
+      // slice 4 (session 9): the grocery's main floor, a blockout behind the street's grocery door; open by day like the other stores. The back of house stays planned.
+      id: "grocery", name: "Grocery", status: "built", tone: "liminal",
+      scenes: [{id: "main_floor", floorY: 0, files: ["world/main_floor.json"]}, {id: "back_of_house"}],
+    },
     stub("jobs", "Hallam Row (street of jobs)", "planned", ["street_of_jobs"]),
     stub("secret_ops", "Secret Operations (Project Never Land)", "planned", ["service_entry", "hidden_entry"]),
     {id: "future_addon_shed", name: "Reserved for the shed", status: "reserved"},
@@ -113,7 +117,10 @@ export const FARWAY = {
     plan("hotel.atrium>maze", {area: "hotel", scene: "atrium"}, {area: "hotel", scene: "anomaly_maze"}, "one_way", {note: "Also reached when the elevator glitches. You leave only by solving it."}),
     plan("hotel.sub_pools>lot.B1", {area: "hotel", scene: "sub_pools"}, {area: "lot", scene: "B1"}, "pool_route", {note: "Separate pools connected underwater, a long way with many levels between."}),
     plan("city.street>mall", {area: "city", scene: "street"}, {area: "mall", scene: "entrance"}, "doors"),
-    plan("city.street>grocery", {area: "city", scene: "street"}, {area: "grocery", scene: "main_floor"}, "doors", {note: "Open by day, abandoned by night."}),
+    // slice 4: the street's grocery door and back. Open 08:00 to 20:00 (at closing you are shown out); solo only.
+    {id: "city.street>grocery", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "grocery"}, to: {area: "grocery", scene: "main_floor", arrive: [0.0, 0.0, 7.4], face: [0.0, -1.0]},
+     note: "Open by day, abandoned by night."},
+    {id: "grocery.main_floor>street", status: "built", connector: "doors", soloOnly: true, from: {area: "grocery", scene: "main_floor", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -17.0], face: [-1.0, 0.0]}},
     plan("city.street>jobs", {area: "city", scene: "street"}, {area: "jobs", scene: "street_of_jobs"}, "doors"),
     plan("grocery.backhouse>secret_ops", {area: "grocery", scene: "back_of_house"}, {area: "secret_ops", scene: "service_entry"}, "service_corridor", {requires: ["keycard_tier_1"]}),
     plan("rdwe.repeating_room>secret_ops", {area: "rdwe", room: "repeating_room"}, {area: "secret_ops", scene: "hidden_entry"}, "gate", {note: "The only entrance with no clearance. Hinted by a room that repeats or a door seen from one angle."}),

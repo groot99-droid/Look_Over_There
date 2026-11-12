@@ -4,6 +4,7 @@
 
 // ---- the clock. A game day is 15 real minutes. It starts at 08:00 on day 1, runs only while you are in the City (leaving pauses it), and is kept in memory (a reload starts at 08:00).
 import {mailLines} from "./application.js";
+import {FOODS, pantryLines} from "./needs.js";
 
 export const DAY_S = 900;                       // real seconds per game day
 export const START_H = 8;                       // the hour the first day starts at
@@ -77,13 +78,14 @@ export const streetDoc = () => ({scene: "street", colliders: colliders(), doors:
 
 // ---- the apartment (slice 2): your one room, reached from the apartment tower's door on the street. For v0 the tower door opens straight into it (the tower's lobby, atrium and floors are the
 // hotel area, planned); the City's clock keeps running while you are inside. One room, a bed, a desk with the computer, a window onto the street's sky, and a door back out. Blockout, no art.
-export const CITY_SCENES = ["street", "apartment"];            // the scenes where the City's clock runs
+export const CITY_SCENES = ["street", "apartment", "main_floor"];            // the scenes where the City's clock (and hunger) runs: the street, your apartment, the grocery
 export const APARTMENT = {
   half: [3, 2.5], h: 2.8,                                      // the room is x in [-3, 3], z in [-2.5, 2.5], 2.8 m high
   arrive: [1.5, 0, 1.4], face: [0, -1],                        // you come in through the door on the south wall and face the room
   door: {at: [1.5, 2.1], reach: 1.8},                          // F near here leaves (the door is in the south wall at x = 1.5)
   bed: {min: [-2.9, 0, -2.4], max: [-0.9, 0.6, -0.4]},
   desk: {min: [0.9, 0, -2.4], max: [2.7, 0.78, -1.6]}, computer: {at: [1.8, -1.0], reach: 1.6},    // stand in front of the desk to use it
+  fridge: {min: [-2.95, 0, 1.6], max: [-2.25, 1.8, 2.45], at: [-1.75, 2.0], reach: 1.2},       // slice 4: the fridge in the south-west corner, where your groceries go
   window: {x: 2.98, z: [-1.4, 0.6], y: [1.0, 2.2]},            // on the east wall; shows the sky of the hour
 };
 // the tower's door on the street leads to the apartment, and the apartment's door leads back to the tower's front: both are links in the manifest and these are what they say
@@ -93,16 +95,39 @@ export function apartmentColliders() {
   add("Floor_Apartment", [-hx - t, -1, -hz - t], [hx + t, 0, hz + t]); add("Ceiling_Apartment", [-hx - t, h, -hz - t], [hx + t, h + t, hz + t]);
   add("Wall_N", [-hx - t, 0, -hz - t], [hx + t, h, -hz]); add("Wall_S", [-hx - t, 0, hz], [hx + t, h, hz + t]);
   add("Wall_W", [-hx - t, 0, -hz], [-hx, h, hz]); add("Wall_E", [hx, 0, -hz], [hx + t, h, hz]);
-  add("Bed", APARTMENT.bed.min, APARTMENT.bed.max); add("Desk", APARTMENT.desk.min, APARTMENT.desk.max);
+  add("Bed", APARTMENT.bed.min, APARTMENT.bed.max); add("Desk", APARTMENT.desk.min, APARTMENT.desk.max); add("Fridge", APARTMENT.fridge.min, APARTMENT.fridge.max);
   return c;
 }
 export const apartmentDoc = () => ({scene: "apartment", colliders: apartmentColliders(), doors: [], cameras: [],
   markers: [{name: "Spawn_door", kind: "Spawn", level: "apartment", position: APARTMENT.arrive}, {name: "Computer", kind: "Interact", level: "apartment", position: [APARTMENT.computer.at[0], 0, APARTMENT.computer.at[1]]}]});
 
+// ---- the grocery (slice 4): the manifest's `grocery` area, scene `main_floor`, behind the street's grocery door. Open by day (08:00 to 20:00, like the other stores); at closing you are shown out.
+// One hall, x in [-12, 12], z in [-9, 9], 4 m high. The way in is the south wall; a cart corral by the door, four shelf units (one food each) and a checkout counter. Blockout, no art.
+export const GROCERY = {
+  half: [12, 9], h: 4,
+  arrive: [0, 0, 7.4], face: [0, -1],
+  door: {at: [0, 8.3], reach: 1.6},
+  cart: {at: [-4.5, 7.2], reach: 1.5, min: [-6.2, 0, 7.6], max: [-5.0, 1.0, 8.8]},          // the corral by the door: take a cart from here
+  checkout: {at: [6.5, 5.6], reach: 1.7, min: [5.5, 0, 6.4], max: [9.5, 0.95, 7.2]},
+  shelves: FOODS.map((f, i) => { const x = -8 + i * 5; return {food: f.id, min: [x - 0.6, 0, -6], max: [x + 0.6, 1.9, 2], at: [x + 1.4, -2], reach: 1.6}; }),   // aisles run north-south; stand on the east side of a unit
+};
+export const GROCERY_FRONT = {arrive: [6.2, 0, -17], face: [-1, 0]};            // where you stand on the street when you come out (the grocery door is on the east side at z = -17)
+export function groceryColliders() {
+  const c = [], add = (s, min, max) => c.push({s, min, max}), [hx, hz] = GROCERY.half, h = GROCERY.h, t = 0.2;
+  add("Floor_Grocery", [-hx - t, -1, -hz - t], [hx + t, 0, hz + t]); add("Ceiling_Grocery", [-hx - t, h, -hz - t], [hx + t, h + t, hz + t]);
+  add("Wall_N", [-hx - t, 0, -hz - t], [hx + t, h, -hz]); add("Wall_S", [-hx - t, 0, hz], [hx + t, h, hz + t]);
+  add("Wall_W", [-hx - t, 0, -hz], [-hx, h, hz]); add("Wall_E", [hx, 0, -hz], [hx + t, h, hz]);
+  for (const sh of GROCERY.shelves) add("Shelf_" + sh.food, sh.min, sh.max);
+  add("Checkout", GROCERY.checkout.min, GROCERY.checkout.max); add("Cart_corral", GROCERY.cart.min, GROCERY.cart.max);
+  return c;
+}
+export const groceryDoc = () => ({scene: "main_floor", colliders: groceryColliders(), doors: [], cameras: [],
+  markers: [{name: "Spawn_door", kind: "Spawn", level: "main_floor", position: GROCERY.arrive}, {name: "Checkout", kind: "Interact", level: "main_floor", position: [GROCERY.checkout.at[0], 0, GROCERY.checkout.at[1]]}]});
+
 // ---- the computer: what its pages say. `st` is {hour, day, clock, open}; `apps` is the applications state of shared/application.js (optional). Pure, so it is tested; the page only draws the strings. Job search lists the five Hallam Row jobs but applications open later (slice 3).
 export const JOBS = BUILDINGS.filter(b => b.door && b.door.job).map(b => ({id: b.id, address: b.door.label, job: b.door.job, quiz: b.door.quiz || null}));      // quiz: the key in shared/application.js (only the Intern has one so far)
 export const JOB_FRONT = {arrive: [-6.2, 0, -127], face: [1, 0]};            // where you stand when you come back out of your shift at 666 Hallam Row
-export function computerPages(st, apps = null) {
+export function computerPages(st, apps = null, needs = null) {
   const left = st.open ? Math.max(0, CLOSE_H - st.hour) : 0, hh = Math.floor(left), mm = Math.round((left - hh) * 60), mine = apps ? mailLines(apps, st.day) : [];
   const tag = j => !j.quiz ? " (not hiring yet)" : apps && apps.accepted[j.quiz] ? " (ACCEPTED)" : apps && apps.rejectedOn[j.quiz] !== undefined && apps.rejectedOn[j.quiz] >= st.day ? " (rejected: try again tomorrow)" : " (hiring: apply below)";
   return {
@@ -110,6 +135,7 @@ export function computerPages(st, apps = null) {
     news: {title: "NEWS", lines: [`Day ${st.day}, ${st.clock}.`, st.open ? `Hallam Row's stores are open for another ${hh} h ${String(mm).padStart(2, "0")} min.` : st.hour >= CLOSE_H || st.hour < DAWN_H ? "The stores on Hallam Row are closed for the night." : "The stores on Hallam Row are not open yet.", "Residents are reminded to be home before midnight."]},
     jobs: {title: "JOB SEARCH", lines: [...JOBS.map(j => `${j.address}: ${j.job}${tag(j)}`), "", "One application at a time."]},
     map: {title: "MAP", lines: ["HALLAM ROW", "West side: apartment tower, 41, 214, 666", "East side: grocery, 108, mall, 330", "The bus stop is at the south end."]},
+    bank: {title: "BANK", lines: needs ? ["Balance: $" + needs.money, needs.lastPay ? "Last shift: +$" + needs.lastPay : "No pay yet. A shift at your job pays.", "", "IN YOUR FRIDGE", ...(pantryLines(needs).length ? pantryLines(needs) : ["Nothing."])] : ["Balance unknown."]},
   };
 }
 
