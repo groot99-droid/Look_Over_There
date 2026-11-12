@@ -107,12 +107,50 @@ try {
   const respawn = await p.evaluate(() => { const g = window.__game; let n = 0; while (g.dead && n < 200) { g.update(0.05); n++; } return +(n * 0.05).toFixed(2); });
   check("solo respawn is still about 3 s", respawn > 3 && respawn < 3.6, `(${respawn} s)`);
   // the cloak (from the locker) and the AFK Beacon
+  // Page-side helpers for the cloak, beacon and health checks. Those checks need room around the player; a random respawn spot sometimes has none
+  // (no 4.5 m clear ray, a low prop that blocks a monster's sight or a rolling beacon), which used to fail them with `null` or "no beacon".
+  await p.evaluate(() => {
+    const g = window.__game;
+    window.__state = () => ({dead: g.dead, loading: g.loading, carry: g.myCarry(), dev: g.devOn.v, imm: +g.P.imm.toFixed(1), hp: g.HP.h.hp, y: +g.P.p.y.toFixed(2), floor: g.S.floor, at: [g.P.p.x, g.P.p.z].map(v => +v.toFixed(1)), fin: g.FIN.out, keypad: g.KPUI.open});
+    // a spot 4 m away with a clear ray and a floor cell, where a monster facing the player really sees them uncloaked, and one 1 m east sees them even cloaked (a monster's sight line is not the player's ray)
+    window.__findSpot = () => {
+      const m = g.monsters[0], eye = [g.P.p.x, g.P.p.y + g.P.eye, g.P.p.z], t = {id: 1, x: g.P.p.x, y: g.P.p.y, z: g.P.p.z, crouch: false, moving: false, cloak: false};
+      m.pos.set(g.P.p.x + 1.0, m.fy, g.P.p.z); m.yaw = Math.atan2(-1, 0);                      // the 1 m half of the check: this monster must see a cloaked player from there
+      if (!m.sees({...t, cloak: true})) return null;
+      for (let a = 0; a < 6.28; a += 0.3) {
+        const d = [Math.sin(a), 0, Math.cos(a)], x = g.P.p.x + d[0] * 4, z = g.P.p.z + d[2] * 4;
+        if (!g.rayClear(eye, d, 4.5) || !g.S.nav[g.cellOf(x, z)]) continue;
+        m.pos.set(x, m.fy, z); m.yaw = Math.atan2(-(g.P.p.x - x), -(g.P.p.z - z));
+        if (m.sees(t)) return {x, z};
+      }
+      return null;
+    };
+    // the farthest a beacon thrown from here would roll in any direction (the same stop rule as throwBeacon, without throwing)
+    window.__rollMax = () => {
+      let best = 0;
+      for (let k = 0; k < 32; k++) {
+        const dx = -Math.sin(k * 0.2), dz = -Math.cos(k * 0.2), sx = g.P.p.x + dx * 0.5, sz = g.P.p.z + dz * 0.5; let ex = sx, ez = sz;
+        for (let d = 0.25; d <= 12; d += 0.25) { const x = sx + dx * d, z = sz + dz * d, c = g.cellOf(x, z); if (c < 0 || !g.S.nav[c] || g.collide({x, y: g.S.floor + 0.5, z})) break; ex = x; ez = z; }
+        best = Math.max(best, Math.hypot(ex - g.P.p.x, ez - g.P.p.z));
+      }
+      return best;
+    };
+  });
+  // stand the player where those checks can run: the respawn spot if it will do, else another spawn spot of the floor
+  const stage = await p.evaluate(() => {
+    const g = window.__game; let tries = 0; const far = q => { q.state = "patrol"; q.path = []; q.pos.set(g.P.p.x + 90, q.fy, g.P.p.z); };
+    for (;;) {
+      for (const q of g.monsters) far(q);
+      if (window.__findSpot() && window.__rollMax() > 5) { for (const q of g.monsters) far(q); return {ok: true, tries, state: window.__state()}; }
+      if (++tries > 300) return {ok: false, tries, state: window.__state()};
+      const c = g.spawnFor("B1"); g.P.p.set(c[0], g.S.floor + 0.02, c[2]); g.P.v.set(0, 0, 0);
+    }
+  });
+  check("a spot on B1 with room for the cloak, beacon and health checks", stage.ok, JSON.stringify(stage));
   check("the locker also gave a cloak", await p.evaluate(() => { const g = window.__game; g.step(0.016); return g.CL.have && g.CL.st.b === 1 && !g.CL.st.on && document.getElementById("cloak").style.display === "block"; }));
   const cl = await p.evaluate(() => {
     const g = window.__game, m = g.monsters[0]; for (const q of g.monsters) { q.state = "patrol"; q.path = []; q.pos.set(g.P.p.x + 90, q.fy, g.P.p.z); }
-    const eye = [g.P.p.x, g.P.p.y + g.P.eye, g.P.p.z]; let spot = null;
-    for (let a = 0; a < 6.28 && !spot; a += 0.3) { const d = [Math.sin(a), 0, Math.cos(a)], x = g.P.p.x + d[0] * 4, z = g.P.p.z + d[2] * 4; if (g.rayClear(eye, d, 4.5) && g.S.nav[g.cellOf(x, z)]) spot = {x, z}; }
-    if (!spot) return null;
+    const spot = window.__findSpot(); if (!spot) return {err: "no spot", state: window.__state()};
     m.pos.set(spot.x, m.fy, spot.z); m.yaw = Math.atan2(-(g.P.p.x - spot.x), -(g.P.p.z - spot.z));
     const t = {id: 1, x: g.P.p.x, y: g.P.p.y, z: g.P.p.z, crouch: false, moving: false, cloak: false};
     const open = m.sees(t), hidden = !m.sees({...t, cloak: true}), near = (m.pos.set(g.P.p.x + 1.0, m.fy, g.P.p.z), m.yaw = Math.atan2(-1, 0), m.sees({...t, cloak: true}));
@@ -120,8 +158,8 @@ try {
     const heard = (() => { m.update(0.05, [{...t, moving: true, run: true, cloak: true}]); return m.state; })();
     return {open, hidden, near, heard};
   });
-  check("a cloaked player is not seen at 4 m but is seen from 1 m", !!cl && cl.open === true && cl.hidden === true && cl.near === true, JSON.stringify(cl));
-  check("a cloaked player running is still heard", !!cl && (cl.heard === "search" || cl.heard === "chase"), JSON.stringify(cl));
+  check("a cloaked player is not seen at 4 m but is seen from 1 m", !!cl && !cl.err && cl.open === true && cl.hidden === true && cl.near === true, JSON.stringify(cl));
+  check("a cloaked player running is still heard", !!cl && !cl.err && (cl.heard === "search" || cl.heard === "chase"), JSON.stringify(cl));
   const cb = await p.evaluate(() => { const g = window.__game; g.toggleCloak(); const on = g.CL.st.on; for (let i = 0; i < 100; i++) g.sim(0.05, performance.now() / 1000); const mid = g.CL.st.b; g.toggleCloak(); return {on, mid, off: !g.CL.st.on}; });
   check("the cloak toggles and the battery drains while it is on", cb.on && cb.off && cb.mid < 0.7 && cb.mid > 0.2, JSON.stringify(cb));
   const bc = await p.evaluate(() => {
@@ -131,11 +169,11 @@ try {
       if (t && Math.hypot(t.x - g.P.p.x, t.z - g.P.p.z) > 4) { g.BC.list.splice(0, g.BC.list.length - 1); g.BC.have = 2; break; }
       if (t) { g.BC.list.pop(); }
     }
-    const b = g.BC.list[0]; if (!b) return {err: "no beacon"}; g.BC.have = 1;
+    const b = g.BC.list[0]; if (!b) { const state = window.__state(); g.P.imm = 0; return {err: "no beacon", state}; } g.BC.have = 1;
     const rolled = Math.hypot(b.x - g.P.p.x, b.z - g.P.p.z);
     b.land = performance.now() / 1000;                                             // skip the roll
     let spot = null; for (let i = 0; i < 400 && !spot; i++) { const c = g.spawnFor("B1"); const d = Math.hypot(c[0] - b.x, c[2] - b.z); if (d > 10 && d < 24 && Math.hypot(c[0] - g.P.p.x, c[2] - g.P.p.z) > 8) spot = c; }
-    const m = g.monsters.find(q => q.cfg.alert > 0 && q.cfg.chase > 0); if (!spot)   /* the gun test froze monsters[0] */ return {err: "no spot", rolled};
+    const m = g.monsters.find(q => q.cfg.alert > 0 && q.cfg.chase > 0); if (!spot)   /* the gun test froze monsters[0] */ { g.P.imm = 0; return {err: "no spot", rolled, state: window.__state()}; }
     m.glitchT = 0; m.immuneT = 0; m.wait = 0; m.lureId = null; m.spot = null; m.path = [];
     m.pos.set(spot[0], m.fy, spot[2]); m.state = "chase"; m.last = [g.P.p.x, g.P.p.z]; m.tgt = 1;                    // even a monster already chasing is pulled off
     const trace = []; b.until = performance.now() / 1000 + 120; for (let i = 0; i < 1600; i++) { g.update(0.05); if (i % 200 === 0) trace.push([+m.pos.x.toFixed(1), +m.pos.z.toFixed(1), m.path.length, m.state, +m.speed.toFixed(1)]); }                      // 80 s of game time: the maze route can be 50 m or more
@@ -178,6 +216,7 @@ try {
   // health: 100 HP, 35 a hit, a second of grace, a hit from one monster at most every 1.2 s, regeneration after 10 s, three hits down you
   const hp1 = await p.evaluate(() => { const g = window.__game; return {hp: g.HP.h.hp, imm: g.P.imm}; });
   check("after the respawn you have full health", hp1.hp === 100);
+  check("and you are up and can be hurt (not dead, loading or immune)", await p.evaluate(() => { const g = window.__game; return !g.dead && !g.loading && !g.FIN.out && !(g.P.imm > 0); }), JSON.stringify(await p.evaluate(() => window.__state())));
   const hp2 = await p.evaluate(() => { const g = window.__game; g.HP.h.hurtAt = -Infinity; g.applyHit(35); const a = g.HP.h.hp; g.applyHit(35); return [a, g.HP.h.hp]; });
   check("a hit takes 35 and a second hit inside the grace second takes nothing", hp2[0] === 65 && hp2[1] === 65, JSON.stringify(hp2));
   const hp3 = await p.evaluate(() => { const g = window.__game; g.HP.h.hurtAt = performance.now() / 1000 - 5; for (let i = 0; i < 40; i++) g.update(0.05); const early = g.HP.h.hp; g.HP.h.hurtAt = performance.now() / 1000 - 11; for (let i = 0; i < 40; i++) g.update(0.05); return [early, g.HP.h.hp]; });
