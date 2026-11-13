@@ -56,7 +56,13 @@ export function checkout(n) {
   const pantry = {...n.pantry}; for (const id of n.cart) pantry[id] = (pantry[id] || 0) + 1;
   return {n: {...n, money: n.money - total, pantry, cart: [], hasCart: false}, ok: true, paid: total, reason: ""};
 }
-export const putBack = n => ({...n, cart: [], hasCart: false});          // leaving with what you did not pay for: it goes back on the shelves (no stealing in v0)
+export const putBack = n => ({...n, cart: [], hasCart: false});
+// slice 19, stealing ("you can also get into trouble by stealing or being seen on camera", docs/WORLD.md): walking out of the door with what you have not paid for.
+// Unseen, you keep it (it goes to your fridge, like a purchase). Seen by the camera, you are fined $5 plus what it would have cost (never more than you have) and it goes back.
+export const THEFT = {fineBase: 5};
+export function steal(n) { const pantry = {...n.pantry}; for (const id of n.cart) pantry[id] = (pantry[id] || 0) + 1; return {...n, pantry, cart: [], hasCart: false}; }
+export const fineFor = n => Math.min(n.money, THEFT.fineBase + cartTotal(n));
+export function caught(n) { const fine = fineFor(n); return {n: {...n, money: n.money - fine, cart: [], hasCart: false}, fine}; }          // leaving with what you did not pay for: it goes back on the shelves (no stealing in v0)
 
 // the fridge at home: one item each time, the most filling one you have; not when you are already full
 export function eat(n) {
