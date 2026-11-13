@@ -221,7 +221,7 @@ import {requirementsMet} from "./shared/manifest.js";
 import {QUIZZES, grade as gradeQuiz, newApplications, canApply, begin as beginApp, abandon as abandonApp, finish as finishApp} from "./shared/application.js";
 import {shiftPay, STUB_SHIFTS, canStartStub} from "./shared/pay.js";
 import {SAVE_KEY, makeSave, readSave, NEW_GAME_KEYS} from "./shared/save.js";
-import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, newPeds, pedAt, stepPeds, GHOST_WINDOW, ghostLit, SPOT, REPORTS, newSightings, spot, fileReport} from "./shared/anomalies.js";
+import {SIGN, signText, passedSign, PEDESTRIANS, pedsOut, newPeds, pedAt, stepPeds, WATCHERS, watcherAt, watchersOut, watcherYaw, GHOST_WINDOW, ghostLit, SPOT, REPORTS, newSightings, spot, fileReport} from "./shared/anomalies.js";
 import {BINS, TRASH, routeEnds, nearBin, trashPay} from "./shared/trash.js";
 import {LAB, BENCH, shiftEnds as benchEnds, newBench, stationNear, useStation, labelOf, cardText, benchPay} from "./shared/lab.js";
 import {FACTORY, KINDS, LINE, shiftEnds as lineEnds, newLine, stepLine, pickUp as pickPart, binNear, drop as dropPart, linePay} from "./shared/factory.js";
@@ -231,7 +231,7 @@ import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
 import {GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
-import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, CAMERA, camYaw, camSees as shopCamSees, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
+import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, windowSlots, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, CAMERA, camYaw, camSees as shopCamSees, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
 
 const MON_URL = "world/monsters.json";
 // one scene is resident at a time; the floors are joined by doors at the top of the stairs (doors carry a "link" to the scene they open)
@@ -1746,10 +1746,8 @@ function cityProps(root) {
   for (const s of [-1, 1]) g.add(boxMesh([s > 0 ? ROAD.x1 : ROAD.x0 - WALK, y - 0.09, z0], [s > 0 ? ROAD.x1 + WALK : ROAD.x0, y - 0.005, z1], 0x8a8a84));   // sidewalks, level with the ground
   for (const b of BUILDINGS) {
     const bx = buildingBox(b), c = boxMesh(bx.min, bx.max, b.color); g.add(c);
-    const fx = sideX(b.side), dir = b.side === "w" ? 1 : -1, zl = Math.min(b.z0, b.z1), zh = Math.max(b.z0, b.z1);
-    for (let f = 1; f * 3.6 < b.h - 1; f++) for (let z = zl + 1.5; z < zh - 1.2; z += 3.4) {                              // window panes on the street face, lit at night
-      if (b.door && f === 1 && Math.abs(z + 0.8 - b.door.z) < 2.4) continue;
-      const w = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.3), CITY.mats.win); w.position.set(fx + dir * 0.02, y + f * 3.6, z + 0.8); w.rotation.y = b.side === "w" ? Math.PI / 2 : -Math.PI / 2; g.add(w);
+    for (const s of windowSlots(b)) {                                                                               // window panes on the street face, lit at night
+      const w = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.3), CITY.mats.win); w.position.set(s.x, y + s.y, s.z); w.rotation.y = b.side === "w" ? Math.PI / 2 : -Math.PI / 2; g.add(w);
     }
   }
   for (const d of DOORS) {
@@ -1779,7 +1777,12 @@ function anomalyProps(g, y) {
   g.add(peds);
   const glow = new THREE.MeshLambertMaterial({color: 0x20262c, emissive: 0xffd890, emissiveIntensity: 0}), [wx, wy, wz] = GHOST_WINDOW.at;
   const ghost = new THREE.Mesh(new THREE.PlaneGeometry(GHOST_WINDOW.w, GHOST_WINDOW.h), glow); ghost.position.set(wx, y + wy, wz); g.add(ghost);   // faces +z: back down the street
-  CITY.anom = {sign, peds, ghost}; CITY.lastZ = null;
+  const watchers = new THREE.Group(), shade = new THREE.MeshBasicMaterial({color: 0x0a0a0c});              // slice 21: a dark figure inside each watching window
+  for (const w of WATCHERS) { const p = watcherAt(w), f = new THREE.Group(); f.position.set(p.x, y + p.y - 0.65, p.z);
+    const part = (wd, h, d, oy) => { const o = new THREE.Mesh(new THREE.BoxGeometry(wd, h, d), shade); o.position.y = oy; f.add(o); };
+    part(0.55, 0.6, 0.28, 0.3); part(0.26, 0.3, 0.26, 0.82); watchers.add(f); }
+  g.add(watchers);
+  CITY.anom = {sign, peds, ghost, watchers}; CITY.lastZ = null;
 }
 // slice 18: the pedestrians' routines (rules: shared/anomalies.js). By day, each one you cannot see walks its beat; each one in your view stands still. All face up the street.
 function pedTick(dt) {
@@ -1789,7 +1792,7 @@ function pedTick(dt) {
   a.peds.children.forEach((f, i) => { const [x, z] = pedAt(i, CITY.peds[i].s); f.position.x = x; f.position.z = z; f.rotation.y = 0; });
 }
 // slice 15: spotting an anomaly is seeing it yourself, in view with a clear line (rules: SPOT in shared/anomalies.js). Checked a few times a second.
-const SPOT_SAYS = {sign: "Did that sign just change?", peds: "They are all facing the same way.", window: "A lit window, up there. There is no building."};
+const SPOT_SAYS = {sign: "Did that sign just change?", peds: "They are all facing the same way.", window: "A lit window, up there. There is no building.", watchers: "Someone in that window is watching you."};
 function spotTick() {
   CITY.spotT -= 1 / 60; if (CITY.spotT > 0) return; CITY.spotT = 0.25;
   const h = hourAt(CITY.t), ey = P.p.y + P.eye, sees = (x, y, z, d) => Math.hypot(x - P.p.x, z - P.p.z) < d && inView(P.p.x, P.p.z, P.yaw, x, z) && segClear(P.p.x, ey, P.p.z, x, y, z, 0.3);
@@ -1797,16 +1800,19 @@ function spotTick() {
   if (CITY.signPasses > 0 && sees(sx, S.floor + SIGN.y, SIGN.z, SPOT.signDist)) found.push("sign");
   if (pedsOut(h) && CITY.peds.filter((p, i) => { const [x, z] = pedAt(i, p.s); return sees(x, S.floor + 1.5, z, SPOT.pedDist); }).length >= SPOT.pedCount) found.push("peds");
   if (ghostLit(h) && sees(GHOST_WINDOW.at[0], S.floor + GHOST_WINDOW.at[1], GHOST_WINDOW.at[2], SPOT.windowDist)) found.push("window");
+  if (watchersOut(h) && WATCHERS.some(w => { const p = watcherAt(w); return sees(p.x, S.floor + p.y - 0.35, p.z, SPOT.watcherDist); })) found.push("watchers");   // its chest, against the pane: in view with a clear line
   for (const id of found) if (!CITY.seen.spotted[id]) { CITY.seen = spot(CITY.seen, id); toast(SPOT_SAYS[id], 3600); }
 }
 function anomalyLook(hour) {
   const a = CITY.anom; if (!a) return;
   a.peds.visible = pedsOut(hour);
   const lit = ghostLit(hour); a.ghost.visible = lit; a.ghost.material.emissiveIntensity = lit ? 1.1 : 0;
+  a.watchers.visible = watchersOut(hour);
 }
 function anomalyTick(dt = 1 / 60) {
   if (S.id !== CITY_SCENE || !CITY.anom) { CITY.lastZ = null; return; }
   spotTick(); pedTick(dt);
+  if (CITY.anom.watchers.visible) CITY.anom.watchers.children.forEach(f => { f.rotation.y = watcherYaw(f.position.x, f.position.z, P.p.x, P.p.z); });   // slice 21: they turn to follow you
   const z0 = CITY.lastZ; CITY.lastZ = P.p.z;
   if (z0 === null || !passedSign(z0, P.p.z, P.p.x)) return;
   CITY.signPasses++; const m = CITY.anom.sign.material; m.map.dispose(); m.map = signTexture(signText(CITY.signPasses)); m.needsUpdate = true;
