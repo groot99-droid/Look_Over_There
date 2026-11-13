@@ -189,3 +189,15 @@ test("the mall locks from 20:00 to 06:00, and unlocks at the next 06:00", async 
   const u = mallUnlocks(secondsAt(20.5, 2)); assert.equal(dayAt(u), 3); assert.ok(Math.abs(hourAt(u) - 6) < 1e-9);
   const v = mallUnlocks(secondsAt(2, 3)); assert.equal(dayAt(v), 3); assert.ok(Math.abs(hourAt(v) - 6) < 1e-9);
 });
+
+test("the grocery's camera (slice 19): it sweeps to and fro, sees the door about a third of the time, and nextCam finds a time it does or does not", async () => {
+  const {CAMERA, camYaw, camSees, nextCam, GROCERY} = await import("./city.js");
+  const [dx, dz] = GROCERY.door.at;
+  assert.equal(camYaw(0), 0); assert.ok(Math.abs(camYaw(CAMERA.period / 4) - CAMERA.sweep) < 1e-9);
+  let seen = 0; const N = 1200; for (let k = 0; k < N; k++) if (camSees(k * CAMERA.period / N, dx, dz)) seen++;
+  assert.ok(seen / N > 0.25 && seen / N < 0.4, String(seen / N));
+  assert.ok(Math.abs(CAMERA.at[2]) < GROCERY.half[1] && CAMERA.at[1] < GROCERY.h, "inside the store, under the ceiling");
+  const on = nextCam(100, dx, dz, true), off = nextCam(100, dx, dz, false);
+  assert.ok(on >= 100 && camSees(on, dx, dz)); assert.ok(off >= 100 && !camSees(off, dx, dz));
+  assert.ok(!camSees(0, dx + 30, dz), "out of range");
+});

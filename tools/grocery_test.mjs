@@ -5,7 +5,7 @@
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
 import {REGISTRY} from "../shared/registry.js";
-import {secondsAt, APARTMENT, GROCERY, GROCERY_FRONT, bedUse} from "../shared/city.js";
+import {secondsAt, APARTMENT, GROCERY, GROCERY_FRONT, bedUse, nextCam} from "../shared/city.js";
 import {HUNGER, MONEY} from "../shared/needs.js";
 import {shiftPay} from "../shared/pay.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
@@ -78,15 +78,16 @@ try {
   n = await needs();
   check("with $20: you pay $19, the cart is empty and the food is in your pantry", n.money === 1 && n.cart.length === 0 && !n.hasCart && n.pantry.bread === 2 && n.pantry.meal === 2 && n.pantry.soup === 1 && /pay \$19/.test(await toast()), JSON.stringify(n));
 
-  // leaving with unpaid items puts them back
+  // leaving with unpaid items while the camera watches the door (slice 19): fined, and they go back
   await stand(...shelf("apple")); await frames(3); await press();
   check("one more item in your hands", (await needs()).cart.length === 1);
   await stand(...GROCERY.door.at); await frames(3);
   check("by the door you are offered the way out", /leave/.test(await prompt()));
+  { const t0 = await page.evaluate(() => window.__game.CITY.t), p = await page.evaluate(() => window.__game.P.p.toArray()); await page.evaluate(t => { window.__game.CITY.t = t; }, nextCam(t0, p[0], p[2], true)); }   // the camera on the door
   await page.keyboard.press("KeyF"); await settled("street"); await frames(5);
   const outP = await page.evaluate(() => window.__game.P.p.toArray());
   n = await needs();
-  check("you come out at the grocery door; what you did not pay for went back", Math.abs(outP[0] - GROCERY_FRONT.arrive[0]) < 0.01 && Math.abs(outP[2] - GROCERY_FRONT.arrive[2]) < 0.01 && n.cart.length === 0 && n.money === 1 && /put back/.test(await toast()), JSON.stringify({outP, n}));
+  check("you come out at the grocery door; the camera saw you: fined your last $1, and what you did not pay for went back", Math.abs(outP[0] - GROCERY_FRONT.arrive[0]) < 0.01 && Math.abs(outP[2] - GROCERY_FRONT.arrive[2]) < 0.01 && n.cart.length === 0 && n.money === 0 && !n.pantry.apple && /camera saw you/.test(await toast()), JSON.stringify({outP, n}));
 
   // closing time: shown out at 20:00, and the door is shut
   await page.keyboard.press("KeyF"); await settled("main_floor"); await setT(19.98); await frames(3);
