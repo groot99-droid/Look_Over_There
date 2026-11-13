@@ -27,6 +27,19 @@ export const passedSign = (z0, z1, x) => Math.abs(x) < FRONT && (z0 - SIGN.z) * 
 export const PEDESTRIANS = [[-6.6, -12], [6.6, -30], [-6.6, -55], [6.6, -78], [6.6, -104], [-6.6, -112]];
 export const PED_FACE = [0, -1];
 export const pedsOut = hour => storesOpen(hour);
+// slice 18, "people with routines" (docs/WORLD.md): while nobody looks at them, each pedestrian walks a beat up and down its sidewalk, PED_ROUTE metres either side
+// of where it stands, at PED_SPEED. The moment one is in your view it stops where it is. They always face up the street, even mid-step: you never see one turn.
+export const PED_ROUTE = 3, PED_SPEED = 1.2;
+export const newPeds = () => PEDESTRIANS.map((p, i) => ({s: 0, dir: i % 2 ? 1 : -1}));
+export const pedAt = (i, s) => [PEDESTRIANS[i][0], PEDESTRIANS[i][1] + s];
+export function stepPeds(ps, dt, seen) {
+  return ps.map((p, i) => {
+    if (seen[i]) return p;
+    let s = p.s + p.dir * PED_SPEED * dt, dir = p.dir;
+    if (s > PED_ROUTE) { s = 2 * PED_ROUTE - s; dir = -1; } else if (s < -PED_ROUTE) { s = -2 * PED_ROUTE - s; dir = 1; }
+    return {s: Math.max(-PED_ROUTE, Math.min(PED_ROUTE, s)), dir};
+  });
+}
 
 // 3. the window: past the end of the east side (the last building there, efill, ends at z -134), high over the grass (above the roofline, so it shows from most of the street), facing back down the street. Lit only at night.
 export const GHOST_WINDOW = {at: [12, 14, -142], w: 1.6, h: 1.3};

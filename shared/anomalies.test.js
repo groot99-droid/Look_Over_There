@@ -79,3 +79,33 @@ test("a true report of a spotted anomaly pays $5 once; anything else is false an
   assert.equal(fileReport(s, "bus", 1).delta, -1); assert.equal(fileReport(s, "bus", 0).delta, 0);
   assert.ok(!fileReport(s, "ufo", 10).ok);
 });
+
+test("routines (slice 18): each pedestrian's whole beat is on its sidewalk, clear of doors, lamp posts, the bus stop and the trash bins", async () => {
+  const {PED_ROUTE, pedAt} = await import("./anomalies.js");
+  const {BINS} = await import("./trash.js");
+  PEDESTRIANS.forEach((_, i) => {
+    for (let s = -PED_ROUTE; s <= PED_ROUTE + 1e-9; s += 0.25) {
+      const [x, z] = pedAt(i, s);
+      assert.ok(Math.abs(x) > ROAD.x1 && Math.abs(x) < ROAD.x1 + WALK && z > ROAD.z0 && z < ROAD.z1, `on the sidewalk: ${i} ${s}`);
+      for (const d of DOORS) assert.ok(Math.hypot(d.x - x, d.z - z) > d.reach, `pedestrian ${i} at ${s} clear of ${d.id}'s door`);
+      for (const lz of LAMP_ZS) assert.ok(Math.hypot(Math.sign(x) * 5.5 - x, lz - z) > 0.6, `pedestrian ${i} at ${s} clear of the lamp at ${lz}`);
+      assert.ok(Math.hypot(BUS_STREET.at[0] - x, BUS_STREET.at[1] - z) > BUS_STREET.radius, "clear of the bus stop");
+      for (const [bx, bz] of BINS) assert.ok(Math.hypot(bx - x, bz - z) > 0.8, `pedestrian ${i} at ${s} clear of the bin at ${bz}`);
+    }
+  });
+});
+test("routines: unwatched pedestrians walk their beat and turn at its ends; a watched one stops where it is", async () => {
+  const {PED_ROUTE, PED_SPEED, newPeds, stepPeds} = await import("./anomalies.js");
+  let ps = newPeds(); const none = ps.map(() => false), all = ps.map(() => true);
+  assert.ok(ps.every(p => p.s === 0));
+  for (let k = 0; k < 50; k++) ps = stepPeds(ps, 0.5, all);
+  assert.ok(ps.every(p => p.s === 0), "watched: nobody moved");
+  ps = stepPeds(newPeds(), 1, none);
+  assert.ok(ps.every(p => Math.abs(Math.abs(p.s) - PED_SPEED) < 1e-9), "one second unwatched: each walked 1.2 m");
+  let lo = 0, hi = 0;
+  for (let k = 0; k < 400; k++) { ps = stepPeds(ps, 0.1, none); for (const p of ps) { lo = Math.min(lo, p.s); hi = Math.max(hi, p.s); assert.ok(Math.abs(p.s) <= PED_ROUTE + 1e-9); } }
+  assert.ok(lo < -PED_ROUTE + 0.2 && hi > PED_ROUTE - 0.2, "they reach both ends of the beat and come back");
+  const one = ps.map((_, i) => i === 2), before = ps[2].s; ps = stepPeds(ps, 3, one);
+  assert.equal(ps[2].s, before, "the one you watch stays put"); assert.notEqual(ps[0].s, stepPeds(ps, 0, one)[0].s + 1, "others go on");
+  const big = stepPeds(newPeds(), 100, none); assert.ok(big.every(p => Math.abs(p.s) <= PED_ROUTE), "even a long step stays on the beat");
+});
