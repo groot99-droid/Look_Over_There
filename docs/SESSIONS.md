@@ -15,10 +15,13 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 6 | Overworld v0 | Next | 1 and 3, after 2 | **done**, merged (PR #9); solo only, rooms cannot enter it yet |
 | 7 | Physics: decision and a playground prototype | Next | | **done**, merged (PR #8); `docs/PHYSICS.md` accepted by the owner with cannon-es, visual only in rooms |
 | 4 | Modes and parties | Next | 1 | **done**, merged (PR #7); server and lobby, "go to a friend" is server-side only |
-| 8 | Going back in prototype | Then | 3 and 4 | **slices 1 to 3 merged** (PR #10, solo only): the options screen to a chamber, a wave on entry, stairs down to the next chamber (2 of 20 chambers); the loadout locker and the hunting crossbow; the Q/E consumables (flash-vial, land mine, tripwire). Not built: the other nine weapons, safe house and Market, hazards, rooms running the mode. Also PR #16 (`mp_test`: wait for the server to have the player at a door or switch; session 14 took this further) |
-| 9 | City v0 on Hallam Row | Then | 6 | **slices 1 to 4 merged** (PRs #11, #14, #15, solo only): bus, Hallam Row blockout, 15-minute day clock, stores close at night; the apartment and its computer, the night stalker (00:00 to 06:00) and the bed; the Intern's job at 666 Hallam Row through the shared application quiz; hunger, money and the grocery |
+| 8 | Going back in prototype | Then | 3 and 4 | **slices 1 to 3 merged** (PR #10, solo only): the options screen to a chamber, a wave on entry, stairs down (2 of 20 chambers); the loadout locker and the hunting crossbow; the Q/E consumables. Rooms still refuse the mode ("soon"). Next step: session 16 |
+| 9 | City v0 on Hallam Row | Then | 6 | **slices 1 to 21 merged** (PRs #11, #14, #15, #19 to #21, #24 to #27, #29 to #31, #33 to #39; solo only): bus, street, day clock and night rules, apartment and computer, stalker and bed, the five jobs (Intern quiz, trash route, museum, factory, lab) and pay, hunger, rest, grocery and theft with its camera, saving and New Game, the mall, the anomalies and reporting them, pedestrians with routines, the HUD layout, the watchers. Not played by a person yet |
 | 13 | Make `tools/solo_test.mjs` deterministic | Now | | **done**, merged (PR #12): the flaky checks needed room around a random respawn spot; the test now stages a spot that has it. No game change |
 | 14 | Make `tools/mp_test.mjs` deterministic | Now | | **done**, merged (PR #17): the recurring failures were the test racing the server (the server acts on its own, trailing, record of where a player is) and an L1 monster parked where it had no path to the noise. The test now waits for the server's view; 7 of 7 runs passed. Going back in's per-frame work in rooms was not measurable. No game change |
+| 15 | `mp_test`: the L4 finale switch race | Round 4 | 14 | not started |
+| 16 | Going back in in rooms | Round 4 | 4 and 8; waits for the owner's playtest and decisions | not started |
+| 17 | Overworld and City in rooms, and "go to a friend" in the page | Round 4 | 4, 6 and 9; waits for the owner's playtest | not started |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
 | 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
@@ -32,7 +35,10 @@ Now:    2    3    12          touch different files, so they can run side by sid
 Next:   6 (after 2 and 3)    7    4
 Then:   8 (needs 3 and 4)    9 (needs 6)
 Later:  5 (needs 3)    10    11 (needs 4)
+Round 4: 15 now;  16 and 17 after the owner has played the build
 ```
+
+- **Round 4 starts with a playtest by the owner.** Nothing from sessions 6, 8, 9 or 12 has been played by a person yet. Sessions 16 and 17 wait for that, and for the owner's open decisions (the score formula, the name of the Going back in locker, "different truths per area", whether the crossbow starts in your hands).
 
 - **The game does not need the backend to be built.** Session 5 waits until there are players who want saved progress or a ranking across players, or until the server log is not enough data. Until then the Original-complete flag lives in the browser and the best time is per browser.
 - **Session 12 matters most for whether the game is fun.** The Original is untuned (see its brief), and a bigger world does not help if the opening floor is too punishing.
@@ -147,3 +153,20 @@ Every prompt below starts with this line:
 - **Done when.** The targets above are met in 3 playtests with 3 or 4 players, and the PR shows the numbers before and after for each lever.
 - **Decision to carry on with a default.** The targets above. The owner may change them.
 - **Prompt.** Reproduce the problem first: run `node tools/bots.mjs` on B1 and record time to the first fuse and downs per player. Then change the levers one at a time, in the order above, and record the same numbers after each. Keep every change in the numbers, never in new rules. Ask the owner for playtests and write down what they report.
+
+### Session 15: `mp_test`: the L4 finale switch race
+- **Goal.** `tools/mp_test.mjs` still fails now and then in the finale room: "the L4 switch sets off the alarm for both players" fails, and every finale check after it fails with it. The test teleports Xia to the L4 power switch and presses X at once, the same teleport-then-act race session 14 fixed at the L1 switch, the L2 keypad and doors and the L4 far switch, but this one was not covered.
+- **Touches.** `tools/mp_test.mjs` only. A game or server change only if you find a real bug, as its own commit with a test that fails first.
+- **Done when.** The finale switch waits on the server's view of the player (the same `serverSees`/`atServer` approach the test already uses) before the press. Failure output prints what the page and the server each see. `mp_test` passes at least 6 runs in a row, one at a time, and the PR lists every run. No assertion weakened, no timeout widened, no blind sleep.
+
+### Session 16: Going back in in rooms
+- **Goal.** Let a party play Going back in together. The server runs chambers as floors (`floorY`, monsters, waves), starts the wave when the first player steps in, and owns bolts, kills and the loadout. The mode's `status` becomes built and the lobby's disabled button is enabled. Session 8 wrote down what is needed in `docs/ROUND.md`.
+- **Touches.** `server/server.js` and the floor sim, the manifest (`going_back_in` and the `gbi` area), the lobby region and the chamber region of `index.html`, server and browser tests.
+- **Waits for.** The owner's playtest of the solo mode and the open decisions (the locker's name, the crossbow at the start).
+- **Done when.** Two clients in one room play a chamber and take the stairs to the next one, and a server test with 10 clients passes.
+
+### Session 17: Overworld and City in rooms, and "go to a friend"
+- **Goal.** A party can walk out of the Original into the parking lot together and ride the bus to Hallam Row, seeing each other (presence and positions only, as session 11's default). Each player's City clock, needs and jobs stay their own in version 1. The page gets the "go to a friend" button that session 4 left server-side.
+- **Touches.** `server/server.js` (page scenes a room can hold with presence only), the scene region of `index.html`, the lobby region for the friend list, tests.
+- **Waits for.** The owner's playtest of the solo City.
+- **Done when.** Two clients in one room meet in the parking lot and on the street and see each other move, and "go to a friend" moves one to the other's scene in a browser test.
