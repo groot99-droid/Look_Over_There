@@ -18,10 +18,11 @@ const srv = await createServer({port: 0, countdownMs: 400});
 const roomOf = code => srv.rooms.get(code), floorOf = (scene, code = "TEST") => roomOf(code).floors[scene], playerOf = (id, code = "TEST") => roomOf(code).players.get(id);
 const parkMonsters = (floor, except = -1) => floor.monsters.forEach((m, i) => { m.cfg = {...m.cfg, patrol: 0, alert: 0, chase: 0}; if (i !== except) { m.pos.set(900 + i * 5, m.fy, 900); m.state = "patrol"; m.path = []; m.wait = 99; } });       // keep them from interfering
 const guard = code => { for (const p of roomOf(code).players.values()) p.ps.immUntil = 1e15; };                    // the server's immunity: monsters ignore the players (tests that want a hit lift it)
-// The same for one player, by name, from the moment the server has them in the room (before their page has loaded the game). A page that is in the game while the
-// test still waits for another page to load stands among live monsters. A player downed then comes back with only the server's own few seconds of safety (the respawn
-// replaces the guard), and a key pressed while a player is down does nothing: the finale's switch press was lost that way.
-const guardWhenIn = async (code, name, ms = 60000) => { const end = Date.now() + ms; while (Date.now() < end) { const p = roomOf(code) && [...roomOf(code).players.values()].find(q => q.name === name); if (p) { p.ps.immUntil = 1e15; return true; } await sleep(20); } return false; };
+// The same for one player, by name, from the moment the server has them in a started round (the start gives every player a fresh state, so not earlier), which is
+// before their page has loaded the game. A page that is in the game while the test still waits for another page to load stands among live monsters. A player downed
+// then comes back with only the server's own few seconds of safety (the respawn replaces the guard), and a key pressed while a player is down does nothing: the
+// finale's switch press was lost that way.
+const guardWhenIn = async (code, name, ms = 60000) => { const end = Date.now() + ms; while (Date.now() < end) { const r = roomOf(code), p = r && r.phase === "playing" && [...r.players.values()].find(q => q.name === name); if (p) { p.ps.immUntil = 1e15; return true; } await sleep(20); } return false; };
 const hpOf = p => `${p.name}: ${Math.round(p.ps.hp.hp)} HP, ${p.ps.downAt ? "down" : "up"}, ${p.ps.stats.deaths} deaths, ${p.ps.immUntil > 1e14 ? "guarded" : "not guarded"}`;          // the server's word on a player's health
 const serverDown = id => { const p = playerOf(id), now = Date.now() / 1000; p.ps.hp = {hp: 0, hurtAt: now}; p.ps.downAt = now; };          // the server downs a player: their client hears it
 const serverUntil = async (name, fn, ms = 30000, why = () => "") => { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return check(name, true); await sleep(100); } check(name, false, why()); };
