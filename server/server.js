@@ -234,6 +234,21 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
           broadcast(room, {t: "beam", id: me.id, o, e}, me.id, scene);
           break;
         }
+        case "bolt": {                                                // Going back in: a crossbow bolt. The server takes the bolt and decides the kill; the others see it fly
+          const r = room.gbi && room.floors[me.scene]?.bolt(me, m.o, m.d, () => PS.shootBow(me.ps) && (sendMe(me), true));
+          if (!r) break;
+          if (r.m) PS.shotHit(me.ps);
+          broadcast(room, {t: "beam", id: me.id, o: m.o, e: r.e, bolt: 1}, me.id, me.scene);
+          break;
+        }
+        case "gear": if (room.gbi && (m.a === "e" ? PS.gbiSetE(me.ps, m.g) : PS.gbiGear(me.ps, m.a, m.g))) sendMe(me); break;          // Going back in, at the locker: take a piece of gear or leave it there; "e" chooses what the E slot holds
+        case "use": {                                                 // Going back in: Q (slot 0, a flash-vial thrown to x, z) or E (slot 1, a land mine or tripwire where you stand)
+          const f = room.gbi && room.floors[me.scene], slot = m.slot === 0 ? 0 : m.slot === 1 ? 1 : -1, kind = f ? PS.gbiSlot(me.ps, slot) : null;
+          if (!kind || !me.st || (kind === "flash" && !f.flashOk(me, m.x, m.z)) || !PS.gbiUse(me.ps, slot)) break;
+          sendMe(me);
+          if (kind === "flash") f.flash(me, m.x, m.z); else f.setTrap(me, kind);
+          break;
+        }
         case "beacon": {                                              // a thrown AFK Beacon: everyone else on the floor learns where it lies (the host's monsters then swarm it)
           const scene = me.scene, x = Number(m.x), z = Number(m.z); if (!scene || !Number.isFinite(x) || !Number.isFinite(z) || Math.abs(x) > 500 || Math.abs(z) > 500) break;
           room.floors[scene]?.beacon(me, x, z, () => PS.throwBeacon(me.ps, clock()) && (sendMe(me), true));          // one you carry, a second apart                         // the monsters swarm it; the floor's players see where it lies
