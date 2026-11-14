@@ -211,7 +211,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
           }
           break;
         }
-        case "goto": {                                                // jump to a friend: their floor and spot, only for someone in this party who is standing on a floor
+        case "goto": {                                                // jump to a friend: their place and spot, only for someone in this party who is standing on a floor or in a presence scene
           const to = room.players.get(m.to);
           if (!to || to === me || !to.scene || !to.st) break;
           const may = REGISTRY.canReach(to.scene, me.flags, room.mode);          // a friend in a page scene (session 17): only if the links a room can follow let you in there too
