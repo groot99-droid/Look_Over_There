@@ -1843,6 +1843,7 @@ function anomalyTick(dt = 1 / 60) {
 }
 // the sky, lights, signs and clock for the time of day; `force` also puts the default look back when you are not in the City
 function cityLook(force) {
+  if (force && net.on) hud();                                                                   // on every arrival: the room's HUD line says whether you are in the City
   const clock = $("clock");
   if (!inCity()) { if (force) { scene.background.set(0x0b0b0c); HEMI.intensity = 1.25; HEMI.color.set(0xfff2d0); clock.style.display = "none"; $("needs").style.display = "none"; document.body.classList.remove("cityhud"); } return; }
   const st = cityState(), sky = skyAt(st.hour);
@@ -2497,7 +2498,7 @@ function removePeer(id) {
   scene.remove(p.obj); disposeTree(p.obj); net.peers.delete(id); hud();
 }
 function hud() {
-  $("hud").textContent = net.on ? `ROOM ${net.room} · ${net.peers.size + 1} in the building · ${[...net.peers.values()].map(p => p.name).join(", ")} · P: party` : "";
+  $("hud").textContent = net.on ? `ROOM ${net.room} · ${net.peers.size + 1} in the building · ${[...net.peers.values()].map(p => p.name).join(", ")} · P: party${inCity() ? " · the City: you only see each other; clocks, money and jobs are your own" : ""}` : "";          // the City's line stays up while you are there: a toast alone is gone when the next one comes
 }
 function onNet(m) {
   switch (m.t) {
