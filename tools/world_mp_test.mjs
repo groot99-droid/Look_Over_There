@@ -120,7 +120,8 @@ try {
   check("the bus stop offers the ride to a player in a room", /take the bus to Hallam Row/.test(await promptOf(a)), await promptOf(a));
   await a.evaluate(() => { window.__game.tryCity(); }); await settled(a, "street");
   await serverUntil("Ann rode the bus: the server has her on the street", () => serverHas(idA, "street", bus.to.arrive[0], bus.to.arrive[2]), () => xzOf(playerOf(idA)));
-  check("on arrival the page says what is shared and what is not", /nothing else is shared/.test(await toastOf(a)), await toastOf(a));
+  const hudOf = pg => pg.evaluate(() => document.getElementById("hud").textContent);
+  check("in the City the HUD says, for as long as you are there, that only presence is shared", /you only see each other; clocks, money and jobs are your own/.test(await hudOf(a)) && !/your own/.test(await hudOf(b)), `${await hudOf(a)} | ${await hudOf(b)}`);
   await until("Bob, still in the lot, sees that Ann went to the street and no longer draws her", b, id => { const p = window.__game.net.peers.get(id); return p && p.scene === "street" && !p.obj.visible; }, idA);
   await stand(b, idB, "parking_lot", BUS_LOT.at[0], BUS_LOT.at[1], "Bob at the lot's bus stop");
   await b.evaluate(() => { window.__game.tryCity(); }); await settled(b, "street");
@@ -154,6 +155,7 @@ try {
   await stand(a, idA, "street", BUS_STREET.at[0] - 1.5, BUS_STREET.at[1], "Ann at the street's bus stop");
   await a.evaluate(() => { window.__game.tryCity(); }); await settled(a, "parking_lot");
   await serverUntil("Ann rode back to the lot", () => serverHas(idA, "parking_lot", busBack.to.arrive[0], busBack.to.arrive[2]), () => xzOf(playerOf(idA)));
+  check("back in the lot the City's line is gone from the HUD", !/your own/.test(await hudOf(a)), await hudOf(a));
   await a.keyboard.press("KeyP");
   const rowsOf = pg => pg.evaluate(() => ({shown: getComputedStyle(document.getElementById("party")).display === "flex", rows: [...document.querySelectorAll("#pt-rows .row")].map(r => ({text: r.textContent, go: !!r.querySelector("button")}))}));
   const la = await rowsOf(a);
