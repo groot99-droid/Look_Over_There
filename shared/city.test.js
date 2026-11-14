@@ -37,7 +37,7 @@ test("world/apartment.json is what shared/city.js makes", () => {
 });
 test("the apartment links match the layout, and the clock runs in both City scenes", () => {
   const into = REGISTRY.linkFrom("street", "tower"), out = REGISTRY.linkFrom("apartment", "front_door");
-  assert.ok(into && into.status === "built" && into.soloOnly && out && out.status === "built" && out.soloOnly);
+  assert.ok(into && into.status === "built" && !into.soloOnly && out && out.status === "built" && !out.soloOnly, "a room can go home too (session 17)");
   assert.deepEqual(into.to.arrive, APARTMENT.arrive); assert.deepEqual(into.to.face, APARTMENT.face);
   assert.deepEqual(out.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(out.to.face, TOWER_FRONT.face);
   assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor", "entrance", "galleries", "factory_floor", "laboratory"]);

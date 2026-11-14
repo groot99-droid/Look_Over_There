@@ -69,7 +69,8 @@ export const FARWAY = {
     {
       // v0 (session 9): Hallam Row as a blockout street, reached by the bus. Its layout and the day clock are in shared/city.js; world/street.json is made from it by tools/make_street.mjs.
       id: "city", name: "City", status: "built", tone: "liminal",
-      scenes: [{id: "street", floorY: 0, files: ["world/street.json"]}, {id: "apartment", floorY: 0, files: ["world/apartment.json"]}, {id: "bus_stop"}],
+      // presence (session 17): a room's players see each other on the street and in the apartment. Nothing else is shared: each player's clock, needs, money, jobs and night are their own.
+      scenes: [{id: "street", floorY: 0, files: ["world/street.json"], presence: true}, {id: "apartment", floorY: 0, files: ["world/apartment.json"], presence: true}, {id: "bus_stop"}],
     },
     stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
     {
@@ -127,15 +128,16 @@ export const FARWAY = {
      from: {area: "lot", scene: "L4", door: "front_doors"}, to: {area: "overworld", scene: "parking_lot", arrive: [-8.0, 9.6, 43.6], face: [0.0, -1.0]},
      note: "You arrive at the table and chairs in the parking lot, facing the store."},
     plan("overworld.store_doors>lot", {area: "overworld", scene: "parking_lot", door: "store_doors"}, {area: "lot"}, "doors", {requires: ["original_complete"], note: "Options screen: Original or Going back in."}),
-    // the bus: a stop in the parking lot (a shelter beside the lot's own bus stop post) takes you to Hallam Row, and the stop on the street brings you back. Solo only (the server runs five floors).
-    {id: "overworld.bus>city", status: "built", connector: "bus", soloOnly: true, from: {area: "overworld", scene: "parking_lot", door: "bus_stop"}, to: {area: "city", scene: "street", arrive: [3.6, 0.0, 4.0], face: [0.0, -1.0]},
+    // the bus: a stop in the parking lot (a shelter beside the lot's own bus stop post) takes you to Hallam Row, and the stop on the street brings you back. A room can ride it (session 17): both ends are presence scenes.
+    {id: "overworld.bus>city", status: "built", connector: "bus", from: {area: "overworld", scene: "parking_lot", door: "bus_stop"}, to: {area: "city", scene: "street", arrive: [3.6, 0.0, 4.0], face: [0.0, -1.0]},
      note: "Just a ride. You arrive on the east sidewalk of Hallam Row, facing up the street."},
-    {id: "city.bus>overworld", status: "built", connector: "bus", soloOnly: true, from: {area: "city", scene: "street", door: "bus_stop"}, to: {area: "overworld", scene: "parking_lot", arrive: [-41.0, 9.6, 43.0], face: [0.0, -1.0]},
+    {id: "city.bus>overworld", status: "built", connector: "bus", from: {area: "city", scene: "street", door: "bus_stop"}, to: {area: "overworld", scene: "parking_lot", arrive: [-41.0, 9.6, 43.0], face: [0.0, -1.0]},
      note: "The ride back. The City's clock pauses while you are away."},
-    // slice 2: the apartment tower's door on the street opens straight into your apartment for now (the tower's lobby and floors belong to the planned hotel area), and its door leads back
-    {id: "city.tower>apartment", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "tower"}, to: {area: "city", scene: "apartment", arrive: [1.5, 0.0, 1.4], face: [0.0, -1.0]},
+    // slice 2: the apartment tower's door on the street opens straight into your apartment for now (the tower's lobby and floors belong to the planned hotel area), and its door leads back.
+    // A room can use both (session 17): at night the street is not safe, so a player on the street must be able to get home. Every other door of the street stays solo only.
+    {id: "city.tower>apartment", status: "built", connector: "doors", from: {area: "city", scene: "street", door: "tower"}, to: {area: "city", scene: "apartment", arrive: [1.5, 0.0, 1.4], face: [0.0, -1.0]},
      note: "The tower's lobby is not built yet: the door opens into your apartment."},
-    {id: "city.apartment>street", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "apartment", door: "front_door"}, to: {area: "city", scene: "street", arrive: [-6.2, 0.0, -19.0], face: [1.0, 0.0]}},
+    {id: "city.apartment>street", status: "built", connector: "doors", from: {area: "city", scene: "apartment", door: "front_door"}, to: {area: "city", scene: "street", arrive: [-6.2, 0.0, -19.0], face: [1.0, 0.0]}},
     // slice 3: once the Intern's application is accepted (the quiz in shared/application.js; the flag is kept in the browser), 666 Hallam Row's door starts your shift: the Intern game, solo only.
     // returnTo carries where you stand when you come back out. Open store hours still apply (the street's doors shut at 20:00).
     {id: "city.666>intern", status: "built", connector: "doors", soloOnly: true, requires: ["job_intern"], from: {area: "city", scene: "street", door: "w666"}, to: {area: "intern"},
