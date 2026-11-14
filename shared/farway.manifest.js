@@ -51,7 +51,8 @@ export const FARWAY = {
       // v0 is one scene: the parking lot with the table and chairs as the spawn, the store doors, and one sky mode. The other scenes are designed, not built (they have no files).
       id: "overworld", name: "Overworld", status: "built", tone: "dreamcore",
       scenes: [
-        {id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/parking_lot.json"]},
+        // presence (session 17): a room's players can be in the lot together. The server relays who is there and where; it runs nothing.
+        {id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/parking_lot.json"], presence: true},
         ...["table_and_chairs", "playground", "tree_house", "bus_station", "road", "endless_hills"].map(id => ({id})),
       ],
     },
@@ -120,9 +121,9 @@ export const FARWAY = {
      from: {area: "gbi", scene: "gbi_L4_4", door: "DoorLeaf_Stair_L3_L4_down"}, to: {area: "gbi", scene: "gbi_L3_1", door: "DoorLeaf_Stair_L3_L4_up", arrive: [16.0, 6.4, 8.0], face: [0.0, 1.0]}},
 
     // ---- planned: from the world bible. None of these reach the game until their area is built.
-    // walking out of the store after the Original: the results screen offers it once the flag is held. Not a door in world/L4.json (the glass doors are open once the power is on),
-    // and rooms stay on the five floors, so it is solo only for now.
-    {id: "lot.L4.front_doors>overworld", status: "built", connector: "doors", soloOnly: true, requires: ["original_complete"],
+    // walking out of the store after the Original: the results screen offers it once the flag is held. Not a door in world/L4.json (the glass doors are open once the power is on).
+    // A room can follow it too (session 17): the lot is a presence scene, and each player still needs the flag.
+    {id: "lot.L4.front_doors>overworld", status: "built", connector: "doors", requires: ["original_complete"],
      from: {area: "lot", scene: "L4", door: "front_doors"}, to: {area: "overworld", scene: "parking_lot", arrive: [-8.0, 9.6, 43.6], face: [0.0, -1.0]},
      note: "You arrive at the table and chairs in the parking lot, facing the store."},
     plan("overworld.store_doors>lot", {area: "overworld", scene: "parking_lot", door: "store_doors"}, {area: "lot"}, "doors", {requires: ["original_complete"], note: "Options screen: Original or Going back in."}),

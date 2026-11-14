@@ -399,7 +399,7 @@ function crossPortals() {                                   // stepping into an 
 
 async function loadScene(id, arrival) {
   if (!net.on && S.id && GATED.includes(S.id) && FZ.st[S.id]) { const n = fuseReduce(FZ.st[S.id], net.id, {a: "release"}); if (n) FZ.st[S.id] = n; }     // solo: a fuse you carry off the floor goes back (a room's server does this)
-  loading = true; pendingLink = null; devOn.v = false; net.snap = null; closeKeypad();
+  loading = true; pendingLink = null; devOn.v = false; net.snap = null; net.shut = null; closeKeypad();
   const fade = $("fade"); fade.style.opacity = 1; await new Promise(r => setTimeout(r, 380));
   if (S.root) { scene.remove(S.root); disposeTree(S.root); }
   clearPortals();
@@ -1553,8 +1553,8 @@ function showResults(rows) {
   welcome.hidden = !first; welcome.textContent = first ? "Welcome to Farway. You made it out." : "";
   const b = me ? bestTime(me.ms) : null;
   $("r-best").textContent = b ? (b.isNew ? `NEW RECORD ${fmtTime(b.best)}` : `BEST ${fmtTime(b.best)}`) : "";
-  const walk = $("r-walk"), out = REGISTRY.linkFrom("L4", "front_doors");          // the way on: only alone for now, and only once the flag is held (it was just set above if this was the first finish)
-  walk.hidden = !(!net.on && me && out && requirementsMet(out, heldFlags()).ok); walk.onclick = () => walkOut(out);
+  const walk = $("r-walk"), out = REGISTRY.linkFrom("L4", "front_doors");          // the way on: once the flag is held (it was just set above if this was the first finish). In a room too, since the
+  walk.hidden = !((me || net.on) && out && !roomShut(out) && requirementsMet(out, heldFlags()).ok); walk.onclick = () => walkOut(out);          // manifest's link is not soloOnly: the party meets in the lot
   $("r-again").onclick = () => location.reload();
   $("results").style.display = "flex";
 }
@@ -1669,7 +1669,9 @@ function gbDeath() {
 // ---------------------------------------------------------------- the Overworld, v0: the parking lot after the Original (session 6)
 // One scene, `parking_lot` (world/parking_lot.json, built by tools/make_parking_lot.mjs, over the store and lot models). The results screen offers the walk out once
 // `original_complete` is held; you arrive at the table and chairs facing the store, and walking up to the glass doors opens the options screen (Original, or Going back
-// in, which is not built yet). Alone only: the server runs five floors and a room cannot enter this scene, so the manifest link says soloOnly.
+// in). A room can walk out too (session 17): the lot is a `presence` scene of the manifest, so the server relays who is in it and where, and everyone there sees
+// each other. It runs nothing: the options screen is each player's own, and Going back in stays alone until rooms can run it.
+const roomShut = link => net.on && !!link.soloOnly;                                       // in a room, a link the manifest marks soloOnly does not open
 const OW = {open: false, armed: true};
 const OW_SCENE = "parking_lot", OW_TABLE = [-8, 41];                                      // the table's centre; the spawn (the manifest link's `arrive`) is 2.6 m toward the store
 const SKY = {parking_lot: 3.5};                                                          // one sky mode so far: clear and bright (the exterior model's own sky, lit up). Every other scene keeps the model's dusk.
@@ -1693,6 +1695,7 @@ function overworldProps(root) {
 function openOptions() {
   OW.open = true; document.exitPointerLock?.(); $("options").style.display = "flex";
   $("o-original").onclick = () => location.reload();
+  $("o-back").disabled = net.on; $("o-back").title = net.on ? "Rooms cannot run Going back in yet. Play it solo." : "";
   $("o-back").onclick = startGoingBackIn;                                         // a fresh round starts from the start screen, as Play again does
   $("o-close").onclick = closeOptions;
 }
@@ -1706,6 +1709,7 @@ function overworldTick() {
 }
 // the results screen's "Walk out": into the parking lot, with the HUD back (the results screen had hidden it)
 async function walkOut(link) {
+  net.sendFlags();                                                                          // a room's server lets you into the lot only with the flag
   $("results").style.display = "none"; FIN.results = null; FIN.out = false; OW.open = false; OW.armed = true;
   await loadScene(link.to.scene, {pos: link.to.arrive, face: link.to.face});
 }
@@ -1931,7 +1935,7 @@ const nearXZ = (x, z, r) => Math.hypot(P.p.x - x, P.p.z - z) < r;
 const nearCityDoor = () => S.id === CITY_SCENE ? DOORS.find(d => nearXZ(d.x, d.z, d.reach)) : null;
 function cityPrompt() {
   if (PC.open) return "";
-  if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return "Press F to take the bus to Hallam Row";
+  if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return roomShut(REGISTRY.linkFrom(OW_SCENE, "bus_stop")) ? "The bus does not take a room yet" : "Press F to take the bus to Hallam Row";
   if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
   if (S.id === LAB_SCENE) {
     if (nearXZ(...LAB.door.at, LAB.door.reach)) return CITY.lb.active ? "Press F to leave your post early (no pay)" : "Press F to leave";
@@ -1978,8 +1982,8 @@ function cityPrompt() {
 }
 // F at a bus stop rides the bus (a fade through loadScene); F at a door says what is behind it. Nothing is built inside yet.
 function tryCity() {
-  if (loading || net.on) return false;
-  const ride = (scene, door) => { const l = REGISTRY.linkFrom(scene, door); loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face}); return true; };
+  if (loading) return false;
+  const ride = (scene, door) => { const l = REGISTRY.linkFrom(scene, door); if (roomShut(l)) { toast("That does not open in a room yet"); return true; } loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face}); return true; };
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return ride(OW_SCENE, "bus_stop");
   if (S.id === APT_SCENE) {
     if (nearXZ(...APARTMENT.door.at, APARTMENT.door.reach)) return ride(APT_SCENE, "front_door");
@@ -2411,7 +2415,8 @@ const DOWNED_S = 20, REVIVE_S = 4;
 const CHARS = [{id: "plaid", name: "Plaid"}, {id: "suit", name: "Suit"}, {id: "shorts", name: "Shorts"}, {id: "red", name: "Red Dress"}, {id: "white", name: "White Suit"}];
 const net = {on: false, ws: null, id: 0, room: "", phase: "lobby", peers: new Map(), snap: null, t: 0, mt: 0, ticks: 0, ready: null, started: null, startRes: null, lobby: null, alert: null,
   host() { return !this.on; },                                // alone, this page runs the monsters; in a room the server does, and everyone follows it
-  send(m) { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(m)); }};
+  send(m) { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(m)); },
+  sendFlags() { this.send({t: "flags", flags: heldFlags()}); }};          // the flags this browser holds: the server uses them to decide which presence scenes you may be in
 let toastT = 0;
 function toast(msg, ms = 3200) { const el = $("toast"); el.textContent = msg; el.style.opacity = 1; clearTimeout(toastT); toastT = setTimeout(() => { el.style.opacity = 0; }, ms); }
 const r2 = v => Math.round(v * 100) / 100;
@@ -2439,7 +2444,7 @@ function addPeer(info) {
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xffc040, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true}));      // lit while they carry a fuse
   halo.scale.set(1.6, 1.6, 1); halo.position.y = 1.0; halo.visible = false; obj.add(halo);
   obj.visible = false; scene.add(obj);
-  const peer = {halo, id: info.id, name: info.name, color: info.color, char: info.char, scene: null, x: 0, y: 0, z: 0, tx: 0, ty: 0, tz: 0, yaw: 0, tyaw: 0, crouch: false, moving: false, dead: false, imm: false, fresh: true,
+  const peer = {halo, id: info.id, name: info.name, color: info.color, char: info.char, scene: info.scene ?? null, x: 0, y: 0, z: 0, tx: 0, ty: 0, tz: 0, yaw: 0, tyaw: 0, crouch: false, moving: false, dead: false, imm: false, fresh: true,
     obj, pivot, stand, mixer: null, acts: null, playing: null, lie: [.6, .25], cv, tex, hp: MAX_HP};
   peerTag(peer); net.peers.set(info.id, peer);
   loadModel("gun").then(g => { if (!g || !net.peers.has(info.id)) return; const m = SkeletonUtils.clone(g.scene); m.scale.setScalar(0.12); m.rotation.y = -Math.PI / 2; m.traverse(o => { if (o.isMesh) o.frustumCulled = false; });         // the ray gun in a teammate's hand
@@ -2484,6 +2489,7 @@ function onNet(m) {
     case "lobby": net.lobby = m; renderWait(); break;
     case "start": net.phase = "playing"; clearInterval(net.cd); net.startRes?.(); break;
     case "p": { const p = net.peers.get(m.id); if (p) { p.scene = m.scene; p.fresh = true; } break; }       // someone changed floor: you only learn which
+    case "noentry": net.shut = m.scene; toast(`The server will not let you in there yet${m.missing && m.missing.includes("original_complete") ? ": finish the Original first" : ""}. The others cannot see you.`, 5000); break;
     case "s": {
       const p = net.peers.get(m.id); if (!p) break;
       const moved = p.scene !== m.scene, wasDead = p.dead;
@@ -2546,7 +2552,7 @@ function drawAlert() {
 function updatePeers(dt) {
   const k = Math.min(1, dt * 14);
   for (const p of net.peers.values()) {
-    const here = p.scene === S.id && !loading;
+    const here = p.scene === S.id && !loading && net.shut !== S.id;          // (a presence scene the server refused you: you are not there for the others, so they are not drawn for you)
     p.obj.visible = here; if (!here) continue;
     p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k; p.z += (p.tz - p.z) * k;
     let da = p.tyaw - p.yaw; da = Math.atan2(Math.sin(da), Math.cos(da)); p.yaw += da * k;
@@ -2581,7 +2587,7 @@ function connect(name, room, char, mode = "original") {
     const timer = setTimeout(() => fail("Could not reach the server. Play solo, or run server/server.js and open the game from it."), 5000);
     net.ready = () => { clearTimeout(timer); resolve(); };
     net.started = new Promise(r => { net.startRes = r; });
-    ws.onopen = () => ws.send(JSON.stringify({t: "join", room, name, char, mode}));
+    ws.onopen = () => ws.send(JSON.stringify({t: "join", room, name, char, mode, flags: heldFlags()}));
     ws.onmessage = ev => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === "full") fail(`That room is full (${m.max || 10} players).`); else if (m.t === "refused") fail(m.reason === "soon" ? "That mode is coming soon." : "That mode does not exist."); else onNet(m); };
     ws.onerror = () => { if (!net.on) fail("Could not reach the server. Play solo, or run server/server.js and open the game from it."); };
     ws.onclose = () => {

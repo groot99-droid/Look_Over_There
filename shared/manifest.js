@@ -3,9 +3,11 @@
 //
 // A manifest is {manifestVersion: 1, flags, connectors, modes, areas, links}.
 //   area  {id, name, status: "built" | "planned" | "reserved", soloOnly?, scenes?: [scene], ...}
-//   scene {id, floorY?, files?, multiplayer?, puzzle?: "fuses" | "switches" | "keypad", powerSource?, loot?: {lockers, packs}, chamber?: {floor, index, wave: {monsters, kind}, stairsDown?, next?}}
+//   scene {id, floorY?, files?, multiplayer?, presence?, puzzle?: "fuses" | "switches" | "keypad", powerSource?, loot?: {lockers, packs}, chamber?: {floor, index, wave: {monsters, kind}, stairsDown?, next?}}
 //   link  {id, from: {area, scene?, door?}, to: {area, scene?, room?, door?, arrive?, face?}, connector, status, requires?: [flag], soloOnly?, returnTo?, note?}
 //   mode  {status, area, floors, players: {min, max}, finish?: {scene, ...}, chambersPerFloor?, waves?, startChamber?}
+// `multiplayer` is a floor the server runs (monsters, puzzles, health). `presence: true` is a page scene a room's players can be in together: the server only relays who is
+// there and where, and runs no rules. A built link without `soloOnly` is one a room can follow, so both its ends must be one or the other.
 // A scene id is unique across the whole manifest (the server's messages name a scene by its bare id).
 // An addon is the same shape ({areas, links, flags?, connectors?, modes?}) and is added with mergeAddon.
 
@@ -26,7 +28,7 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
   if (doc.manifestVersion !== 1) err(`manifestVersion must be 1 (got ${JSON.stringify(doc.manifestVersion)})`);
   if (!Array.isArray(doc.areas)) { err("areas must be an array"); return {errors, warnings}; }
   const flags = new Set(Array.isArray(doc.flags) ? doc.flags : []), connectors = new Set(Array.isArray(doc.connectors) ? doc.connectors : []);
-  const areas = new Map(), sceneArea = new Map(), scenesOf = new Map(), chambers = [];
+  const areas = new Map(), sceneArea = new Map(), scenesOf = new Map(), chambers = [], roomScenes = new Set();
 
   for (const a of doc.areas) {
     if (!isObj(a) || !isId(a.id)) { err(`an area needs an id of letters, digits and underscores (got ${JSON.stringify(a && a.id)})`); continue; }
@@ -50,10 +52,15 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
         else if (c.stairsDown !== undefined && typeof c.stairsDown !== "string") err(`${at}: chamber.stairsDown must be a door name`);
         chambers.push(s);
       }
+      if (s.presence !== undefined && s.presence !== true) err(`${at}: presence must be true (or left out)`);
+      if (s.presence && s.multiplayer) err(`${at}: a scene is multiplayer (the server runs it) or presence, not both`);
       if (a.status === "built") {
         if (s.files !== undefined && s.files.length === 0) err(`${at}: a built scene needs at least one file`);
         if (s.multiplayer && typeof s.floorY !== "number") err(`${at}: a multiplayer scene needs a floorY`);
-      } else if (s.multiplayer) err(`${at}: only a built scene can be multiplayer`);
+        if (s.presence && typeof s.floorY !== "number") err(`${at}: a presence scene needs a floorY`);
+        if (s.presence && s.files === undefined) err(`${at}: a presence scene needs files (it is a scene the page loads)`);
+        if (s.multiplayer || s.presence === true) roomScenes.add(s.id);
+      } else if (s.multiplayer || s.presence) err(`${at}: only a built scene can be multiplayer or presence`);
     }
   }
 
@@ -71,6 +78,7 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
       if (!isObj(e) || !areas.has(e.area)) { err(`${at}: ${end}.area ${JSON.stringify(e && e.area)} is not an area`); continue; }
       if (e.scene !== undefined && scenesOf.has(e.area) && !scenesOf.get(e.area).has(e.scene)) err(`${at}: ${end}.scene ${e.scene} is not a scene of ${e.area}`);
       if (l.status === "built" && areas.get(e.area).status !== "built") err(`${at}: a built link cannot touch the ${areas.get(e.area).status} area ${e.area}`);
+      if (l.status === "built" && !l.soloOnly && !roomScenes.has(e.scene)) err(`${at}: a room could follow this link into ${e.scene || e.area}, which is neither multiplayer nor presence: mark the link soloOnly`);
     }
     if (l.returnTo !== undefined && !(isObj(l.returnTo) && areas.has(l.returnTo.area) && (l.returnTo.scene === undefined || sceneArea.get(l.returnTo.scene) === l.returnTo.area))) err(`${at}: returnTo is not a place`);
   }
@@ -139,9 +147,10 @@ export function buildRegistry(doc) {
   const {errors} = checkManifest(doc);
   if (errors.length) throw new Error("invalid world manifest:\n  " + errors.join("\n  "));
   const builtScenes = doc.areas.filter(a => a.status === "built").flatMap(a => (a.scenes || []).map(s => ({...s, area: a.id})));
-  const floors = {}, pageScenes = {}, loot = {};
+  const floors = {}, pageScenes = {}, loot = {}, presence = {};
   for (const s of builtScenes) {
     if (s.multiplayer) floors[s.id] = s.floorY;
+    if (s.presence) presence[s.id] = s.floorY;
     if (s.files) pageScenes[s.id] = {glbs: s.files.filter(f => f.endsWith(".glb")), floor: s.floorY};
     if (s.loot) loot[s.id] = {lockers: s.loot.lockers, packs: s.loot.packs};
   }
@@ -152,7 +161,23 @@ export function buildRegistry(doc) {
     const no = modeGbi.floors.indexOf(s.chamber.floor) * (modeGbi.chambersPerFloor || 4) + s.chamber.index;
     return {id, floorY: s.floorY, ...s.chamber, wave: {...s.chamber.wave, no}};
   };
+  // Which scenes a player in a room of `mode` may be in, given the flags they hold: the mode's floors, and whatever the built links a room can follow (no soloOnly) lead
+  // to from there, each link's `requires` met. {ok, missing}: `missing` names the flags of the shut links on the way, for a message. The page's own doors check each
+  // link as you use it; this is for the server (may this player be in that scene?) and for "go to a friend", which skips the doors.
+  const canReach = (scene, flags, mode = "original") => {
+    const m = (doc.modes || {})[mode], seen = new Set(m && Array.isArray(m.floors) ? m.floors : []), todo = [...seen], missing = new Set();
+    while (todo.length) {
+      const from = todo.pop();
+      for (const l of links) {
+        if (l.status !== "built" || l.soloOnly || l.from.scene !== from || !l.to.scene || seen.has(l.to.scene)) continue;
+        const r = requirementsMet(l, flags);
+        if (r.ok) { seen.add(l.to.scene); todo.push(l.to.scene); } else r.missing.forEach(f => missing.add(f));
+      }
+    }
+    return seen.has(scene) ? {ok: true, missing: []} : {ok: false, missing: [...missing]};
+  };
   return deepFreeze({
+    presence, canReach,
     chamber, chambers: [...chamberScenes.keys()],
     manifest: structuredClone(doc),
     floors, pageScenes, loot,
