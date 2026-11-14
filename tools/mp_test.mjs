@@ -345,12 +345,12 @@ try {
   const toL4 = pg => pg.evaluate(() => window.__game.loadScene("L4")).then(() => pg.waitForFunction(() => window.__game.S.id === "L4" && !window.__game.loading, null, {timeout: 170000}));
   await toL4(x); await toL4(y);
   await serverUntil("the server runs L4 for the finale room", () => !!floorOf("L4", "FIN") && roomOf("FIN").players.size === 2); parkMonsters(floorOf("L4", "FIN"));
-  // the press needs Xia up, on L4 for the server (it takes the power only from a floor that has a switch) and in reach of the switch on her own page
+  // The press needs Xia up, on L4 for the server (it takes the power by the floor a player is on, not by where they stand) and in reach of the switch on her own page
+  // (which reads her position as set, with no frame in between). So this does not wait for a frame or for the server to hear the new position: with two pages
+  // drawing L4 in software a frame can take most of a minute, and a wait the press does not need would only add a way to time out.
   const fin = () => [...roomOf("FIN").players.values()], xia = fin().find(p => p.name === "Xia"), finView = () => `server has Xia on ${xia.scene}; ${fin().map(hpOf).join("; ")}`;
-  const swF = await x.evaluate(() => { const g = window.__game; g.P.imm = 99; return g.S.pw.spot; });
-  await stand(x, swF[0] + 1.2, swF[1], "Xia at the L4 switch", "FIN");
-  { const ok = xia.scene === "L4" && fin().every(p => !p.ps.downAt && p.ps.hp.hp >= 100 && p.ps.stats.deaths === 0 && p.ps.immUntil > 1e14); check("the server has Xia on L4, and nobody in the finale room was hurt on the way", ok, ok ? "" : finView()); }
-  const atPress = await x.evaluate(() => { const g = window.__game; return {near: g.nearPower(), dead: g.dead, loading: g.loading, scene: g.S.id}; });
+  await serverUntil("the server has Xia on L4, and nobody in the finale room was hurt on the way", () => xia.scene === "L4" && fin().every(p => !p.ps.downAt && p.ps.hp.hp >= 100 && p.ps.stats.deaths === 0 && p.ps.immUntil > 1e14), 30000, finView);
+  const atPress = await x.evaluate(() => { const g = window.__game, sp = g.S.pw.spot; g.P.imm = 99; g.P.p.set(sp[0] + 1.2, g.S.floor + 0.02, sp[1]); g.P.v.set(0, 0, 0); return {near: g.nearPower(), dead: g.dead, loading: g.loading, scene: g.S.id}; });
   check("Xia's page has her in reach of the L4 switch", atPress.near, atPress.near ? "" : JSON.stringify(atPress));
   await x.keyboard.press("KeyX");
   const alarmView = () => `at the press Xia's page had ${JSON.stringify(atPress)}; server power ${JSON.stringify(roomOf("FIN").power)}, alarm ${roomOf("FIN").alarmAt ? "on" : "off"}; ${finView()}; ${xzOf(xia)}`;
