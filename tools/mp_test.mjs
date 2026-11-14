@@ -236,7 +236,7 @@ try {
   await until("and for the host", host, () => window.__game.KP.st.L2.solved);
 
   // ---- power: the host throws the L3 box (the quick way); the guest, who comes to L4 afterwards, finds the doors open
-  const onFloor = id => Promise.all([a, b].map(pg => pg.evaluate(i => window.__game.loadScene(i), id).then(() => pg.waitForFunction(i => { const g = window.__game; return g.S.id === i && !g.loading && [...g.net.peers.values()].every(q => q.scene === i); }, id, {timeout: 60000}))));
+  const onFloor = id => Promise.all([a, b].map(pg => pg.evaluate(i => window.__game.loadScene(i), id).then(() => pg.waitForFunction(i => { const g = window.__game; return g.S.id === i && !g.loading && [...g.net.peers.values()].every(q => q.scene === i); }, id, {timeout: 170000})))).catch(e => { check(`both pages arrive on ${id} and know the other is there`, false, [...roomOf("TEST").players.values()].map(xzOf).join("; ")); throw e; });          // 170 s like the finale's arrival on L4: two pages drawing L4 in software took 50 to 89 s to arrive there, measured in the finale
   await onFloor("L3");
   A = await info(a); B = await info(b);
   check("the power starts off for both players", await a.evaluate(() => !window.__game.POWER.on) && await b.evaluate(() => !window.__game.POWER.on));
