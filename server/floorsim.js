@@ -7,20 +7,36 @@ import {HIT_DMG} from "../shared/health.js";
 import {LURE_S, reverse as reverseLure} from "../shared/beacon.js";
 import {STUN_S} from "../shared/cloak.js";
 import {ALARM_MS} from "../shared/finish.js";
+import {wavePlan, startWave} from "../shared/gbi.js";
 
 export const TICK_S = 0.05, SNAP_EVERY = 2, DOORS_EVERY = 10, ALERT_R = 40, THROW_SPEED = 4;
 const nums = (v, n) => Array.isArray(v) && v.length === n && v.every(x => typeof x === "number" && Number.isFinite(x)) ? v : null;
 
 export class Floor {
   // room: the server's room object ({players: Map, power, alarmAt}); io: {to(player, msg), toFloor(msg, exceptId)}; docs: {doc(scene) -> world json}; monCfg: world/monsters.json
-  constructor({scene, room, io, doc, monCfg, rnd = Math.random, onHit = () => {}, flags = p => ({dead: !!p.st.dead, imm: !!p.st.imm, cloak: !!p.st.cloak})}) {
+  // chamber: REGISTRY.chamber(scene) for a Going back in chamber (null for an Original floor). A chamber has no monsters until its wave starts, and is kept while the room lives.
+  constructor({scene, room, io, doc, monCfg, chamber = null, rnd = Math.random, onHit = () => {}, flags = p => ({dead: !!p.st.dead, imm: !!p.st.imm, cloak: !!p.st.cloak})}) {
     this.scene = scene; this.room = room; this.io = io; this.t = 0; this.rnd = rnd; this.onHit = onHit; this.flags = flags;
-    this.W = worldFromDoc(doc, scene, {powerOn: room.power.on});
+    this.chamber = chamber; this.keep = !!chamber; this.wave = null; this.monCfg = monCfg;
+    this.W = worldFromDoc(doc, scene, chamber ? {floor: chamber.floorY, art: chamber.floor} : {powerOn: room.power.on});
     this.env = {W: this.W, now: () => this.t, rnd, openDoor: dr => this.openDoor(dr)};
     this.monsters = spawnPlan(this.W, monCfg, scene).map(p => new MonsterSim(p.cfg, scene, p.x, p.z, this.env));
     this.lures = []; this.ticks = 0; this.hunt = 0; this.beaconSeq = 0;
   }
   players() { return [...this.room.players.values()].filter(p => p.scene === this.scene); }
+  // ---- Going back in: the chamber's wave (shared/gbi.js). It starts once, when the first player steps in, away from where they stand; each monster keeps a number (`wid`) for
+  // the life of the room, so a kill can name it. Returns true if this call started it.
+  enterChamber(p) {
+    if (!this.chamber || this.wave || !p.st) return false;
+    this.monsters = wavePlan(this.W, this.monCfg, this.chamber, [[p.st.x, p.st.z]]).map((s, i) => Object.assign(new MonsterSim(s.cfg, this.scene, s.x, s.z, this.env), {wid: i}));
+    this.wave = {...startWave(this.chamber, this.t), monsters: this.monsters.length};
+    return true;
+  }
+  // what a player in the chamber is told about its wave: the count, and each living monster as [wid, x, z] in the order the snapshots use
+  waveMsg(of, fresh = false) {
+    const w = this.wave; if (!w) return null;
+    return {t: "wave", scene: this.scene, no: w.no, of, monsters: w.monsters, kills: w.kills, cleared: w.cleared, kind: this.chamber.wave.kind, l: this.monsters.map(m => [m.wid, +m.pos.x.toFixed(2), +m.pos.z.toFixed(2)]), ...(fresh ? {fresh: 1} : {})};
+  }
   exited(p) { return !!(this.room.run && this.room.run.exits.some(e => e.id === p.id)); }
   // who the monsters can see and hear: living, not newly lifted (immune), still in the building; a shot counts as running noise for half a second
   targets() {
