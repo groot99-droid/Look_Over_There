@@ -9,6 +9,10 @@ export const DOWNED_S = 20, IMMUNE_S = 4, REVIVE_R = 2.5, THROW_GAP_S = 1;
 // what a round is scored on, counted here because only the server can be trusted with it (RND-20). `floorMs` is time spent on each scene.
 export const newStats = () => ({downs: 0, deaths: 0, revives: 0, shots: 0, hits: 0, beacons: 0, floorMs: {}});
 export const newPS = () => ({stats: newStats(), hp: newHealth(), gun: false, rounds: 0, beacons: 0, cloak: null, downAt: 0, immUntil: 0, shotAt: -99, throwAt: -99, sent: ""});
+// Going back in (session 16): you start with the ray and the cloak, as the solo mode does (there is no Market yet)
+export const newGbiPS = () => { const ps = newPS(); gotLocker(ps); return ps; };
+// a death in Going back in (docs/WORLD.md): the ammunition is not returned. Called when the down time ran out with nobody lifting them.
+export function gbiDied(ps) { ps.rounds = 0; ps.beacons = 0; }
 export const isDown = ps => downed(ps.hp);
 export const isImmune = (ps, now) => now < ps.immUntil;
 export const cloakOn = ps => !!(ps.cloak && ps.cloak.on);

@@ -185,7 +185,7 @@
   <div id="l-chars"></div>
   <div id="l-snd"><span>MUSIC</span><input id="l-vm" type="range" min="0" max="1" step="0.05"><span>EFFECTS</span><input id="l-vs" type="range" min="0" max="1" step="0.05"></div>
   <input id="l-name" placeholder="Your name" maxlength="16">
-  <div id="l-mode"><button type="button" class="on" data-mode="original">ORIGINAL</button><button type="button" data-mode="going_back_in" disabled title="Planned">GOING BACK IN · soon</button></div>
+  <div id="l-mode"><button type="button" class="on" data-mode="original">ORIGINAL</button><button type="button" data-mode="going_back_in">GOING BACK IN</button></div>
   <input id="l-room" placeholder="Room code (share it with friends)" maxlength="8">
   <div id="l-open"></div>
   <button class="go" id="l-join" type="submit">JOIN ROOM</button>
@@ -463,6 +463,7 @@ async function loadScene(id, arrival) {
     }
   }
   if (arrival && arrival.pos) { teleport(arrival.pos); P.yaw = arrival.face ? Math.atan2(-arrival.face[0], -arrival.face[1]) : P.yaw; P.pitch = 0; }
+  else if (net.on && chamber) { teleport(groupSpawn(id)); P.yaw = Math.random() * Math.PI * 2; }          // a party starts a chamber together: the server places the wave away from whoever is first in
   else { teleport(spawnFor(id)); P.yaw = Math.random() * Math.PI * 2; }                      // everyone gets their own spot, leaning toward what the floor still needs
   S.arrive = [P.p.x, S.floor, P.p.z];
   startChamber(chamber);                                       // Going back in: the wave begins as you step in (nothing for an Original floor)
@@ -1559,7 +1560,8 @@ function showResults(rows) {
   $("results").style.display = "flex";
 }
 
-// ---------------------------------------------------------------- Going back in, slice 1 (session 8): chambers, one wave on entry, the stairs down. Alone only: rooms cannot run the mode yet.
+// ---------------------------------------------------------------- Going back in (session 8 alone; session 16 in a room): chambers, one wave on entry, the stairs down.
+// In a room the server runs the chamber (server/floorsim.js): it starts the wave when the first player steps in and tells everyone which monsters are in it (`wave`).
 // A chamber is a scene of the manifest (REGISTRY.chamber(id)): an existing floor's model with its own world file (tools/make_chambers.mjs). The wave is shared/gbi.js: as many
 // monsters as the manifest says, placed far from where you stand. After that it is quiet time; the stairs-down door is open from the start (clearing rules come with the objectives).
 const GB = {mode: null, wave: null, load: null, kit: null};                       // load: the loadout (shared/loadout.js), only inside the mode
@@ -1567,10 +1569,19 @@ const GBI = REGISTRY.modes.going_back_in;
 function startChamber(ch) {
   GB.mode = ch ? "going_back_in" : null; GB.wave = null; if (!ch) { GB.load = null; GB.kit = null; STN.spot = null; }
   TRAPS.list.length = 0; TRAPS.flashes.length = 0;                      // traps stay in the chamber they were set in
-  if (!ch || net.on) return;
+  if (!ch || net.on) return;                                            // in a room the wave is the server's: gbWave builds it when the server says
   GB.wave = startWave(ch, performance.now());
   for (const p of wavePlan(S, monCfg, ch, [[P.p.x, P.p.z]])) monsters.push(new Monster(p.cfg, S.id, p.x, p.z));
   toast(`WAVE ${GB.wave.no} of ${GBI.waves}: ${monsters.length} of them are in here with you`, 4200);
+}
+// a room's chamber: the server's word on the wave. m.l is each living monster as [wid, x, z], in the order its snapshots use; `fresh` means it started just now.
+function gbWave(m) {
+  if (m.scene !== S.id || loading) return;
+  const cfg = monCfg.monsters.find(c => c.name === m.kind); if (!cfg) return;
+  monsters.forEach(mo => mo.dispose()); monsters.length = 0; net.snap = null;
+  for (const [wid, x, z] of m.l) monsters.push(Object.assign(new Monster(cfg, S.id, x, z), {wid}));
+  GB.wave = {chamber: m.scene, no: m.no, monsters: m.monsters, t0: performance.now(), kills: m.kills, cleared: m.cleared};
+  if (m.fresh) toast(`WAVE ${m.no} of ${m.of}: ${m.l.length} of them are in here with you`, 4200);
 }
 async function startGoingBackIn() {                                    // from the options screen at the store doors
   closeOptions();
@@ -2471,7 +2482,7 @@ function onNet(m) {
   switch (m.t) {
     case "welcome":
       if (Number.isFinite(m.now)) net.off = m.now - Date.now();
-      net.id = m.id; net.room = m.room; net.on = true; net.phase = m.phase;
+      net.id = m.id; net.room = m.room; net.on = true; net.phase = m.phase; net.mode = m.mode; net.start = m.start;
       for (const p of m.players) if (p.id !== m.id) addPeer(p);
       if (m.phase !== "lobby") net.startRes?.();
       if (m.power) setPower(true, null, true);
@@ -2526,6 +2537,7 @@ function onNet(m) {
     case "exited": FIN.exited.set(m.id, m); if (m.id !== net.id) toast(`${m.name} is out (place ${m.place})`); break;
     case "results": showResults(m.rows); break;
     case "keypad": setKeypad(m.scene, {found: m.found, solved: m.solved, fails: m.fails, lockMs: m.lockMs}); break;
+    case "wave": gbWave(m); break;                                    // Going back in in a room: the server started (or describes) this chamber's wave
   }
 }
 // the nearest downed teammate within reach on your floor
@@ -2623,7 +2635,8 @@ function lobby() {
   mark();
   $("l-name").value = q.get("name") || store.get("lot-name");
   $("l-room").value = (q.get("room") || store.get("lot-room")).toUpperCase();
-  let mode = "original";                                                  // the planned modes are shown but cannot be picked yet
+  let mode = REGISTRY.modes[q.get("mode")]?.status === "built" ? q.get("mode") : "original";          // ?mode=going_back_in picks it (a shared link, and the tests)
+  $("l-mode").querySelectorAll("button").forEach(x => x.classList.toggle("on", x.dataset.mode === mode));
   const openRooms = async () => {                                         // open rooms of the mode (no names): click one to fill in its code
     try { const r = await (await fetch("/rooms?mode=" + mode)).json();
       $("l-open").innerHTML = r.rooms.map(x => `<button type="button" data-code="${String(x.code).replace(/[^A-Z0-9]/g, "")}">${String(x.code).replace(/[^A-Z0-9]/g, "")} · ${x.players}/${x.max}${x.state === "playing" ? " · playing" : ""}</button>`).join("");
@@ -2666,8 +2679,7 @@ function hpHud(dt) {
 function die() {
   closeKeypad();
   if (myCarry() >= 0) fuseAct({a: "drop", x: P.p.x, z: P.p.z});                      // it stays where you fell
-  if (!net.on) { SOLO.downs++; SOLO.deaths++; }
-  gbDeath();
+  if (!net.on) { SOLO.downs++; SOLO.deaths++; gbDeath(); }                      // in a room a down is not yet a death (a teammate may lift you): the server applies the mode's death rule if nobody does
   AUD.stinger("st_down"); dead = true; deadT = 0; deathLevel = S.id; devOn.v = false; P.reviveT = 0; $("revive").style.display = "none";
   $("death").style.opacity = 1; $("fear").style.opacity = 1;
   if (net.on) { $("death").textContent = "DOWNED"; $("death").style.background = "rgba(0,0,0,.55)"; }       // in a room you can be lifted, so you may still look around
@@ -2804,7 +2816,7 @@ function frame() { if (!BOT && !inGame) step(); requestAnimationFrame(frame); }
 const clock = new THREE.Clock();
 await lobby();
 FIN.t0 = performance.now();
-await loadScene("B1");
+await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
 window.__game = {TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
