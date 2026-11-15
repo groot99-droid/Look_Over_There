@@ -454,22 +454,29 @@ Single use, on Q and E, in Going back in and Secret Operations. The three below 
 - **Where it works.** Going back in and Secret Operations. Not the Original (section 1.2): its regeneration, downs and lifts already do this job, and the round stays the same for everyone. It can be carried in the City but nothing there takes HP today.
 - **In a room.** The server owns the count, the 2.5 s clock (it must see the hold start and end), the HP and the faster lift.
 
-### 6.2 Spicy Brew [PROPOSAL] (model: `Spicy_Brew_Bottle`)
+### 6.2 Spicy Brew (model: `Spicy_Brew_Bottle`)
 
-- **What it is.** "XXX Spicy Brew", a chilli on the label. Where Old Brew slows the world down and takes the edge off, this one wakes you up and will not let you keep quiet about it.
-- **How it differs from Old Brew.** Old Brew is defence: you take less damage, and you pay in aim and balance. Spicy Brew is legs: you run without tiring and it sobers you up, and you pay in noise.
-- **Where and price.** $7, from the same dealer who sells Old Brew, and at the Market.
-- **Slot and controls.** Q / LB, in the support ring. A tap drinks it (1 s).
-- **What it does, for 45 s.**
-  - Your run does not drain: you can run for the whole 45 s (the built run lasts 4 s).
-  - It clears every Old Brew drink on you at once, wobble and all.
-  - Toxic gas (a Going back in threat, not built) does half its harm.
-- **The downside, for the same 45 s.** You cough every 6 s. Each cough is noise class N2, even if you are crouched or standing still, so you cannot hide. The cloak still hides you from sight, and the cough still brings them. A second bottle within 2 minutes of the first is heartburn: 10 HP, no extra time.
-- **After.** No crash.
-- **What it does to monsters and players.** Nothing directly. In a room teammates hear your cough.
-- **Ammo.** Carry 2 at most. Lost on death in Going back in.
-- **Where it works.** Everywhere except the Original (section 1.2). In the City it is a way to outrun the stalker for 45 s, at the price of the cough.
-- **In a room.** The server owns the timer, lets you run past the stamina limit, and makes the coughs (so a client cannot drop them).
+**The rule is the owner's, relayed to this session by the owner's coordinating session after the first draft** (marked **[OWNER, relayed]**; this session could not confirm it with the owner directly). The numbers are proposals.
+
+- **What it is.** "XXX Spicy Brew", a chilli on the label. It does to your legs what Old Brew does to your balance, and it burns through you while it does it.
+- **The rule [OWNER, relayed].** It has Old Brew's alcohol effects: the funny walk and run, the wobble that grows with each drink, and aim you cannot hold steady. But it makes you faster, and instead of making you pass out it makes you hungrier. Each drink speeds you up and drains hunger, stacking. Too much of it and you die of hunger quickly. There is no blackout from Spicy Brew.
+- **How it differs from Old Brew.** Old Brew: 5% less damage taken a bottle, blackout at 5. Spicy Brew: faster a bottle, no damage reduction, no blackout, and it eats your hunger.
+- **Where and price [PROPOSAL].** $7, from the same dealer who sells Old Brew, and at the Market.
+- **Slot and controls [PROPOSAL].** Q / LB, in the support ring. A tap drinks it (1 s).
+- **The numbers [PROPOSAL].**
+  - A drink lasts 90 s, the same as an Old Brew drink.
+  - **Wobble.** Each running drink adds the same sway and aim drift as an Old Brew drink (0.25 m and 1 degree), and the two brews add together for wobble. The aim zoom does not hold steady.
+  - **Speed.** Each running drink adds 8% to every speed of yours, up to 5 drinks (+40%: walk 5.6, run 10.5 m/s). A sixth adds no speed. A run still lasts 4 s. With a trip running the two multiply, and the total is capped at 1.6 times normal.
+  - **Hunger.** Each running drink drains 8 hunger a real minute on top of the normal drain, so one drink costs 12 hunger over its 90 s. **Too much is four:** with four or more running at once every drink drains double, 16 a minute each. Four drinks together are 64 a minute, so the City's starting 80 is gone in 75 s.
+  - **No blackout.** Spicy Brew drinks do not count toward Old Brew's five. Only Old Brew drinks do.
+- **Hunger where hunger exists (the City).** It uses the built hunger in `shared/needs.js` as it is: the same 0 to 100 bar, the same warnings at 30 and 10, and at 0 the built rule, you faint and wake at home with 25. The City has no death today, so "die of hunger" is that faint there. The extra drain runs on real time, so it keeps draining while the City's clock is paused. Green Leaf's doubling applies to the normal drain only.
+- **Hunger where there is none yet (Going back in, Secret Operations).** Your one hunger bar travels with you. Nothing drains it there today except Spicy Brew, and the HUD shows the bar while a drink is running. At 0 you die, by that mode's death rule (gear to the locker, ammo and consumables lost), and you come back with hunger at 25. What you spent stays spent: you arrive back in the City as hungry as you left the run. A player who has never been to the City starts at the built 80.
+- **Getting hunger back.** Only food at the fridge, and Munchy Mushies (+10). So in a run every bottle is paid for with hunger you cannot refill there.
+- **What it does to monsters and players.** Nothing directly. At +40% your walk (5.6) matches a monster's chase (5.4 to 5.7), which no other item gives you for this long.
+- **Ammo.** Carry 5 at most. Lost on death in Going back in.
+- **Downside.** The hunger, the wobble, and no way to stop a drink once it is down. Three is strong. Four is a countdown.
+- **Where it works.** Everywhere except the Original (section 1.2).
+- **In a room.** The server owns the drink timers, the speed limit it allows you, and the hunger, so a client cannot drink without paying.
 
 ---
 
@@ -480,9 +487,9 @@ Sold by the shady dealers in the hotel lobby. The effect, downside and duration 
 **Rules for all five** [PROPOSAL].
 
 - **On-screen names.** The names on the models: Green Leaf, Trippy Paper, Munchy Mushies, Sugar Rush, Old Brew. The bible's words (green plant, paper tab, mushrooms, white powder, alcohol) are never shown.
-- **Where you get them.** The lobby's dealers. The lobby is not built, so until it is, one dealer stands by the dry fountain in the mall (built: `world/entrance.json`) while the stores are open. Each dealer has 2 of each item a game day.
+- **Where you get them.** The lobby's dealers. The lobby is not built, so until it is, one dealer stands by the dry fountain in the mall (built: `world/entrance.json`) while the stores are open. Each dealer has 2 of each trip and 6 of each brew a game day.
 - **Slot and controls.** Q / LB, in the support ring (the bible puts them on Q and E). A tap uses one; it takes 1 s.
-- **Carry.** 2 of each at most.
+- **Carry.** 2 of each trip, 5 of each brew (five Old Brews must be reachable, since the fifth is the owner's blackout).
 - **One trip at a time.** Green Leaf, Trippy Paper, Munchy Mushies and Sugar Rush are trips. Taking one while another runs ends the first; if the first has a crash, the crash starts at once and runs under the new trip. Old Brew and Spicy Brew are drinks and stack on top of a trip.
 - **Where they work.** Everywhere except the Original (section 1.2). In the City and hotel there is no HP and no weapon, so only the speed, hunger, noise and stalker parts apply.
 - **Death.** Carried items are lost on death in Going back in. A running effect ends when you die.
@@ -532,7 +539,7 @@ Sold by the shady dealers in the hotel lobby. The effect, downside and duration 
 - **What it is.** A brown bottle with a faded label. Each one makes the hits matter a little less and the floor a little less level.
 - **Effect [OWNER].** A funny walk and run, wobble that grows with each drink, 5% less damage per bottle. **Downside [OWNER]:** a blackout at 5 drinks for 15 s, and it is impossible to aim stably. **Duration [OWNER]:** per drink.
 - **The numbers [PROPOSAL].** A drink lasts 90 s. Each drink running on you means you take 5% less damage from a hit: 35 becomes 33.25, 31.5, 29.75 and 28 with one to four drinks. Each also adds a sway to your walk (your path drifts up to 0.25 m a drink to either side) and 1 degree of drift to your aim; the aim zoom on right click / LT does not hold steady at all.
-- **The fifth.** Five drinks running at once: the screen goes black for 15 s. You can still move and you can still be hit. Then every drink is cleared.
+- **The fifth.** Five Old Brew drinks running at once (Spicy Brew drinks do not count): the screen goes black for 15 s. You can still move and you can still be hit. Then every drink is cleared.
 - **Reading the owner's line.** "5% less damage per bottle" is read as damage you take. If it meant damage you deal, say so (open question 9).
 - **Monsters and players.** Nothing directly.
 - **Why it is not strictly best.** A fifth of the damage off at four bottles, for $20 and an aim you cannot trust; one more and you are blind for 15 s.
@@ -675,7 +682,7 @@ Proposed prices: ray rounds $2 for 3, a beacon $6. ATL X: a hit removes the mons
 | Land mine | arm 1.5 s, trigger 1.2 m, kills 1; start 2, cap 3, +1 a pack | $6; 200 damage; can be picked up again |
 | Tripwire | arm 0.5 s, trigger 2 m, kills within 3 m, heard 25 m; start 1, cap 2, +1 a pack | $10; 200 damage; snaps to a doorway within 2 m |
 | Med kit | none | $12; use 2.5 s; +60 HP; refused at 95; cap 2; lift 1.5 s to 100 HP; 1 found per floor |
-| Spicy Brew | none | $7; 45 s; run does not drain; clears Old Brew; cough every 6 s (N2); second within 120 s costs 10 HP; cap 2 |
+| Spicy Brew | none | $7; 90 s a drink; Old Brew's wobble; +8% speed a drink up to 5 (total speed cap x1.6); 8 hunger a real minute a drink, 16 with four or more running; no blackout; at 0 hunger the City's faint, or a death in Going back in (back at 25); cap 5 |
 
 ### 10.5 Dealer items
 
@@ -687,7 +694,7 @@ Proposed prices: ray rounds $2 for 3, a beacon $6. ATL X: a hit removes the mons
 | Sugar Rush | $15 | 60 s + 60 s crash | speed x1.3, run does not drain, melee x1.5, lift 2 s; crash: speed x0.75, melee x0.5, noise one step louder |
 | Old Brew | $5 | per drink | 90 s a drink; 5% less damage taken each; 0.25 m sway and 1 degree drift each; blackout at 5 for 15 s |
 
-All: carry 2 of each; a dealer stocks 2 of each a game day; 1 s to use; one trip at a time.
+All: 1 s to use; one trip at a time. Carry 2 of each trip and 5 of each brew; a dealer stocks 2 of each trip and 6 of each brew a game day.
 
 ### 10.6 Food [BUILT `shared/needs.js`]
 
@@ -738,7 +745,7 @@ Rules for all of it: the pure rules go in `shared/` with a unit test that fails 
 | Gauntlet | new `shared/gauntlet.js`; the player's movement in `index.html` (session 12's region: say so in the PR) | charges rewind, the leap needs the lenses and two charges, the wall bonus, the landing spot is checked |
 | Flash-vial, mine, tripwire (changes) | `shared/consumables.js` (damage numbers, pick a mine up, carry both traps), `index.html` | extend `shared/consumables.test.js`; `tools/gbi3_test.mjs` still passes |
 | Med kit | `shared/consumables.js` (a fourth kind on the Q slot), `shared/health.js` (`heal`, a lift at full health), `server/playerstate.js` (the faster lift), `shared/loot.js` and the manifest (one found per floor) | heal by 60 and never above 100, refused at 95, cancelled if let go early, the lift takes 1.5 s and gives 100 HP and uses the kit |
-| Spicy Brew, the five dealer items | new `shared/effects.js` (one state: the trip, the crash, the drinks, with timers and the multipliers the rest of the game reads), `shared/monsters.js` (Passive toward one player; noise one step louder), `shared/needs.js` (hunger x2), `index.html` (filters, wobble, the dealer in the mall), `shared/save.js` (carried items and running timers) | `shared/effects.test.js`: each duration and crash, one trip at a time, the fifth drink blacks out and clears, Spicy Brew clears drinks, passive breaks on damage; a browser test buys one from the dealer and sees the speed change |
+| Spicy Brew, the five dealer items | new `shared/effects.js` (one state: the trip, the crash, the drinks, with timers and the multipliers the rest of the game reads), `shared/monsters.js` (Passive toward one player; noise one step louder), `shared/needs.js` (hunger x2; Spicy Brew's extra drain on real time, and the bar used outside the City), `index.html` (filters, wobble, the dealer in the mall), `shared/save.js` (carried items and running timers) | `shared/effects.test.js`: each duration and crash, one trip at a time, the fifth Old Brew blacks out and clears, Spicy Brew adds speed and hunger drain a drink and never blacks out, four at once double the drain, hunger 0 faints in the City and kills in a chamber, passive breaks on damage; a browser test buys one from the dealer and sees the speed change |
 | Food names | `shared/needs.js` (`label` and a new short label), the tests that read the old names (`shared/needs.test.js` checks "Apples: 1"), `tools/grocery_test.mjs` | the fridge line and the receipt show the new names; prices and hunger values are unchanged |
 | ATL X | `shared/monsters.js` (a deleting shot), `index.html` (the red gun), the `admin_access` flag | a deleting shot removes the monster and needs the flag |
 | Docs | `docs/ROUND.md` (GBI-8 and its slice table), `docs/GAMEPLAY.md` (controls), `docs/WORLD.md` (section 10, item 6, is answered by this file) | the doc-against-code tests in `shared/*.test.js` |
@@ -760,7 +767,7 @@ Each has the default this document uses. Change any of them and the entries abov
 9. **Old Brew's "5% less damage per bottle".** Default: damage you take.
 10. **Trippy Paper's "mushroom effects".** Default: both the good half (outlines) and the bad half (scatter) of Munchy Mushies.
 11. **Green Leaf and the stalker.** Default: the stalker goes passive too; agents, the boss and the environment do not.
-12. **Spicy Brew.** Default: 45 s of endless running and a sobering-up, paid for with a cough every 6 s. If you wanted it to be a weapon (a thrown fire bottle) say so; the flash-vial already sits close to that.
+12. **Spicy Brew's numbers.** The rule is the owner's as relayed (Old Brew's wobble, faster, hungrier, no blackout, too much starves you). Defaults for the numbers: +8% speed and 8 hunger a minute a drink, four at once is "too much" and doubles the drain, and at 0 hunger you faint in the City (the built rule) and die in Going back in. Say if starving in the City should be a real death too.
 13. **Where dealers stand before the hotel lobby exists.** Default: one dealer by the mall's fountain during opening hours.
 14. **Can weapons leave Going back in and Secret Operations?** Default: no, they stay in the locker; the City has only the stalker, which nothing kills.
 15. **The crossbow at the start** (already open in `docs/SESSIONS.md`). Default: it stays free in your hands until the Market exists, then costs $40.
