@@ -26,6 +26,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 19 | Build the pneumatic bolt driver (the first arsenal weapon after the crossbow) | Round 4 | 18 | **built**, draft PR on `claude/bolt-driver`: `shared/driver.js`, monster health (`hp`, `MonsterSim.hurt`), key 5 and a locker row, solo only. Rooms (session 16) and the Market are not touched |
 | 20 | Build the stun baton, the two-weapon carry cap and the weapon slots | Round 4 | 19 | **built**, draft PR on `claude/stun-baton`, stacked on session 19's `claude/bolt-driver`: `shared/baton.js`, `ARSENAL`/`canTake` in `shared/loadout.js`, solo only. Rooms and the Market are not touched |
 | 21 | Build the moth jelly dart and the Slowed and Jellied statuses | Round 4 | 20 | **built**, draft PR on `claude/moth-jelly-dart`, stacked on session 20's `claude/stun-baton` (itself on session 19's `claude/bolt-driver`): `shared/dart.js`, `MonsterSim.slow`/`jelly`/`statusTick`, solo only. Rooms and the Market are not touched |
+| 22 | Build the propane flamethrower and the Burning status | Round 4 | 21 | **built**, draft PR on `claude/flamethrower`, stacked on session 21's `claude/moth-jelly-dart`: `shared/flame.js`, `MonsterSim.burn`, solo only. Rooms and the Market are not touched |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
 | 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
