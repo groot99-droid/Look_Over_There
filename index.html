@@ -2921,9 +2921,10 @@ function lobby() {
   let mode = REGISTRY.modes[q.get("mode")]?.status === "built" ? q.get("mode") : "original";          // ?mode=going_back_in picks it (a shared link, and the tests)
   $("l-mode").querySelectorAll("button").forEach(x => x.classList.toggle("on", x.dataset.mode === mode));
   const openRooms = async () => {                                         // open rooms of the mode (no names): click one to fill in its code
+    const show = html => { const el = $("l-open"); if (el) el.innerHTML = html; };          // the lobby may already be closed (Solo pressed before the list came back)
     try { const r = await (await fetch("/rooms?mode=" + mode)).json();
-      $("l-open").innerHTML = r.rooms.map(x => `<button type="button" data-code="${String(x.code).replace(/[^A-Z0-9]/g, "")}">${String(x.code).replace(/[^A-Z0-9]/g, "")} · ${x.players}/${x.max}${x.state === "playing" ? " · playing" : ""}</button>`).join("");
-    } catch (e) { $("l-open").innerHTML = ""; }
+      show(r.rooms.map(x => `<button type="button" data-code="${String(x.code).replace(/[^A-Z0-9]/g, "")}">${String(x.code).replace(/[^A-Z0-9]/g, "")} · ${x.players}/${x.max}${x.state === "playing" ? " · playing" : ""}</button>`).join(""));
+    } catch (e) { show(""); }
   };
   $("l-open").onclick = e => { const b = e.target.closest("button"); if (b) $("l-room").value = b.dataset.code; };
   $("l-mode").onclick = e => { const b = e.target.closest("button"); if (!b || b.disabled) return; mode = b.dataset.mode; $("l-mode").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); openRooms(); };
