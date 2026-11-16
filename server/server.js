@@ -27,7 +27,7 @@ if (COLORS.length < MAX_PLAYERS) throw new Error(`the world manifest allows ${MA
 // a party is a room: the same mode and the same code. The original keeps its plain code as the key; any other mode is "mode:CODE".
 const partyKey = (mode, code) => mode === DEFAULT_MODE ? code : `${mode}:${code}`;
 
-export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = Math.random, simHz = Number(process.env.SIM_HZ) || 20, clock = () => Date.now() / 1000, log = line => console.log(line)} = {}) {
+export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes = REGISTRY.modes, rng = Math.random, simHz = Number(process.env.SIM_HZ) || 20, clock = () => Date.now() / 1000, log = line => console.log(line)} = {}) {
   const docs = new Map(), readJson = rel => JSON.parse(fs.readFileSync(path.join(root, rel), "utf8"));
   const worldDoc = scene => { if (!docs.has(scene)) docs.set(scene, readJson(`world/${scene}.json`)); return docs.get(scene); };
   let monCfgCache = null; const monCfg = () => monCfgCache ||= readJson("world/monsters.json");
@@ -36,7 +36,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
     const url = new URL(req.url, "http://x");
     if (url.pathname === "/rooms") {                                // open rooms of a mode (all modes with none given): no player names
       const mode = url.searchParams.get("mode");
-      if (mode !== null && !Object.hasOwn(REGISTRY.modes, mode)) { res.writeHead(400, {"content-type": "application/json"}); return res.end(JSON.stringify({error: "unknown_mode"})); }
+      if (mode !== null && !Object.hasOwn(modes, mode)) { res.writeHead(400, {"content-type": "application/json"}); return res.end(JSON.stringify({error: "unknown_mode"})); }
       const list = [...rooms.values()].filter(r => (mode === null || r.mode === mode) && r.players.size < r.max).map(r => ({mode: r.mode, code: r.code, players: r.players.size, max: r.max, state: r.phase}));
       res.writeHead(200, {"content-type": "application/json", "cache-control": "no-store"}); return res.end(JSON.stringify({rooms: list}));
     }
@@ -60,7 +60,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
   function ensureFloor(room, scene) {
     if (!scene || FLOORS[scene] === undefined || room.floors[scene]) return room.floors[scene] || null;
     try {
-      return room.floors[scene] = new Floor({scene, room, doc: worldDoc(scene), monCfg: monCfg(), rnd: rng,
+      return room.floors[scene] = new Floor({scene, room, doc: worldDoc(scene), monCfg: monCfg(), rnd: rng, chamber: room.gbi ? REGISTRY.chamber(scene) : null,
         io: {toFloor: (msg, except) => broadcast(room, msg, except, scene)},
         flags: p => ({dead: PS.isDown(p.ps), imm: PS.isImmune(p.ps, clock()), cloak: PS.cloakOn(p.ps)}),
         onHit: (id, dmg) => hurtPlayer(room, room.players.get(id), dmg)});
@@ -69,18 +69,26 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
   // what the server knows about each player (health, rounds, cloak, beacons): the client is told, and cannot say otherwise
   const sendMe = (p, extra = {}) => { p.ps.sent = JSON.stringify(PS.view(p.ps)); send(p, {t: "me", ...PS.view(p.ps), ...extra}); };
   function hurtPlayer(room, p, dmg) { if (p && p.ps && PS.hit(p.ps, dmg, clock())) sendMe(p); }
-  function pruneFloors(room) { for (const scene of Object.keys(room.floors)) if (!room.floors[scene].players().length) delete room.floors[scene]; }
+  function pruneFloors(room) { for (const scene of Object.keys(room.floors)) if (!room.floors[scene].keep && !room.floors[scene].players().length) delete room.floors[scene]; }          // a chamber is kept: its kills are for the life of the room
+  // ---- Going back in rooms (session 16). A room of that mode has `room.gbi`; its scenes are the chambers, each run as a floor whose wave starts when the first player steps in.
+  const newPlayerPS = room => room.gbi ? PS.newGbiPS() : PS.newPS();
+  function gbiArrive(room, p, scene) {                                  // a player has just arrived in a chamber: start its wave if nobody has, and tell them what is in it
+    const floor = room.floors[scene]; if (!room.gbi || !floor || !floor.chamber) return;
+    if (floor.enterChamber(p)) broadcast(room, floor.waveMsg(room.gbi.waves, true), undefined, scene);
+    else send(p, floor.waveMsg(room.gbi.waves));
+  }
+  function gbiDeath(room, p) { if (room.gbi) PS.gbiDied(p.ps); }           // nobody lifted them in time: the mode's death rule
   const tickStats = {n: 0, sum: 0, max: 0};                                          // how long the simulation tick takes (ms), for load checks
   const ticker = setInterval(() => {
     const t0 = performance.now();
     for (const room of rooms.values()) {
-      for (const f of Object.values(room.floors)) f.step(1 / simHz);
+      for (const f of Object.values(room.floors)) if (!f.keep || f.players().length) f.step(1 / simHz);          // a kept chamber stands still while nobody is in it
       if (room.run && !room.run.ended) {                                // time on each floor: per player (until they leave the store) and per floor with anyone on it
         const seen = new Set();
         for (const p of room.players.values()) if (p.scene && !room.out.has(p.id)) { PS.onFloor(p.ps, p.scene, 1 / simHz); seen.add(p.scene); }
         for (const s of seen) room.floorMs[s] = (room.floorMs[s] || 0) + 1000 / simHz;
       }
-      for (const p of room.players.values()) { const r = PS.tick(p.ps, 1 / simHz, clock()); if (r === "respawn") sendMe(p, {respawn: 1}); else if (PS.changed(p.ps)) sendMe(p); }
+      for (const p of room.players.values()) { const r = PS.tick(p.ps, 1 / simHz, clock()); if (r === "respawn") { gbiDeath(room, p); sendMe(p, {respawn: 1}); } else if (PS.changed(p.ps)) sendMe(p); }
     }
     const ms = performance.now() - t0; tickStats.n++; tickStats.sum += ms; if (ms > tickStats.max) tickStats.max = ms;
   }, 1000 / simHz);
@@ -109,7 +117,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
   // the finale: the alarm goes off once the doors are open and someone is in the store; everyone leaving through them ends the round
   const alarmMs = room => room.alarmAt ? Math.max(0, ALARM_MS - (Date.now() - room.alarmAt)) : 0;
   function maybeAlarm(room) {
-    if (room.alarmAt || !room.power.on || ![...room.players.values()].some(p => p.scene === room.finish)) return;
+    if (!room.finish || room.alarmAt || !room.power.on || ![...room.players.values()].some(p => p.scene === room.finish)) return;
     room.alarmAt = Date.now(); broadcast(room, {t: "alarm", ms: ALARM_MS});
   }
   // a row for the results screen: the old fields (id, name, place, ms) plus what the player did; stats were taken as they walked out
@@ -130,7 +138,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
     clearTimeout(room.timer); room.timer = null;
     const all = [...room.players.values()];
     if (all.length && all.every(p => p.ready)) {
-      room.timer = setTimeout(() => { room.timer = null; room.phase = "playing"; room.run = newRun(Date.now()); room.out = new Map(); room.floorMs = {}; room.final = null; for (const p of room.players.values()) { p.ps = PS.newPS(); sendMe(p); } broadcast(room, {t: "start"}); }, countdownMs);
+      room.timer = setTimeout(() => { room.timer = null; room.phase = "playing"; room.run = newRun(Date.now()); room.out = new Map(); room.floorMs = {}; room.final = null; for (const p of room.players.values()) { p.ps = newPlayerPS(room); sendMe(p); } broadcast(room, {t: "start"}); }, countdownMs);
     }
     broadcast(room, lobbyMsg(room));
   }
@@ -146,19 +154,20 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
       if (!me) {
         if (m.t !== "join") return;
         const code = String(m.room || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "MAIN";
-        const mode = m.mode === undefined ? DEFAULT_MODE : m.mode, def = typeof mode === "string" && Object.hasOwn(REGISTRY.modes, mode) ? REGISTRY.modes[mode] : null;
+        const mode = m.mode === undefined ? DEFAULT_MODE : m.mode, def = typeof mode === "string" && Object.hasOwn(modes, mode) ? modes[mode] : null;
         if (!def) { send({ws}, {t: "refused", reason: "unknown_mode"}); return ws.close(); }
         if (def.status !== "built") { send({ws}, {t: "refused", reason: "soon", mode}); return ws.close(); }          // planned modes are listed but cannot be joined yet
         const key = partyKey(mode, code);
-        room = rooms.get(key) || {code, mode, floorNames: def.floors, finish: def.finish.scene, max: def.players.max, players: new Map(), floors: {}, seq: 0, phase: "lobby", timer: null, fuses: {}, switches: {}, keypads: {}, power: newPower(), run: null, alarmAt: 0, loot: {}, armed: new Map(), out: new Map(), floorMs: {}, final: null, floorList() { return Object.entries(this.floorMs).map(([scene, ms]) => ({scene, ms})); }}; rooms.set(key, room);
+        const gbi = def.startChamber ? {waves: def.waves} : null;                   // Going back in: the room's scenes are the chambers the server can run, and it starts in the mode's first one
+        room = rooms.get(key) || {code, mode, gbi, floorNames: gbi ? REGISTRY.chambers.filter(c => Object.hasOwn(FLOORS, c)) : def.floors, start: gbi ? def.startChamber : def.startScene, finish: def.finish ? def.finish.scene : null, max: def.players.max, players: new Map(), floors: {}, seq: 0, phase: "lobby", timer: null, fuses: {}, switches: {}, keypads: {}, power: newPower(), run: null, alarmAt: 0, loot: {}, armed: new Map(), out: new Map(), floorMs: {}, final: null, floorList() { return Object.entries(this.floorMs).map(([scene, ms]) => ({scene, ms})); }}; rooms.set(key, room);
         if (room.players.size >= room.max) { ws.send(JSON.stringify({t: "full", max: room.max})); return ws.close(); }
         const used = new Set([...room.players.values()].map(p => p.color));
         const taken = new Set([...room.players.values()].map(p => p.char));                    // a character you ask for is yours even if someone has it; with no choice you get one nobody has
         const char = Number.isInteger(m.char) && m.char >= 0 && m.char < NUM_CHARS ? m.char : ([...Array(NUM_CHARS).keys()].find(c => !taken.has(c)) ?? (room.seq % NUM_CHARS));
-        me = {id: ++room.seq, seq: room.seq, ws, scene: null, ready: false, ps: PS.newPS(), st: null, char, name: String(m.name || "Player").replace(/[^\w .-]/g, "").slice(0, 16) || "Player",
+        me = {id: ++room.seq, seq: room.seq, ws, scene: null, ready: false, ps: newPlayerPS(room), st: null, char, name: String(m.name || "Player").replace(/[^\w .-]/g, "").slice(0, 16) || "Player",
               color: COLORS.find(c => !used.has(c)) || COLORS[0]};
         room.players.set(me.id, me);
-        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, mode: room.mode, floors: room.floorNames, max: room.max, finish: room.finish, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? room.final : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char}))});
+        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, mode: room.mode, floors: room.floorNames, start: room.start, max: room.max, finish: room.finish, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? room.final : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char}))});
         broadcast(room, {t: "join", id: me.id, name: me.name, color: me.color, char: me.char}, me.id);
         lobbyChanged(room);
         return;
@@ -183,6 +192,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
             if (KEYPAD_FLOORS.includes(scene)) send(me, keypadMsg(room, scene));
             if (LOOT_FLOORS.includes(scene)) send(me, {t: "loot", scene, st: floorLoot(room, scene)});
             maybeAlarm(room);
+            gbiArrive(room, me, scene);
           }
           break;
         }
@@ -222,6 +232,21 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, rng = 
           if (!shot) break;
           if (shot.r) PS.shotHit(me.ps);
           broadcast(room, {t: "beam", id: me.id, o, e}, me.id, scene);
+          break;
+        }
+        case "bolt": {                                                // Going back in: a crossbow bolt. The server takes the bolt and decides the kill; the others see it fly
+          const r = room.gbi && room.floors[me.scene]?.bolt(me, m.o, m.d, () => PS.shootBow(me.ps) && (sendMe(me), true));
+          if (!r) break;
+          if (r.m) PS.shotHit(me.ps);
+          broadcast(room, {t: "beam", id: me.id, o: m.o, e: r.e, bolt: 1}, me.id, me.scene);
+          break;
+        }
+        case "gear": if (room.gbi && (m.a === "e" ? PS.gbiSetE(me.ps, m.g) : PS.gbiGear(me.ps, m.a, m.g))) sendMe(me); break;          // Going back in, at the locker: take a piece of gear or leave it there; "e" chooses what the E slot holds
+        case "use": {                                                 // Going back in: Q (slot 0, a flash-vial thrown to x, z) or E (slot 1, a land mine or tripwire where you stand)
+          const f = room.gbi && room.floors[me.scene], slot = m.slot === 0 ? 0 : m.slot === 1 ? 1 : -1, kind = f ? PS.gbiSlot(me.ps, slot) : null;
+          if (!kind || !me.st || (kind === "flash" && !f.flashOk(me, m.x, m.z)) || !PS.gbiUse(me.ps, slot)) break;
+          sendMe(me);
+          if (kind === "flash") f.flash(me, m.x, m.z); else f.setTrap(me, kind);
           break;
         }
         case "beacon": {                                              // a thrown AFK Beacon: everyone else on the floor learns where it lies (the host's monsters then swarm it)
