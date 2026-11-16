@@ -1,6 +1,6 @@
 # models/items/
 
-The owner's Meshy AI models for the arsenal, the consumables, the dealer items, the grocery food and two extras (24 files). **None is loaded by the game yet**: wiring each one in is separate work, and the rules for them are being written in `docs/ITEMS.md`.
+The owner's Meshy AI models for the arsenal, the consumables, the dealer items, the grocery food and two extras (24 files). **Two are loaded by the game so far**, the land mine and the nail-bomb tripwire (as the floor traps, scaled to 0.46 m and 0.45 m); the other 22 are not, and wiring each one in is separate work. The rules for them are in `docs/ITEMS.md`.
 
 ## How they were prepared
 
