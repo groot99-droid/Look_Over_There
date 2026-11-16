@@ -23,7 +23,11 @@ const until = (name, page, fn, arg) => page.waitForFunction(fn, arg, {timeout: 6
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "lot-")); fs.mkdirSync(path.join(tmp, "models"));
 for (const n of ["index.html", "world", "monsters", "characters", "shared", "audio"]) fs.symlinkSync(path.join(here, n), path.join(tmp, n));
 fs.copyFileSync(path.join(here, "characters", "shorts.glb"), path.join(tmp, "models", "fuse.glb"));
-const plain = await createServer({countdownMs: 60000}), withModel = await createServer({root: tmp, countdownMs: 60000});
+// and a root with every model except the fuse, for the checks "without models/fuse.glb" (the repo itself now ships one)
+const tmpPlain = fs.mkdtempSync(path.join(os.tmpdir(), "lot-")); fs.mkdirSync(path.join(tmpPlain, "models"));
+for (const n of fs.readdirSync(here)) if (!["models", ".git", "node_modules"].includes(n)) fs.symlinkSync(path.join(here, n), path.join(tmpPlain, n));
+for (const n of fs.readdirSync(path.join(here, "models"))) if (n !== "fuse.glb") fs.symlinkSync(path.join(here, "models", n), path.join(tmpPlain, "models", n));
+const plain = await createServer({root: tmpPlain, countdownMs: 60000}), withModel = await createServer({root: tmp, countdownMs: 60000});
 try {
   const p = await solo(plain.port);
   check("solo: no room, you are the host", await p.evaluate(() => !window.__game.net.on && window.__game.net.host()));
@@ -359,8 +363,16 @@ try {
   const q = await solo(withModel.port);
   await until("with models/fuse.glb the model replaces the placeholder", q, () => window.__game.FZ.vis.items.every(i => i.o.userData.model));
   check("the placeholder art is hidden behind it", await q.evaluate(() => window.__game.FZ.vis.items[0].o.userData.art.visible === false));
+  // the repo's own models/fuse.glb (the owner's Meshy model, its texture stored as WebP) loads in the page and replaces the placeholder
+  await q.close().catch(() => {});
+  const real = await createServer({countdownMs: 60000});
+  try {
+    const rp = await solo(real.port);
+    await until("the repo's own models/fuse.glb replaces the placeholder", rp, () => window.__game.FZ.vis.items.every(i => i.o.userData.model));
+    check("and it is about 0.4 m tall", await rp.evaluate(() => { const o = window.__game.FZ.vis.items[0].o, w = o.children.find(c => c.type === "Group" && c !== o.userData.art); return !!w && Math.abs(w.children[0].scale.y * 0.95 - 0.4) < 0.02; }));
+  } finally { await real.close(); }
 } catch (e) { console.log("ERROR", e); failed++; }
 check("no page errors", errors.length === 0, errors.slice(0, 3).join(" | "));
-await browser.close(); await plain.close(); await withModel.close(); fs.rmSync(tmp, {recursive: true, force: true});
+await browser.close(); await plain.close(); await withModel.close(); fs.rmSync(tmp, {recursive: true, force: true}); fs.rmSync(tmpPlain, {recursive: true, force: true});
 console.log(failed ? `${failed} FAILED` : "ALL PASSED");
 process.exit(failed ? 1 : 0);

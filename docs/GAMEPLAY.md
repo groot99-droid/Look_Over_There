@@ -42,7 +42,7 @@ The stair door at the top of each floor stays locked until that floor's puzzle i
 - A carrier is easier to find: monsters hear a carrier walking or running 1.5x as far, and a crouching carrier is no longer silent (heard at 0.4x the hearing range) and is seen from 0.75x instead of 0.5x. Other players see a glow round a carrier.
 - A downed carrier drops the fuse where they fell. A carrier who leaves the floor or the room puts it back where it started. A powered door stays powered.
 - State is held by the server per room (`shared/fuses.js` is the one rule set, used by the server and by solo play); a late joiner sees the current state.
-- The art is drawn in code for now; an optional `models/fuse.glb` replaces it (`docs/MODELS.md` has the Meshy prompts and the budget).
+- The art is the owner's Meshy model, `models/fuse.glb` (a glass cartridge fuse with brass-grey end caps, 2,096 triangles, scaled to 0.4 m); the code-made cylinder stays as the fallback if the file cannot load.
 
 ### Switches (built)
 - Two switch posts stand at least 14 m apart (usually 25+), in the same places for everyone (seeded, like the fuses). Press E / X within 1.6 m to flip one. They are flipped one at a time, by anyone, in any order, and stay flipped; both on powers the stair door. The lamps over the door and the HUD (`SWITCHES 1/2`) show progress.
