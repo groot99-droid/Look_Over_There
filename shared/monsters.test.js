@@ -144,3 +144,15 @@ test("a slowed monster moves at half speed in a chase, and so covers less ground
   assert.equal(full.state, "chase"); assert.equal(full.speed, cfgOf("creature").chase); assert.ok(full.d > 2.5, "it is chasing, not standing: " + full.d);
   assert.equal(half.speed, cfgOf("creature").chase * 0.5, "every speed times the slow"); assert.ok(half.d < full.d * 0.75, `${half.d} against ${full.d}`);
 });
+
+test("burning: 10 a second and slowed to 0.6 for the time given; it adds to the jelly's damage, the strongest slow wins, and a longer burn is kept", () => {
+  const W = mkWorld("L4"), env = mkEnv(W), [a] = clearPair(W, 4);
+  const mk = name => new MonsterSim(cfgOf(name), "L4", a[0], a[1], env);
+  const m = mk("creature"); m.burn(4, 10, 0.6); assert.equal(m.slowMul(), 0.6);
+  assert.equal(m.statusTick(1), false); assert.ok(Math.abs(m.hp - 90) < 1e-9);
+  m.burn(2, 10, 0.6); assert.ok(Math.abs(m.burnT - 3) < 1e-9, "a shorter burn does not cut the time"); m.burn(4, 10, 0.6); assert.equal(m.burnT, 4, "a fresh flame restarts it");
+  m.jelly(10, 15, 0.5); assert.equal(m.slowMul(), 0.5, "the jelly is the stronger slow"); m.statusTick(1); assert.ok(Math.abs(m.hp - (90 - 25)) < 1e-9, "10 and 15 together");
+  m.statusTick(3); assert.equal(m.burnT, 0); assert.equal(m.slowMul(), 0.5, "burn over, jelly still on");
+  const d = mk("pale_traveler"); d.burn(100, 10, 0.6); let t = 0; for (; t < 20; t += 0.05) if (d.statusTick(0.05)) break; assert.ok(Math.abs(t - 8) < 0.1, "80 health at 10 a second: " + t);
+  const o = new MonsterSim({...cfgOf("creature"), hp: undefined}, "L4", a[0], a[1], env); o.burn(10, 10, 0.6); assert.equal(o.statusTick(5), false); assert.equal(o.hp, Infinity);
+});

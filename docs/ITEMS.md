@@ -278,7 +278,11 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
   3. Sell bolts at $1 each, and the crossbow at $40, when the Market exists. Until then keep the free start.
   4. Add the aim on right click / LT.
 
-### 4.3 Propane flamethrower [PROPOSAL] (model: `Rustborn_Flamethrower`)
+### 4.3 Propane flamethrower [BUILT, solo Going back in] (model: `Rustborn_Flamethrower`)
+
+**Built (session 22):** `shared/flame.js` and `shared/flame.test.js` (the fuel, the swap, the cone, the wall at your feet), the Burning status on `MonsterSim` (`burn`, and `statusTick` now adds every running status together; `shared/monsters.test.js`), `burnTime` on the sinew in `world/monsters.json`, the page (`index.html`: hold to burn on left click or RT, the swap on right click or LT, orange puffs along the view, a red-orange glow on a burning monster, the HUD line `FUEL 90%  SPARE 100%`, packs, death), `tools/flame_test.mjs`. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* the burn damage (10 a second) runs the whole time a monster is burning, including while you still hold the flame on it, so inside the flame it is 50 a second and a creature falls in 2 s (20% of a tank), not the 2.5 s the table in section 9 gives; a pack's 25% goes to the tank and what does not fit fills the spare canister (so a spare comes from packs until the Market sells canisters); swapping exchanges the two canisters (a half-empty one becomes the spare); a burst is "new" after 0.5 s without flame; a wall within 1 m of your face costs you one hit of 35, repeated each time the hit's one second of grace ends while you keep burning it; you count as running (noise) for as long as you fire and the cloak goes off.
+- *Not built:* the Market (it starts in the locker, with a full tank and no spare); the toxic gas chamber's ignition (no gas exists yet); the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`); the other players' hit from the flame (solo has none).
 
 - **What it is.** A blue propane tank strapped to a rifle frame. It lights the corridor up, and everything in the corridor knows.
 - **Role.** Close area control: it holds a doorway against a crowd.
