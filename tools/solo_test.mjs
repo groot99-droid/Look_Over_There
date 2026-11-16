@@ -370,6 +370,11 @@ try {
     const rp = await solo(real.port);
     await until("the repo's own models/fuse.glb replaces the placeholder", rp, () => window.__game.FZ.vis.items.every(i => i.o.userData.model));
     check("and it is about 0.4 m tall", await rp.evaluate(() => { const o = window.__game.FZ.vis.items[0].o, w = o.children.find(c => c.type === "Group" && c !== o.userData.art); return !!w && Math.abs(w.children[0].scale.y * 0.95 - 0.4) < 0.02; }));
+    // Solo pressed before the open-rooms list has come back (a slow /rooms): the lobby is already gone, and filling it in must not throw
+    const sp = await (await browser.newContext({viewport: {width: 640, height: 400}})).newPage(); let thrown = null; sp.on("pageerror", e => { thrown ||= e.message; });
+    await sp.route("**/rooms*", async r => { await new Promise(x => setTimeout(x, 1500)); r.continue(); });
+    await sp.goto(`http://localhost:${real.port}/`); await sp.click("#l-solo"); await sp.waitForTimeout(2500);
+    check("pressing Solo before the open-rooms list comes back throws nothing", thrown === null, thrown || ""); await sp.close();
   } finally { await real.close(); }
 } catch (e) { console.log("ERROR", e); failed++; }
 check("no page errors", errors.length === 0, errors.slice(0, 3).join(" | "));
