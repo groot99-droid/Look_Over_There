@@ -7,20 +7,40 @@ import {HIT_DMG} from "../shared/health.js";
 import {LURE_S, reverse as reverseLure} from "../shared/beacon.js";
 import {STUN_S} from "../shared/cloak.js";
 import {ALARM_MS} from "../shared/finish.js";
+import {wavePlan, startWave, killed} from "../shared/gbi.js";
+import {killShot, SHOT_NOISE_S as BOLT_NOISE_S} from "../shared/crossbow.js";
+import {placeTrap, springs, FLASH_THROW_M, FLASH_R, FLASH_STUN_S, WIRE_NOISE_R} from "../shared/consumables.js";
 
 export const TICK_S = 0.05, SNAP_EVERY = 2, DOORS_EVERY = 10, ALERT_R = 40, THROW_SPEED = 4;
 const nums = (v, n) => Array.isArray(v) && v.length === n && v.every(x => typeof x === "number" && Number.isFinite(x)) ? v : null;
 
 export class Floor {
   // room: the server's room object ({players: Map, power, alarmAt}); io: {to(player, msg), toFloor(msg, exceptId)}; docs: {doc(scene) -> world json}; monCfg: world/monsters.json
-  constructor({scene, room, io, doc, monCfg, rnd = Math.random, onHit = () => {}, flags = p => ({dead: !!p.st.dead, imm: !!p.st.imm, cloak: !!p.st.cloak})}) {
+  // chamber: REGISTRY.chamber(scene) for a Going back in chamber (null for an Original floor). A chamber has no monsters until its wave starts, and is kept while the room lives.
+  constructor({scene, room, io, doc, monCfg, chamber = null, rnd = Math.random, onHit = () => {}, flags = p => ({dead: !!p.st.dead, imm: !!p.st.imm, cloak: !!p.st.cloak})}) {
     this.scene = scene; this.room = room; this.io = io; this.t = 0; this.rnd = rnd; this.onHit = onHit; this.flags = flags;
-    this.W = worldFromDoc(doc, scene, {powerOn: room.power.on});
+    this.chamber = chamber; this.keep = !!chamber; this.wave = null; this.monCfg = monCfg;
+    this.W = worldFromDoc(doc, scene, chamber ? {floor: chamber.floorY, art: chamber.floor} : {powerOn: room.power.on});
     this.env = {W: this.W, now: () => this.t, rnd, openDoor: dr => this.openDoor(dr)};
     this.monsters = spawnPlan(this.W, monCfg, scene).map(p => new MonsterSim(p.cfg, scene, p.x, p.z, this.env));
     this.lures = []; this.ticks = 0; this.hunt = 0; this.beaconSeq = 0;
+    this.traps = []; this.trapSeq = 0;                                // Going back in: the land mines and tripwires set in this chamber and not yet sprung
   }
   players() { return [...this.room.players.values()].filter(p => p.scene === this.scene); }
+  // ---- Going back in: the chamber's wave (shared/gbi.js). It starts once, when the first player steps in, away from where they stand; each monster keeps a number (`wid`) for
+  // the life of the room, so a kill can name it. Returns true if this call started it.
+  enterChamber(p) {
+    if (!this.chamber || this.wave || !p.st) return false;
+    this.monsters = wavePlan(this.W, this.monCfg, this.chamber, [[p.st.x, p.st.z]]).map((s, i) => Object.assign(new MonsterSim(s.cfg, this.scene, s.x, s.z, this.env), {wid: i}));
+    this.wave = {...startWave(this.chamber, this.t), monsters: this.monsters.length};
+    return true;
+  }
+  // what a player in the chamber is told about its wave: the count, and each living monster as [wid, x, z] in the order the snapshots use
+  waveMsg(of, fresh = false) {
+    const w = this.wave; if (!w) return null;
+    return {t: "wave", scene: this.scene, no: w.no, of, monsters: w.monsters, kills: w.kills, cleared: w.cleared, kind: this.chamber.wave.kind, l: this.monsters.map(m => [m.wid, +m.pos.x.toFixed(2), +m.pos.z.toFixed(2)]),
+      traps: this.traps.map(t => this.trapView(t)), ...(fresh ? {fresh: 1} : {})};
+  }
   exited(p) { return !!(this.room.run && this.room.run.exits.some(e => e.id === p.id)); }
   // who the monsters can see and hear: living, not newly lifted (immune), still in the building; a shot counts as running noise for half a second
   targets() {
@@ -57,6 +77,50 @@ export class Floor {
     if (r) this.io.toFloor({t: "zap", scene: this.scene, i: r.i, from: r.from, to: r.to});
     return {r};
   }
+  // a monster of the wave is dead for good (a bolt, a trap): gone from the floor and its snapshots, counted toward the wave, and everyone in the chamber is told which
+  kill(m, by = 0) {
+    const i = this.monsters.indexOf(m); if (i < 0) return false;
+    this.monsters.splice(i, 1); if (this.wave) this.wave = killed(this.wave);
+    this.io.toFloor({t: "kill", scene: this.scene, id: m.wid, by, x: +m.pos.x.toFixed(2), z: +m.pos.z.toFixed(2), kills: this.wave ? this.wave.kills : 0, cleared: !!(this.wave && this.wave.cleared)});
+    return true;
+  }
+  // a crossbow bolt (Going back in): checked like a ray shot; it kills the monster it hits, whatever its state. `spend()` takes the bolt once the shot is known to be genuine.
+  // Returns null when refused, else {m: the monster killed or null, e: where the bolt stopped}.
+  bolt(p, o, d, spend = () => true) {
+    o = nums(o, 3); d = nums(d, 3); if (!this.chamber || !o || !d || !p.st) return null;
+    if (Math.hypot(o[0] - p.st.x, o[2] - p.st.z) > 3 || Math.abs(o[1] - p.st.y - 1.5) > 1.2) return null;
+    const L = Math.hypot(...d); if (!(L > 0.5 && L < 1.5)) return null; d = d.map(v => v / L);
+    if (!spend()) return null;
+    p.shotT = BOLT_NOISE_S;                                          // half the ray's noise
+    const m = killShot(this.W, this.monsters, o, d), t = m ? Math.hypot(m.pos.x - o[0], m.pos.z - o[2]) : 25;
+    if (m) this.kill(m, p.id);
+    return {m, e: [o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t]};
+  }
+  // ---- the Q and E consumables (shared/consumables.js). The caller has taken one from the player's kit.
+  // may a flash-vial thrown by p land at (x, z)? Within the throw of where the server has them (a little slack: the page shortens the throw at a wall).
+  flashOk(p, x, z) { return !!this.chamber && !!p.st && Number.isFinite(x) && Number.isFinite(z) && Math.hypot(x - p.st.x, z - p.st.z) <= FLASH_THROW_M + 1; }
+  // the vial bursts at (x, z): every monster within FLASH_R is stunned; the chamber sees the flash
+  flash(p, x, z) {
+    const n = stunNear(this.monsters, x, this.W.floor, z, FLASH_STUN_S, FLASH_R).length;
+    this.io.toFloor({t: "flash", scene: this.scene, from: p.id, x: +x.toFixed(2), z: +z.toFixed(2), n, secs: FLASH_STUN_S});
+  }
+  trapView(t) { return {id: t.id, kind: t.kind, by: t.by, x: t.x, z: t.z, arm: +Math.max(0, t.armAt - this.t).toFixed(2)}; }          // arm: seconds until it is armed
+  // a land mine or a tripwire set down where the server has the player; everyone in the chamber sees it
+  setTrap(p, kind) {
+    if (!this.chamber || !p.st) return null;
+    const t = {...placeTrap(kind, +p.st.x.toFixed(2), +p.st.z.toFixed(2), this.t), id: ++this.trapSeq, by: p.id};
+    this.traps.push(t); this.io.toFloor({t: "trap", scene: this.scene, ...this.trapView(t)}); return t;
+  }
+  // armed traps go off when a monster is on them: it (a mine) or everything in the blast (a tripwire) dies, and a tripwire's blast is loud
+  stepTraps() {
+    for (const t of this.traps) {
+      const r = springs(t, this.t, this.monsters); if (!r) continue;
+      t.done = true; this.io.toFloor({t: "sprung", scene: this.scene, id: t.id, kind: t.kind, x: t.x, z: t.z});
+      for (const m of r.kills) this.kill(m, t.by);
+      if (r.loud) this.alertNear(t.x, t.z, WIRE_NOISE_R);
+    }
+    if (this.traps.some(t => t.done)) this.traps = this.traps.filter(t => !t.done);
+  }
   // a thrown AFK Beacon: it rolls from the thrower to (x, z) at 4 m/s, then runs for LURE_S seconds
   beacon(p, x, z, spend = () => true) {
     if (!p.st || !Number.isFinite(x) || !Number.isFinite(z) || Math.abs(x) > 500 || Math.abs(z) > 500 || !spend()) return false;
@@ -90,6 +154,7 @@ export class Floor {
     this.lures = this.lures.filter(b => this.t < b.until + 1);
     for (const m of this.monsters) for (const id of m.update(dt, targets, live).caught) this.onHit(id, HIT_DMG, m);
     swarmApart(this.monsters, dt);
+    if (this.traps.length) this.stepTraps();
     if (this.ticks % SNAP_EVERY === 0) {
       const msg = {t: "m", scene: this.scene, l: this.monsters.map(m => m.snapshot())};
       if ((this.ticks / SNAP_EVERY) % DOORS_EVERY === 1) msg.d = this.W.doors.filter(d => !d.link && d.target === 1).map(d => d.d.name);          // late joiners learn which doors are open

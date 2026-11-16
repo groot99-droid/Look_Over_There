@@ -68,3 +68,32 @@ test("counters: time on each floor adds up per scene, and a snapshot does not ch
   assert.deepEqual(ps.stats.floorMs, {B1: 750, L1: 1000});
   const snap = statsOf(ps); onFloor(ps, "B1", 1); assert.equal(snap.floorMs.B1, 750); assert.equal(ps.stats.floorMs.B1, 1750);
 });
+
+// ---- Going back in in a room (session 16): the loadout, the crossbow and the consumables are kept here
+import {newGbiPS, gbiGear, gbiSetE, gbiSlot, gbiUse, shootBow, gbiDied} from "./playerstate.js";
+import {GUN_ROUNDS} from "../shared/loot.js";
+import {START_BOLTS, PACK_BOLTS, RELOAD_S} from "../shared/crossbow.js";
+import {START as KIT_START} from "../shared/consumables.js";
+test("Going back in: you start with all your gear; the loadout decides the ray and the cloak; the Original's state has none of it", () => {
+  const ps = newGbiPS(), v = view(ps);
+  assert.deepEqual(v.carry, ["gun", "cloak", "crossbow"]); assert.equal(v.bolts, START_BOLTS); assert.deepEqual(v.kit, {n: KIT_START, e: "mine"}); assert.equal(v.rounds, GUN_ROUNDS); assert.ok(v.gun && v.cloak);
+  assert.ok(gbiGear(ps, "leave", "gun")); assert.equal(ps.gun, false); assert.ok(!shoot(ps, 10), "the ray is in the locker"); assert.equal(ps.rounds, GUN_ROUNDS, "its rounds stay on you");
+  assert.ok(!gbiGear(ps, "leave", "gun"), "already there"); assert.ok(!gbiGear(ps, "take", "sword")); assert.ok(!gbiGear(ps, "grab", "gun"));
+  assert.ok(gbiGear(ps, "leave", "cloak")); assert.equal(ps.cloak, null); assert.ok(gbiGear(ps, "take", "cloak")); assert.ok(ps.cloak);
+  assert.ok(gbiGear(ps, "take", "gun")); assert.ok(shoot(ps, 10));
+  const o = newPS(); assert.equal(view(o).carry, undefined); assert.equal(view(o).kit, undefined); assert.ok(!gbiGear(o, "take", "gun")); assert.ok(!shootBow(o)); assert.equal(gbiUse(o, 0), null); assert.ok(!gbiSetE(o, "wire"));
+  gotPack(o); assert.equal(o.gbi, undefined, "an Original pack is rounds only");
+});
+test("Going back in: a bolt costs one and the bow must reload; consumables are counted; a death puts the gear in the locker and takes the ammunition", () => {
+  const ps = newGbiPS();
+  assert.ok(shootBow(ps)); assert.equal(ps.gbi.bow.bolts, START_BOLTS - 1); assert.ok(!shootBow(ps), "reloading"); assert.equal(ps.stats.shots, 1);
+  tick(ps, RELOAD_S, 5); assert.ok(shootBow(ps)); gbiGear(ps, "leave", "crossbow"); tick(ps, RELOAD_S, 8); assert.ok(!shootBow(ps), "not in hand");
+  gotPack(ps); assert.equal(ps.gbi.bow.bolts, START_BOLTS - 2, "no bolts for a crossbow left in the locker"); assert.equal(ps.gbi.kit.n.flash, Math.min(3, KIT_START.flash + 1));
+  gbiGear(ps, "take", "crossbow"); gotPack(ps); assert.equal(ps.gbi.bow.bolts, START_BOLTS - 2 + PACK_BOLTS);
+  assert.equal(gbiSlot(ps, 1), "mine"); assert.equal(gbiSlot(ps, 2), null); assert.ok(gbiSetE(ps, "wire")); assert.ok(!gbiSetE(ps, "wire")); assert.ok(!gbiSetE(ps, "flash")); assert.equal(gbiUse(ps, 1), "wire"); assert.equal(gbiUse(ps, 1), null, "one tripwire to start with");
+  assert.equal(gbiUse(ps, 0), "flash");
+  hit(ps, 100, 20); assert.ok(isDown(ps)); assert.ok(!gbiGear(ps, "leave", "gun")); assert.equal(gbiUse(ps, 0), null); assert.ok(!shootBow(ps));
+  assert.equal(tick(ps, 0.05, 20 + DOWNED_S), "respawn"); gbiDied(ps);
+  const v = view(ps); assert.deepEqual(v.carry, []); assert.equal(v.gun, false); assert.equal(v.cloak, null); assert.equal(v.rounds, 0); assert.equal(v.bolts, 0); assert.deepEqual(v.kit.n, {flash: 0, mine: 0, wire: 0}); assert.equal(v.kit.e, "wire", "the E slot's choice is kept");
+  for (const g of ["gun", "cloak", "crossbow"]) assert.ok(gbiGear(ps, "take", g)); assert.ok(ps.gun && ps.cloak); assert.equal(ps.rounds, 0);
+});
