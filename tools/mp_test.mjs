@@ -18,6 +18,12 @@ const srv = await createServer({port: 0, countdownMs: 400});
 const roomOf = code => srv.rooms.get(code), floorOf = (scene, code = "TEST") => roomOf(code).floors[scene], playerOf = (id, code = "TEST") => roomOf(code).players.get(id);
 const parkMonsters = (floor, except = -1) => floor.monsters.forEach((m, i) => { m.cfg = {...m.cfg, patrol: 0, alert: 0, chase: 0}; if (i !== except) { m.pos.set(900 + i * 5, m.fy, 900); m.state = "patrol"; m.path = []; m.wait = 99; } });       // keep them from interfering
 const guard = code => { for (const p of roomOf(code).players.values()) p.ps.immUntil = 1e15; };                    // the server's immunity: monsters ignore the players (tests that want a hit lift it)
+// The same for one player, by name, from the moment the server has them in a started round (the start gives every player a fresh state, so not earlier), which is
+// before their page has loaded the game. A page that is in the game while the test still waits for another page to load stands among live monsters. A player downed
+// then comes back with only the server's own few seconds of safety (the respawn replaces the guard), and a key pressed while a player is down does nothing: the
+// finale's switch press was lost that way.
+const guardWhenIn = async (code, name, ms = 60000) => { const end = Date.now() + ms; while (Date.now() < end) { const r = roomOf(code), p = r && r.phase === "playing" && [...r.players.values()].find(q => q.name === name); if (p) { p.ps.immUntil = 1e15; return true; } await sleep(20); } return false; };
+const hpOf = p => `${p.name}: ${Math.round(p.ps.hp.hp)} HP, ${p.ps.downAt ? "down" : "up"}, ${p.ps.stats.deaths} deaths, ${p.ps.immUntil > 1e14 ? "guarded" : "not guarded"}`;          // the server's word on a player's health
 const serverDown = id => { const p = playerOf(id), now = Date.now() / 1000; p.ps.hp = {hp: 0, hurtAt: now}; p.ps.downAt = now; };          // the server downs a player: their client hears it
 const serverUntil = async (name, fn, ms = 30000, why = () => "") => { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return check(name, true); await sleep(100); } check(name, false, why()); };
 // waits until the server has player `id` within 0.5 m of (x, z), and (given y) within 0.3 m of that height. The server judges a door, and centres a switch's noise,
@@ -230,7 +236,7 @@ try {
   await until("and for the host", host, () => window.__game.KP.st.L2.solved);
 
   // ---- power: the host throws the L3 box (the quick way); the guest, who comes to L4 afterwards, finds the doors open
-  const onFloor = id => Promise.all([a, b].map(pg => pg.evaluate(i => window.__game.loadScene(i), id).then(() => pg.waitForFunction(i => { const g = window.__game; return g.S.id === i && !g.loading && [...g.net.peers.values()].every(q => q.scene === i); }, id, {timeout: 60000}))));
+  const onFloor = id => Promise.all([a, b].map(pg => pg.evaluate(i => window.__game.loadScene(i), id).then(() => pg.waitForFunction(i => { const g = window.__game; return g.S.id === i && !g.loading && [...g.net.peers.values()].every(q => q.scene === i); }, id, {timeout: 170000})))).catch(e => { check(`both pages arrive on ${id} and know the other is there`, false, [...roomOf("TEST").players.values()].map(xzOf).join("; ")); throw e; });          // 170 s like the finale's arrival on L4: two pages drawing L4 in software took 50 to 89 s to arrive there, measured in the finale
   await onFloor("L3");
   A = await info(a); B = await info(b);
   check("the power starts off for both players", await a.evaluate(() => !window.__game.POWER.on) && await b.evaluate(() => !window.__game.POWER.on));
@@ -319,7 +325,7 @@ try {
   const solo2 = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage();
   solo2.on("pageerror", e => console.log("[Cy pageerror]", e.message));
   await solo2.goto(`http://localhost:${srv.port}/?room=OTHER&name=Cy&char=2&auto=1&ready=1`);
-  await inGame(solo2); guard("OTHER");
+  await guardWhenIn("OTHER", "Cy"); await inGame(solo2); guard("OTHER");
   await solo2.evaluate(() => window.__game.loadScene("L4")); await solo2.waitForFunction(() => window.__game.S.id === "L4" && !window.__game.loading, null, {timeout: 60000});
   check("a room that did not use the L3 box finds L4 shut", await solo2.evaluate(() => { const g = window.__game; return !g.POWER.on && !g.S.shutter.off && !!g.collide({x: 0, y: g.S.floor + 0.3, z: 27.2}); }));
   await serverUntil("the server runs L4 for the other room", () => !!floorOf("L4", "OTHER")); parkMonsters(floorOf("L4", "OTHER"));
@@ -333,16 +339,23 @@ try {
 
   // ---- the finale in a third room: the alarm for both, the first out is place 1, the results come when the second is out
   for (const pg of [a, b, solo2]) await pg.close().catch(() => {});             // software rendering: free the CPU for the last room
-  const mk = async (name, char) => { const pg = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage(); pg.on("pageerror", e => console.log(`[${name} pageerror]`, e.message)); await pg.goto(`http://localhost:${srv.port}/?room=FIN&name=${name}&char=${char}&auto=1&ready=1`); await inGame(pg); return pg; };
+  const mk = async (name, char) => { const pg = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage(); pg.on("pageerror", e => console.log(`[${name} pageerror]`, e.message)); await pg.goto(`http://localhost:${srv.port}/?room=FIN&name=${name}&char=${char}&auto=1&ready=1`); await guardWhenIn("FIN", name); await inGame(pg); return pg; };          // guarded at once: Xia stands on B1 while Yul's page loads
   const x = await mk("Xia", 1), y = await mk("Yul", 4);
   await serverUntil("both are in the finale room", () => roomOf("FIN") && roomOf("FIN").players.size === 2); guard("FIN");
   const toL4 = pg => pg.evaluate(() => window.__game.loadScene("L4")).then(() => pg.waitForFunction(() => window.__game.S.id === "L4" && !window.__game.loading, null, {timeout: 170000}));
   await toL4(x); await toL4(y);
   await serverUntil("the server runs L4 for the finale room", () => !!floorOf("L4", "FIN") && roomOf("FIN").players.size === 2); parkMonsters(floorOf("L4", "FIN"));
-  await x.evaluate(() => { const g = window.__game, sp = g.S.pw.spot; g.P.imm = 99; g.P.p.set(sp[0] + 1.2, g.S.floor + 0.02, sp[1]); g.P.v.set(0, 0, 0); });
+  // The press needs Xia up, on L4 for the server (it takes the power by the floor a player is on, not by where they stand) and in reach of the switch on her own page
+  // (which reads her position as set, with no frame in between). So this does not wait for a frame or for the server to hear the new position: with two pages
+  // drawing L4 in software a frame can take most of a minute, and a wait the press does not need would only add a way to time out.
+  const fin = () => [...roomOf("FIN").players.values()], xia = fin().find(p => p.name === "Xia"), finView = () => `server has Xia on ${xia.scene}; ${fin().map(hpOf).join("; ")}`;
+  await serverUntil("the server has Xia on L4, and nobody in the finale room was hurt on the way", () => xia.scene === "L4" && fin().every(p => !p.ps.downAt && p.ps.hp.hp >= 100 && p.ps.stats.deaths === 0 && p.ps.immUntil > 1e14), 30000, finView);
+  const atPress = await x.evaluate(() => { const g = window.__game, sp = g.S.pw.spot; g.P.imm = 99; g.P.p.set(sp[0] + 1.2, g.S.floor + 0.02, sp[1]); g.P.v.set(0, 0, 0); return {near: g.nearPower(), dead: g.dead, loading: g.loading, scene: g.S.id}; });
+  check("Xia's page has her in reach of the L4 switch", atPress.near, atPress.near ? "" : JSON.stringify(atPress));
   await x.keyboard.press("KeyX");
-  await until("the L4 switch sets off the alarm for both players", y, () => window.__game.POWER.on && window.__game.FIN.alarmUntil > 0);
-  await until("and for the one who threw it", x, () => window.__game.FIN.alarmUntil > 0);
+  const alarmView = () => `at the press Xia's page had ${JSON.stringify(atPress)}; server power ${JSON.stringify(roomOf("FIN").power)}, alarm ${roomOf("FIN").alarmAt ? "on" : "off"}; ${finView()}; ${xzOf(xia)}`;
+  if (!await until("the L4 switch sets off the alarm for both players", y, () => window.__game.POWER.on && window.__game.FIN.alarmUntil > 0, undefined, alarmView)) console.log("  why: teleports on Xia's page: " + await jumpsOf(x));
+  await until("and for the one who threw it", x, () => window.__game.FIN.alarmUntil > 0, undefined, alarmView);
   await y.evaluate(() => { const g = window.__game; g.P.imm = 99; g.step(0.05); });
   check("the alarm shows a countdown", await y.evaluate(() => /ALARM \d:\d\d/.test(document.getElementById("alarm").textContent)));
   await x.evaluate(() => { const g = window.__game; g.P.p.set(0, g.S.floor + 0.02, g.EXIT_Z + 0.5); g.step(0.02); });
@@ -353,7 +366,8 @@ try {
   await y.evaluate(() => { const g = window.__game; g.P.p.set(1, g.S.floor + 0.02, g.EXIT_Z + 0.5); g.step(0.02); });
   await until("when the second is out both see the results", x, () => !!window.__game.FIN.results);
   await until("and the other one", y, () => !!window.__game.FIN.results);
-  check("places are 1 and 2, in the order they left", await x.evaluate(() => window.__game.FIN.results.map(r => r.place + r.name).join()) === "1Xia,2Yul");
+  const places = await x.evaluate(() => { const r = window.__game.FIN.results; return r ? r.map(e => e.place + e.name).join() : null; });          // no results is a failed check, not a crash
+  check("places are 1 and 2, in the order they left", places === "1Xia,2Yul", places === "1Xia,2Yul" ? "" : places === null ? "there are no results" : "got " + places);
   check("the results screen shows", await y.evaluate(() => getComputedStyle(document.getElementById("results")).display === "flex" && [...document.querySelectorAll("#r-rows tr")].filter(r => r.querySelector("td")).length === 2));   // the table has a header row since results v2
 } catch (e) { console.log("ERROR", e); failed++; }
 await browser.close(); await srv.close();

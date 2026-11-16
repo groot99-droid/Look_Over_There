@@ -115,7 +115,12 @@ try {
   await until("Bob, still upstairs, learns Ann went down and keeps his own wave", b, ([s, no]) => { const g = window.__game; return [...g.net.peers.values()].some(p => p.name === "Ann" && p.scene === s) && g.GB.wave.no === no; }, [NEXT, first.wave.no], () => view(b));
   check("the chamber upstairs still has its monsters", floorOf(START).monsters.length === first.wave.monsters, serverView(START));
   const t1 = floorOf(NEXT).wave.t0;
-  await takeStairs(b, first.stairsDown); await settled(b, NEXT);
+  // Bob follows her with the party list (session 17): P shows where Ann is, and Go takes him to her spot
+  const annId = await a.evaluate(() => window.__game.net.id), annSpot = await serverHasMe(a, NEXT) && [playerOf(annId).st.x, playerOf(annId).st.z];
+  await b.evaluate(() => window.__game.openParty());
+  await until("the party list says Ann is in the next chamber's wave and offers Go", b, ([id, no]) => { const r = document.querySelector(`#pt-rows .row[data-id="${id}"]`); return !!r && r.textContent.includes(`wave ${no}`) && !!r.querySelector("[data-go]"); }, [annId, next.wave.no], () => b.evaluate(() => document.getElementById("pt-rows").textContent));
+  await b.click(`#pt-rows [data-go="${annId}"]`); await settled(b, NEXT);
+  check("Bob arrives where Ann stands", await b.evaluate(([x, z]) => Math.hypot(window.__game.P.p.x - x, window.__game.P.p.z - z) < 1.5, annSpot), await view(b));
   check("the server has Bob in the next chamber", await serverHasMe(b, NEXT), serverView(NEXT));
   await until("Bob has the same wave Ann met, not a new one", b, ([no, n]) => { const g = window.__game; return g.GB.wave && g.GB.wave.no === no && g.monsters.length === n; }, [next.wave.no, next.wave.monsters], () => both(b, NEXT));
   check("the next chamber's wave started once", floorOf(NEXT).wave.t0 === t1 && floorOf(NEXT).monsters.length === next.wave.monsters, serverView(NEXT));
@@ -123,7 +128,7 @@ try {
   await until("they see each other downstairs", a, s => [...window.__game.net.peers.values()].some(p => p.name === "Bob" && p.scene === s), NEXT, () => view(a));
 
   // ---- slice 2: the locker. Both pages put it in the same place; what you carry is the server's, and each player's own
-  const annId = await a.evaluate(() => window.__game.net.id), bobId = await b.evaluate(() => window.__game.net.id), pa = playerOf(annId), pb = playerOf(bobId);
+  const bobId = await b.evaluate(() => window.__game.net.id), pa = playerOf(annId), pb = playerOf(bobId);
   const spots = await Promise.all([a, b].map(p => p.evaluate(() => window.__game.STN.spot)));
   check("the chamber's locker stands in the same place on both pages", !!spots[0] && JSON.stringify(spots[0]) === JSON.stringify(spots[1]), JSON.stringify(spots));
   check("both start carrying the ray, the cloak and the crossbow with its bolts (the server's word)", JSON.stringify(pa.ps.gbi.load.carry) === JSON.stringify(GEAR) && await a.evaluate(n => { const g = window.__game; return g.GB.load && g.GB.load.carry.length === 3 && g.BOW.st.bolts === n && g.owned().includes("crossbow"); }, START_BOLTS), await view(a));
