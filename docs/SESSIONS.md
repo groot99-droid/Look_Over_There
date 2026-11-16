@@ -22,6 +22,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 15 | `mp_test`: the L4 finale switch race | Round 4 | 14 | not started |
 | 16 | Going back in in rooms | Round 4 | 4 and 8; waits for the owner's playtest and decisions | not started |
 | 17 | Overworld and City in rooms, and "go to a friend" in the page | Round 4 | 4, 6 and 9; waits for the owner's playtest | not started |
+| 18 | Item rules: one document for every item | Round 4 | | **written**, draft PR: `docs/ITEMS.md` proposes rules, prices and tuning tables for all 24 modelled items plus the ray, cloak and beacon. A design document only: no game code, models or manifest changed. Waits for the owner's critique before any of it is built |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
 | 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
