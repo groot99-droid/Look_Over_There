@@ -16,6 +16,8 @@ export const vec = (x, y, z) => ({x, y, z, set(a, b, c) { this.x = a; this.y = b
 export class MonsterSim {
   constructor(cfg, level, x, z, env) {
     this.cfg = cfg; this.level = level; this.env = env; this.fy = env.W.floor;
+    this.slowT = 0; this.slowK = 1; this.jellyT = 0; this.jellyDps = 0; this.jellySlow = 1; this.burnT = 0; this.burnDps = 0; this.burnSlow = 1;          // statuses (docs/ITEMS.md 1.4): a slow, and the jelly (damage over time and a slow)
+    this.hp = cfg.hp > 0 ? cfg.hp : Infinity;                                        // health: only Going back in's weapons take it (hurt); no `hp` in the config means it cannot be killed this way
     this.home = [x, z]; this.pos = vec(x, this.fy, z); this.yaw = env.rnd() * 6.28;
     this.state = "patrol"; this.path = []; this.repath = 0; this.target = null; this.lost = 0; this.wait = 0; this.speed = 0; this.doorT = 0; this.last = null; this.glitchT = 0; this.immuneT = 0; this.stunT = 0; this.fleeId = null;
     this.hitAt = {}; this.k = Math.abs(Math.floor(x * 7.3 + z * 3.1)) % 97; this.lureId = null; this.lureAt = null; this.spot = null; this.tgt = null;
@@ -112,6 +114,7 @@ export class MonsterSim {
         this.wait = 0.6 + env.rnd() * 2.5;
       }
     }
+    speed *= this.slowMul();
     this.speed = 0;
     if (this.path.length && speed > 0) {
       const [tx, tz] = this.path[0], dx = tx - this.pos.x, dz = tz - this.pos.z, dd = Math.hypot(dx, dz);
@@ -145,6 +148,23 @@ export class MonsterSim {
       }
     }
     return false;
+  }
+  slow(k, secs) {                                                            // every speed times k for secs: the strongest slow wins, they do not stack
+    if (this.slowT <= 0 || k < this.slowK) { this.slowK = k; this.slowT = secs; } else if (k === this.slowK) this.slowT = Math.max(this.slowT, secs);
+  }
+  slowMul() { return Math.min(this.slowT > 0 ? this.slowK : 1, this.jellyT > 0 ? this.jellySlow : 1, this.burnT > 0 ? this.burnSlow : 1); }
+  jelly(secs, dps, slowK) { this.jellyT = Math.max(this.jellyT, secs); this.jellyDps = dps; this.jellySlow = slowK; }          // a dart restarts the time; it never adds to the damage
+  burn(secs, dps, slowK) { this.burnT = Math.max(this.burnT, secs); this.burnDps = dps; this.burnSlow = slowK; }          // the flamethrower (shared/flame.js): a fresh flame restarts the time; the damage per second is the same
+  statusTick(dt) {                                                           // time passes for the statuses: true when the jelly takes the last of its health (the page then removes it)
+    if (this.slowT > 0) this.slowT = Math.max(0, this.slowT - dt);
+    const tj = Math.min(dt, Math.max(0, this.jellyT)), tb = Math.min(dt, Math.max(0, this.burnT));
+    if (tj <= 0 && tb <= 0) return false;
+    this.jellyT = Math.max(0, this.jellyT - tj); this.burnT = Math.max(0, this.burnT - tb);
+    return this.hurt(this.jellyDps * tj + this.burnDps * tb);          // the damage over time of every status that was running, together
+  }
+  hurt(dmg) {                                                                // a weapon's damage (docs/ITEMS.md 1.4): true when it takes the last of the health
+    if (!(dmg > 0) || this.hp === Infinity) return false;
+    this.hp = Math.max(0, this.hp - dmg); return this.hp <= 0;
   }
   stun(secs) { this.stunT = Math.max(this.stunT, secs); this.speed = 0; }       // see shared/cloak.js: the short circuit
   banish(x, z) {                                                             // the ray no-clips it to (x, z): it forgets the chase, waits, then patrols, and cannot be banished again for a while

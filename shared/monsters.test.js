@@ -112,3 +112,47 @@ test("a reversed beacon sends monsters away from it, and when it ends they come 
   assert.equal(m.lureId, null, "it is not lured while the frequency is reversed");
   env.t = can.repelUntil + 0.1; tick(m, env, [], 40, 0.05, [can]); assert.ok(Math.hypot(m.pos.x - can.x, m.pos.z - can.z) < 5, "afterwards it comes back to the can and idles round it");
 });
+
+test("monsters have health in Going back in: a hit takes it, 0 is dead; one with no health in its config cannot be killed", () => {
+  assert.deepEqual(Object.fromEntries(monCfg.monsters.map(m => [m.name, m.hp])), {sinew: 140, pale_traveler: 80, clawed: 100, creature: 100}, "docs/ITEMS.md 1.4");
+  const W = mkWorld("L4"), env = mkEnv(W), [a] = clearPair(W, 4);
+  const m = new MonsterSim(cfgOf("creature"), "L4", a[0], a[1], env);
+  assert.equal(m.hp, 100); assert.equal(m.hurt(35), false); assert.equal(m.hp, 65);
+  assert.equal(m.hurt(65), true, "exactly 0 is dead"); assert.equal(m.hp, 0);
+  const ghost = new MonsterSim({...cfgOf("creature"), hp: undefined}, "L4", a[0], a[1], env);
+  assert.equal(ghost.hurt(9999), false, "the Original's monsters have no health to lose"); assert.equal(ghost.hp, Infinity);
+  assert.equal(m.hurt(-5), false, "a bad number does nothing"); assert.equal(m.hp, 0);
+});
+
+test("statuses: a slow multiplies every speed (the strongest wins, they do not stack), and a jellied monster takes damage over time until it dies", () => {
+  const W = mkWorld("L4"), env = mkEnv(W), [a] = clearPair(W, 4);
+  const mk = name => new MonsterSim(cfgOf(name), "L4", a[0], a[1], env);
+  const m = mk("creature"); assert.equal(m.slowMul(), 1);
+  m.slow(0.6, 4); assert.equal(m.slowMul(), 0.6); m.slow(0.8, 9); assert.equal(m.slowMul(), 0.6, "a weaker slow does not replace it"); m.slow(0.5, 2); assert.equal(m.slowMul(), 0.5, "a stronger one does");
+  assert.equal(m.statusTick(2.01), false); assert.equal(m.slowMul(), 1, "and it wears off");
+  // the jelly: 15 a second, slow 0.5, a creature (100) dies after 6.67 s, a pale traveler (80) after 5.33 s, a sinew (140) after 9.33 s
+  const dieAt = name => { const x = mk(name); x.jelly(10, 15, 0.5); assert.equal(x.slowMul(), 0.5); let t = 0; for (; t < 12; t += 0.05) if (x.statusTick(0.05)) return t + 0.05; return null; };
+  assert.ok(Math.abs(dieAt("creature") - 6.67) < 0.1); assert.ok(Math.abs(dieAt("pale_traveler") - 5.33) < 0.1); assert.ok(Math.abs(dieAt("sinew") - 9.33) < 0.1);
+  const r = mk("clawed"); r.jelly(10, 15, 0.5); r.statusTick(5); r.jelly(10, 15, 0.5); assert.equal(r.jellyT, 10, "a second dart restarts the time"); assert.equal(r.jellyDps, 15, "and does not add to the damage");
+  r.statusTick(0.2); assert.ok(Math.abs(r.hp - (100 - 15 * 5.2)) < 0.01, "5.2 s of jelly, not 10.2");
+  const o = new MonsterSim({...cfgOf("creature"), hp: undefined}, "L4", a[0], a[1], env); o.jelly(10, 15, 0.5); assert.equal(o.statusTick(30), false, "the Original's monsters take no damage"); assert.equal(o.hp, Infinity);
+  const s = mk("creature"); s.jelly(10, 15, 0.5); s.statusTick(10); assert.equal(s.jellyT, 0, "it has run out"); assert.equal(s.slowMul(), 1);
+});
+test("a slowed monster moves at half speed in a chase, and so covers less ground", () => {
+  const run = k => { const {m, env, t} = setup(10, "creature", "L4"); m.wait = 0; if (k) m.slow(k, 99); const x0 = m.pos.x, z0 = m.pos.z; tick(m, env, [t], 1); return {d: Math.hypot(m.pos.x - x0, m.pos.z - z0), speed: m.speed, state: m.state}; };
+  const full = run(0), half = run(0.5);
+  assert.equal(full.state, "chase"); assert.equal(full.speed, cfgOf("creature").chase); assert.ok(full.d > 2.5, "it is chasing, not standing: " + full.d);
+  assert.equal(half.speed, cfgOf("creature").chase * 0.5, "every speed times the slow"); assert.ok(half.d < full.d * 0.75, `${half.d} against ${full.d}`);
+});
+
+test("burning: 10 a second and slowed to 0.6 for the time given; it adds to the jelly's damage, the strongest slow wins, and a longer burn is kept", () => {
+  const W = mkWorld("L4"), env = mkEnv(W), [a] = clearPair(W, 4);
+  const mk = name => new MonsterSim(cfgOf(name), "L4", a[0], a[1], env);
+  const m = mk("creature"); m.burn(4, 10, 0.6); assert.equal(m.slowMul(), 0.6);
+  assert.equal(m.statusTick(1), false); assert.ok(Math.abs(m.hp - 90) < 1e-9);
+  m.burn(2, 10, 0.6); assert.ok(Math.abs(m.burnT - 3) < 1e-9, "a shorter burn does not cut the time"); m.burn(4, 10, 0.6); assert.equal(m.burnT, 4, "a fresh flame restarts it");
+  m.jelly(10, 15, 0.5); assert.equal(m.slowMul(), 0.5, "the jelly is the stronger slow"); m.statusTick(1); assert.ok(Math.abs(m.hp - (90 - 25)) < 1e-9, "10 and 15 together");
+  m.statusTick(3); assert.equal(m.burnT, 0); assert.equal(m.slowMul(), 0.5, "burn over, jelly still on");
+  const d = mk("pale_traveler"); d.burn(100, 10, 0.6); let t = 0; for (; t < 20; t += 0.05) if (d.statusTick(0.05)) break; assert.ok(Math.abs(t - 8) < 0.1, "80 health at 10 a second: " + t);
+  const o = new MonsterSim({...cfgOf("creature"), hp: undefined}, "L4", a[0], a[1], env); o.burn(10, 10, 0.6); assert.equal(o.statusTick(5), false); assert.equal(o.hp, Infinity);
+});
