@@ -10,13 +10,14 @@ import {BUS_STREET} from "./city.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const clone = o => structuredClone(o);
-const worldDocs = () => Object.fromEntries(Object.keys(REGISTRY.floors).map(id => [id, JSON.parse(fs.readFileSync(path.join(ROOT, `world/${id}.json`), "utf8"))]));
+const worldDocs = () => Object.fromEntries(REGISTRY.modes.original.floors.map(id => [id, JSON.parse(fs.readFileSync(path.join(ROOT, `world/${id}.json`), "utf8"))]));
 const bad = (mutate, expect) => { const d = clone(FARWAY); mutate(d); const e = validateManifest(d); assert.ok(e.some(m => expect.test(m)), `wanted ${expect}, got ${JSON.stringify(e)}`); };
 
 // ---- the values that used to be written out by hand in six files. If one of these changes, a rule of the game changed: say so on purpose.
 test("the registry gives the same floors, scenes, puzzles, loot and room size the code used to hard-code", () => {
-  assert.deepEqual(REGISTRY.floors, {B1: -3.0, L1: 0, L2: 3.2, L3: 6.4, L4: 9.6});
-  assert.deepEqual(Object.keys(REGISTRY.floors), ["B1", "L1", "L2", "L3", "L4"], "order matters: the page seeds spots by scene index");
+  assert.deepEqual(REGISTRY.floors, {B1: -3.0, L1: 0, L2: 3.2, L3: 6.4, L4: 9.6, gbi_L4_4: 9.6, gbi_L3_1: 6.4});          // session 16: the two chambers are scenes a room's server runs
+  assert.deepEqual(Object.keys(REGISTRY.floors), ["B1", "L1", "L2", "L3", "L4", "gbi_L4_4", "gbi_L3_1"]);
+  assert.deepEqual(Object.keys(REGISTRY.pageScenes).slice(0, 5), ["B1", "L1", "L2", "L3", "L4"], "order matters: the page seeds spots by scene index");
   assert.deepEqual(REGISTRY.pageScenes, {
     B1: {glbs: ["world/B1.glb"], floor: -3.0}, L1: {glbs: ["world/L1.glb"], floor: 0}, L2: {glbs: ["world/L2.glb"], floor: 3.2},
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
@@ -114,10 +115,10 @@ test("a planned scene never reaches the page or the server", () => {
   assert.ok(REGISTRY.links.some(l => l.id === "city.street>jobs" && l.status === "planned"), "planned links are listed");
 });
 test("the Overworld's parking lot is on the page but never a floor the server runs", () => {
-  assert.equal(REGISTRY.floors.parking_lot, undefined, "a room cannot enter it yet");
+  assert.equal(REGISTRY.floors.parking_lot, undefined, "the server runs nothing there (a room can be in it: see the presence tests)");
   assert.deepEqual(REGISTRY.pageScenes.parking_lot, {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6});
   const l = REGISTRY.links.find(x => x.id === "lot.L4.front_doors>overworld");
-  assert.deepEqual([l.status, l.soloOnly, l.requires], ["built", true, ["original_complete"]]);
+  assert.deepEqual([l.status, l.requires], ["built", ["original_complete"]]);
   assert.deepEqual(requirementsMet(l, []), {ok: false, missing: ["original_complete"]}, "shut until the Original has been finished");
   assert.equal(requirementsMet(l, ["original_complete"]).ok, true);
   const doc = JSON.parse(fs.readFileSync(path.join(ROOT, "world/parking_lot.json"), "utf8"));
@@ -149,7 +150,7 @@ test("an addon adds scenes, links and a mode without touching the base", () => {
   const m = mergeAddon(base, addon());
   assert.equal(JSON.stringify(base), frozen, "the base is unchanged");
   const r = buildRegistry(m);
-  assert.deepEqual(Object.keys(r.floors), ["B1", "L1", "L2", "L3", "L4", "shed_inside"]);
+  assert.deepEqual(Object.keys(r.floors), ["B1", "L1", "L2", "L3", "L4", "gbi_L4_4", "gbi_L3_1", "shed_inside"]);
   assert.deepEqual(r.scenesWith("keypad"), ["L2", "shed_inside"]);
   assert.equal(r.maxPlayers("shed"), 4);
   assert.deepEqual(r.pageScenes.shed_inside, {glbs: ["addons/shed/shed.glb"], floor: 0});
@@ -174,7 +175,9 @@ test("the chambers: wave numbers follow the run (4th chamber of L4 is wave 4, 1s
   assert.equal(c.wave.no, 4); assert.equal(n.wave.no, 5); assert.equal(c.next, "gbi_L3_1"); assert.equal(c.stairsDown, "DoorLeaf_Stair_L3_L4_down");
   assert.equal(REGISTRY.modes.going_back_in.startChamber, "gbi_L4_4");
   assert.equal(REGISTRY.chamber("L3"), null, "an Original floor is not a chamber");
-  assert.equal(REGISTRY.modes.going_back_in.status, "planned", "rooms cannot run the mode yet");
+  assert.equal(REGISTRY.modes.going_back_in.status, "built", "session 16: a room can run the mode");
+  for (const id of REGISTRY.chambers) assert.equal(REGISTRY.floors[id], REGISTRY.chamber(id).floorY, "every chamber is a scene the server runs, at its floor's height");
+  assert.ok(!REGISTRY.linkFrom("gbi_L4_4", "DoorLeaf_Stair_L3_L4_down").soloOnly, "the stairs down are open to a room");
 });
 test("a bad chamber is caught", () => {
   bad(d => { d.modes.going_back_in.startChamber = "L3"; }, /startChamber L3 is not a chamber/);
@@ -187,6 +190,39 @@ test("the City's street is on the page, never a floor the server runs, and the b
   assert.equal(REGISTRY.floors.street, undefined);
   assert.deepEqual(REGISTRY.pageScenes.street, {glbs: [], floor: 0});
   const there = REGISTRY.linkFrom("parking_lot", "bus_stop"), back = REGISTRY.linkFrom("street", "bus_stop");
-  assert.ok(there && there.status === "built" && there.soloOnly && there.to.scene === "street" && back && back.to.scene === "parking_lot");
+  assert.ok(there && there.status === "built" && !there.soloOnly && !back.soloOnly && there.to.scene === "street" && back && back.to.scene === "parking_lot");
   assert.deepEqual(there.to.arrive, BUS_STREET.arrive, "the arrival is the street's spawn point"); assert.deepEqual(there.to.face, BUS_STREET.face);
+});
+
+// ---- presence (session 17): page scenes a room's players can be in together. The server relays who is there and where, and runs nothing.
+test("presence scenes: the parking lot is one, the floors and the chambers are not, and the field is checked", () => {
+  assert.deepEqual(REGISTRY.presence, {parking_lot: 9.6, street: 0, apartment: 0}, "the lot, the street and the apartment are places a room can be in, each at its floor height");
+  for (const id of ["B1", "L4", "gbi_L4_4", "main_floor", "playground"]) assert.equal(REGISTRY.presence[id], undefined, id);
+  assert.equal(REGISTRY.floors.parking_lot, undefined, "the server still runs nothing there");
+  bad(d => { d.areas.find(a => a.id === "overworld").scenes[0].presence = "yes"; }, /parking_lot: presence must be true/);
+  bad(d => { d.areas.find(a => a.id === "lot").scenes[0].presence = true; }, /B1: a scene is multiplayer \(the server runs it\) or presence, not both/);
+  bad(d => { delete d.areas.find(a => a.id === "overworld").scenes[0].floorY; }, /parking_lot: a presence scene needs a floorY/);
+  bad(d => { d.areas.find(a => a.id === "overworld").scenes[1].presence = true; }, /table_and_chairs: a presence scene needs files/);
+});
+test("a built link a room can follow joins scenes a room can be in; every other link says soloOnly", () => {
+  const out = REGISTRY.links.find(l => l.id === "lot.L4.front_doors>overworld");
+  assert.deepEqual([out.soloOnly, out.requires], [undefined, ["original_complete"]], "a room can walk out, and the flag is still needed");
+  for (const l of REGISTRY.links.filter(l => l.status === "built" && !l.soloOnly)) for (const e of [l.from, l.to])
+    assert.ok(REGISTRY.floors[e.scene] !== undefined || REGISTRY.presence[e.scene] !== undefined, `${l.id}: ${e.scene}`);
+  bad(d => { delete d.links.find(l => l.id === "city.street>grocery").soloOnly; }, /city\.street>grocery: a room could follow this link into main_floor/);
+  bad(d => { delete d.links.find(l => l.connector === "gate").soloOnly; }, /a room could follow this link into rdwe/);
+});
+test("canReach: which scenes a room's player may be in, by the flags they hold", () => {
+  assert.deepEqual(REGISTRY.canReach("L2", []), {ok: true, missing: []}, "the mode's floors are always open");
+  assert.deepEqual(REGISTRY.canReach("parking_lot", []), {ok: false, missing: ["original_complete"]});
+  assert.deepEqual(REGISTRY.canReach("parking_lot", ["original_complete"]), {ok: true, missing: []});
+  assert.equal(REGISTRY.canReach("parking_lot", new Set(["job_intern"])).ok, false);
+  assert.equal(REGISTRY.canReach("main_floor", ["original_complete", "job_intern"]).ok, false, "the grocery's links are solo only");
+  for (const id of ["street", "apartment"]) { assert.equal(REGISTRY.canReach(id, ["original_complete"]).ok, true, id); assert.deepEqual(REGISTRY.canReach(id, []).missing, ["original_complete"], "the City is past the lot, so it needs the lot's flag"); }
+  for (const id of ["main_floor", "entrance", "galleries", "factory_floor", "laboratory", "gbi_L4_4"]) assert.equal(REGISTRY.canReach(id, REGISTRY.manifest.flags).ok, false, `${id} stays solo only`);
+  assert.equal(REGISTRY.canReach("nowhere", ["original_complete"]).ok, false);
+  assert.equal(REGISTRY.canReach("L2", [], "no_such_mode").ok, false);
+  // a Going back in room's scenes are its chambers (its `floors` name storeys): you can be in either chamber, never in the Original's floors or the lot, flags or not
+  for (const id of REGISTRY.chambers) assert.deepEqual(REGISTRY.canReach(id, [], "going_back_in"), {ok: true, missing: []}, id);
+  for (const id of ["L4", "B1", "parking_lot", "street", "apartment"]) assert.equal(REGISTRY.canReach(id, REGISTRY.manifest.flags, "going_back_in").ok, false, `${id} is not a scene of a going_back_in room`);
 });
