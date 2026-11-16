@@ -185,7 +185,7 @@
   <div id="l-chars"></div>
   <div id="l-snd"><span>MUSIC</span><input id="l-vm" type="range" min="0" max="1" step="0.05"><span>EFFECTS</span><input id="l-vs" type="range" min="0" max="1" step="0.05"></div>
   <input id="l-name" placeholder="Your name" maxlength="16">
-  <div id="l-mode"><button type="button" class="on" data-mode="original">ORIGINAL</button><button type="button" data-mode="going_back_in" disabled title="Planned">GOING BACK IN · soon</button></div>
+  <div id="l-mode"><button type="button" class="on" data-mode="original">ORIGINAL</button><button type="button" data-mode="going_back_in">GOING BACK IN</button></div>
   <input id="l-room" placeholder="Room code (share it with friends)" maxlength="8">
   <div id="l-open"></div>
   <button class="go" id="l-join" type="submit">JOIN ROOM</button>
@@ -231,7 +231,7 @@ import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
 import {newDriver, addNails, tick as drvTick, shoot as drvShoot, nailHit, lost as drvLost, MAX_NAILS, START_NAILS, PACK_NAILS, GAUGE as DRV_GAUGE, RANGE_M as DRV_RANGE, SHOT_NOISE_S as DRV_NOISE_S} from "./shared/driver.js";
-import {GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
+import {GEAR, SOLO_GEAR, newLoadout, carries, take as lockerTake, leave as lockerLeave, died as lockerDied} from "./shared/loadout.js";
 import {DAY_S, hourAt, dayAt, phaseAt, storesOpen, fmtClock, skyAt, BUILDINGS, DOORS, windowSlots, LAMP_ZS, DOOR_W, DOOR_H, FLOOR_Y as CITY_Y, ROAD, WALK, FRONT, BUS_STREET, BUS_LOT, OPEN_H, buildingBox, sideX, CITY_SCENES, APARTMENT, GROCERY, computerPages, JOBS, dangerous, inView, stalkerStep, nextMorning, bedUse, carryStalker, CAMERA, camYaw, camSees as shopCamSees, MALL, mallLocked, mallUnlocks} from "./shared/city.js";
 
 const MON_URL = "world/monsters.json";
@@ -464,6 +464,7 @@ async function loadScene(id, arrival) {
     }
   }
   if (arrival && arrival.pos) { teleport(arrival.pos); P.yaw = arrival.face ? Math.atan2(-arrival.face[0], -arrival.face[1]) : P.yaw; P.pitch = 0; }
+  else if (net.on && chamber) { teleport(groupSpawn(id)); P.yaw = Math.random() * Math.PI * 2; }          // a party starts a chamber together: the server places the wave away from whoever is first in
   else { teleport(spawnFor(id)); P.yaw = Math.random() * Math.PI * 2; }                      // everyone gets their own spot, leaning toward what the floor still needs
   S.arrive = [P.p.x, S.floor, P.p.z];
   startChamber(chamber);                                       // Going back in: the wave begins as you step in (nothing for an Original floor)
@@ -849,8 +850,9 @@ function useConsumable(slot) {
   if (dead || loading || FIN.out || KPUI.open || devOn.v || STN.open || myCarry() >= 0) return false;
   const r = useSlot(GB.kit, slot);
   if (!r.ok) { toast(slot === 0 ? "No flash-vials left (LB / Q)" : `No ${KIT_NAMES[GB.kit.e]} left (RB / E)`); AUD.play("gun_dry"); return false; }
-  GB.kit = r.kit;
+  GB.kit = r.kit;                                                        // in a room the count is the server's: its `me` follows
   if (r.kind === "flash") throwFlash();
+  else if (net.on) net.send({t: "use", slot: 1});                        // the server sets it down where it has you, and tells the chamber (`trap`)
   else { const t = placeTrap(r.kind, P.p.x, P.p.z, TRAPS.t); t.mesh = trapMesh(r.kind, t); TRAPS.list.push(t); toast(`${KIT_NAMES[r.kind]} set down: ${r.kind === "mine" ? "armed in a moment" : "armed almost at once, and loud"}`); }
   return true;
 }
@@ -910,7 +912,7 @@ function pad() {
   const a = gp.axes, b = gp.buttons, down = i => !!(b[i] && (b[i].pressed || b[i].value > 0.5));
   const edge = i => { const now = down(i), was = padPrev[i]; padPrev[i] = now; return now && !was; };
   if (STN.open) {                                           // the locker panel: D-pad up / down chooses, A takes or leaves, B or X closes
-    const rowsN = GEAR.length + (GB.kit ? 1 : 0); if (edge(12)) STN.sel = (STN.sel + rowsN - 1) % rowsN; if (edge(13)) STN.sel = (STN.sel + 1) % rowsN;
+    const rowsN = gearList().length + (GB.kit ? 1 : 0); if (edge(12)) STN.sel = (STN.sel + rowsN - 1) % rowsN; if (edge(13)) STN.sel = (STN.sel + 1) % rowsN;
     if (edge(0)) stationToggle(STN.sel); if (edge(1) || edge(2)) closeStation(); renderStation();
     return {mx: 0, mz: 0, lx: 0, ly: 0, jump: false, use: false, run: false};
   }
@@ -1564,7 +1566,8 @@ function showResults(rows) {
   $("results").style.display = "flex";
 }
 
-// ---------------------------------------------------------------- Going back in, slice 1 (session 8): chambers, one wave on entry, the stairs down. Alone only: rooms cannot run the mode yet.
+// ---------------------------------------------------------------- Going back in (session 8 alone; session 16 in a room): chambers, one wave on entry, the stairs down.
+// In a room the server runs the chamber (server/floorsim.js): it starts the wave when the first player steps in and tells everyone which monsters are in it (`wave`).
 // A chamber is a scene of the manifest (REGISTRY.chamber(id)): an existing floor's model with its own world file (tools/make_chambers.mjs). The wave is shared/gbi.js: as many
 // monsters as the manifest says, placed far from where you stand. After that it is quiet time; the stairs-down door is open from the start (clearing rules come with the objectives).
 const GB = {mode: null, wave: null, load: null, kit: null};                       // load: the loadout (shared/loadout.js), only inside the mode
@@ -1572,14 +1575,51 @@ const GBI = REGISTRY.modes.going_back_in;
 function startChamber(ch) {
   GB.mode = ch ? "going_back_in" : null; GB.wave = null; if (!ch) { GB.load = null; GB.kit = null; STN.spot = null; }
   TRAPS.list.length = 0; TRAPS.flashes.length = 0;                      // traps stay in the chamber they were set in
-  if (!ch || net.on) return;
+  if (!ch || net.on) return;                                            // in a room the wave is the server's: gbWave builds it when the server says
   GB.wave = startWave(ch, performance.now());
   for (const p of wavePlan(S, monCfg, ch, [[P.p.x, P.p.z]])) monsters.push(new Monster(p.cfg, S.id, p.x, p.z));
   toast(`WAVE ${GB.wave.no} of ${GBI.waves}: ${monsters.length} of them are in here with you`, 4200);
 }
+// a room's chamber: the server's word on the wave. m.l is each living monster as [wid, x, z], in the order its snapshots use; `fresh` means it started just now.
+function gbWave(m) {
+  if (m.scene !== S.id || loading) return;
+  const cfg = monCfg.monsters.find(c => c.name === m.kind); if (!cfg) return;
+  monsters.forEach(mo => mo.dispose()); monsters.length = 0; net.snap = null;
+  for (const [wid, x, z] of m.l) monsters.push(Object.assign(new Monster(cfg, S.id, x, z), {wid}));
+  GB.wave = {chamber: m.scene, no: m.no, monsters: m.monsters, t0: performance.now(), kills: m.kills, cleared: m.cleared};
+  if (m.fresh) toast(`WAVE ${m.no} of ${m.of}: ${m.l.length} of them are in here with you`, 4200);
+  for (const t of TRAPS.list) if (t.mesh) S.root.remove(t.mesh); TRAPS.list.length = 0;
+  for (const t of m.traps || []) gbTrap(t, false);                      // what was set before you came in
+}
+// a trap the server holds: drawn here, armed when the server says; it goes off only on the server's word
+function gbTrap(m, news) {
+  if (TRAPS.list.some(t => t.id === m.id)) return;
+  const t = {id: m.id, kind: m.kind, x: m.x, z: m.z, armAt: TRAPS.t + m.arm, done: false}; t.mesh = trapMesh(m.kind, t); TRAPS.list.push(t);
+  if (news && m.by === net.id) toast(`${KIT_NAMES[m.kind]} set down: ${m.kind === "mine" ? "armed in a moment" : "armed almost at once, and loud"}`);
+}
+function gbSprung(m) {
+  if (m.scene !== S.id || loading) return;
+  const t = TRAPS.list.find(q => q.id === m.id); if (t) { t.done = true; if (t.mesh) t.mesh.visible = false; }
+  AUD.play("beacon_end", {pos: [m.x, S.floor + 0.5, m.z], loud: true});
+}
+// the server's word on what you carry (the locker's loadout) and on the crossbow's bolts; after a death nobody lifted you from, the gear is in the locker
+function gbMe(m) {
+  GB.load = {carry: [...m.carry], stash: GEAR.filter(g => !m.carry.includes(g))};
+  if (BOW.st.bolts !== m.bolts) BOW.st = {...BOW.st, bolts: m.bolts};
+  if (m.kit) GB.kit = {n: {...m.kit.n}, e: m.kit.e};
+  if (HELD.item && !owned().includes(HELD.item)) setHeld(null);
+  if (STN.open) renderStation();
+  if (m.respawn) toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
+}
+// the server killed a monster of the wave (somebody's bolt or trap): it is gone here too, and the count is the server's
+function gbKill(m) {
+  if (m.scene !== S.id || loading) return;
+  const mo = monsters.find(x => x.wid === m.id); if (!mo) return;
+  flashAt(mo.pos.x, mo.pos.z); killMonster(mo, {kills: m.kills, cleared: m.cleared});
+}
 async function startGoingBackIn() {                                    // from the options screen at the store doors
   closeOptions();
-  GB.load = newLoadout(); LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); BC.have = 0; BOW.st = newBow(START_BOLTS); DRV.st = newDriver(START_NAILS); GB.kit = newKit();          // starting gear: the Market does not exist yet, so the crossbow and the bolt driver start in your hands (default; the owner may change it)
+  GB.load = newLoadout(null, SOLO_GEAR); LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); BC.have = 0; BOW.st = newBow(START_BOLTS); DRV.st = newDriver(START_NAILS); GB.kit = newKit();          // starting gear: the Market does not exist yet, so the crossbow and the bolt driver start in your hands (default; the owner may change it)
   await loadScene(GBI.startChamber);
 }
 
@@ -1598,7 +1638,8 @@ function fireBow() {
   const o = [P.p.x, P.p.y + P.eye, P.p.z], cp = Math.cos(P.pitch), d = [-Math.sin(P.yaw) * cp, Math.sin(P.pitch), -Math.cos(P.yaw) * cp];
   const m = killShot(S, monsters, o, d), t = m ? Math.hypot(m.pos.x - o[0], m.pos.z - o[2]) : rayLength(o, d);
   beam(o, [o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t]); AUD.play("gun", {rate: .7 + Math.random() * .08, priority: true});
-  if (m) killMonster(m);
+  if (net.on) net.send({t: "bolt", o, d});                              // in a room the server takes the bolt and decides the kill (a `kill` message comes back)
+  else if (m) killMonster(m);
   return true;
 }
 // ---- the pneumatic bolt driver (shared/driver.js): its own nails and a pressure gauge; a hit hurts (monsters have health in this mode), it does not kill outright.
@@ -1620,9 +1661,9 @@ function fireDriver() {
   return true;
 }
 // a monster is dead for good (a bolt, a mine, a blast): gone from the floor, and counted toward the wave
-function killMonster(m) {
+function killMonster(m, count) {                                       // count: in a room, the server's {kills, cleared}
   const i = monsters.indexOf(m); if (i < 0) return; m.dispose(); monsters.splice(i, 1);
-  if (GB.wave) { GB.wave = killed(GB.wave); toast(GB.wave.cleared ? "Wave cleared" : `${GB.wave.kills} of ${GB.wave.monsters} down`, 2400); }
+  if (GB.wave) { GB.wave = count ? {...GB.wave, ...count} : killed(GB.wave); toast(GB.wave.cleared ? "Wave cleared" : `${GB.wave.kills} of ${GB.wave.monsters} down`, 2400); }
 }
 // ---- the Q and E consumables (shared/consumables.js): Q a flash-vial that stuns, E a land mine or a tripwire that kills. Traps stay where they are set until a monster springs them.
 const KIT_NAMES = {flash: "Flash-vial", mine: "Land mine", wire: "Tripwire"};
@@ -1636,7 +1677,10 @@ function trapMesh(kind, t) {
 function throwFlash() {
   const dx = -Math.sin(P.yaw), dz = -Math.cos(P.yaw), ahead = rayLength([P.p.x, P.p.y + P.eye, P.p.z], [dx, 0, dz]);
   const [lx, lz] = flashLanding(P.p.x, P.p.z, dx, dz, Math.max(0.5, Math.min(FLASH_THROW_M, ahead - 0.3)));          // it stops at a wall
-  const n = stunNear(monsters, lx, S.floor, lz, FLASH_STUN_S, FLASH_R).length;
+  if (net.on) { net.send({t: "use", slot: 0, x: r2(lx), z: r2(lz)}); return; }          // in a room the server stuns them and everyone sees the burst (`flash`)
+  flashBurst(lx, lz, stunNear(monsters, lx, S.floor, lz, FLASH_STUN_S, FLASH_R).length);
+}
+function flashBurst(lx, lz, n) {
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), depthWrite: false, transparent: true, opacity: 1})); sp.scale.set(2, 2, 1); sp.position.set(lx, S.floor + 1.2, lz); S.root.add(sp); TRAPS.flashes.push({o: sp, t: 0});
   AUD.play("beacon_end", {pos: [lx, S.floor + 1, lz]}); toast(n ? `The flash-vial bursts: ${n} stunned for ${FLASH_STUN_S} s` : "The flash-vial bursts: nothing near it");
 }
@@ -1645,7 +1689,7 @@ function trapTick(dt) {
   for (const t of TRAPS.list) {
     if (t.done) continue;
     if (t.mesh && t.mesh.userData.lamp) t.mesh.userData.lamp.visible = TRAPS.t >= t.armAt && Math.floor(TRAPS.t * 3) % 2 === 0;           // the mine blinks once it is armed
-    const r = springs(t, TRAPS.t, monsters); if (!r) continue;
+    const r = net.on ? null : springs(t, TRAPS.t, monsters); if (!r) continue;          // in a room the server decides when it goes off (`sprung`)
     t.done = true; if (t.mesh) t.mesh.visible = false;
     AUD.play("beacon_end", {pos: [t.x, S.floor + 0.5, t.z], loud: true});
     for (const m of r.kills) killMonster(m);
@@ -1655,9 +1699,10 @@ function trapTick(dt) {
 }
 // ---- the loadout locker (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is. (Name still open: docs/WORLD.md.)
 const STN = {open: false, spot: null, mesh: null, sel: 0};
+const gearList = () => net.on ? GEAR : SOLO_GEAR;                  // the locker rows: a room runs the first three; the bolt driver is solo only so far (the server does not own its nails)
 const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow", driver: "Pneumatic bolt driver"};
 function buildStation(ch) {
-  STN.spot = null; STN.mesh = null; if (!ch || net.on) return;
+  STN.spot = null; STN.mesh = null; if (!ch) return;                      // the spot is seeded from the scene, so everyone in a room finds the locker in the same place
   const home = floorSpots(1, 9910, [[8, 6, 4], [4, 2, 2], [2, 1, 0]])[0]; if (!home) return;
   const o = lockerMesh(); o.position.set(home[0], S.floor, home[1]); o.userData.lamp.material.color.setHex(0xffc040); S.root.add(o); STN.spot = home; STN.mesh = o;
   boxes.push({n: [home[0] - 0.3, S.floor, home[1] - 0.3], x: [home[0] + 0.3, S.floor + 1.8, home[1] + 0.3]}); indexBoxes(S);
@@ -1667,13 +1712,15 @@ function tryStation() { if (!nearStation()) return false; openStation(); return 
 function openStation() { STN.open = true; STN.sel = 0; document.exitPointerLock?.(); renderStation(); $("station").style.display = "flex"; }
 function closeStation() { STN.open = false; $("station").style.display = "none"; }
 function renderStation() {
-  const rows = $("st-rows"); rows.innerHTML = GEAR.map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i + 1}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>${GEAR.length + 1}  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
-  rows.querySelectorAll("button").forEach(b => { b.onclick = () => stationToggle(b.dataset.slot ? GEAR.length : GEAR.indexOf(b.dataset.gear)); });
+  const rows = $("st-rows"); rows.innerHTML = gearList().map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i + 1}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>${gearList().length + 1}  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
+  rows.querySelectorAll("button").forEach(b => { b.onclick = () => stationToggle(b.dataset.slot ? gearList().length : gearList().indexOf(b.dataset.gear)); });
   $("st-close").onclick = closeStation;
 }
 function stationToggle(i) {
-  if (i === GEAR.length && GB.kit) { GB.kit = setE(GB.kit, GB.kit.e === "mine" ? "wire" : "mine"); renderStation(); return; }          // the E slot: land mine or tripwire
-  const g = GEAR[i]; if (!g || !GB.load) return;
+  if (i === gearList().length && GB.kit && net.on) { net.send({t: "gear", a: "e", g: GB.kit.e === "mine" ? "wire" : "mine"}); return; }
+  if (i === gearList().length && GB.kit) { GB.kit = setE(GB.kit, GB.kit.e === "mine" ? "wire" : "mine"); renderStation(); return; }          // the E slot: land mine or tripwire
+  const g = gearList()[i]; if (!g || !GB.load) return;
+  if (net.on) { net.send({t: "gear", a: carries(GB.load, g) ? "leave" : "take", g}); return; }          // in a room the loadout is the server's: its answer (`me`) redraws this
   GB.load = carries(GB.load, g) ? lockerLeave(GB.load, g) : lockerTake(GB.load, g); syncGear(); renderStation();
 }
 // the loadout decides what you hold: the page's own flags follow it (ammo is not part of it)
@@ -2494,7 +2541,7 @@ function onNet(m) {
   switch (m.t) {
     case "welcome":
       if (Number.isFinite(m.now)) net.off = m.now - Date.now();
-      net.id = m.id; net.room = m.room; net.on = true; net.phase = m.phase;
+      net.id = m.id; net.room = m.room; net.on = true; net.phase = m.phase; net.mode = m.mode; net.start = m.start;
       for (const p of m.players) if (p.id !== m.id) addPeer(p);
       if (m.phase !== "lobby") net.startRes?.();
       if (m.power) setPower(true, null, true);
@@ -2532,6 +2579,7 @@ function onNet(m) {
       if (m.cloak) CL.st = {...CL.st, on: m.cloak.on, b: (m.cloak.on !== CL.st.on || Math.abs(CL.st.b - m.cloak.b) > 0.15) ? m.cloak.b : CL.st.b, broken: Math.abs((CL.st.broken || 0) - (m.cloak.x || 0)) > 3 ? (m.cloak.x || 0) : (CL.st.broken || 0)};
       if (m.hp <= 0 && !dead && !loading) die();
       if (m.respawn && dead) respawn();
+      if (m.carry) gbMe(m);                                           // Going back in in a room: the loadout and the bolts are the server's too
       break;
     }
     case "beacon": if (m.scene === S.id && !loading) addBeacon(m.x, m.z, [m.x, m.z]); break;                       // someone rolled a beacon on this floor (it lands at once for us)
@@ -2549,6 +2597,11 @@ function onNet(m) {
     case "exited": FIN.exited.set(m.id, m); if (m.id !== net.id) toast(`${m.name} is out (place ${m.place})`); break;
     case "results": showResults(m.rows); break;
     case "keypad": setKeypad(m.scene, {found: m.found, solved: m.solved, fails: m.fails, lockMs: m.lockMs}); break;
+    case "wave": gbWave(m); break;
+    case "kill": gbKill(m); break;                                    // a monster of the wave is dead for good, for everyone
+    case "flash": if (m.scene === S.id && !loading) flashBurst(m.x, m.z, m.n); break;          // somebody's flash-vial burst here
+    case "trap": if (m.scene === S.id && !loading) gbTrap(m, true); break;                    // somebody set a land mine or a tripwire
+    case "sprung": gbSprung(m); break;                                // one went off                                    // Going back in in a room: the server started (or describes) this chamber's wave
   }
 }
 // the nearest downed teammate within reach on your floor
@@ -2646,7 +2699,8 @@ function lobby() {
   mark();
   $("l-name").value = q.get("name") || store.get("lot-name");
   $("l-room").value = (q.get("room") || store.get("lot-room")).toUpperCase();
-  let mode = "original";                                                  // the planned modes are shown but cannot be picked yet
+  let mode = REGISTRY.modes[q.get("mode")]?.status === "built" ? q.get("mode") : "original";          // ?mode=going_back_in picks it (a shared link, and the tests)
+  $("l-mode").querySelectorAll("button").forEach(x => x.classList.toggle("on", x.dataset.mode === mode));
   const openRooms = async () => {                                         // open rooms of the mode (no names): click one to fill in its code
     try { const r = await (await fetch("/rooms?mode=" + mode)).json();
       $("l-open").innerHTML = r.rooms.map(x => `<button type="button" data-code="${String(x.code).replace(/[^A-Z0-9]/g, "")}">${String(x.code).replace(/[^A-Z0-9]/g, "")} · ${x.players}/${x.max}${x.state === "playing" ? " · playing" : ""}</button>`).join("");
@@ -2689,8 +2743,7 @@ function hpHud(dt) {
 function die() {
   closeKeypad();
   if (myCarry() >= 0) fuseAct({a: "drop", x: P.p.x, z: P.p.z});                      // it stays where you fell
-  if (!net.on) { SOLO.downs++; SOLO.deaths++; }
-  gbDeath();
+  if (!net.on) { SOLO.downs++; SOLO.deaths++; gbDeath(); }                      // in a room a down is not yet a death (a teammate may lift you): the server applies the mode's death rule if nobody does
   AUD.stinger("st_down"); dead = true; deadT = 0; deathLevel = S.id; devOn.v = false; P.reviveT = 0; $("revive").style.display = "none";
   $("death").style.opacity = 1; $("fear").style.opacity = 1;
   if (net.on) { $("death").textContent = "DOWNED"; $("death").style.background = "rgba(0,0,0,.55)"; }       // in a room you can be lifted, so you may still look around
@@ -2827,7 +2880,7 @@ function frame() { if (!BOT && !inGame) step(); requestAnimationFrame(frame); }
 const clock = new THREE.Clock();
 await lobby();
 FIN.t0 = performance.now();
-await loadScene("B1");
+await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
 window.__game = {DRV, fireDriver, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};

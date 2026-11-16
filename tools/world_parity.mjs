@@ -6,6 +6,7 @@ import crypto from "node:crypto";
 import {createServer} from "../server/server.js";
 import {worldFromDoc, FLOORS, mainRegion} from "../shared/world.js";
 import {spawnPlan} from "../shared/monsters.js";
+import {REGISTRY} from "../shared/registry.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let fails = 0; const check = (n, ok, x = "") => { console.log(`${ok ? "PASS" : "FAIL"} ${n}${x ? "  " + x : ""}`); if (!ok) fails++; };
 const json = p => JSON.parse(fs.readFileSync(new URL(p, import.meta.url)));
@@ -20,7 +21,8 @@ await page.waitForFunction(() => window.__game && !document.getElementById("load
 for (const id of Object.keys(FLOORS)) {
   await page.evaluate(i => window.__game.loadScene(i), id); await page.waitForFunction(i => window.__game.S.id === i && !window.__game.loading, id, {timeout: 120000});
   const c = await page.evaluate(() => { const g = window.__game; return {nav: Array.from(g.S.nav), boxes: g.S.boxes.length, doors: g.doors.map(d => [d.d.name, !!d.link, +d.cx.toFixed(3), +d.cz.toFixed(3)]), spawns: g.monsters.map(m => [+m.home[0].toFixed(3), +m.home[1].toFixed(3), m.cfg.name]), shutter: !!g.S.shutter}; });
-  const W = worldFromDoc(json(`../world/${id}.json`), id), plan = spawnPlan(W, monCfg, id);
+  const W = worldFromDoc(json(`../world/${id}.json`), id), plan = spawnPlan(W, monCfg, id), ch = REGISTRY.chamber(id);          // a Going back in chamber (session 16: the server runs those too): alone, the page adds its locker's box and starts the wave itself
+  if (ch) { check(`${id}: same navigation grid`, hash(c.nav) === hash(W.nav)); check(`${id}: same boxes (plus the locker) and doors`, c.boxes === W.boxes.length + 1 && JSON.stringify(c.doors) === JSON.stringify(W.doors.map(d => [d.d.name, !!d.link, +d.cx.toFixed(3), +d.cz.toFixed(3)])), `${c.boxes} boxes`); check(`${id}: the wave's monsters, none of the Original's`, plan.length === 0 && c.spawns.length === ch.wave.monsters); continue; }
   check(`${id}: same navigation grid`, hash(c.nav) === hash(W.nav), `${hash(c.nav)} ${hash(W.nav)} (${c.nav.reduce((a, b) => a + b, 0)} cells)`);
   check(`${id}: same boxes and doors`, c.boxes === W.boxes.length && JSON.stringify(c.doors) === JSON.stringify(W.doors.map(d => [d.d.name, !!d.link, +d.cx.toFixed(3), +d.cz.toFixed(3)])), `${c.boxes} boxes, ${c.doors.length} doors`);
   check(`${id}: same monster spawns`, JSON.stringify(c.spawns) === JSON.stringify(plan.map(p => [+p.x.toFixed(3), +p.z.toFixed(3), p.cfg.name])), `${c.spawns.length} monsters`);

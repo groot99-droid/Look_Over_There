@@ -12,7 +12,7 @@ const browser = await chromium.launch(), page = await browser.newPage();
 const errors = []; page.on("pageerror", e => errors.push(e.message));
 await page.goto(base + "/"); await page.waitForSelector("#l-open button");
 check("the open-rooms list shows the party with 9/10", (await page.textContent("#l-open")).includes("TEN · 9/10"));
-check("Going back in is shown and cannot be picked", await page.$eval('#l-mode button[data-mode="going_back_in"]', b => b.disabled && /soon/.test(b.textContent)));
+check("Going back in is shown and can be picked; the Original is still the one selected", await page.$eval('#l-mode', el => { const g = el.querySelector('button[data-mode="going_back_in"]'), o = el.querySelector('button[data-mode="original"]'); return !g.disabled && !/soon/.test(g.textContent) && o.classList.contains("on") && !g.classList.contains("on"); }));          // session 16 built the mode (tools/gbi_mp_test.mjs plays it)
 await page.click("#l-open button"); await page.fill("#l-name", "Human"); await page.click("#l-join");
 await page.waitForSelector("#l-wait", {state: "visible"});
 await page.waitForFunction(() => document.querySelectorAll("#l-players > div").length === 10, null, {timeout: 5000}).then(() => check("the waiting room lists all 10", true), () => check("the waiting room lists all 10", false));

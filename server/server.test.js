@@ -439,9 +439,10 @@ test("a join with no mode is the original; the room takes its floors, size and f
 });
 
 test("a mode that is planned is refused with 'soon', an unknown one with 'unknown_mode', and neither crashes or opens a room", async () => {
-  const srv = await createServer();
-  const g = await joinRaw(srv, {room: "MD3", name: "Gus", mode: "going_back_in"});
-  const r1 = await g.next(kind("refused")); assert.equal(r1.reason, "soon"); assert.equal(r1.mode, "going_back_in");
+  // session 16 built going_back_in, so the manifest has no planned mode left: the server is given one (createServer's `modes`) to keep the refusal covered
+  const srv = await createServer({modes: {...REGISTRY.modes, later: {...REGISTRY.modes.original, status: "planned"}}});
+  const g = await joinRaw(srv, {room: "MD3", name: "Gus", mode: "later"});
+  const r1 = await g.next(kind("refused")); assert.equal(r1.reason, "soon"); assert.equal(r1.mode, "later");
   const x = await joinRaw(srv, {room: "MD3", name: "Xi", mode: "nope"});
   assert.equal((await x.next(kind("refused"))).reason, "unknown_mode");
   const j = await joinRaw(srv, {room: "MD3", name: "Jo", mode: {}}); assert.equal((await j.next(kind("refused"))).reason, "unknown_mode");

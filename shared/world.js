@@ -23,6 +23,7 @@ export function near(W, x, z, r) {
 }
 // a world from world/<id>.json (the server's way; the page builds the same boxes itself and adds its doors' leaves): colliders, doors and the L4 shutter
 export function worldFromDoc(doc, id, {powerOn = false, floor, art} = {}) {          // floor and art: for a Going back in chamber, whose id is not a floor (art = the floor whose model it reuses)
+  art ??= REGISTRY.chamber(id)?.floor;                                              // a chamber the caller did not describe: the manifest knows whose model it reuses
   const W = newWorld(id, floor); if (art) W.art = art;
   for (const c of doc.colliders) W.boxes.push({n: c.min, x: c.max});
   for (const d of doc.doors || []) {
