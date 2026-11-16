@@ -9,7 +9,7 @@ let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
 const intoApt = REGISTRY.linkFrom("street", "tower"), outApt = REGISTRY.linkFrom("apartment", "front_door");
 const there = REGISTRY.linkFrom("parking_lot", "bus_stop"), back = REGISTRY.linkFrom("street", "bus_stop");
-check("the manifest has the bus there and back, solo only", !!there && !!back && there.soloOnly && back.soloOnly && there.to.scene === "street" && back.to.scene === "parking_lot");
+check("the manifest has the bus there and back", !!there && !!back && there.to.scene === "street" && back.to.scene === "parking_lot");
 const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
 const srv = await createServer({countdownMs: 60000}), errors = [];
 const page = await (await browser.newContext({viewport: {width: 900, height: 700}})).newPage(); page.on("pageerror", e => errors.push(e.message));
@@ -111,7 +111,7 @@ try {
   await page.keyboard.press("KeyF"); await settled("street");
   const out = await page.evaluate(() => { const g = window.__game; return {p: g.P.p.toArray(), yaw: g.P.yaw, opts: getComputedStyle(document.getElementById("pc")).display}; });
   check("the door leads back to the tower's front on the street, and the computer is gone", Math.abs(out.p[0] - TOWER_FRONT.arrive[0]) < 0.01 && Math.abs(out.p[2] - TOWER_FRONT.arrive[2]) < 0.01 && out.opts === "none", JSON.stringify(out));
-  check("the apartment links are the manifest's, solo only", !!intoApt && !!outApt && intoApt.soloOnly && outApt.soloOnly && intoApt.to.scene === "apartment" && outApt.to.scene === "street");
+  check("the apartment links are the manifest's", !!intoApt && !!outApt && intoApt.to.scene === "apartment" && outApt.to.scene === "street");
 
   // the night rule, first half: at 20:00 the stores close
   await stand(6.4, 0.02, -41, -Math.PI / 2);

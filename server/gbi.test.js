@@ -269,3 +269,14 @@ test("consumables are not returned after a death; an ammo pack adds one flash-vi
   assert.ok(!(await o.quiet(100)).some(m => m.t === "trap" || m.t === "flash"));
   await srv.close();
 });
+
+// ---- with presence scenes (session 17): a Going back in room still takes only its own scenes
+test("a Going back in room does not let anyone into the parking lot, flags or not; go to a friend works between its chambers", async () => {
+  const srv = await createServer({countdownMs: 60}), a = client(srv.port), b = client(srv.port); await a.open; await b.open;
+  for (const [c, n] of [[a, "Ann"], [b, "Bob"]]) { c.send({t: "join", room: "PR1", name: n, mode: MODE, flags: ["original_complete"]}); c.id = (await c.next(kind("welcome"))).id; }
+  const room = srv.rooms.get(`${MODE}:PR1`); a.send({t: "ready", ready: true}); b.send({t: "ready", ready: true}); await a.next(kind("start")); await b.next(kind("start"));
+  at(a, "parking_lot", -8, 41); assert.equal((await a.next(kind("noentry"))).scene, "parking_lot"); assert.equal(room.players.get(a.id).scene, null, "nowhere: not in the lot");
+  at(a, START, 0, 0); await a.next(kind("wave")); at(b, NEXT, 16, 8); await b.next(kind("wave"));
+  a.send({t: "goto", to: b.id}); const g = await a.next(kind("goto")); assert.equal(g.scene, NEXT); assert.equal(g.refused, undefined, "a friend in the next chamber is reachable"); assert.equal(g.x, 16);
+  await srv.close();
+});

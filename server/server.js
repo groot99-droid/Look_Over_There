@@ -85,7 +85,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
       for (const f of Object.values(room.floors)) if (!f.keep || f.players().length) f.step(1 / simHz);          // a kept chamber stands still while nobody is in it
       if (room.run && !room.run.ended) {                                // time on each floor: per player (until they leave the store) and per floor with anyone on it
         const seen = new Set();
-        for (const p of room.players.values()) if (p.scene && !room.out.has(p.id)) { PS.onFloor(p.ps, p.scene, 1 / simHz); seen.add(p.scene); }
+        for (const p of room.players.values()) if (p.scene && room.floorNames.includes(p.scene) && !room.out.has(p.id)) { PS.onFloor(p.ps, p.scene, 1 / simHz); seen.add(p.scene); }
         for (const s of seen) room.floorMs[s] = (room.floorMs[s] || 0) + 1000 / simHz;
       }
       for (const p of room.players.values()) { const r = PS.tick(p.ps, 1 / simHz, clock()); if (r === "respawn") { gbiDeath(room, p); sendMe(p, {respawn: 1}); } else if (PS.changed(p.ps)) sendMe(p); }
@@ -126,10 +126,31 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
   function checkDone(room) {
     if (!runDone(room.run, [...room.players.keys()])) return;
     room.run = finish(room.run); room.final = runResults(room.run).map(e => rowOf(room, e)); broadcast(room, resultsMsg(room));
+    for (const r of room.final) earnFlag(room.players.get(r.id), "original_complete");          // everyone in the results finished the Original here: the server knows it without asking
     // one JSON line per finished round, with no player names; nothing is stored
     log(JSON.stringify({event: "run", ...runRecord({roomCode: room.code, mode: room.mode, startedAt: room.run.startedAt, endedAt: Date.now(), floors: room.floorList(),
       players: room.final.map(r => ({char: r.char, place: r.place, ms: r.ms, downs: r.downs, deaths: r.deaths, revives: r.revives, shots: r.shots}))})}));
   }
+  // ---- presence in page scenes (session 17). A scene the manifest marks `presence` (the parking lot, the street) is a place a room's players can be together. The
+  // server runs nothing there: it knows who is in it and relays their position snapshots to the others of the room in the same scene. Each player's City clock, needs,
+  // money, jobs and saves stay on their own page. A player may be in such a scene when the links a room can follow lead there with the flags they hold
+  // (REGISTRY.canReach). The flags live in the browser until there are accounts (docs/BACKEND.md), so the server takes the client's word for them, except
+  // `original_complete`, which it also knows for itself once the player has finished a round in this room.
+  const PRESENCE = REGISTRY.presence, FLAG_NAMES = new Set(REGISTRY.manifest.flags), PRESENCE_REACH = 2000;          // a presence scene can be long (Hallam Row runs 130 m); a position past this is not one
+  function claimFlags(p, list) { p.claimed = new Set((Array.isArray(list) ? list : []).filter(f => FLAG_NAMES.has(f))); p.flags = new Set([...p.earned, ...p.claimed]); }
+  function earnFlag(p, flag) { if (!p) return; p.earned.add(flag); p.flags.add(flag); }
+  // the presence scene a player asks to be in, or null (told why once, not with every snapshot)
+  function presencePlace(room, p, wanted) {
+    if (typeof wanted !== "string" || !Object.hasOwn(PRESENCE, wanted)) { p.noEntry = null; return null; }
+    const r = REGISTRY.canReach(wanted, p.flags, room.mode);
+    if (r.ok) { p.noEntry = null; return wanted; }
+    if (p.noEntry !== wanted) { p.noEntry = wanted; send(p, {t: "noentry", scene: wanted, missing: r.missing}); }
+    return null;
+  }
+  // what the others in a presence scene are sent about a player: where they are and how they move, and nothing a floor's rules would own
+  const presenceSnap = (p, m) => ({t: "s", id: p.id, scene: p.scene, x: p.st.x, y: p.st.y, z: p.st.z, yaw: p.st.yaw, crouch: p.st.crouch ? 1 : 0, moving: p.st.moving ? 1 : 0, run: p.st.run ? 1 : 0,
+    hp: Math.round(p.ps.hp.hp), ...(Number.isFinite(m.tod) && m.tod >= 0 && m.tod < 24 ? {tod: Math.round(m.tod * 100) / 100} : {})});
+
   // the waiting room: everyone readies, then a countdown, then the round starts for the whole room (a round runs until the room empties)
   const lobbyMsg = room => ({t: "lobby", phase: room.phase, countdownMs: room.timer ? countdownMs : null,
     players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char, ready: p.ready}))});
@@ -164,10 +185,11 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
         const used = new Set([...room.players.values()].map(p => p.color));
         const taken = new Set([...room.players.values()].map(p => p.char));                    // a character you ask for is yours even if someone has it; with no choice you get one nobody has
         const char = Number.isInteger(m.char) && m.char >= 0 && m.char < NUM_CHARS ? m.char : ([...Array(NUM_CHARS).keys()].find(c => !taken.has(c)) ?? (room.seq % NUM_CHARS));
-        me = {id: ++room.seq, seq: room.seq, ws, scene: null, ready: false, ps: newPlayerPS(room), st: null, char, name: String(m.name || "Player").replace(/[^\w .-]/g, "").slice(0, 16) || "Player",
+        me = {id: ++room.seq, seq: room.seq, ws, scene: null, ready: false, ps: newPlayerPS(room), st: null, char, earned: new Set(), claimed: new Set(), flags: new Set(), noEntry: null, name: String(m.name || "Player").replace(/[^\w .-]/g, "").slice(0, 16) || "Player",
               color: COLORS.find(c => !used.has(c)) || COLORS[0]};
+        claimFlags(me, m.flags);
         room.players.set(me.id, me);
-        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, mode: room.mode, floors: room.floorNames, start: room.start, max: room.max, finish: room.finish, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? room.final : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char}))});
+        send(me, {t: "welcome", now: Date.now(), id: me.id, room: code, mode: room.mode, floors: room.floorNames, start: room.start, max: room.max, finish: room.finish, phase: room.phase, power: room.power.on, alarmMs: alarmMs(room), exited: room.run ? room.run.exits : [], results: room.run?.ended ? room.final : null, players: [...room.players.values()].map(p => ({id: p.id, name: p.name, color: p.color, char: p.char, scene: p.scene}))});
         broadcast(room, {t: "join", id: me.id, name: me.name, color: me.color, char: me.char}, me.id);
         lobbyChanged(room);
         return;
@@ -176,13 +198,16 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
         case "ready":
           me.ready = !!m.ready; lobbyChanged(room);
           break;
+        case "flags": claimFlags(me, m.flags); break;                 // the flags this browser holds (see the presence notes above)
         case "s": {                                                   // a player's state goes only to those on the same floor; everyone else just learns which floor you are on
-          const scene = typeof m.scene === "string" && Object.hasOwn(FLOORS, m.scene) && room.floorNames.includes(m.scene) ? m.scene : null;          // only the five floors exist for the server (the solo-only passages and games never reach a room)
+          const onFloor = typeof m.scene === "string" && Object.hasOwn(FLOORS, m.scene) && room.floorNames.includes(m.scene);          // the server runs only the mode's floors (the solo-only passages and games never reach a room)
+          const scene = onFloor ? m.scene : presencePlace(room, me, m.scene), there = !onFloor && scene !== null, reach = there ? PRESENCE_REACH : 100;          // or a presence scene: relayed, not run
           const was = me.scene; me.scene = scene;
-          const f = k => Number.isFinite(m[k]) ? m[k] : 0, inMap = Math.abs(f("x")) <= 100 && Math.abs(f("z")) <= 100 && f("y") > -20 && f("y") < 30;          // a position off the map (or not a number) is ignored: the player stays where they were
+          const f = k => Number.isFinite(m[k]) ? m[k] : 0, inMap = Math.abs(f("x")) <= reach && Math.abs(f("z")) <= reach && f("y") > -20 && f("y") < 30;          // a position off the map (or not a number) is ignored: the player stays where they were
           if (!inMap && me.st) { m = {...m, x: me.st.x, y: me.st.y, z: me.st.z}; }
           me.st = {x: f("x"), y: f("y"), z: f("z"), yaw: f("yaw"), crouch: !!m.crouch, moving: !!m.moving, run: !!m.run, carry: !!m.carry, cloak: !!m.cloak, dead: !!m.dead, imm: !!m.imm};
-          broadcast(room, {...m, id: me.id, hp: Math.round(me.ps.hp.hp), cloak: PS.cloakOn(me.ps) ? 1 : 0, gun: me.ps.gun ? 1 : 0, dead: PS.isDown(me.ps) ? 1 : 0, imm: PS.isImmune(me.ps, clock()) ? 1 : 0}, me.id, scene);          // health, cloak, gun and being down are the server's word, not the client's
+          if (there) broadcast(room, presenceSnap(me, m), me.id, scene);
+          else broadcast(room, {...m, id: me.id, hp: Math.round(me.ps.hp.hp), cloak: PS.cloakOn(me.ps) ? 1 : 0, gun: me.ps.gun ? 1 : 0, dead: PS.isDown(me.ps) ? 1 : 0, imm: PS.isImmune(me.ps, clock()) ? 1 : 0}, me.id, scene);          // health, cloak, gun and being down are the server's word, not the client's
           if (was !== scene) {
             ensureFloor(room, scene); pruneFloors(room);
             broadcast(room, {t: "p", id: me.id, scene}, me.id);
@@ -196,9 +221,11 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
           }
           break;
         }
-        case "goto": {                                                // jump to a friend: their floor and spot, only for someone in this party who is standing on a floor
+        case "goto": {                                                // jump to a friend: their place and spot, only for someone in this party who is standing on a floor or in a presence scene
           const to = room.players.get(m.to);
           if (!to || to === me || !to.scene || !to.st) break;
+          const may = REGISTRY.canReach(to.scene, me.flags, room.mode);          // a friend in a page scene (session 17): only if the links a room can follow let you in there too
+          if (!may.ok) { send(me, {t: "goto", id: to.id, scene: to.scene, refused: "requires", missing: may.missing}); break; }
           send(me, {t: "goto", id: to.id, scene: to.scene, x: to.st.x, y: to.st.y, z: to.st.z});
           break;
         }
