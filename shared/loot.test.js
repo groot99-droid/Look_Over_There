@@ -4,7 +4,7 @@ import {LOOT, LOOT_FLOORS, GUN_ROUNDS, PACK_ROUNDS, MAX_ROUNDS, BEACONS, MAX_BEA
 import {GATED} from "./fuses.js";
 
 test("every floor has ammo, only B1 has lockers, enough of them for a full room", () => {
-  assert.deepEqual(LOOT_FLOORS, ["B1", "L1", "L2", "L3", "L4"]);
+  assert.deepEqual(LOOT_FLOORS, ["B1", "L1", "L2", "L3", "L4", "gbi_L4_4", "gbi_L3_1"]);          // session 16: a going_back_in room's server runs the chambers, so their packs are the server's too
   for (const f of LOOT_FLOORS) assert.ok(LOOT[f].packs >= 3, f);
   assert.equal(LOOT.B1.lockers, 8); for (const f of ["L1", "L2", "L3", "L4"]) assert.equal(LOOT[f].lockers, 0);
   assert.equal(LOOT.L3.packs, 4, "L3 has no monsters: the place to restock");

@@ -1,4 +1,4 @@
-// Going back in: the pure rules for a chamber's wave, with no graphics. The page (index.html) places the monsters this plan names; a room's server will use the same plan later.
+// Going back in: the pure rules for a chamber's wave, with no graphics. Alone, the page (index.html) places the monsters this plan names; in a room the server does (server/floorsim.js), from the same plan.
 // A chamber's wave starts when the player enters it; the rest of the time is quiet (nothing here ticks a clock).
 import {pickSpots, rng32} from "./world.js";
 
