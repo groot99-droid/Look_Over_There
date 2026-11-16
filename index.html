@@ -131,6 +131,17 @@
   #options h2{margin:0;font:700 20px/1.1 Georgia,serif;letter-spacing:.18em}
   #options p{margin:0 0 6px;color:#9a9a86}
   #options button:disabled{opacity:.45;cursor:default}
+  #party{position:fixed;inset:0;z-index:7;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);color:#d8d8c4;font:14px/1.5 system-ui,sans-serif}
+  #party .card{width:min(460px,92vw);display:flex;flex-direction:column;gap:10px}
+  #party h2{margin:0;font:700 20px/1.1 Georgia,serif;letter-spacing:.18em;text-align:center}
+  #party small{color:#8a8a78;letter-spacing:.04em;text-align:center}
+  #pt-rows{display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto}
+  #pt-rows .row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#1c1c16;border:1px solid #33332a;border-radius:3px}
+  #pt-rows .row b{flex:0 0 auto;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #pt-rows .row span{flex:1;color:#a8a894}
+  #pt-rows .row i{font-style:normal;color:#8a8a78;font-size:12px;text-align:right}
+  #party button{font:600 13px/1 system-ui,sans-serif;letter-spacing:.1em;padding:9px 12px;color:#d8d8c4;background:#2a2a20;border:1px solid #4a4a3c;border-radius:3px;cursor:pointer}
+  #party button:hover{border-color:#e0a040}
   #station{position:fixed;inset:0;z-index:7;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);color:#d8d8c4;font:14px/1.5 system-ui,sans-serif}
   #station .card{width:min(420px,92vw);display:flex;flex-direction:column;gap:10px;text-align:center}
   #station h2{margin:0;font:700 20px/1.1 Georgia,serif;letter-spacing:.18em}
@@ -170,9 +181,10 @@
 <div id="pc"><div class="card"><div id="pc-tabs"></div><h2 id="pc-title"></h2><pre id="pc-body"></pre><div id="pc-actions"></div><button id="pc-close" type="button">Close (Esc or F)</button></div></div>
 <div id="clock"><span></span><small></small></div><div id="needs"><span id="needs-n"></span><span id="needs-j"></span></div>
 <div id="options"><div class="card"><h2>LOOK OVER THERE</h2><p>The doors are open. Where to?</p><button id="o-original" type="button">Original</button><button id="o-back" type="button">Going back in<small>alone, for now</small></button><button id="o-close" type="button">Not yet</button></div></div>
+<div id="party"><div class="card"><h2>PARTY</h2><div id="pt-rows"></div><small>Go takes you to that player's place, if you may enter it. You only see each other there: nothing else is shared.</small><button id="pt-close" type="button">Close (Esc or P)</button></div></div>
 <div id="help"><div class="card"><h2>CONTROLS</h2><div class="cols"><div>
 <div><b>WASD</b>move</div><div><b>Mouse</b>look</div><div><b>Space</b>jump</div><div><b>Shift</b>crouch (press again to walk)</div><div><b>R (hold)</b>run, loud</div><div><b>X / F</b>action: doors, fuses, switches, loot (hold to lift a teammate)</div><div><b>Y</b>take out what you carry; tap again to rotate; hold for the wheel (arrows or mouse wheel)</div><div><b>1 2 3</b>ray gun, cloak, beacon</div></div><div>
-<div><b>Left click</b>use what you hold: fire, cloak on/off, roll a beacon</div><div><b>Right click</b>gun: aim. Cloak: short circuit (stuns monsters near you, cloak dead 5 min). Beacon: reverse it (monsters run away, then group up)</div><div><b>Q / E</b>support / combat consumable (none yet)</div><div><b>Tab / M</b>handheld map</div><div><b>N</b>sound on / off</div><div><b>H</b>this list</div></div></div>
+<div><b>Left click</b>use what you hold: fire, cloak on/off, roll a beacon</div><div><b>Right click</b>gun: aim. Cloak: short circuit (stuns monsters near you, cloak dead 5 min). Beacon: reverse it (monsters run away, then group up)</div><div><b>Q / E</b>support / combat consumable (none yet)</div><div><b>Tab / M</b>handheld map</div><div><b>N</b>sound on / off</div><div><b>P</b>party: who is where, go to a friend (in a room)</div><div><b>H</b>this list</div></div></div>
 <small>Controller: left stick move · right stick look · A jump · left-stick click crouch (click again to walk) · right-stick click run (hold) · X action · Y hold / rotate (hold for the wheel) · RT use what you hold · LT aim (gun) or secondary (cloak, beacon) · LB / RB support / combat consumables · D-pad up or View: map</small></div></div>
 <div id="toast"></div>
 <div id="prompt"></div>
@@ -399,7 +411,7 @@ function crossPortals() {                                   // stepping into an 
 
 async function loadScene(id, arrival) {
   if (!net.on && S.id && GATED.includes(S.id) && FZ.st[S.id]) { const n = fuseReduce(FZ.st[S.id], net.id, {a: "release"}); if (n) FZ.st[S.id] = n; }     // solo: a fuse you carry off the floor goes back (a room's server does this)
-  loading = true; pendingLink = null; devOn.v = false; net.snap = null; closeKeypad();
+  loading = true; pendingLink = null; devOn.v = false; net.snap = null; net.shut = null; closeKeypad();
   const fade = $("fade"); fade.style.opacity = 1; await new Promise(r => setTimeout(r, 380));
   if (S.root) { scene.remove(S.root); disposeTree(S.root); }
   clearPortals();
@@ -1555,8 +1567,8 @@ function showResults(rows) {
   welcome.hidden = !first; welcome.textContent = first ? "Welcome to Farway. You made it out." : "";
   const b = me ? bestTime(me.ms) : null;
   $("r-best").textContent = b ? (b.isNew ? `NEW RECORD ${fmtTime(b.best)}` : `BEST ${fmtTime(b.best)}`) : "";
-  const walk = $("r-walk"), out = REGISTRY.linkFrom("L4", "front_doors");          // the way on: only alone for now, and only once the flag is held (it was just set above if this was the first finish)
-  walk.hidden = !(!net.on && me && out && requirementsMet(out, heldFlags()).ok); walk.onclick = () => walkOut(out);
+  const walk = $("r-walk"), out = REGISTRY.linkFrom("L4", "front_doors");          // the way on: once the flag is held (it was just set above if this was the first finish). In a room too, since the
+  walk.hidden = !((me || net.on) && out && !roomShut(out) && requirementsMet(out, heldFlags()).ok); walk.onclick = () => walkOut(out);          // manifest's link is not soloOnly: the party meets in the lot
   $("r-again").onclick = () => location.reload();
   $("results").style.display = "flex";
 }
@@ -1715,7 +1727,9 @@ function gbDeath() {
 // ---------------------------------------------------------------- the Overworld, v0: the parking lot after the Original (session 6)
 // One scene, `parking_lot` (world/parking_lot.json, built by tools/make_parking_lot.mjs, over the store and lot models). The results screen offers the walk out once
 // `original_complete` is held; you arrive at the table and chairs facing the store, and walking up to the glass doors opens the options screen (Original, or Going back
-// in, which is not built yet). Alone only: the server runs five floors and a room cannot enter this scene, so the manifest link says soloOnly.
+// in). A room can walk out too (session 17): the lot is a `presence` scene of the manifest, so the server relays who is in it and where, and everyone there sees
+// each other. It runs nothing: the options screen is each player's own, and Going back in stays alone until rooms can run it.
+const roomShut = link => net.on && !!link.soloOnly;                                       // in a room, a link the manifest marks soloOnly does not open
 const OW = {open: false, armed: true};
 const OW_SCENE = "parking_lot", OW_TABLE = [-8, 41];                                      // the table's centre; the spawn (the manifest link's `arrive`) is 2.6 m toward the store
 const SKY = {parking_lot: 3.5};                                                          // one sky mode so far: clear and bright (the exterior model's own sky, lit up). Every other scene keeps the model's dusk.
@@ -1739,6 +1753,7 @@ function overworldProps(root) {
 function openOptions() {
   OW.open = true; document.exitPointerLock?.(); $("options").style.display = "flex";
   $("o-original").onclick = () => location.reload();
+  $("o-back").disabled = net.on; $("o-back").title = net.on ? "Rooms cannot run Going back in yet. Play it solo." : "";
   $("o-back").onclick = startGoingBackIn;                                         // a fresh round starts from the start screen, as Play again does
   $("o-close").onclick = closeOptions;
 }
@@ -1752,6 +1767,7 @@ function overworldTick() {
 }
 // the results screen's "Walk out": into the parking lot, with the HUD back (the results screen had hidden it)
 async function walkOut(link) {
+  net.sendFlags();                                                                          // a room's server lets you into the lot only with the flag
   $("results").style.display = "none"; FIN.results = null; FIN.out = false; OW.open = false; OW.armed = true;
   await loadScene(link.to.scene, {pos: link.to.arrive, face: link.to.face});
 }
@@ -1760,7 +1776,9 @@ async function walkOut(link) {
 // The bus stop in the parking lot takes you to the street scene `street` (layout and the clock rules: shared/city.js; collision: world/street.json, made by tools/make_street.mjs).
 // All of it is blockout geometry, no art yet. A game day is 15 real minutes starting at 08:00; the clock (CITY.t, seconds) runs only while you are on the street and is paused
 // everywhere else. Stores open 08:00 to 20:00: after that the shutters come down and the doors will not open. 20:00 to midnight is the grace period; the danger after midnight
-// and the apartment come in slice 2. The apartment (slice 2) is below. Alone only, like the Overworld: a room cannot enter these scenes.
+// and the apartment come in slice 2. The apartment (slice 2) is below. A room can ride the bus and be on the street and in the apartment together (session 17), as presence
+// only: the server relays positions, and every rule here (the clock, the night, needs, money, jobs, saving, the stalker, pedestrians, anomalies) runs per player on their own
+// page. So two players side by side can be in different hours; a name tag shows that player's time. The other doors of the street are solo only (the manifest says which).
 const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor", MALL_SCENE = "entrance", MUSEUM_SCENE = "galleries", FACTORY_SCENE = "factory_floor", LAB_SCENE = "laboratory";
 const inCity = () => CITY_SCENES.includes(S.id);
 let NEEDS = newNeeds();                                       // slice 4: hunger, money, the cart and the fridge (rules: shared/needs.js); in memory, like the clock
@@ -1783,7 +1801,13 @@ function busStopLotProps(root) {                                                
   const g = new THREE.Group(), [sx, sz] = BUS_LOT.shelter; shelter(g, BUS_LOT.shelter, S.floor); root.add(g);
   boxes.push({n: [sx - 0.7, S.floor, sz - 0.3], x: [sx + 0.7, S.floor + 0.9, sz + 0.3]});
 }
+// In a room (session 17) the street and the apartment are presence scenes: you see the others walk, and that is all that is shared. Said once, on arrival.
+function roomCityNote() {
+  if (!net.on || net.toldCity) return; net.toldCity = true;
+  toast("Hallam Row with your party: you see each other, and nothing else is shared. Each of you has your own clock, night, money and jobs. The time under a name is theirs, not yours.", 11000);
+}
 function cityProps(root) {
+  roomCityNote();
   const g = new THREE.Group(), y = CITY_Y, z0 = ROAD.z0, z1 = ROAD.z1;
   CITY.doors = []; CITY.mats = {win: new THREE.MeshLambertMaterial({color: 0x20262c, emissive: 0xffd890, emissiveIntensity: 0}), lamp: new THREE.MeshLambertMaterial({color: 0x333333, emissive: 0xffe0a0, emissiveIntensity: 0})};
   g.add(boxMesh([-60, y - 0.2, z0 - 10], [60, y - 0.02, z1 + 10], 0x3a4a34));                                                  // grass past the buildings
@@ -1865,6 +1889,7 @@ function anomalyTick(dt = 1 / 60) {
 }
 // the sky, lights, signs and clock for the time of day; `force` also puts the default look back when you are not in the City
 function cityLook(force) {
+  if (force && net.on) hud();                                                                   // on every arrival: the room's HUD line says whether you are in the City
   const clock = $("clock");
   if (!inCity()) { if (force) { scene.background.set(0x0b0b0c); HEMI.intensity = 1.25; HEMI.color.set(0xfff2d0); clock.style.display = "none"; $("needs").style.display = "none"; document.body.classList.remove("cityhud"); } return; }
   const st = cityState(), sky = skyAt(st.hour);
@@ -1977,7 +2002,7 @@ const nearXZ = (x, z, r) => Math.hypot(P.p.x - x, P.p.z - z) < r;
 const nearCityDoor = () => S.id === CITY_SCENE ? DOORS.find(d => nearXZ(d.x, d.z, d.reach)) : null;
 function cityPrompt() {
   if (PC.open) return "";
-  if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return "Press F to take the bus to Hallam Row";
+  if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return roomShut(REGISTRY.linkFrom(OW_SCENE, "bus_stop")) ? "The bus does not take a room yet" : "Press F to take the bus to Hallam Row";
   if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
   if (S.id === LAB_SCENE) {
     if (nearXZ(...LAB.door.at, LAB.door.reach)) return CITY.lb.active ? "Press F to leave your post early (no pay)" : "Press F to leave";
@@ -2019,13 +2044,14 @@ function cityPrompt() {
   }
   if (nearXZ(BUS_STREET.at[0], BUS_STREET.at[1], BUS_STREET.radius)) return dangerous(hourAt(CITY.t)) ? "The bus does not run at night" : CITY.tr.active ? "Press F to take the bus back (it ends your shift)" : "Press F to take the bus back";
   const d = nearCityDoor(); if (!d) return "";
+  if (roomShut(REGISTRY.linkFrom(CITY_SCENE, d.id) || {})) return `${d.label}: a solo place for now (not in a room)`;
   const stub = stubJob(d); if (stub) { const can = canStartStub(stub, hourAt(CITY.t)); return can.ok ? `Press F to start your shift (${d.job})` : `${d.label} (${d.job}): ${can.reason}`; }
   return d.kind === "tower" ? "Press F to go up to your apartment" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.id === "mall" ? "Press F to go into the mall" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
 }
 // F at a bus stop rides the bus (a fade through loadScene); F at a door says what is behind it. Nothing is built inside yet.
 function tryCity() {
-  if (loading || net.on) return false;
-  const ride = (scene, door) => { const l = REGISTRY.linkFrom(scene, door); loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face}); return true; };
+  if (loading) return false;
+  const ride = (scene, door) => { const l = REGISTRY.linkFrom(scene, door); if (roomShut(l)) { toast("That does not open in a room yet"); return true; } loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face}); return true; };
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return ride(OW_SCENE, "bus_stop");
   if (S.id === APT_SCENE) {
     if (nearXZ(...APARTMENT.door.at, APARTMENT.door.reach)) return ride(APT_SCENE, "front_door");
@@ -2079,6 +2105,7 @@ function tryCity() {
   }
   if (nearXZ(BUS_STREET.at[0], BUS_STREET.at[1], BUS_STREET.radius)) { if (dangerous(hourAt(CITY.t))) { toast("The bus does not run at night."); return true; } if (CITY.tr.active) endTrash("left"); return ride(CITY_SCENE, "bus_stop"); }   // the City's tick stops outside the City, so the bus ends the route itself
   const d = nearCityDoor(); if (!d) return false;
+  if (roomShut(REGISTRY.linkFrom(CITY_SCENE, d.id) || {})) { toast(`${d.label}: a solo place for now. It does not open while you are in a room.`, 4200); return true; }          // the manifest's soloOnly links
   if (d.kind === "tower") return ride(CITY_SCENE, "tower");
   if (d.id === "mall" && storesOpen(hourAt(CITY.t))) return ride(CITY_SCENE, "mall");                    // slice 13: in by day; it locks at 20:00
   if (d.id === "grocery" && storesOpen(hourAt(CITY.t))) return ride(CITY_SCENE, "grocery");              // slice 4: the grocery is open by day                    // the tower is always open: its door opens into your apartment (the lobby is the planned hotel)
@@ -2457,7 +2484,8 @@ const DOWNED_S = 20, REVIVE_S = 4;
 const CHARS = [{id: "plaid", name: "Plaid"}, {id: "suit", name: "Suit"}, {id: "shorts", name: "Shorts"}, {id: "red", name: "Red Dress"}, {id: "white", name: "White Suit"}];
 const net = {on: false, ws: null, id: 0, room: "", phase: "lobby", peers: new Map(), snap: null, t: 0, mt: 0, ticks: 0, ready: null, started: null, startRes: null, lobby: null, alert: null,
   host() { return !this.on; },                                // alone, this page runs the monsters; in a room the server does, and everyone follows it
-  send(m) { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(m)); }};
+  send(m) { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(m)); },
+  sendFlags() { this.send({t: "flags", flags: heldFlags()}); }};          // the flags this browser holds: the server uses them to decide which presence scenes you may be in
 let toastT = 0;
 function toast(msg, ms = 3200) { const el = $("toast"); el.textContent = msg; el.style.opacity = 1; clearTimeout(toastT); toastT = setTimeout(() => { el.style.opacity = 0; }, ms); }
 const r2 = v => Math.round(v * 100) / 100;
@@ -2468,8 +2496,13 @@ function peerTag(p) {                                                           
   const g = p.cv.getContext("2d"); g.clearRect(0, 0, 256, 64);
   g.font = "700 34px system-ui,sans-serif"; g.textAlign = "center"; g.fillStyle = p.color; g.strokeStyle = "#000"; g.lineWidth = 5;
   g.strokeText(p.name, 128, 40); g.fillText(p.name, 128, 40);
-  g.fillStyle = "rgba(0,0,0,.65)"; g.fillRect(56, 50, 144, 9);
-  g.fillStyle = p.hp <= 35 ? "#e03a30" : "#c8504a"; g.fillRect(57, 51, 142 * p.hp / MAX_HP, 7);
+  if (p.tod != null) {                                                          // in the City there is no health to show: the line under the name is that player's own time of day
+    g.font = "700 17px system-ui,sans-serif"; g.fillStyle = "#e8e0c0"; g.lineWidth = 4; const t = `their time ${fmtClock(p.tod)} · ${phaseAt(p.tod)}`;
+    g.strokeText(t, 128, 60); g.fillText(t, 128, 60);
+  } else {
+    g.fillStyle = "rgba(0,0,0,.65)"; g.fillRect(56, 50, 144, 9);
+    g.fillStyle = p.hp <= 35 ? "#e03a30" : "#c8504a"; g.fillRect(57, 51, 142 * p.hp / MAX_HP, 7);
+  }
   p.tex.needsUpdate = true;
 }
 function addPeer(info) {
@@ -2485,7 +2518,7 @@ function addPeer(info) {
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xffc040, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true}));      // lit while they carry a fuse
   halo.scale.set(1.6, 1.6, 1); halo.position.y = 1.0; halo.visible = false; obj.add(halo);
   obj.visible = false; scene.add(obj);
-  const peer = {halo, id: info.id, name: info.name, color: info.color, char: info.char, scene: null, x: 0, y: 0, z: 0, tx: 0, ty: 0, tz: 0, yaw: 0, tyaw: 0, crouch: false, moving: false, dead: false, imm: false, fresh: true,
+  const peer = {halo, id: info.id, name: info.name, color: info.color, char: info.char, scene: info.scene ?? null, x: 0, y: 0, z: 0, tx: 0, ty: 0, tz: 0, yaw: 0, tyaw: 0, crouch: false, moving: false, dead: false, imm: false, fresh: true, tod: null,
     obj, pivot, stand, mixer: null, acts: null, playing: null, lie: [.6, .25], cv, tex, hp: MAX_HP};
   peerTag(peer); net.peers.set(info.id, peer);
   loadModel("gun").then(g => { if (!g || !net.peers.has(info.id)) return; const m = SkeletonUtils.clone(g.scene); m.scale.setScalar(0.12); m.rotation.y = -Math.PI / 2; m.traverse(o => { if (o.isMesh) o.frustumCulled = false; });         // the ray gun in a teammate's hand
@@ -2511,13 +2544,13 @@ function removePeer(id) {
   scene.remove(p.obj); disposeTree(p.obj); net.peers.delete(id); hud();
 }
 function hud() {
-  $("hud").textContent = net.on ? `ROOM ${net.room} · ${net.peers.size + 1} in the building · ${[...net.peers.values()].map(p => p.name).join(", ")}` : "";
+  $("hud").textContent = net.on ? `ROOM ${net.room} · ${net.peers.size + 1} in the building · ${[...net.peers.values()].map(p => p.name).join(", ")} · P: party${inCity() ? " · the City: you only see each other; clocks, money and jobs are your own" : ""}` : "";          // the City's line stays up while you are there: a toast alone is gone when the next one comes
 }
 function onNet(m) {
   switch (m.t) {
     case "welcome":
       if (Number.isFinite(m.now)) net.off = m.now - Date.now();
-      net.id = m.id; net.room = m.room; net.on = true; net.phase = m.phase; net.mode = m.mode; net.start = m.start;
+      net.id = m.id; net.room = m.room; net.on = true; net.phase = m.phase; net.mode = m.mode || "original"; net.start = m.start;
       for (const p of m.players) if (p.id !== m.id) addPeer(p);
       if (m.phase !== "lobby") net.startRes?.();
       if (m.power) setPower(true, null, true);
@@ -2530,10 +2563,13 @@ function onNet(m) {
     case "lobby": net.lobby = m; renderWait(); break;
     case "start": net.phase = "playing"; clearInterval(net.cd); net.startRes?.(); break;
     case "p": { const p = net.peers.get(m.id); if (p) { p.scene = m.scene; p.fresh = true; } break; }       // someone changed floor: you only learn which
+    case "goto": arriveAtFriend(m); break;
+    case "noentry": net.shut = m.scene; toast(`The server will not let you in there yet${m.missing && m.missing.includes("original_complete") ? ": finish the Original first" : ""}. The others cannot see you.`, 5000); break;
     case "s": {
       const p = net.peers.get(m.id); if (!p) break;
       const moved = p.scene !== m.scene, wasDead = p.dead;
       p.scene = m.scene; p.tx = m.x; p.ty = m.y; p.tz = m.z; p.tyaw = m.yaw; p.crouch = !!m.crouch; p.moving = !!m.moving; p.run = !!m.run; p.dead = !!m.dead; p.imm = !!m.imm; p.carry = !!m.carry; p.cloak = !!m.cloak; p.gun = !!m.gun; if (Number.isFinite(m.hp)) { const hp = Math.max(0, Math.min(MAX_HP, Math.round(m.hp / 5) * 5)); if (hp !== p.hp) { p.hp = hp; peerTag(p); } }
+      { const tod = Number.isFinite(m.tod) ? Math.floor(m.tod * 6) / 6 : null; if (tod !== p.tod) { p.tod = tod; peerTag(p); } }          // their City clock, to the ten minutes (it is not yours)
       if (p.fresh || moved || Math.hypot(p.tx - p.x, p.tz - p.z) > 6) { p.x = p.tx; p.y = p.ty; p.z = p.tz; p.yaw = p.tyaw; p.fresh = false; }
       if (!wasDead && p.dead && m.scene === S.id) { net.alert = {id: p.id, until: performance.now() + 8000}; toast(`${p.name} was caught`); }     // the scream: an arrow toward the body
       break;
@@ -2579,7 +2615,58 @@ function onNet(m) {
     case "trap": if (m.scene === S.id && !loading) gbTrap(m, true); break;                    // somebody set a land mine or a tripwire
     case "sprung": gbSprung(m); break;                                // one went off                                    // Going back in in a room: the server started (or describes) this chamber's wave
   }
+  if (PT.open && (m.t === "p" || m.t === "join" || m.t === "leave")) renderParty();          // someone moved place while the list is up
 }
+// ---------------------------------------------------------------- the party list and "go to a friend" (session 17)
+// P (in a room) lists the party with where each player is. Go asks the server for that player's place ({t:"goto"}, session 4) and takes you there: a floor of the
+// store, or a page scene the manifest marks `presence`. What you may enter is the manifest's word (REGISTRY.canReach with the flags this browser holds), and the server
+// checks the same before it answers. Your own City rules still hold: at night the bus does not run, so there is no way out of (or back into) the City by a friend either.
+const PT = {open: false};
+const PLACE_NAMES = {parking_lot: "the parking lot", street: "Hallam Row", apartment: "an apartment on Hallam Row"};
+const placeName = id => !id ? "on the way somewhere" : PLACE_NAMES[id] || (REGISTRY.chamber(id) ? `Going back in: wave ${REGISTRY.chamber(id).wave.no}` : REGISTRY.floors[id] !== undefined ? `Look Over There, floor ${id}` : id);
+const nightBound = scene => inCity() !== CITY_SCENES.includes(scene) && inCity() && dangerous(hourAt(CITY.t));          // leaving the City at night, by your own clock
+// may you go to this player now? {ok, why}
+function gotoState(p) {
+  if (!p.scene) return {ok: false, why: "not in a place yet"};
+  const r = REGISTRY.canReach(p.scene, heldFlags(), net.mode);
+  if (!r.ok) return {ok: false, why: r.missing.includes("original_complete") ? "finish the Original first" : r.missing.length ? `needs ${r.missing.join(", ")}` : "a solo place"};
+  if (dead) return {ok: false, why: "you are down"};
+  if (nightBound(p.scene)) return {ok: false, why: "no bus at night (your clock)"};
+  return {ok: true, why: ""};
+}
+function renderParty() {
+  const esc = s => String(s).replace(/[<>&"]/g, "");
+  const rows = [`<div class="row"><b>You</b><span>${placeName(loading ? null : S.id)}</span><i></i></div>`];
+  for (const p of net.peers.values()) { const g = gotoState(p), here = p.scene === S.id && !loading;
+    rows.push(`<div class="row" data-id="${p.id}"><b style="color:${esc(p.color)}">${esc(p.name)}</b><span>${placeName(p.scene)}${here ? " (with you)" : ""}</span>${g.ok ? `<button type="button" data-go="${p.id}">Go</button>` : `<i>${g.why}</i>`}</div>`); }
+  if (!net.peers.size) rows.push(`<div class="row"><span>Nobody else is in room ${esc(net.room)} yet.</span></div>`);
+  $("pt-rows").innerHTML = rows.join("");
+}
+function openParty() {
+  if (!net.on || inGame || PT.open) return;
+  PT.open = true; document.exitPointerLock?.(); renderParty(); $("party").style.display = "flex";
+  $("pt-close").onclick = closeParty; $("pt-rows").onclick = e => { const b = e.target.closest("[data-go]"); if (b) goToFriend(+b.dataset.go); };
+}
+function closeParty() { PT.open = false; $("party").style.display = "none"; }
+function goToFriend(id) {
+  const p = net.peers.get(id); if (!p || loading || !gotoState(p).ok) return;
+  closeParty(); net.sendFlags(); net.send({t: "goto", to: id});          // the flags first: the server decides with what it knows
+}
+// the server's answer: their scene and spot, or a refusal
+async function arriveAtFriend(m) {
+  const p = net.peers.get(m.id), name = p ? p.name : "your friend";
+  if (m.refused) { toast(`You cannot go to ${name} yet${(m.missing || []).includes("original_complete") ? ": finish the Original first" : ""}.`, 4200); return; }
+  if (loading || dead || inGame || !SCENES[m.scene] || !REGISTRY.canReach(m.scene, heldFlags(), net.mode).ok || nightBound(m.scene)) return;
+  if (FIN.results) { $("results").style.display = "none"; FIN.results = null; FIN.out = false; }          // from the results screen, as the walk out does
+  if (S.id === CITY_SCENE && CITY.tr.active && m.scene !== CITY_SCENE) endTrash("left");                // leaving the street ends a trash route, as the bus does
+  const pos = [m.x, m.y, m.z];
+  if (m.scene === S.id) teleport(pos); else await loadScene(m.scene, {pos});
+  toast(`You are with ${name}: ${placeName(m.scene)}.`);
+}
+addEventListener("keydown", e => {
+  if (PT.open) { if (e.code === "Escape" || e.code === "KeyP") closeParty(); return; }
+  if (e.code === "KeyP" && !e.repeat && net.on && !KPUI.open && !STN.open && !PC.open && !SH.open && !QZ.open && !OW.open && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || "")) openParty();
+});
 // the nearest downed teammate within reach on your floor
 function reviveTarget() {
   if (!net.on || dead || loading) return null;
@@ -2598,7 +2685,7 @@ function drawAlert() {
 function updatePeers(dt) {
   const k = Math.min(1, dt * 14);
   for (const p of net.peers.values()) {
-    const here = p.scene === S.id && !loading;
+    const here = p.scene === S.id && !loading && net.shut !== S.id;          // (a presence scene the server refused you: you are not there for the others, so they are not drawn for you)
     p.obj.visible = here; if (!here) continue;
     p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k; p.z += (p.tz - p.z) * k;
     let da = p.tyaw - p.yaw; da = Math.atan2(Math.sin(da), Math.cos(da)); p.yaw += da * k;
@@ -2621,7 +2708,7 @@ function netTick(dt) {
   if (!net.on) return;
   if ((net.t -= dt) <= 0) {
     net.t = 1 / 15;
-    net.send({t: "s", scene: loading ? null : S.id, x: r2(P.p.x), y: r2(P.p.y), z: r2(P.p.z), yaw: r2(P.yaw), crouch: P.crouch ? 1 : 0, moving: P.moving ? 1 : 0, run: P.running ? 1 : 0, dead: dead ? 1 : 0, imm: P.imm > 0 ? 1 : 0, carry: myCarry() >= 0 ? 1 : 0, hp: Math.round(HP.h.hp), cloak: CL.st.on ? 1 : 0, gun: LT.gun ? 1 : 0});
+    net.send({t: "s", scene: loading ? null : S.id, x: r2(P.p.x), y: r2(P.p.y), z: r2(P.p.z), yaw: r2(P.yaw), crouch: P.crouch ? 1 : 0, moving: P.moving ? 1 : 0, run: P.running ? 1 : 0, dead: dead ? 1 : 0, imm: P.imm > 0 ? 1 : 0, carry: myCarry() >= 0 ? 1 : 0, hp: Math.round(HP.h.hp), cloak: CL.st.on ? 1 : 0, gun: LT.gun ? 1 : 0, ...(inCity() ? {tod: r2(hourAt(CITY.t))} : {})});          // in the City: your own clock's hour, for your name tag on the others' screens
   }
 }
 function connect(name, room, char, mode = "original") {
@@ -2633,7 +2720,7 @@ function connect(name, room, char, mode = "original") {
     const timer = setTimeout(() => fail("Could not reach the server. Play solo, or run server/server.js and open the game from it."), 5000);
     net.ready = () => { clearTimeout(timer); resolve(); };
     net.started = new Promise(r => { net.startRes = r; });
-    ws.onopen = () => ws.send(JSON.stringify({t: "join", room, name, char, mode}));
+    ws.onopen = () => ws.send(JSON.stringify({t: "join", room, name, char, mode, flags: heldFlags()}));
     ws.onmessage = ev => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === "full") fail(`That room is full (${m.max || 10} players).`); else if (m.t === "refused") fail(m.reason === "soon" ? "That mode is coming soon." : "That mode does not exist."); else onNet(m); };
     ws.onerror = () => { if (!net.on) fail("Could not reach the server. Play solo, or run server/server.js and open the game from it."); };
     ws.onclose = () => {
@@ -2859,7 +2946,7 @@ FIN.t0 = performance.now();
 await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
