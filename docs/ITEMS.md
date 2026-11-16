@@ -365,7 +365,11 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server owns the charge, the knockback and the alert.
 
-### 4.9 Moth jelly dart [PROPOSAL] (model: `Moth_Jelly_Blaster`)
+### 4.9 Moth jelly dart [BUILT, solo Going back in] (model: `Moth_Jelly_Blaster`)
+
+**Built (session 21):** `shared/dart.js` and `shared/dart.test.js` (the ammo, the projectile and the spread), the statuses on `MonsterSim` in `shared/monsters.js` (`slow`, `slowMul`, `jelly`, `statusTick`; `shared/monsters.test.js`), the page (`index.html`: the dart in the air, an amber glow on a jellied monster, the map mark, the HUD line `DARTS n/5`, packs, death), `tools/dart_test.mjs`. It is the first thing to use the Slowed status of 1.4, so the flamethrower and the rocket's mist can reuse it. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* the strongest slow wins and replaces a weaker one (a weaker one does not resume when the stronger ends); a dart restarts the 10 s and never adds to the damage (the dps stays 15); the spread is itself a jelly of 5 s, so a monster already jellied for longer keeps its longer time, and a monster the spread kills infects its neighbours in turn; any death of a jellied monster spreads (a baton or a bolt too); the dart flies straight (no drop); a dart in the air is lost when you change chamber.
+- *Not built:* the Market; the right-click / LT aim; the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`); the "team map" is the handheld map today and shows a jellied monster at its real position, refreshed every 0.2 s, while the jelly lasts.
 
 - **What it is.** An air rifle with a syringe of amber jelly. You fire once and walk away. The moths do the rest.
 - **Role.** Silent damage over time. Fire and leave.
