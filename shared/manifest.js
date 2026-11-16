@@ -162,10 +162,10 @@ export function buildRegistry(doc) {
     return {id, floorY: s.floorY, ...s.chamber, wave: {...s.chamber.wave, no}};
   };
   // Which scenes a player in a room of `mode` may be in, given the flags they hold: the mode's floors, and whatever the built links a room can follow (no soloOnly) lead
-  // to from there, each link's `requires` met. {ok, missing}: `missing` names the flags of the shut links on the way, for a message. The page's own doors check each
+  // to from there, each link's `requires` met. A room starts in the mode's own scenes: its `floors`, or for Going back in (whose `floors` name storeys, not scenes) its first chamber. {ok, missing}: `missing` names the flags of the shut links on the way, for a message. The page's own doors check each
   // link as you use it; this is for the server (may this player be in that scene?) and for "go to a friend", which skips the doors.
   const canReach = (scene, flags, mode = "original") => {
-    const m = (doc.modes || {})[mode], seen = new Set(m && Array.isArray(m.floors) ? m.floors : []), todo = [...seen], missing = new Set();
+    const m = (doc.modes || {})[mode], seen = new Set(!m ? [] : m.startChamber ? [m.startChamber] : Array.isArray(m.floors) ? m.floors : []), todo = [...seen], missing = new Set();
     while (todo.length) {
       const from = todo.pop();
       for (const l of links) {
