@@ -217,6 +217,8 @@ Wrong Exit maze, keycard doors everywhere else, hardest boss (The Registrar), Ad
 
 ## 5. Systems
 
+The rules for every item (the arsenal, consumables, dealer items, food, the med kit and Spicy Brew) are proposed in `docs/ITEMS.md` (session 18), for the owner to critique.
+
 **Money.** Job pay by performance, chests and piggy banks in Right Door, Wrong Exit, chamber clears, kills and revives. Level is based on how much of the game you have beaten, marked by achievements.
 
 **Death in Going back in.** [SETTLED]
