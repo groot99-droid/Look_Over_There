@@ -63,9 +63,9 @@ Nothing in this session changed game code, models or the manifest.
 Nothing that is bound today moves. `tools/controls_test.mjs` must still pass unchanged.
 
 - **Keys 1, 2, 3:** ray, cloak, beacon, as today.
-- **Key 4:** arsenal weapon A. Today it is always the crossbow; it becomes whichever weapon you put in slot A at the locker.
-- **Key 5 (new, unused in play today):** arsenal weapon B.
-- **You carry at most two arsenal weapons.** The rest wait in the locker. The locker panel gets one row per owned weapon, and choosing a third asks which to leave.
+- **Key 4:** arsenal weapon A. [BUILT in solo, session 20: it is the first arsenal weapon you carry, in the order you took them; the crossbow when you start.]
+- **Key 5:** arsenal weapon B [BUILT in solo: the second one you carry].
+- **You carry at most two arsenal weapons.** The rest wait in the locker. The locker panel gets one row per owned weapon, and choosing a third asks which to leave [BUILT in solo: the locker refuses it with a toast until you leave one; the E slot's key in the panel is then the last row's number, 6].
 - **Y:** tap still rotates through what you carry, hold still opens the wheel. The wheel grows from 4 entries to at most 6 (hands, ray, cloak, beacon, A, B). On a controller this is the only way to choose a weapon, as it is today.
 - **Left click / RT:** the primary use. Weapons that say "hold" fire for as long as it is held.
 - **Right click / LT:** aim (a zoom and a slower look, the ray's rule) for the bolt driver, crossbow, rocket launcher and jelly dart. The other six weapons have a secondary there, written in each entry.
@@ -246,7 +246,7 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 ### 4.1 Pneumatic bolt driver [BUILT, solo Going back in] (model: `Rustborn_Raycaster`)
 
 **Built (session 19):** `shared/driver.js` and `shared/driver.test.js` (the rules), `MonsterSim.hurt` and `hp` in `world/monsters.json` (`shared/monsters.test.js`), the page (`index.html`: key 5, the locker row, the HUD line `NAILS n/32 AIR ▮▮▮…`, packs, death) and `tools/driver_test.mjs`. Everything below is as built except what this note lists.
-- *Not built yet:* the Market (like the crossbow, it starts in your hands, with 16 nails, until the Market exists); the right-click / LT aim; the two-weapon carry cap (only two arsenal weapons exist, so it does not bind yet); the monster traits of 1.4 (only the health is built); the model (a box placeholder is drawn in code; `models/items/pneumatic_bolt_driver.glb` is not loaded); rooms: session 16's server runs three pieces of gear (`GEAR` in `shared/loadout.js`), so the driver is `SOLO_GEAR` only, absent from a room's loadout and locker rows, until the server owns its nails, gauge and hits.
+- *Not built yet:* the Market (like the crossbow, it starts in your hands, with 16 nails, until the Market exists); the right-click / LT aim; the monster traits of 1.4 (only the health is built, and since the baton the sinew's longer stun); the model (a box placeholder is drawn in code; `models/items/pneumatic_bolt_driver.glb` is not loaded); rooms: session 16's server runs three pieces of gear (`GEAR` in `shared/loadout.js`), so the driver is `SOLO_GEAR` only, absent from a room's loadout and locker rows, until the server owns its nails, gauge and hits.
 - *Clarified while building:* the air refills one eighth every 1.5 s starting 1 s after your last shot, so from empty it is full again 13 s after the last shot (12 s of refilling). The weapon's damage is read before the eighth is spent, so shots from a full gauge do 35, 32.5, 30, 27.5 ...
 - *Built:* a creature (100) falls to 4 nails, as the table in section 9 says.
 
@@ -291,7 +291,11 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations. Proposal for a toxic gas chamber: lighting it there sets the gas off, one hit of 35 to everyone in the gas.
 - **In a room.** The server owns the fuel and the burning status, and decides who is in the cone each tick.
 
-### 4.4 Stun-baton capacitor [PROPOSAL] (model: `Rustbound_Contraption`)
+### 4.4 Stun-baton capacitor [BUILT, solo Going back in] (model: `Rustbound_Contraption`)
+
+**Built (session 20):** `shared/baton.js` and `shared/baton.test.js` (the rules), `batonStun` on the sinew in `world/monsters.json`, the page (`index.html`: the swing, the discharge, a placeholder mesh drawn in code, the HUD line `BATON ● ● ○`), `tools/baton_test.mjs`. It also builds the two-weapon carry cap and the weapon slots of 1.3, because a third arsenal weapon is what makes them bind (`ARSENAL`, `MAX_ARSENAL`, `canTake` in `shared/loadout.js`). Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* a swing that misses costs nothing but the cooldown (only a hit uses a capacitor); the baton does not charge while it is dead (so the first capacitor is back 20 + 8 s after a discharge); a death changes nothing about its charge ("nothing is lost"); the 60 degree arc is measured on the floor plane from where you face, with a clear line to the monster's middle.
+- *Not built:* the Market (it starts in the locker because you carry two arsenal weapons at most, so you leave the crossbow or the driver to take it); the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`); the other monster traits of 1.4 (only the sinew's longer stun).
 
 - **What it is.** A long baton with a bank of capacitors and bare wires. It does not finish anything. It makes something stop.
 - **Role.** Melee crowd control with free ammo: the weapon that still works after you have lost everything.

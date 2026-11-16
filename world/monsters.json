@@ -1,9 +1,10 @@
 {
-  "_note": "One monster kind per floor. hp = health in Going back in (docs/ITEMS.md 1.4; a weapon that hurts takes it, a kill removes the monster; the Original never hurts one). glb = animated, textured model; anim maps roles to the clip names inside it; yawOffset turns it to face the way it walks (Meshy models face +Z: 3.14159); perLevel = how many patrol each floor.",
+  "_note": "One monster kind per floor. hp = health in Going back in (docs/ITEMS.md 1.4; a weapon that hurts takes it, a kill removes the monster; the Original never hurts one). batonStun = how much longer the stun baton's stun lasts on it (docs/ITEMS.md 4.4). glb = animated, textured model; anim maps roles to the clip names inside it; yawOffset turns it to face the way it walks (Meshy models face +Z: 3.14159); perLevel = how many patrol each floor.",
   "monsters": [
     {
       "name": "sinew",
       "hp": 140,
+      "batonStun": 1.5,
       "glb": "monsters/sinew.glb",
       "height": 2.3,
       "yawOffset": 3.14159,
