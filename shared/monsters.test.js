@@ -123,3 +123,24 @@ test("monsters have health in Going back in: a hit takes it, 0 is dead; one with
   assert.equal(ghost.hurt(9999), false, "the Original's monsters have no health to lose"); assert.equal(ghost.hp, Infinity);
   assert.equal(m.hurt(-5), false, "a bad number does nothing"); assert.equal(m.hp, 0);
 });
+
+test("statuses: a slow multiplies every speed (the strongest wins, they do not stack), and a jellied monster takes damage over time until it dies", () => {
+  const W = mkWorld("L4"), env = mkEnv(W), [a] = clearPair(W, 4);
+  const mk = name => new MonsterSim(cfgOf(name), "L4", a[0], a[1], env);
+  const m = mk("creature"); assert.equal(m.slowMul(), 1);
+  m.slow(0.6, 4); assert.equal(m.slowMul(), 0.6); m.slow(0.8, 9); assert.equal(m.slowMul(), 0.6, "a weaker slow does not replace it"); m.slow(0.5, 2); assert.equal(m.slowMul(), 0.5, "a stronger one does");
+  assert.equal(m.statusTick(2.01), false); assert.equal(m.slowMul(), 1, "and it wears off");
+  // the jelly: 15 a second, slow 0.5, a creature (100) dies after 6.67 s, a pale traveler (80) after 5.33 s, a sinew (140) after 9.33 s
+  const dieAt = name => { const x = mk(name); x.jelly(10, 15, 0.5); assert.equal(x.slowMul(), 0.5); let t = 0; for (; t < 12; t += 0.05) if (x.statusTick(0.05)) return t + 0.05; return null; };
+  assert.ok(Math.abs(dieAt("creature") - 6.67) < 0.1); assert.ok(Math.abs(dieAt("pale_traveler") - 5.33) < 0.1); assert.ok(Math.abs(dieAt("sinew") - 9.33) < 0.1);
+  const r = mk("clawed"); r.jelly(10, 15, 0.5); r.statusTick(5); r.jelly(10, 15, 0.5); assert.equal(r.jellyT, 10, "a second dart restarts the time"); assert.equal(r.jellyDps, 15, "and does not add to the damage");
+  r.statusTick(0.2); assert.ok(Math.abs(r.hp - (100 - 15 * 5.2)) < 0.01, "5.2 s of jelly, not 10.2");
+  const o = new MonsterSim({...cfgOf("creature"), hp: undefined}, "L4", a[0], a[1], env); o.jelly(10, 15, 0.5); assert.equal(o.statusTick(30), false, "the Original's monsters take no damage"); assert.equal(o.hp, Infinity);
+  const s = mk("creature"); s.jelly(10, 15, 0.5); s.statusTick(10); assert.equal(s.jellyT, 0, "it has run out"); assert.equal(s.slowMul(), 1);
+});
+test("a slowed monster moves at half speed in a chase, and so covers less ground", () => {
+  const run = k => { const {m, env, t} = setup(10, "creature", "L4"); m.wait = 0; if (k) m.slow(k, 99); const x0 = m.pos.x, z0 = m.pos.z; tick(m, env, [t], 1); return {d: Math.hypot(m.pos.x - x0, m.pos.z - z0), speed: m.speed, state: m.state}; };
+  const full = run(0), half = run(0.5);
+  assert.equal(full.state, "chase"); assert.equal(full.speed, cfgOf("creature").chase); assert.ok(full.d > 2.5, "it is chasing, not standing: " + full.d);
+  assert.equal(half.speed, cfgOf("creature").chase * 0.5, "every speed times the slow"); assert.ok(half.d < full.d * 0.75, `${half.d} against ${full.d}`);
+});

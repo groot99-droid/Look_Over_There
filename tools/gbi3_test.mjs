@@ -58,8 +58,8 @@ try {
 
   // E at the locker: switch to the tripwire; it kills everything in its blast and is loud
   const spot = await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); return !!x; });
-  await page.keyboard.press("6"); await page.keyboard.press("Escape");
-  s = await st(); check("the locker's key 6 changes the E slot to the tripwire", spot && s.e === "wire", JSON.stringify(s));
+  await page.keyboard.press("7"); await page.keyboard.press("Escape");
+  s = await st(); check("the locker's key 7 changes the E slot to the tripwire", spot && s.e === "wire", JSON.stringify(s));
   p = await stand(); await put(0, p.x + 1.5, p.z); await put(1, p.x, p.z + 2.8);
   const far = await page.evaluate(() => { const g = window.__game; return {x: g.P.p.x, z: g.P.p.z}; });
   check("E sets down a tripwire", await page.evaluate(() => window.__game.useConsumable(1)));
