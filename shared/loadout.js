@@ -1,7 +1,7 @@
 // The Going back in loadout and its locker (GBI-7): which gear you carry and which is in the locker. No graphics here.
 // Rule from docs/WORLD.md ("Death in Going back in"): after a death the locker returns your weapons and gear for free; it does NOT return ammo, consumables or perks
-// (the page zeroes those; this file only moves gear). Gear in v1: the ray, the cloak and the hunting crossbow. A beacon is counted as charges, so it is lost like ammo.
-export const GEAR = ["gun", "cloak", "crossbow"];
+// (the page zeroes those; this file only moves gear). Gear in v1: the ray, the cloak, the hunting crossbow and the pneumatic bolt driver (docs/ITEMS.md). A beacon is counted as charges, so it is lost like ammo.
+export const GEAR = ["gun", "cloak", "crossbow", "driver"];
 export const newLoadout = (carry = GEAR) => ({carry: [...carry], stash: GEAR.filter(g => !carry.includes(g))});
 export const carries = (l, g) => l.carry.includes(g);
 const has = (l, g) => GEAR.includes(g) && (l.carry.includes(g) || l.stash.includes(g));

@@ -112,3 +112,14 @@ test("a reversed beacon sends monsters away from it, and when it ends they come 
   assert.equal(m.lureId, null, "it is not lured while the frequency is reversed");
   env.t = can.repelUntil + 0.1; tick(m, env, [], 40, 0.05, [can]); assert.ok(Math.hypot(m.pos.x - can.x, m.pos.z - can.z) < 5, "afterwards it comes back to the can and idles round it");
 });
+
+test("monsters have health in Going back in: a hit takes it, 0 is dead; one with no health in its config cannot be killed", () => {
+  assert.deepEqual(Object.fromEntries(monCfg.monsters.map(m => [m.name, m.hp])), {sinew: 140, pale_traveler: 80, clawed: 100, creature: 100}, "docs/ITEMS.md 1.4");
+  const W = mkWorld("L4"), env = mkEnv(W), [a] = clearPair(W, 4);
+  const m = new MonsterSim(cfgOf("creature"), "L4", a[0], a[1], env);
+  assert.equal(m.hp, 100); assert.equal(m.hurt(35), false); assert.equal(m.hp, 65);
+  assert.equal(m.hurt(65), true, "exactly 0 is dead"); assert.equal(m.hp, 0);
+  const ghost = new MonsterSim({...cfgOf("creature"), hp: undefined}, "L4", a[0], a[1], env);
+  assert.equal(ghost.hurt(9999), false, "the Original's monsters have no health to lose"); assert.equal(ghost.hp, Infinity);
+  assert.equal(m.hurt(-5), false, "a bad number does nothing"); assert.equal(m.hp, 0);
+});

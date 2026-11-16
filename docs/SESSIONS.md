@@ -23,6 +23,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 16 | Going back in in rooms | Round 4 | 4 and 8; waits for the owner's playtest and decisions | not started |
 | 17 | Overworld and City in rooms, and "go to a friend" in the page | Round 4 | 4, 6 and 9; waits for the owner's playtest | not started |
 | 18 | Item rules: one document for every item | Round 4 | | **written**, draft PR: `docs/ITEMS.md` proposes rules, prices and tuning tables for all 24 modelled items plus the ray, cloak and beacon. A design document only: no game code, models or manifest changed. Waits for the owner's critique before any of it is built |
+| 19 | Build the pneumatic bolt driver (the first arsenal weapon after the crossbow) | Round 4 | 18 | **built**, draft PR on `claude/bolt-driver`: `shared/driver.js`, monster health (`hp`, `MonsterSim.hurt`), key 5 and a locker row, solo only. Rooms (session 16) and the Market are not touched |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
 | 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
