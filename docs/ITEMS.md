@@ -243,7 +243,12 @@ These are not changed by this document. Their numbers are from the code.
 
 All ten: bought at the Market, kept for good, returned free by the locker, used in Going back in and Secret Operations only. Each entry says only what is special; sections 1.6 to 1.8 give the shared rules. Kill counts per monster kind are in the table in section 9.
 
-### 4.1 Pneumatic bolt driver [PROPOSAL] (model: `Rustborn_Raycaster`)
+### 4.1 Pneumatic bolt driver [BUILT, solo Going back in] (model: `Rustborn_Raycaster`)
+
+**Built (session 19):** `shared/driver.js` and `shared/driver.test.js` (the rules), `MonsterSim.hurt` and `hp` in `world/monsters.json` (`shared/monsters.test.js`), the page (`index.html`: key 5, the locker row, the HUD line `NAILS n/32 AIR ▮▮▮…`, packs, death) and `tools/driver_test.mjs`. Everything below is as built except what this note lists.
+- *Not built yet:* the Market (like the crossbow, it starts in your hands, with 16 nails, until the Market exists); the right-click / LT aim; the two-weapon carry cap (only two arsenal weapons exist, so it does not bind yet); the monster traits of 1.4 (only the health is built); the model (a box placeholder is drawn in code; `models/items/pneumatic_bolt_driver.glb` is not loaded); rooms (session 16 owns the server side).
+- *Clarified while building:* the air refills one eighth every 1.5 s starting 1 s after your last shot, so from empty it is full again 13 s after the last shot (12 s of refilling). The weapon's damage is read before the eighth is spent, so shots from a full gauge do 35, 32.5, 30, 27.5 ...
+- *Built:* a creature (100) falls to 4 nails, as the table in section 9 says.
 
 - **What it is.** A rusted nail gun with a pressure gauge and a coiled air hose. The first thing you can afford: it works, as long as you let it breathe.
 - **Role.** The cheap workhorse: single target, a short burst, mid range.

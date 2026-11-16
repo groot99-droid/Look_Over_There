@@ -16,6 +16,7 @@ export const vec = (x, y, z) => ({x, y, z, set(a, b, c) { this.x = a; this.y = b
 export class MonsterSim {
   constructor(cfg, level, x, z, env) {
     this.cfg = cfg; this.level = level; this.env = env; this.fy = env.W.floor;
+    this.hp = cfg.hp > 0 ? cfg.hp : Infinity;                                        // health: only Going back in's weapons take it (hurt); no `hp` in the config means it cannot be killed this way
     this.home = [x, z]; this.pos = vec(x, this.fy, z); this.yaw = env.rnd() * 6.28;
     this.state = "patrol"; this.path = []; this.repath = 0; this.target = null; this.lost = 0; this.wait = 0; this.speed = 0; this.doorT = 0; this.last = null; this.glitchT = 0; this.immuneT = 0; this.stunT = 0; this.fleeId = null;
     this.hitAt = {}; this.k = Math.abs(Math.floor(x * 7.3 + z * 3.1)) % 97; this.lureId = null; this.lureAt = null; this.spot = null; this.tgt = null;
@@ -145,6 +146,10 @@ export class MonsterSim {
       }
     }
     return false;
+  }
+  hurt(dmg) {                                                                // a weapon's damage (docs/ITEMS.md 1.4): true when it takes the last of the health
+    if (!(dmg > 0) || this.hp === Infinity) return false;
+    this.hp = Math.max(0, this.hp - dmg); return this.hp <= 0;
   }
   stun(secs) { this.stunT = Math.max(this.stunT, secs); this.speed = 0; }       // see shared/cloak.js: the short circuit
   banish(x, z) {                                                             // the ray no-clips it to (x, z): it forgets the chase, waits, then patrols, and cannot be banished again for a while
