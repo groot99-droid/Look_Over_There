@@ -29,8 +29,9 @@ export const FARWAY = {
       finish: {scene: "L4", trigger: "parking_lot", alarmMs: 60000}, results: ["place", "time", "bestOnBrowser"],
     },
     going_back_in: {
-      // status stays planned: rooms cannot run this mode yet (the server answers "soon"). Solo play enters it from the Overworld's options screen (session 8), at `startChamber`.
-      status: "planned", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20, startChamber: "gbi_L4_4",
+      // built (session 16): a room runs it on the server, starting everyone in `startChamber`; its scenes are the chambers of the `gbi` area, not `floors` (those say which storeys the run
+      // goes down). Solo play still enters it from the Overworld's options screen (session 8). No finish yet: the run has no end until all 20 chambers exist.
+      status: "built", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20, startChamber: "gbi_L4_4",
     },
   },
 
@@ -57,11 +58,11 @@ export const FARWAY = {
     },
     {
       // Going back in, slice 1: two chambers made from existing floors (tools/make_chambers.mjs writes their world files). `chamber.floor` and `index` place it in the run (wave number =
-      // floor position x chambersPerFloor + index); the 4th chamber of a floor has the stairs down, to the next floor's first. Page scenes only: the server does not run them.
+      // floor position x chambersPerFloor + index); the 4th chamber of a floor has the stairs down, to the next floor's first. `multiplayer`: a going_back_in room's server runs them as floors (session 16).
       id: "gbi", name: "Going back in", status: "built", tone: "backrooms",
       scenes: [
-        {id: "gbi_L4_4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
-        {id: "gbi_L3_1", floorY: 6.4, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
+        {id: "gbi_L4_4", floorY: 9.6, multiplayer: true, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
+        {id: "gbi_L3_1", floorY: 6.4, multiplayer: true, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
       ],
     },
     stub("dreamcore_forest", "Dreamcore forest and meadow", "planned", ["forest", "meadow"]),
@@ -116,7 +117,7 @@ export const FARWAY = {
     gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4"),
 
     // Going back in: the stairs down from the 4th chamber of L4 to the first chamber of L3. One way (the chamber's own `up` door has no link). Arrival is on L3's floor (6.4).
-    {id: "gbi.gbi_L4_4.stairs_down", status: "built", connector: "stair_door", soloOnly: true,
+    {id: "gbi.gbi_L4_4.stairs_down", status: "built", connector: "stair_door",
      from: {area: "gbi", scene: "gbi_L4_4", door: "DoorLeaf_Stair_L3_L4_down"}, to: {area: "gbi", scene: "gbi_L3_1", door: "DoorLeaf_Stair_L3_L4_up", arrive: [16.0, 6.4, 8.0], face: [0.0, 1.0]}},
 
     // ---- planned: from the world bible. None of these reach the game until their area is built.
