@@ -1806,6 +1806,15 @@ function trapMesh(kind, t) {
   const g = new THREE.Group(), mat = c => new THREE.MeshBasicMaterial({color: c});
   if (kind === "mine") { const d = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.06, 14), mat(0x7a7a5a)); d.position.y = 0.03; const l = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 0.06), mat(0xff3a2a)); l.position.y = 0.08; g.add(d, l); g.userData.lamp = l; }
   else { for (const a of [0, 1.05, 2.1]) { const w = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.012, 0.012), mat(0xb8b8a0)); w.position.y = 0.12; w.rotation.y = a; g.add(w); } const c = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.1, 0.14), mat(0x5a5a40)); c.position.y = 0.05; g.add(c); }
+  // the owner's Meshy models (models/items/, optional: if one cannot load, the code-made shape stays). The mine's disc and the tripwire's box are hidden behind them; the mine's blinking lamp and the tripwire's wires stay
+  const [id, size, hide] = kind === "mine" ? ["items/almond_water_land_mine", 0.46, g.children[0]] : ["items/nail_bomb_tripwire", 0.45, g.children[g.children.length - 1]];
+  loadModel(id).then(gl => {
+    if (!gl) return;
+    const m = SkeletonUtils.clone(gl.scene), bb = new THREE.Box3().setFromObject(m, true), k = size / (bb.getSize(new THREE.Vector3()).x || 1), c = bb.getCenter(new THREE.Vector3());
+    m.scale.setScalar(k); m.position.set(-c.x * k, -bb.min.y * k, -c.z * k); m.traverse(o => { if (o.isMesh) o.frustumCulled = false; });
+    const w = new THREE.Group(); w.add(m); g.add(w); hide.visible = false;
+    if (g.userData.lamp) g.userData.lamp.position.y = (bb.max.y - bb.min.y) * k + 0.02;
+  });
   g.position.set(t.x, S.floor, t.z); S.root.add(g); return g;
 }
 function throwFlash() {

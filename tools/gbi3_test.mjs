@@ -11,6 +11,8 @@ const start = REGISTRY.modes.going_back_in.startChamber;
 const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
 const srv = await createServer({countdownMs: 60000}), errors = [];
 const page = await (await browser.newContext({viewport: {width: 900, height: 700}})).newPage(); page.on("pageerror", e => errors.push(e.message));
+// the owner's Meshy model has replaced the code-made shape on the newest trap (its Group child is there and the old shape is hidden)
+const trapModel = () => page.waitForFunction(() => { const t = window.__game.TRAPS.list.at(-1); return !!t && t.mesh.children.some(c => c.type === "Group" && c.children.length > 0); }, null, {timeout: 30000}).then(() => true, () => false);
 const settled = id => page.waitForFunction(i => window.__game.S.id === i && !window.__game.loading, id, {timeout: 180000});
 const frames = n => page.evaluate(n => { for (let i = 0; i < n; i++) window.__game.sim(0.05, i); }, n);
 const st = () => page.evaluate(() => { const g = window.__game; return {n: g.GB.kit && {...g.GB.kit.n}, e: g.GB.kit && g.GB.kit.e, mons: g.monsters.length, kills: g.GB.wave && g.GB.wave.kills, cleared: g.GB.wave && g.GB.wave.cleared, traps: g.TRAPS.list.filter(t => !t.done).length, stun: g.monsters.map(m => m.stunT > 0), bolts: g.BOW.st.bolts, rounds: g.LT.rounds}; });
@@ -55,6 +57,7 @@ try {
   await page.evaluate(() => { const g = window.__game; g.monsters[1].pos.x += 30; });                         // only monster 0 stays on it
   await frames(40); s = await st();
   check("then it kills the monster on it, is spent, and counts as a kill", s.mons === 2 && s.kills === 1 && s.traps === 0, JSON.stringify(s));
+  check("the land mine was drawn with its Meshy model", await trapModel());
 
   // E at the locker: switch to the tripwire; it kills everything in its blast and is loud
   const spot = await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); return !!x; });
@@ -66,6 +69,7 @@ try {
   await frames(2); s = await st(); check("it arms in under a second", s.traps === 1 && s.mons === 2, JSON.stringify(s));
   await frames(20); s = await st();
   check("the blast kills both monsters near it, and the wave is cleared", s.mons === 0 && s.kills === 3 && s.cleared === true && s.traps === 0, JSON.stringify(s));
+  check("the tripwire was drawn with its Meshy model", await trapModel());
   check("an empty E slot does nothing and places nothing", await page.evaluate(() => { const g = window.__game; g.GB.kit.n.wire = 0; return g.useConsumable(1) === false && g.TRAPS.list.filter(t => !t.done).length === 0; }));
 
   // an ammo pack refills the flash-vial and the E item
