@@ -27,7 +27,7 @@ if (COLORS.length < MAX_PLAYERS) throw new Error(`the world manifest allows ${MA
 // a party is a room: the same mode and the same code. The original keeps its plain code as the key; any other mode is "mode:CODE".
 const partyKey = (mode, code) => mode === DEFAULT_MODE ? code : `${mode}:${code}`;
 
-export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes = REGISTRY.modes, rng = Math.random, simHz = Number(process.env.SIM_HZ) || 20, clock = () => Date.now() / 1000, log = line => console.log(line)} = {}) {
+export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes = REGISTRY.modes, rng = Math.random, simHz = Number(process.env.SIM_HZ) || 20, clock = () => Date.now() / 1000, registry = REGISTRY, log = line => console.log(line)} = {}) {
   const docs = new Map(), readJson = rel => JSON.parse(fs.readFileSync(path.join(root, rel), "utf8"));
   const worldDoc = scene => { if (!docs.has(scene)) docs.set(scene, readJson(`world/${scene}.json`)); return docs.get(scene); };
   let monCfgCache = null; const monCfg = () => monCfgCache ||= readJson("world/monsters.json");
@@ -123,8 +123,9 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
   // a row for the results screen: the old fields (id, name, place, ms) plus what the player did; stats were taken as they walked out
   const rowOf = (room, e) => { const s = room.out.get(e.id) || PS.newStats(); return {...e, char: s.char, downs: s.downs, deaths: s.deaths, revives: s.revives, shots: s.shots, hits: s.hits, beacons: s.beacons, score: score({deaths: s.deaths, revives: s.revives, ms: e.ms})}; };
   const resultsMsg = room => ({t: "results", rows: room.final, mode: room.mode, floors: room.floorList()});
+  const inGame = p => typeof p.scene === "string" && Object.hasOwn(GAME_PLACES, p.scene);
   function checkDone(room) {
-    if (!runDone(room.run, [...room.players.keys()])) return;
+    if (!runDone(room.run, [...room.players.values()].filter(p => !inGame(p)).map(p => p.id))) return;          // a player inside a game does not hold the round: they are not ranked if it ends while they are in there
     room.run = finish(room.run); room.final = runResults(room.run).map(e => rowOf(room, e)); broadcast(room, resultsMsg(room));
     for (const r of room.final) earnFlag(room.players.get(r.id), "original_complete");          // everyone in the results finished the Original here: the server knows it without asking
     // one JSON line per finished round, with no player names; nothing is stored
@@ -136,13 +137,13 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
   // money, jobs and saves stay on their own page. A player may be in such a scene when the links a room can follow lead there with the flags they hold
   // (REGISTRY.canReach). The flags live in the browser until there are accounts (docs/BACKEND.md), so the server takes the client's word for them, except
   // `original_complete`, which it also knows for itself once the player has finished a round in this room.
-  const PRESENCE = REGISTRY.presence, FLAG_NAMES = new Set(REGISTRY.manifest.flags), PRESENCE_REACH = 2000;          // a presence scene can be long (Hallam Row runs 130 m); a position past this is not one
+  const PRESENCE = registry.presence, GAME_PLACES = registry.gamePlaces, FLAG_NAMES = new Set(registry.manifest.flags), PRESENCE_REACH = 2000;          // a presence scene can be long (Hallam Row runs 130 m); a position past this is not one
   function claimFlags(p, list) { p.claimed = new Set((Array.isArray(list) ? list : []).filter(f => FLAG_NAMES.has(f))); p.flags = new Set([...p.earned, ...p.claimed]); }
   function earnFlag(p, flag) { if (!p) return; p.earned.add(flag); p.flags.add(flag); }
   // the presence scene a player asks to be in, or null (told why once, not with every snapshot)
   function presencePlace(room, p, wanted) {
-    if (typeof wanted !== "string" || !Object.hasOwn(PRESENCE, wanted)) { p.noEntry = null; return null; }
-    const r = REGISTRY.canReach(wanted, p.flags, room.mode);
+    if (typeof wanted !== "string" || !(Object.hasOwn(PRESENCE, wanted) || Object.hasOwn(GAME_PLACES, wanted))) { p.noEntry = null; return null; }          // a game's room (`rdwe:teal`) is a place like the lot: relayed, not run (session 11)
+    const r = registry.canReach(wanted, p.flags, room.mode);
     if (r.ok) { p.noEntry = null; return wanted; }
     if (p.noEntry !== wanted) { p.noEntry = wanted; send(p, {t: "noentry", scene: wanted, missing: r.missing}); }
     return null;
@@ -218,13 +219,14 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
             if (LOOT_FLOORS.includes(scene)) send(me, {t: "loot", scene, st: floorLoot(room, scene)});
             maybeAlarm(room);
             gbiArrive(room, me, scene);
+            if (inGame(me)) checkDone(room);          // the last of the others may already be out: going into a game must not leave the round open
           }
           break;
         }
         case "goto": {                                                // jump to a friend: their place and spot, only for someone in this party who is standing on a floor or in a presence scene
           const to = room.players.get(m.to);
           if (!to || to === me || !to.scene || !to.st) break;
-          const may = REGISTRY.canReach(to.scene, me.flags, room.mode);          // a friend in a page scene (session 17): only if the links a room can follow let you in there too
+          const may = registry.canReach(to.scene, me.flags, room.mode);          // a friend in a page scene (session 17): only if the links a room can follow let you in there too
           if (!may.ok) { send(me, {t: "goto", id: to.id, scene: to.scene, refused: "requires", missing: may.missing}); break; }
           send(me, {t: "goto", id: to.id, scene: to.scene, x: to.st.x, y: to.st.y, z: to.st.z});
           break;

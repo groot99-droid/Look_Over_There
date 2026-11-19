@@ -32,7 +32,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 25 | Build the laser pointer dissector | Round 4 | 24 | **built**, draft PR on `claude/laser-dissector`, stacked on session 24's `claude/rocket-launcher`: `shared/laser.js`, `MonsterSim.provoke`, solo only. Rooms and the Market are not touched |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
-| 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
+| 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | **slices 1 and 2 in the draft PR for `claude/games-in-parties`** (design note; manifest `coop` areas and game places, server relay, tests): both games still solo only. Slices 3 (Right Door, Wrong Exit drawn in a room) and 4 (the Intern) are next; the owner chose the defaults for the three open questions |
 
 Update this table in the last commit of each session.
 
