@@ -97,9 +97,9 @@ No assigned classes. **Monsters show on the handheld map only through the camera
 
 Five playable characters (`characters/<id>.glb`, picked in the lobby, shown to everyone else with name tags): `plaid`, `suit`, `shorts`, `red`, `white`. Duplicates are allowed. Each has Walking and Running clips; standing still plays the walk almost frozen (no idle clip), crouching walks slowly, being downed lies the model down. `tools/optimize_character.mjs` produced them from the Meshy exports (1024 px WebP texture, ~30–76k vertices, Draco; about 0.5–0.7 MB each).
 
-## Fighting back: the Error Deletion Ray (planned)
+## Fighting back: the Error Deletion Ray (built)
 
-The gun is `models/gun.glb` (Meshy's "Error Deletion Ray", 10k triangles). It is not in the game yet. These are the owner's decisions and the rules built from them; anything marked *assumed* is mine and open to change.
+The gun is `models/gun.glb` (Meshy's "Error Deletion Ray", 10k triangles). It is in the game (`GUN` in `index.html`): held bottom right, fired with the left mouse button, F or the right trigger; teammates are seen holding it. The section below is the plan it was built from. These are the owner's decisions and the rules built from them; anything marked *assumed* is mine and open to change.
 
 **Decisions (owner).**
 - A hit **does not kill: it no-clips the monster to another place on the map** (the ray deletes it from where it stands and it reappears elsewhere).
