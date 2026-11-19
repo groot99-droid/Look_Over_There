@@ -1665,7 +1665,14 @@ const BOW = {st: newBow(0), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .8}), stock = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.07, 0.5), mat(0x5a4632));
   const limb = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.03, 0.04), mat(0x2d2d2a)); limb.position.set(0, 0.02, -0.2);
   const rail = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.4), mat(0x9a9a86)); rail.position.set(0, 0.05, -0.05);
-  BOW.pivot.add(stock, limb, rail); BOW.pivot.position.set(0.22, -0.3, -0.5); BOW.pivot.visible = false; camera.add(BOW.pivot); }
+  BOW.art = new THREE.Group(); BOW.art.add(stock, limb, rail); BOW.pivot.add(BOW.art); BOW.pivot.position.set(0.22, -0.3, -0.5); BOW.pivot.visible = false; camera.add(BOW.pivot);
+  // the owner's Meshy model (models/items/hunting_crossbow.glb): its front is -X in the file, like the ray gun's, so it is turned a quarter to face away from you; 0.42 m long, a little under the code-made bow and 5 cm left, so its limbs clear the ammo lines. If it cannot load, the code-made bow stays
+  loadModel("items/hunting_crossbow").then(g => {
+    if (!g) return;
+    const m = SkeletonUtils.clone(g.scene), bb = new THREE.Box3().setFromObject(m, true), k = 0.42 / (bb.getSize(new THREE.Vector3()).x || 1), c = bb.getCenter(new THREE.Vector3());
+    m.position.set(-c.x, -c.y, -c.z); m.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.material.side = THREE.DoubleSide; } });
+    const w = new THREE.Group(); w.add(m); w.scale.setScalar(k); w.rotation.y = -Math.PI / 2; w.position.x = -0.05; BOW.pivot.add(w); BOW.model = w; BOW.art.visible = false;
+  }); }
 function fireBow() {
   if (!GB.load || !carries(GB.load, "crossbow") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
