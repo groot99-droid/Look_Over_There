@@ -93,7 +93,7 @@ try {
   await page.evaluate(() => { const g = window.__game; g.LT.rounds = 5; g.BOW.st.bolts = 4; g.die(); });
   await frames(100);
   s = await st();
-  check("after a death you carry no gear, no rays and no bolts", s.owned.length === 0 && s.rounds === 0 && s.bolts === 0 && s.carry.length === 0 && s.stash.length === 10, JSON.stringify(s));
+  check("after a death you carry no gear, no rays and no bolts", s.owned.length === 0 && s.rounds === 0 && s.bolts === 0 && s.carry.length === 0 && s.stash.length === 11, JSON.stringify(s));
   await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); });
   for (const gear of ["gun", "cloak", "crossbow", "driver"]) await page.click(`#station button[data-gear="${gear}"]`);
   await page.keyboard.press("Escape");
