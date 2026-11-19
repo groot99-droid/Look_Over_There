@@ -70,7 +70,7 @@ try {
 
   // the locker: a row for it, leave and take
   await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); }); await frames(2);
-  check("the locker panel lists nine pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 9);
+  check("the locker panel lists ten pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 10);
   await page.click('#station button[data-gear="driver"]'); s = await st();
   check("clicking the driver leaves it in the locker", !s.owned.includes("driver") && s.stash.includes("driver") && s.held !== "driver", JSON.stringify(s));
   await page.click('#station button[data-gear="driver"]'); s = await st();

@@ -29,6 +29,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 22 | Build the propane flamethrower and the Burning status | Round 4 | 21 | **built, merged** (PR #49): `shared/flame.js`, `MonsterSim.burn`, solo only. Rooms and the Market are not touched |
 | 23 | Build the frequency horn | Round 4 | 22 | **built**, draft PR on `claude/frequency-horn`: `shared/horn.js`, `shared/cone.js`, `MonsterSim.shove`, solo only. Rooms and the Market are not touched |
 | 24 | Build the rocket launcher | Round 4 | 23 | **built**, draft PR on `claude/rocket-launcher`, stacked on session 23's `claude/frequency-horn`: `shared/rocket.js`, `shared/flight.js`, solo only. Rooms and the Market are not touched |
+| 25 | Build the laser pointer dissector | Round 4 | 24 | **built**, draft PR on `claude/laser-dissector`, stacked on session 24's `claude/rocket-launcher`: `shared/laser.js`, `MonsterSim.provoke`, solo only. Rooms and the Market are not touched |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
 | 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
