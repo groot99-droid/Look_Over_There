@@ -38,6 +38,13 @@ try {
   check("Going back in starts with the ray, the cloak, the crossbow and the driver carried, and the crossbow's bolts", ["gun", "cloak", "crossbow", "driver"].every(i => s.owned.includes(i)) && s.bolts === 4, JSON.stringify(s));
   check("the crossbow is a fourth thing to hold (key 4)", await page.evaluate(() => { const g = window.__game; g.setHeld("crossbow"); return g.HELD.item === "crossbow"; }));
   check("the held crossbow is the owner's Meshy model, with the code-made one hidden", await page.waitForFunction(() => { const b = window.__game.BOW; return !!b.model && b.art.visible === false && b.pivot.visible; }, null, {timeout: 30000}).then(() => true, () => false));
+  // the other four held weapons draw the owner's Meshy models too (each is carried in turn; the crossbow goes back in hand and the loadout is put back after)
+  const load0 = await page.evaluate(() => JSON.stringify(window.__game.GB.load));
+  for (const [item, W] of [["driver", "DRV"], ["baton", "BAT"], ["dart", "DART"], ["flame", "FLAME"]]) {
+    await page.evaluate(item => { const g = window.__game; g.GB.load = {carry: ["gun", "cloak", "crossbow", item], stash: ["driver", "baton", "dart", "flame"].filter(x => x !== item)}; g.setHeld(item); }, item);
+    check(`the held ${item} is the owner's Meshy model, with the code-made one hidden`, await page.waitForFunction(W => { const w = window.__game[W]; return !!w.model && w.art.visible === false && w.pivot.visible; }, W, {timeout: 30000}).then(() => true, () => false));
+  }
+  await page.evaluate(l => { const g = window.__game; g.GB.load = JSON.parse(l); g.setHeld("crossbow"); }, load0);
 
   // the ray only banishes: the monster is still there after a ray shot
   check("a clear 6 m line was found", await lineUp());
