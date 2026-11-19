@@ -242,6 +242,8 @@ import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
+import {newShear, tick as shearTickState, hold as shearHold, release as shearRelease, resetHold as shearResetHold, addCuts as shearAdd, lost as shearLost, cutTarget, worn as shearWorn, spooled as shearSpooled, blocked as shearBlocked, CUTS as SHEAR_CUTS, SPOOL_S as SHEAR_SPOOL_S, READY_S as SHEAR_READY_S, RESET_S as SHEAR_RESET_S, PACK_CUTS as SHEAR_PACK, WALK_K as SHEAR_WALK, NOISE_S as SHEAR_NOISE_S} from "./shared/shear.js";
+import {pickChainedDoor, setChained, relink, behindSpot, newBarricades, cutOpen as barricadeCut, shutList as barricadesShut, BEHIND_PACKS} from "./shared/barricade.js";
 import {newLaser, beam as laserBeam, dot as laserDot, idle as laserIdle, addCharge as laserAdd, lost as laserLost, dmgMul as laserMul, dotHears, RANGE_M as LASER_RANGE, PACK_CHARGE as LASER_PACK} from "./shared/laser.js";
 import {newRocket, addRockets, tick as rocketTickState, fire as rocketShoot, lost as rocketLost, newFlight as newRocketFlight, stepFlight as stepRocket, armed as rocketArmed, blastTargets as rocketTargets, inMist, START_ROCKETS, MAX_ROCKETS, MIST_S, MIST_SLOW, MIST_R, NOISE_R as ROCKET_NOISE_R, BLAST_R as ROCKET_BLAST_R} from "./shared/rocket.js";
 import {newHorn, tick as hornTickState, blast as hornBlast, call as hornCall, recharge as hornRecharge, lost as hornLost, blastTargets, knockEnd, knockDist, within as hornWithin, STUN_S as HORN_STUN_S, CALL_R, BLAST_NOISE_R, BLAST_RANGE_M, BLAST_ARC_DEG, BLASTS} from "./shared/horn.js";
@@ -286,6 +288,7 @@ const near = (x, z, r) => nearW(S, x, z, r);                    // the shared wo
 let pendingLink = null, loading = false;
 function openDoor(dr, byPlayer) {
   if (dr.target !== 0) return;
+  if (dr.chained) { if (byPlayer) toast("Chained shut: a rebar shear cuts the chain"); return; }          // nobody opens a chained door, monsters neither (shared/barricade.js)
   if (dr.link && !byPlayer) return;                           // monsters do not use the stair doors
   if (dr.link && dr.link.game && net.on && (gateEntry(dr.link) || {}).soloOnly !== false) { toast("That door does not open in a room"); return; }          // the manifest says which gates are solo only (all of them for now)
   if (dr.link && isLocked(dr)) { doorLocked(); return; }
@@ -841,9 +844,9 @@ function useDoor() {
 const HELD = {mouseAlt: false, padAlt: false, mouseFire: false, padFire: false, item: null, yAt: 0, yDown: false, wheel: false, sel: 0, aimBtn: false, padAim: false};
 const AIM = {on: false, fov: 75, fovAim: 42};
 let crouchLatch = false;
-const ITEM_NAMES = {gun: "RAY GUN", cloak: "CLOAK", beacon: "AFK BEACON", crossbow: "HUNTING CROSSBOW", driver: "PNEUMATIC BOLT DRIVER", baton: "STUN BATON", dart: "MOTH JELLY DART", flame: "PROPANE FLAMETHROWER", horn: "FREQUENCY HORN", rocket: "ROCKET LAUNCHER", laser: "LASER DISSECTOR"};
-const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT / click: on/off · LT / right click: short circuit (5 min offline, stuns monsters near you)", beacon: "RT / click: roll it · LT / right click: reverse the frequency", crossbow: "RT / click: shoot a bolt (it kills; slow reload)", driver: "RT / click: a nail (weaker as the air runs down, which refills when you stop)", baton: "RT / click: swing (it hurts and stuns, 3 capacitors) · LT / right click: discharge (all three: stuns everything near you, then dead for 20 s)", dart: "RT / click: a dart (slow: lead a moving target; the jelly burns it for 10 s and slows it)", flame: "hold RT / click: burn (6 m cone, 10 s of fuel; it calls the floor, and switches your cloak off) · LT / right click: swap in the spare canister (2.5 s)", horn: "RT / click: blast (10 m cone: throws monsters back and stuns them 2 s; the whole floor within 40 m hears it) · LT / right click: the call (free: everything within 25 m comes to look at where you stand)", rocket: "RT / click: fire a rocket (it bursts on the first thing it meets: 150 close, 50 at 5 m, a slowing mist, a bang the floor hears; it hurts you inside 5 m, and under 5 m of flight it is a dud) · you cannot run while you hold it", laser: "hold RT / click: the beam (silent, 30 m; it cuts faster the longer it stays on one target; overheats after 5 s; you move slowly) · hold LT / right click: the dot (monsters that are not chasing go and look at it)"};
-const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon", GB.load && carries(GB.load, "crossbow") && "crossbow", GB.load && carries(GB.load, "driver") && "driver", GB.load && carries(GB.load, "baton") && "baton", GB.load && carries(GB.load, "dart") && "dart", GB.load && carries(GB.load, "flame") && "flame", GB.load && carries(GB.load, "horn") && "horn", GB.load && carries(GB.load, "rocket") && "rocket", GB.load && carries(GB.load, "laser") && "laser"].filter(Boolean);
+const ITEM_NAMES = {gun: "RAY GUN", cloak: "CLOAK", beacon: "AFK BEACON", crossbow: "HUNTING CROSSBOW", driver: "PNEUMATIC BOLT DRIVER", baton: "STUN BATON", dart: "MOTH JELLY DART", flame: "PROPANE FLAMETHROWER", horn: "FREQUENCY HORN", rocket: "ROCKET LAUNCHER", laser: "LASER DISSECTOR", shear: "REBAR SHEAR"};
+const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT / click: on/off · LT / right click: short circuit (5 min offline, stuns monsters near you)", beacon: "RT / click: roll it · LT / right click: reverse the frequency", crossbow: "RT / click: shoot a bolt (it kills; slow reload)", driver: "RT / click: a nail (weaker as the air runs down, which refills when you stop)", baton: "RT / click: swing (it hurts and stuns, 3 capacitors) · LT / right click: discharge (all three: stuns everything near you, then dead for 20 s)", dart: "RT / click: a dart (slow: lead a moving target; the jelly burns it for 10 s and slows it)", flame: "hold RT / click: burn (6 m cone, 10 s of fuel; it calls the floor, and switches your cloak off) · LT / right click: swap in the spare canister (2.5 s)", horn: "RT / click: blast (10 m cone: throws monsters back and stuns them 2 s; the whole floor within 40 m hears it) · LT / right click: the call (free: everything within 25 m comes to look at where you stand)", rocket: "RT / click: fire a rocket (it bursts on the first thing it meets: 150 close, 50 at 5 m, a slowing mist, a bang the floor hears; it hurts you inside 5 m, and under 5 m of flight it is a dud) · you cannot run while you hold it", laser: "hold RT / click: the beam (silent, 30 m; it cuts faster the longer it stays on one target; overheats after 5 s; you move slowly) · hold LT / right click: the dot (monsters that are not chasing go and look at it)", shear: "hold RT / click: spool the motor (1 s; loud), let go to cut (2 m: four cuts kill anything, a worn spring kills only a stunned or slowed monster; a cut opens a chained cage or door) · hold LT / right click 3 s: reset a worn jaw · you walk slower"};
+const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon", GB.load && carries(GB.load, "crossbow") && "crossbow", GB.load && carries(GB.load, "driver") && "driver", GB.load && carries(GB.load, "baton") && "baton", GB.load && carries(GB.load, "dart") && "dart", GB.load && carries(GB.load, "flame") && "flame", GB.load && carries(GB.load, "horn") && "horn", GB.load && carries(GB.load, "rocket") && "rocket", GB.load && carries(GB.load, "laser") && "laser", GB.load && carries(GB.load, "shear") && "shear"].filter(Boolean);
 function setHeld(it) {
   HELD.item = it || null; AIM.on = false; HELD.mouseFire = false; HELD.mouseAlt = false;
   toast(HELD.item ? `Holding: ${ITEM_NAMES[it]}   ${ITEM_HINT[it]}` : "Hands empty", 2600);
@@ -867,7 +870,7 @@ function yTick() {
   if (HELD.yDown && !HELD.wheel && performance.now() - HELD.yAt > 350) { HELD.wheel = true; const k = wheelEntries().indexOf(HELD.item || "hands"); HELD.sel = k < 0 ? 0 : k; renderWheel(); }
 }
 const wheelMove = d => { if (HELD.wheel) { const n = wheelEntries().length; HELD.sel = (HELD.sel + d + n) % n; renderWheel(); } };
-const usePrimary = () => HELD.item === "gun" ? fire() : HELD.item === "cloak" ? toggleCloak() : HELD.item === "beacon" ? throwBeacon() : HELD.item === "crossbow" ? fireBow() : HELD.item === "driver" ? fireDriver() : HELD.item === "baton" ? swingBaton() : HELD.item === "dart" ? fireDart() : HELD.item === "flame" || HELD.item === "laser" ? (HELD.mouseFire = true) : HELD.item === "horn" ? blowHorn() : HELD.item === "rocket" ? fireRocket() : (toast("Nothing in your hands: tap Y"), false);
+const usePrimary = () => HELD.item === "gun" ? fire() : HELD.item === "cloak" ? toggleCloak() : HELD.item === "beacon" ? throwBeacon() : HELD.item === "crossbow" ? fireBow() : HELD.item === "driver" ? fireDriver() : HELD.item === "baton" ? swingBaton() : HELD.item === "dart" ? fireDart() : HELD.item === "flame" || HELD.item === "laser" || HELD.item === "shear" ? (HELD.mouseFire = true) : HELD.item === "horn" ? blowHorn() : HELD.item === "rocket" ? fireRocket() : (toast("Nothing in your hands: tap Y"), false);
 const useSecondary = () => HELD.item === "cloak" ? cloakShortCircuit() : HELD.item === "beacon" ? reverseBeacon() : HELD.item === "baton" ? dischargeBaton() : HELD.item === "flame" ? swapCanister() : HELD.item === "horn" ? callHorn() : false;
 function useConsumable(slot) {
   if (!GB.kit) { toast(slot === 0 ? "Your support slot (LB / Q) is empty" : "Your combat / objective slot (RB / E) is empty"); return false; }       // the Original has no consumables
@@ -880,7 +883,7 @@ function useConsumable(slot) {
   else { const t = placeTrap(r.kind, P.p.x, P.p.z, TRAPS.t); t.mesh = trapMesh(r.kind, t); TRAPS.list.push(t); toast(`${KIT_NAMES[r.kind]} set down: ${r.kind === "mine" ? "armed in a moment" : "armed almost at once, and loud"}`); }
   return true;
 }
-const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryStation() && !tryLoot() && !tryCity()) useDoor(); };
+const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryStation() && !tryLoot() && !tryBarricade() && !tryCity()) useDoor(); };
 const crouchToggle = () => { crouchLatch = !crouchLatch; };
 addEventListener("keydown", e => {
   if (inGame) return;
@@ -920,7 +923,7 @@ addEventListener("blur", () => { for (const k in keys) keys[k] = false; HELD.aim
 renderer.domElement.addEventListener("mousedown", e => {
   if (document.pointerLockElement !== renderer.domElement || dead || inGame) return;
   if (e.button === 0) usePrimary();
-  else if (e.button === 2) { if (HELD.item === "gun") HELD.aimBtn = true; else if (HELD.item === "laser") HELD.mouseAlt = true; else useSecondary(); }
+  else if (e.button === 2) { if (HELD.item === "gun") HELD.aimBtn = true; else if (HELD.item === "laser" || HELD.item === "shear") HELD.mouseAlt = true; else useSecondary(); }
 });
 addEventListener("mouseup", e => { if (e.button === 2) HELD.aimBtn = false; if (e.button === 0) HELD.mouseFire = false; if (e.button === 2) HELD.mouseAlt = false; });
 renderer.domElement.addEventListener("contextmenu", e => e.preventDefault());
@@ -956,8 +959,8 @@ function pad() {
     HELD.padFire = down(7); if (edge(7)) usePrimary();       // RT: use what you hold (held down, the flamethrower burns)
     const lt = down(6), ltEdge = lt && !padPrev[6]; padPrev[6] = lt;
     HELD.padAim = lt && HELD.item === "gun";                  // LT: the gun aims while it is held ...
-    HELD.padAlt = lt && HELD.item === "laser";               // ... the laser's dot is held ...
-    if (ltEdge && HELD.item !== "gun" && HELD.item !== "laser") useSecondary();        // ... and with the cloak or a beacon it is the secondary ability
+    HELD.padAlt = lt && (HELD.item === "laser" || HELD.item === "shear");               // ... the laser's dot and the shear's reset are held ...
+    if (ltEdge && HELD.item !== "gun" && HELD.item !== "laser" && HELD.item !== "shear") useSecondary();        // ... and with the cloak or a beacon it is the secondary ability
   } else { HELD.padAim = false; HELD.yDown = false; HELD.padFire = false; HELD.padAlt = false; }
   const k = AIM.on ? 0.45 : 1, still = HELD.wheel;
   return {mx: dz(a[0] || 0), mz: dz(a[1] || 0), lx: still ? 0 : dz(a[2] || 0, 0.12) * k, ly: still ? 0 : dz(a[3] || 0, 0.12) * k, jump: down(0), use: down(2), run: down(11)};          // right-stick click runs (hold)
@@ -1065,12 +1068,13 @@ function animateLoot() {
     v.packs.forEach((it, i) => { const gone = st.packs[i] !== 0; it.o.visible = !gone; if (gone) return; const k = fade(it); it.o.userData.halo.material.opacity = 0.6 * k; it.o.userData.beacon.material.opacity = 0.3 * k; });
   }
   const eb = $("beacons"); eb.style.display = BC.have ? "block" : "none"; if (BC.have) eb.textContent = `BEACON ×${BC.have}  [G]`;
-  const el = $("ammo"), bow = GB.load && carries(GB.load, "crossbow"), drv = GB.load && carries(GB.load, "driver"), bat = GB.load && carries(GB.load, "baton"), dart = GB.load && carries(GB.load, "dart"), flame = GB.load && carries(GB.load, "flame"), horn = GB.load && carries(GB.load, "horn"), rocket = GB.load && carries(GB.load, "rocket"), laser = GB.load && carries(GB.load, "laser"), kit = GB.kit;
+  const el = $("ammo"), bow = GB.load && carries(GB.load, "crossbow"), drv = GB.load && carries(GB.load, "driver"), bat = GB.load && carries(GB.load, "baton"), dart = GB.load && carries(GB.load, "dart"), flame = GB.load && carries(GB.load, "flame"), horn = GB.load && carries(GB.load, "horn"), rocket = GB.load && carries(GB.load, "rocket"), laser = GB.load && carries(GB.load, "laser"), shear = GB.load && carries(GB.load, "shear"), kit = GB.kit;
   const lines = [kit && `Q ${KIT_NAMES.flash} ×${kit.n.flash}   E ${KIT_NAMES[kit.e]} ×${kit.n[kit.e]}`,
     LT.gun && `RAY  ${"● ".repeat(LT.rounds)}${"○ ".repeat(Math.max(0, 3 - LT.rounds))}${LT.rounds}/${MAX_ROUNDS}`,
     bow && `BOW  ${BOW.st.bolts}/${MAX_BOLTS}${BOW.st.cool > 0 ? "  reloading" : ""}`,
     drv && `NAILS  ${DRV.st.nails}/${MAX_NAILS}  AIR ${"▮".repeat(DRV.st.air)}${"▯".repeat(DRV_GAUGE - DRV.st.air)}`,
     laser && `LASER  ${Math.round(LASER.st.charge * 100)}%  SPARE ×${LASER.st.spares}${LASER.st.swapT > 0 ? `  swapping ${LASER.st.swapT.toFixed(1)} s` : LASER.st.lock > 0 ? `  OVERHEATED ${LASER.st.lock.toFixed(1)} s` : LASER.st.heat > 3 ? "  hot" : ""}`,
+    shear && `SHEAR  ${"● ".repeat(SHEAR.st.cuts)}${"○ ".repeat(SHEAR_CUTS - SHEAR.st.cuts)} SPARE ×${SHEAR.st.spares}${shearWorn(SHEAR.st) ? "  WORN" : ""}${SHEAR.st.swapT > 0 ? `  swapping ${SHEAR.st.swapT.toFixed(1)} s` : SHEAR.st.needReset ? `  RESET ${SHEAR.st.reset.toFixed(1)}/${SHEAR_RESET_S} s` : SHEAR.st.cool > 0 ? "  cooling" : shearSpooled(SHEAR.st) ? `  READY ${(SHEAR_READY_S - SHEAR.st.ready).toFixed(1)} s` : SHEAR.st.spool > 0 ? `  spooling ${Math.round(SHEAR.st.spool / SHEAR_SPOOL_S * 100)}%` : ""}`,
     rocket && `ROCKETS  ${"● ".repeat(ROCKET.st.rockets)}${"○ ".repeat(MAX_ROCKETS - ROCKET.st.rockets)}${ROCKET.st.cool > 0 ? "  reloading" : ""}`,
     horn && `HORN  ${"▮".repeat(HORN.st.charge)}${"▯".repeat(BLASTS - HORN.st.charge)}  ${HORN.st.charge}/${BLASTS}${HORN.st.spare ? "  SPARE" : ""}${HORN.st.swapT > 0 ? `  swapping ${HORN.st.swapT.toFixed(1)} s` : HORN.st.coolB > 0 ? `  ${Math.ceil(HORN.st.coolB)} s` : ""}`,
     flame && `FUEL  ${Math.round(FLAME.st.fuel * 100)}%  SPARE ${Math.round(FLAME.st.spare * 100)}%${FLAME.st.swapT > 0 ? `  swapping ${FLAME.st.swapT.toFixed(1)} s` : ""}`,
@@ -1127,13 +1131,13 @@ function heldHud(dt) {
   for (const it of [...heldSeen]) if (!o.includes(it)) heldSeen.delete(it);
   if (HELD.item && !o.includes(HELD.item)) HELD.item = null;
   const el = $("held"), show = !loading && !dead && !FIN.results && !!HELD.item;
-  el.style.display = show ? "block" : "none"; if (show) el.innerHTML = `<b>${ITEM_NAMES[HELD.item]}${HELD.item === "gun" ? " · " + LT.rounds : HELD.item === "beacon" ? " ×" + BC.have : HELD.item === "crossbow" ? " · " + BOW.st.bolts : HELD.item === "driver" ? " · " + DRV.st.nails : HELD.item === "baton" ? " · " + BAT.st.caps : HELD.item === "dart" ? " · " + DART.st.darts : HELD.item === "flame" ? " · " + Math.round(FLAME.st.fuel * 100) + "%" : HELD.item === "horn" ? " · " + HORN.st.charge : HELD.item === "rocket" ? " · " + ROCKET.st.rockets : HELD.item === "laser" ? " · " + Math.round(LASER.st.charge * 100) + "%" : ""}</b>${ITEM_HINT[HELD.item]}`;
+  el.style.display = show ? "block" : "none"; if (show) el.innerHTML = `<b>${ITEM_NAMES[HELD.item]}${HELD.item === "gun" ? " · " + LT.rounds : HELD.item === "beacon" ? " ×" + BC.have : HELD.item === "crossbow" ? " · " + BOW.st.bolts : HELD.item === "driver" ? " · " + DRV.st.nails : HELD.item === "baton" ? " · " + BAT.st.caps : HELD.item === "dart" ? " · " + DART.st.darts : HELD.item === "flame" ? " · " + Math.round(FLAME.st.fuel * 100) + "%" : HELD.item === "horn" ? " · " + HORN.st.charge : HELD.item === "rocket" ? " · " + ROCKET.st.rockets : HELD.item === "laser" ? " · " + Math.round(LASER.st.charge * 100) + "%" : HELD.item === "shear" ? " · " + (shearWorn(SHEAR.st) ? "worn" : SHEAR.st.cuts) : ""}</b>${ITEM_HINT[HELD.item]}`;
   $("reticle").style.display = AIM.on ? "block" : "none";
   stunFx = Math.max(0, stunFx - dt * 1.6); $("stunfx").style.opacity = stunFx;
 }
 function animateGun(dt) {
   heldHud(dt);
-  BOW.st = bowTick(BOW.st, dt); BOW.kick = Math.max(0, BOW.kick - dt * 5); DRV.st = drvTick(DRV.st, dt); DRV.kick = Math.max(0, DRV.kick - dt * 8); BAT.st = batTick(BAT.st, dt); BAT.kick = Math.max(0, BAT.kick - dt * 6); DART.st = dartTick(DART.st, dt); DART.kick = Math.max(0, DART.kick - dt * 5); dartFlights(dt); flameTick(dt); HORN.st = hornTickState(HORN.st, dt); HORN.kick = Math.max(0, HORN.kick - dt * 4); ROCKET.st = rocketTickState(ROCKET.st, dt); ROCKET.kick = Math.max(0, ROCKET.kick - dt * 3); rocketFlights(dt); laserTick(dt);
+  BOW.st = bowTick(BOW.st, dt); BOW.kick = Math.max(0, BOW.kick - dt * 5); DRV.st = drvTick(DRV.st, dt); DRV.kick = Math.max(0, DRV.kick - dt * 8); BAT.st = batTick(BAT.st, dt); BAT.kick = Math.max(0, BAT.kick - dt * 6); DART.st = dartTick(DART.st, dt); DART.kick = Math.max(0, DART.kick - dt * 5); dartFlights(dt); flameTick(dt); HORN.st = hornTickState(HORN.st, dt); HORN.kick = Math.max(0, HORN.kick - dt * 4); ROCKET.st = rocketTickState(ROCKET.st, dt); ROCKET.kick = Math.max(0, ROCKET.kick - dt * 3); rocketFlights(dt); laserTick(dt); shearTick(dt);
   GUN.cool = Math.max(0, GUN.cool - dt); P.shotT = Math.max(0, P.shotT - dt); GUN.kick = Math.max(0, GUN.kick - dt * 7);
   if (net.on) for (const p of net.peers.values()) if (p.shotT > 0) p.shotT -= dt;
   GUN.pivot.visible = !!LT.gun && HELD.item === "gun" && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
@@ -1274,19 +1278,21 @@ function tryLoot() {
   if (n.k === "pack" && LT.rounds >= MAX_ROUNDS) { toast(`You cannot carry more than ${MAX_ROUNDS} rounds`); return true; }
   lootAct(n.k, n.i); return true;
 }
+// what an ammo pack gives (from the floor, a supply cage or behind a chained door): rounds, the Q and E items, and each carried weapon's own ammo
+function gotPack() {
+  LT.rounds = roundsAfterPack(LT.rounds);
+  if (GB.kit) GB.kit = kitPack(GB.kit);                                                                       // a pack also refills the Q and E items
+  const hasBow = GB.load && carries(GB.load, "crossbow"), hasDrv = GB.load && carries(GB.load, "driver"), hasDart = GB.load && carries(GB.load, "dart"), hasFlame = GB.load && carries(GB.load, "flame"), hasLaser = GB.load && carries(GB.load, "laser"), hasShear = GB.load && carries(GB.load, "shear");
+  if (hasBow) BOW.st = addBolts(BOW.st, PACK_BOLTS); if (hasDrv) DRV.st = addNails(DRV.st, PACK_NAILS); if (hasDart) DART.st = addDarts(DART.st, PACK_DARTS); if (hasFlame) FLAME.st = addFuel(FLAME.st, PACK_FUEL); if (hasLaser) LASER.st = laserAdd(LASER.st, LASER_PACK); if (hasShear) SHEAR.st = shearAdd(SHEAR.st, SHEAR_PACK);                      // a pack feeds each weapon you carry (the arsenal's own ammo, docs/ITEMS.md 1.6)
+  toast(`Ammo: ${LT.rounds} rounds${hasBow ? `, ${BOW.st.bolts} bolts` : ""}${hasDrv ? `, ${DRV.st.nails} nails` : ""}${hasDart ? `, ${DART.st.darts} darts` : ""}${hasFlame ? `, ${Math.round(FLAME.st.fuel * 100)}% propane` : ""}`);
+}
 function setLoot(scene, st, by, k) {
   LT.st[scene] = st;
   if (by !== undefined && by === myId()) {
     AUD.play(k === "locker" ? "locker" : "pickup");
     if (k === "locker") { LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); toast(`You take the Error Deletion Ray (${GUN_ROUNDS} rounds) and a cloak: V toggles it`); }
     else if (k === "beacon") { BC.have = Math.min(MAX_BEACONS, BC.have + 1); toast(`AFK Beacon ×${BC.have}: G rolls one ahead, monsters nearby swarm it for ${LURE_S} s`); }
-    else if (k === "pack") {
-      LT.rounds = roundsAfterPack(LT.rounds);
-      if (GB.kit) GB.kit = kitPack(GB.kit);                                                                       // a pack also refills the Q and E items
-      const hasBow = GB.load && carries(GB.load, "crossbow"), hasDrv = GB.load && carries(GB.load, "driver"), hasDart = GB.load && carries(GB.load, "dart"), hasFlame = GB.load && carries(GB.load, "flame"), hasLaser = GB.load && carries(GB.load, "laser");
-      if (hasBow) BOW.st = addBolts(BOW.st, PACK_BOLTS); if (hasDrv) DRV.st = addNails(DRV.st, PACK_NAILS); if (hasDart) DART.st = addDarts(DART.st, PACK_DARTS); if (hasFlame) FLAME.st = addFuel(FLAME.st, PACK_FUEL); if (hasLaser) LASER.st = laserAdd(LASER.st, LASER_PACK);                      // a pack feeds each weapon you carry (the arsenal's own ammo, docs/ITEMS.md 1.6)
-      toast(`Ammo: ${LT.rounds} rounds${hasBow ? `, ${BOW.st.bolts} bolts` : ""}${hasDrv ? `, ${DRV.st.nails} nails` : ""}${hasDart ? `, ${DART.st.darts} darts` : ""}${hasFlame ? `, ${Math.round(FLAME.st.fuel * 100)}% propane` : ""}`);
-    }
+    else if (k === "pack") gotPack();
   }
 }
 function glowTexture() {
@@ -1625,9 +1631,11 @@ const GBI = REGISTRY.modes.going_back_in;
 function startChamber(ch) {
   GB.mode = ch ? "going_back_in" : null; GB.wave = null; if (!ch) { GB.load = null; GB.kit = null; STN.spot = null; }
   TRAPS.list.length = 0; TRAPS.flashes.length = 0; clearFlights(); clearFlames(); clearRockets();       // traps stay in the chamber they were set in; a dart in the air does not
+  BAR.st = null; BAR.cage = null; BAR.behind = [];
   if (!ch || net.on) return;                                            // in a room the wave is the server's: gbWave builds it when the server says
   GB.wave = startWave(ch, performance.now());
   for (const p of wavePlan(S, monCfg, ch, [[P.p.x, P.p.z]])) monsters.push(new Monster(p.cfg, S.id, p.x, p.z));
+  buildBarricades();                                                    // solo only: a chained supply cage, and a chained door where one is safe
   toast(`WAVE ${GB.wave.no} of ${GBI.waves}: ${monsters.length} of them are in here with you`, 4200);
 }
 // a room's chamber: the server's word on the wave. m.l is each living monster as [wid, x, z], in the order its snapshots use; `fresh` means it started just now.
@@ -1669,7 +1677,7 @@ function gbKill(m) {
 }
 async function startGoingBackIn() {                                    // from the options screen at the store doors
   closeOptions();
-  GB.load = newLoadout(["gun", "cloak", "crossbow", "driver"], SOLO_GEAR); BAT.st = newBaton(); DART.st = newDart(START_DARTS); FLAME.st = newFlame(); HORN.st = newHorn(); ROCKET.st = newRocket(START_ROCKETS); LASER.st = newLaser(); LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); BC.have = 0; BOW.st = newBow(START_BOLTS); DRV.st = newDriver(START_NAILS); GB.kit = newKit();          // starting gear: the Market does not exist yet, so the crossbow and the bolt driver start in your hands (two weapons at most; the stun baton, the moth jelly dart, the propane flamethrower, the frequency horn, the rocket launcher and the laser dissector wait in the locker) (default; the owner may change it)
+  GB.load = newLoadout(["gun", "cloak", "crossbow", "driver"], SOLO_GEAR); BAT.st = newBaton(); DART.st = newDart(START_DARTS); FLAME.st = newFlame(); HORN.st = newHorn(); ROCKET.st = newRocket(START_ROCKETS); LASER.st = newLaser(); SHEAR.st = newShear(); LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); BC.have = 0; BOW.st = newBow(START_BOLTS); DRV.st = newDriver(START_NAILS); GB.kit = newKit();          // starting gear: the Market does not exist yet, so the crossbow and the bolt driver start in your hands (two weapons at most; the stun baton, the moth jelly dart, the propane flamethrower, the frequency horn, the rocket launcher, the laser dissector and the rebar shear wait in the locker) (default; the owner may change it)
   await loadScene(GBI.startChamber);
 }
 
@@ -1922,6 +1930,97 @@ function laserTick(dt) {
   LASER.spot.visible = true; LASER.spot.position.set(p[0], p[1], p[2]); LASER.dotAt = p;
   if ((LASER.lureT -= dt) <= 0) { LASER.lureT = 0.4; for (const m of dotHears(S, monsters, p)) m.alert(p[0], p[2]); }          // look over there
 }
+// ---- the hydraulic rebar shear (shared/shear.js): hold to spool, let go to cut whatever is within 2 m in front. Four fresh cuts kill anything; then the spring is worn
+// until fluid is refilled: a worn cut kills only a helpless monster (100 to a free one) and the jaw has to be reset by hand (hold the other button 3 s). Loud while it spools.
+const SHEAR = {st: newShear(), was: false, pivot: new THREE.Group(), kick: 0, msgT: 0};
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), body = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.11, 0.34), mat(0xb8411e));
+  const jawA = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.05, 0.16), mat(0x3a3a3a)), jawB = jawA.clone(); jawA.position.set(-0.03, 0, -0.24); jawB.position.set(0.03, 0, -0.24);
+  const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.1, 10), mat(0x2a2a2a)); motor.rotation.z = Math.PI / 2; motor.position.set(0, 0.07, 0.06);
+  SHEAR.jaws = [jawA, jawB]; SHEAR.pivot.add(body, jawA, jawB, motor); SHEAR.pivot.position.set(0.22, -0.3, -0.5); SHEAR.pivot.visible = false; camera.add(SHEAR.pivot); }
+function shearTick(dt) {
+  SHEAR.msgT = Math.max(0, SHEAR.msgT - dt); SHEAR.kick = Math.max(0, SHEAR.kick - dt * 4);
+  SHEAR.st = shearTickState(SHEAR.st, dt);
+  const can = HELD.item === "shear" && GB.load && carries(GB.load, "shear") && !dead && !loading && !KPUI.open && !FIN.out && !devOn.v && !STN.open && myCarry() < 0;
+  SHEAR.pivot.visible = can && !FIN.results;
+  const fire = can && (HELD.mouseFire || HELD.padFire), alt = can && (HELD.mouseAlt || HELD.padAlt);
+  SHEAR.st = shearResetHold(SHEAR.st, dt, alt && !fire);
+  if (SHEAR.st.needReset && SHEAR.st.reset === 0 && fire && SHEAR.msgT <= 0) { SHEAR.msgT = 1.5; toast("The jaw is worn: hold right click / LT 3 s to reset it", 1800); }
+  if (fire) { SHEAR.st = shearHold(SHEAR.st, dt); if (SHEAR.st.spool > 0) P.shotT = Math.max(P.shotT, SHEAR_NOISE_S); }       // the motor is loud: monsters hear it as running
+  else if (SHEAR.was && can) shearCut();
+  else if (!can) SHEAR.st = {...SHEAR.st, spool: 0, ready: 0};
+  SHEAR.was = fire;
+  if (SHEAR.pivot.visible) { const open = shearSpooled(SHEAR.st) ? 1 : SHEAR.st.spool / SHEAR_SPOOL_S, buzz = SHEAR.st.spool > 0 ? Math.sin(performance.now() / 18) * 0.003 : 0;
+    SHEAR.jaws[0].rotation.y = 0.35 * open; SHEAR.jaws[1].rotation.y = -0.35 * open; SHEAR.pivot.position.set(0.22 + buzz, -0.3, -0.5 + SHEAR.kick * 0.08); }
+}
+// the trigger let go: cut what is in front (a monster or a shut barricade), or nothing if it was let go early
+function shearCut() {
+  const o = [P.p.x, P.p.y + P.eye, P.p.z], f = [-Math.sin(P.yaw), -Math.cos(P.yaw)];
+  const tgt = cutTarget(S, monsters, BAR.st ? barricadesShut(BAR.st, S.floor) : [], o, f);
+  const r = shearRelease(SHEAR.st, tgt ? (tgt.kind === "monster" ? {kind: "monster", helpless: tgt.helpless} : {kind: "barricade"}) : null);
+  SHEAR.st = r.shear; if (!r.ok) return false;                                    // let go before it spooled: nothing happens
+  SHEAR.kick = 1; P.shotT = Math.max(P.shotT, SHEAR_NOISE_S); AUD.play("zap", {rate: 0.55, loud: true, priority: true});
+  if (tgt && tgt.kind === "monster") { if (tgt.m.hurt(r.dmg)) killMonster(tgt.m); else tgt.m.provoke(P.p.x, P.p.z, net.id); }
+  if (r.opened) cutBarricade(tgt.b.id);
+  if (r.wornCut) toast("Worn: hold right click / LT 3 s to reset the jaw", 2200);
+  else if (SHEAR.st.cuts === 0 && !SHEAR.st.swapT) toast("The spring is worn: a pack of fluid makes it fresh", 2400);
+  return true;
+}
+// ---- barricades (shared/barricade.js), solo Going back in: a chained supply cage with two packs, and a chained door where one is safe to chain. Only a shear cut opens them.
+const BAR = {st: null, cage: null, chain: null, behind: []};
+function cageMesh() {
+  const o = new THREE.Group(), bar = new THREE.MeshStandardMaterial({color: 0x6b6f72, roughness: .6, metalness: .4});
+  for (const [x, z] of [[-.5, -.5], [.5, -.5], [-.5, .5], [.5, .5]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.04, 1.1, .04), bar); p.position.set(x, .55, z); o.add(p); }
+  for (let k = -4; k <= 4; k++) for (const side of [0, 1, 2, 3]) { const w = new THREE.Mesh(new THREE.BoxGeometry(.012, 1.1, .012), bar), t = k / 8;
+    w.position.set(side === 0 ? t : side === 1 ? t : side === 2 ? -.5 : .5, .55, side === 0 ? -.5 : side === 1 ? .5 : t); o.add(w); }
+  const top = new THREE.Mesh(new THREE.BoxGeometry(1.04, .03, 1.04), bar); top.position.y = 1.1; o.add(top);
+  const front = new THREE.Group(); front.position.set(-.5, 0, .5); o.add(front);                   // the front swings open on its left edge once cut
+  const chain = chainMesh(); chain.position.set(0, .6, .53); o.add(chain);
+  Object.assign(o.userData, {chain}); return o;
+}
+function chainMesh() {
+  const o = new THREE.Group(), m = new THREE.MeshStandardMaterial({color: 0xa8a29a, roughness: .4, metalness: .8});
+  for (let k = 0; k < 7; k++) { const l = new THREE.Mesh(new THREE.TorusGeometry(.035, .009, 6, 10), m); l.position.set(-.21 + k * .07, 0, 0); l.rotation.y = k % 2 ? Math.PI / 2 : 0; o.add(l); }
+  const lock = new THREE.Mesh(new THREE.BoxGeometry(.07, .08, .03), new THREE.MeshStandardMaterial({color: 0xc8a030})); lock.position.y = -.07; o.add(lock); return o;
+}
+function buildBarricades() {
+  if (!GB.mode || net.on || !S.root) return;
+  const cage = floorSpots(1, 9300, [[6, 6, 6], [4, 3, 3], [2, 1, 0]])[0] || null;
+  const need = [[P.p.x, P.p.z], ...(STN.spot ? [STN.spot] : []), ...packSpots(), ...lockerSpots(), ...beaconSpots(), ...(cage ? [cage] : []), ...monsters.map(m => [m.pos.x, m.pos.z]),
+    ...doors.filter(d => d.link && Math.abs(d.cy - S.floor) < 0.6).map(d => [d.cx, d.cz])];                       // what must stay reachable with the door chained
+  const door = pickChainedDoor(S, need, rng32(9310 + Object.keys(SCENES).indexOf(S.id) * 37));
+  BAR.st = newBarricades(cage, door); BAR.behind = [];
+  if (cage) { const o = cageMesh(); o.position.set(cage[0], S.floor, cage[1]); S.root.add(o);
+    const box = {n: [cage[0] - .52, S.floor, cage[1] - .52], x: [cage[0] + .52, S.floor + 1.12, cage[1] + .52]}; boxes.push(box); indexBoxes(S);
+    const packs = [[-.2, 0], [.2, 0]].map(([dx, dz]) => { const p = packMesh(); p.position.set(cage[0] + dx, S.floor, cage[1] + dz); S.root.add(p); return p; });
+    BAR.cage = {o, box, packs}; }
+  if (door) {
+    door.target = door.p = 0; door.box.off = false; if (door.leaf && door.qClosed) door.leaf.quaternion.copy(door.qClosed);
+    setChained(S, door, true); relink(S);
+    const c = chainMesh(); c.position.set(door.cx, door.cy + 1.05, door.cz); c.rotation.y = door.th || 0; S.root.add(c); BAR.chain = c;
+    const spot = behindSpot(S, door);
+    if (spot) for (let k = 0; k < BEHIND_PACKS; k++) { const p = packMesh(); p.position.set(spot[0], S.floor, spot[1]); S.root.add(p); BAR.behind.push({home: spot, o: p, taken: false}); }
+  }
+}
+// a shear cut opened barricade `id`: the cage swings open (its packs can be taken), or the chain falls off the door, which is an ordinary door from now on
+function cutBarricade(id) {
+  if (!BAR.st) return;
+  const door = BAR.st.door; BAR.st = barricadeCut(BAR.st, id);
+  if (id === "cage" && BAR.cage) { BAR.cage.o.userData.chain.visible = false; BAR.cage.box.off = true; indexBoxes(S); toast("The cage is open: two ammo packs", 2200); }
+  if (id === "door" && door) { setChained(S, door, false); relink(S); if (BAR.chain) BAR.chain.visible = false; toast("The chain falls: the door opens now", 2200); }
+}
+// X / E at a barricade: a shut one says what opens it; an open cage (or the room behind the door) gives its packs one at a time
+function tryBarricade() {
+  if (!BAR.st || dead || loading || Math.abs(S.floor - P.p.y) > 1.5) return false;
+  const d = (x, z) => Math.hypot(x - P.p.x, z - P.p.z);
+  const c = BAR.st.cage;
+  if (c && d(c.x, c.z) < 1.4) {
+    if (!c.open) { toast("Chained shut: a rebar shear cuts the chain"); return true; }
+    const left = BAR.cage.packs.filter(p => p.visible); if (!left.length) return false;
+    left[0].visible = false; AUD.play("pickup"); gotPack(); return true;
+  }
+  for (const b of BAR.behind) if (!b.taken && d(b.home[0], b.home[1]) < 1.4) { b.taken = true; b.o.visible = false; AUD.play("pickup"); gotPack(); return true; }
+  return false;
+}
 // a monster is dead for good (a bolt, a mine, a blast): gone from the floor, and counted toward the wave
 function killMonster(m, count) {                                       // count: in a room, the server's {kills, cleared}
   const i = monsters.indexOf(m); if (i < 0) return;
@@ -1973,7 +2072,7 @@ function trapTick(dt) {
 // ---- the loadout locker (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is. (Name still open: docs/WORLD.md.)
 const STN = {open: false, spot: null, mesh: null, sel: 0};
 const gearList = () => net.on ? GEAR : SOLO_GEAR;                  // the locker rows: a room runs the first three; the bolt driver is solo only so far (the server does not own its nails)
-const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow", driver: "Pneumatic bolt driver", baton: "Stun baton", dart: "Moth jelly dart", flame: "Propane flamethrower", horn: "Frequency horn", rocket: "Almond water rocket launcher", laser: "Laser pointer dissector"};
+const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow", driver: "Pneumatic bolt driver", baton: "Stun baton", dart: "Moth jelly dart", flame: "Propane flamethrower", horn: "Frequency horn", rocket: "Almond water rocket launcher", laser: "Laser pointer dissector", shear: "Hydraulic rebar shear"};
 function buildStation(ch) {
   STN.spot = null; STN.mesh = null; if (!ch) return;                      // the spot is seeded from the scene, so everyone in a room finds the locker in the same place
   const home = floorSpots(1, 9910, [[8, 6, 4], [4, 2, 2], [2, 1, 0]])[0]; if (!home) return;
@@ -1985,7 +2084,7 @@ function tryStation() { if (!nearStation()) return false; openStation(); return 
 function openStation() { HORN.st = hornRecharge(HORN.st); STN.open = true; STN.sel = 0; document.exitPointerLock?.(); renderStation(); $("station").style.display = "flex"; }
 function closeStation() { STN.open = false; $("station").style.display = "none"; }
 function renderStation() {
-  const rows = $("st-rows"); rows.innerHTML = gearList().map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i + 1}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>E  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
+  const rows = $("st-rows"); rows.innerHTML = gearList().map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i < 9 ? i + 1 : i === 9 ? 0 : "·"}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>E  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
   rows.querySelectorAll("button").forEach(b => { b.onclick = () => stationToggle(b.dataset.slot ? gearList().length : gearList().indexOf(b.dataset.gear)); });
   $("st-close").onclick = closeStation;
 }
@@ -2006,7 +2105,7 @@ function syncGear() {
 // a death in the mode: the gear is in the locker; ammo, rays, bolts and beacons are gone (docs/WORLD.md, "Death in Going back in")
 function gbDeath() {
   if (!GB.load) return;
-  GB.load = lockerDied(GB.load); if (GB.kit) GB.kit = kitLost(GB.kit); LT.rounds = 0; BOW.st = newBow(0); DRV.st = drvLost(); DART.st = dartLost(); FLAME.st = flameLost(); HORN.st = hornLost(); ROCKET.st = rocketLost(); LASER.st = laserLost(); BC.have = 0; syncGear();
+  GB.load = lockerDied(GB.load); if (GB.kit) GB.kit = kitLost(GB.kit); LT.rounds = 0; BOW.st = newBow(0); DRV.st = drvLost(); DART.st = dartLost(); FLAME.st = flameLost(); HORN.st = hornLost(); ROCKET.st = rocketLost(); LASER.st = laserLost(); SHEAR.st = shearLost(); BC.have = 0; syncGear();
   toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
 }
 
@@ -3161,7 +3260,7 @@ function update(dt) {
   P.stam = Math.max(0, Math.min(1, P.stam + (P.running ? -dt / RUN_S : dt / RECOVER_S)));
   if (P.running && P.stam <= 0) { P.tired = true; P.running = false; }
   $("stam").style.opacity = P.stam < 0.999 ? 1 : 0; $("stam").firstElementChild.style.width = P.stam * 100 + "%"; $("stam").firstElementChild.style.background = P.tired ? "#a55" : "#cdb";
-  const sp = (P.crouch || LASER.on ? CROUCH_SPEED : P.running ? RUN_SPEED : WALK_SPEED) * dt;          // the laser's beam holds you to a crouch's pace
+  const sp = (P.crouch || LASER.on ? CROUCH_SPEED : P.running ? RUN_SPEED : WALK_SPEED) * (HELD.item === "shear" && GB.load && carries(GB.load, "shear") ? SHEAR_WALK : 1) * dt;          // the laser's beam holds you to a crouch's pace
   let wx = -Math.sin(P.yaw) * fwd + Math.cos(P.yaw) * side, wz = -Math.cos(P.yaw) * fwd - Math.sin(P.yaw) * side;
   const mag = Math.min(1, Math.hypot(wx, wz)), l = Math.hypot(wx, wz) || 1;
   wx = wx / l * mag * sp; wz = wz / l * mag * sp;
@@ -3234,7 +3333,7 @@ FIN.t0 = performance.now();
 await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {SHEAR, shearTick, shearCut, BAR, buildBarricades, cutBarricade, tryBarricade, gotPack, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>

@@ -39,7 +39,7 @@ try {
   let s = await st();
   check("the launcher waits in the locker with one rocket", !s.owned.includes("rocket") && s.stash.includes("rocket") && s.rockets === 1, JSON.stringify(s));
   await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); }); await frames(2);
-  check("the locker lists ten pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 10);
+  check("the locker lists eleven pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 11);
   await page.click('#station button[data-gear="driver"]'); await page.click('#station button[data-gear="rocket"]'); await page.keyboard.press("Escape"); s = await st();
   check("leave the driver and the launcher can be taken", s.owned.includes("rocket") && !s.owned.includes("driver"), JSON.stringify(s));
   await page.keyboard.press("Digit5"); s = await st(); check("key 5 holds it", s.held === "rocket", JSON.stringify(s));

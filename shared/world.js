@@ -54,7 +54,7 @@ export function buildNav(W, fy) {
     const x = NX0 + (i + .5) * NAV, z = NZ0 + (j + .5) * NAV;
     let ground = false, blocked = false;
     for (const id of near(W, x, z, 0.6)) {
-      const b = W.boxes[id]; if ((b.door && !b.link) || b.off) continue;
+      const b = W.boxes[id]; if ((b.door && !b.link && !b.chained) || b.off) continue;          // a chained door (shared/barricade.js) is a wall
       if (x >= b.n[0] && x <= b.x[0] && z >= b.n[2] && z <= b.x[2] && b.x[1] >= fy - 0.15 && b.x[1] <= fy + 0.15 && b.n[1] < fy) ground = true;
       if (x + 0.4 > b.n[0] && x - 0.4 < b.x[0] && z + 0.4 > b.n[2] && z - 0.4 < b.x[2] && b.n[1] < fy + 1.7 && b.x[1] > fy + 0.35) { blocked = true; break; }
     }
