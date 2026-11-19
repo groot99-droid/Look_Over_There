@@ -156,3 +156,10 @@ test("burning: 10 a second and slowed to 0.6 for the time given; it adds to the 
   const d = mk("pale_traveler"); d.burn(100, 10, 0.6); let t = 0; for (; t < 20; t += 0.05) if (d.statusTick(0.05)) break; assert.ok(Math.abs(t - 8) < 0.1, "80 health at 10 a second: " + t);
   const o = new MonsterSim({...cfgOf("creature"), hp: undefined}, "L4", a[0], a[1], env); o.burn(10, 10, 0.6); assert.equal(o.statusTick(5), false); assert.equal(o.hp, Infinity);
 });
+
+test("shove moves a monster to a spot and drops its path; the clawed shrug off half of a knockback (knockback 0.5 in the config)", () => {
+  const W = mkWorld("L4"), env = mkEnv(W), [a, b] = clearPair(W, 6);
+  const m = new MonsterSim(cfgOf("creature"), "L4", a[0], a[1], env); m.goTo(b[0], b[1]); assert.ok(m.path.length > 0);
+  m.shove(b[0], b[1]); assert.equal(m.pos.x, b[0]); assert.equal(m.pos.z, b[1]); assert.equal(m.path.length, 0); assert.equal(m.target, null);
+  assert.equal(cfgOf("clawed").knockback, 0.5); for (const k of ["creature", "sinew", "pale_traveler"]) assert.equal(cfgOf(k).knockback, undefined);
+});

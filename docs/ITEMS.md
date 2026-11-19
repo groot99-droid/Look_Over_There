@@ -353,7 +353,11 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server owns the spool clock, the fluid, the kill and which barricade or cable was cut.
 
-### 4.8 Sound-amplified frequency horn [PROPOSAL] (model: `Junkyard_Sonic_Blaster`)
+### 4.8 Sound-amplified frequency horn [BUILT, solo Going back in] (model: `Junkyard_Sonic_Blaster`)
+
+**Built (session 23):** `shared/horn.js` and `shared/horn.test.js` (the battery, the two cooldowns, the cone, the knockback), `shared/cone.js` (the cone test, now shared with the flamethrower), `MonsterSim.shove` and `knockback` on the clawed in `world/monsters.json`, the page (`index.html`: the blast on left click or RT, the call on right click or LT, rings along the cone, the HUD line `HORN ▮▮▮▮▮▯ 5/6`, a free recharge each time you open the locker, death), `tools/horn_test.mjs`. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* the blast and the call have separate cooldowns (a blast does not stop a call and the other way round); a knocked-back monster is moved at once, in quarter-metre steps straight away from you, and stops 0.5 m before anything solid or at the edge of the walkable floor; opening the locker recharges the battery whether the horn is in your hands or in the locker, so taking it out always gives a full one; a monster already chasing is not drawn by the call or the blast (the alert never takes a chaser off its chase), but is still thrown and stunned by a blast; the blast's noise and the call's reach are measured from where you stand, on your floor.
+- *Not built:* the spare battery has a rule (`addSpare`, the automatic 3 s swap, both tested) but no source until the Market sells it ($4); the Market; the model (a placeholder is drawn in code; `models/items/frequency_horn.glb` is not loaded); rooms (solo only, `SOLO_GEAR`); the unkillable monsters' halved knockback (no such monster is in the mode yet).
 
 - **What it is.** A dented megaphone horn wired to a car battery box. It hurts nothing. It moves everything, and then everything comes.
 - **Role.** The loud lure and the shove. No damage at all.

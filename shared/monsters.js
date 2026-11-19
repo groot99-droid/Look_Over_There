@@ -149,6 +149,7 @@ export class MonsterSim {
     }
     return false;
   }
+  shove(x, z) { this.pos.x = x; this.pos.z = z; this.path = []; this.target = null; }                // thrown to a spot (the frequency horn): where it was going no longer applies
   slow(k, secs) {                                                            // every speed times k for secs: the strongest slow wins, they do not stack
     if (this.slowT <= 0 || k < this.slowK) { this.slowK = k; this.slowT = secs; } else if (k === this.slowK) this.slowT = Math.max(this.slowT, secs);
   }
