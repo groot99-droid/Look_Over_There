@@ -1040,7 +1040,15 @@ function packMesh() {
   const o = new THREE.Group(), box = new THREE.Mesh(new THREE.BoxGeometry(.3, .15, .2), new THREE.MeshBasicMaterial({color: 0x5a5e3c}));
   box.position.y = .08; const stripe = new THREE.Mesh(new THREE.BoxGeometry(.31, .04, .21), new THREE.MeshBasicMaterial({color: 0x40d8ff})); stripe.position.y = .09;
   const halo = cyanGlow(.7, .7, .6), beacon = cyanGlow(.25, 1.8, .3); halo.position.y = .3; beacon.position.y = .9; o.add(box, stripe, halo, beacon);
-  Object.assign(o.userData, {halo, beacon}); return o;
+  Object.assign(o.userData, {halo, beacon});
+  // the owner's Meshy model (models/ammo_pack.glb): an upright case with "AMMO PACK" on its +Z face, stood on the floor 0.4 m tall; the code-made box and stripe stay if it cannot load. The glow and the beacon stay either way
+  loadModel("ammo_pack").then(g => {
+    if (!g) return;
+    const m = SkeletonUtils.clone(g.scene), bb = new THREE.Box3().setFromObject(m, true), k = 0.4 / (bb.getSize(new THREE.Vector3()).y || 1), c = bb.getCenter(new THREE.Vector3());
+    m.scale.setScalar(k); m.position.set(-c.x * k, -bb.min.y * k, -c.z * k);
+    const w = new THREE.Group(); w.add(m); o.add(w); box.visible = false; stripe.visible = false; o.userData.model = w;
+  });
+  return o;
 }
 function buildLootVisuals() {
   LT.vis = null; if (!S.root || !LOOT[S.id]) return;
