@@ -2,7 +2,7 @@
 // server and the tools can all use them. The data is in shared/farway.manifest.js; shared/registry.js builds it once at load.
 //
 // A manifest is {manifestVersion: 1, flags, connectors, modes, areas, links}.
-//   area  {id, name, status: "built" | "planned" | "reserved", soloOnly?, scenes?: [scene], ...}
+//   area  {id, name, status: "built" | "planned" | "reserved", soloOnly?, coop?, rooms?: [id], spine?: [id], scenes?: [scene], ...}
 //   scene {id, floorY?, files?, multiplayer?, presence?, puzzle?: "fuses" | "switches" | "keypad", powerSource?, loot?: {lockers, packs}, chamber?: {floor, index, wave: {monsters, kind}, stairsDown?, next?}}
 //   link  {id, from: {area, scene?, door?}, to: {area, scene?, room?, door?, arrive?, face?}, connector, status, requires?: [flag], soloOnly?, returnTo?, note?}
 //   mode  {status, area, floors, players: {min, max}, finish?: {scene, ...}, chambersPerFloor?, waves?, startChamber?}
@@ -19,6 +19,8 @@ const isLinkId = v => typeof v === "string" && /^[A-Za-z0-9_.>-]+$/.test(v);
 const isFile = v => typeof v === "string" && v.length > 0 && !v.startsWith("/") && !v.split("/").includes("..");
 const isCount = v => Number.isInteger(v) && v >= 0;
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+// the rooms of a game (Right Door, Wrong Exit) or the stages of its spine (the Intern): what a `coop` game makes a place of
+const placeIds = a => { const l = Array.isArray(a.rooms) ? a.rooms : Array.isArray(a.spine) ? a.spine : []; return l.length && l.every(isId) ? l : []; };
 
 // Everything wrong with a manifest, as {errors, warnings} (arrays of strings). With worldDocs ({sceneId: parsed world/<id>.json}) it also checks that the
 // door links in those files and the built links here are the same set. Never throws and never mutates its input.
@@ -28,13 +30,19 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
   if (doc.manifestVersion !== 1) err(`manifestVersion must be 1 (got ${JSON.stringify(doc.manifestVersion)})`);
   if (!Array.isArray(doc.areas)) { err("areas must be an array"); return {errors, warnings}; }
   const flags = new Set(Array.isArray(doc.flags) ? doc.flags : []), connectors = new Set(Array.isArray(doc.connectors) ? doc.connectors : []);
-  const areas = new Map(), sceneArea = new Map(), scenesOf = new Map(), chambers = [], roomScenes = new Set();
+  const areas = new Map(), sceneArea = new Map(), scenesOf = new Map(), chambers = [], roomScenes = new Set(), coopRooms = new Map();
 
   for (const a of doc.areas) {
     if (!isObj(a) || !isId(a.id)) { err(`an area needs an id of letters, digits and underscores (got ${JSON.stringify(a && a.id)})`); continue; }
     if (areas.has(a.id)) { err(`duplicate area id ${a.id}`); continue; }
     areas.set(a.id, a);
     if (!STATUSES.includes(a.status)) err(`area ${a.id}: status must be one of ${STATUSES.join(", ")}`);
+    if (a.coop !== undefined) {                                                                  // a game a room's players can be in together: a place for each room or stage (session 11)
+      if (a.coop !== true) err(`area ${a.id}: coop must be true (or left out)`);
+      else if (a.status !== "built") err(`area ${a.id}: only a built area can be coop`);
+      else if (!placeIds(a).length) err(`area ${a.id}: coop needs rooms or spine (a list of ids)`);
+      else coopRooms.set(a.id, new Set(placeIds(a)));
+    }
     if (a.scenes === undefined) continue;
     if (!Array.isArray(a.scenes)) { err(`area ${a.id}: scenes must be an array`); continue; }
     const ids = new Set(); scenesOf.set(a.id, ids);
@@ -78,10 +86,13 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
       if (!isObj(e) || !areas.has(e.area)) { err(`${at}: ${end}.area ${JSON.stringify(e && e.area)} is not an area`); continue; }
       if (e.scene !== undefined && scenesOf.has(e.area) && !scenesOf.get(e.area).has(e.scene)) err(`${at}: ${end}.scene ${e.scene} is not a scene of ${e.area}`);
       if (l.status === "built" && areas.get(e.area).status !== "built") err(`${at}: a built link cannot touch the ${areas.get(e.area).status} area ${e.area}`);
-      if (l.status === "built" && !l.soloOnly && !roomScenes.has(e.scene)) err(`${at}: a room could follow this link into ${e.scene || e.area}, which is neither multiplayer nor presence: mark the link soloOnly`);
+      const game = end === "to" && e.scene === undefined && coopRooms.has(e.area);                // a link into a coop game: a room can follow it to the game's rooms
+      if (l.status === "built" && game && e.room !== undefined && !coopRooms.get(e.area).has(e.room)) err(`${at}: to.room ${e.room} is not a room of ${e.area}`);
+      if (l.status === "built" && !l.soloOnly && !roomScenes.has(e.scene) && !game) err(`${at}: a room could follow this link into ${e.scene || e.area}, which is neither multiplayer nor presence: mark the link soloOnly`);
     }
     if (l.returnTo !== undefined && !(isObj(l.returnTo) && areas.has(l.returnTo.area) && (l.returnTo.scene === undefined || sceneArea.get(l.returnTo.scene) === l.returnTo.area))) err(`${at}: returnTo is not a place`);
   }
+  for (const id of coopRooms.keys()) if (!(doc.links || []).some(l => l && l.status === "built" && l.connector === "gate" && !l.soloOnly && l.to && l.to.area === id)) err(`area ${id} is coop but no built gate leads into it that a room can follow (its gate says soloOnly)`);
 
   for (const [name, m] of Object.entries(isObj(doc.modes) ? doc.modes : {})) {
     const at = `mode ${name}`;
@@ -124,7 +135,8 @@ function compareWorldDocs(doc, worldDocs, err, warn) {
       if (!l) { err(`world/${scene}.json: door ${name} has a link that the manifest does not list`); continue; }
       if (jl.game) {
         if (l.to.area !== jl.game || l.to.room !== jl.room || !same(l.to.arrive, jl.arrive) || !same(l.to.face, jl.face)) err(`${l.id}: differs from the game link in world/${scene}.json`);
-        if (!l.soloOnly) err(`${l.id}: a game gate must say soloOnly while rooms cannot enter games`);
+        const coop = (doc.areas.find(a => a.id === l.to.area) || {}).coop === true;
+        if (!l.soloOnly && !coop) err(`${l.id}: a game gate must say soloOnly unless its game is coop`);
         if (jl.scene === undefined) warn(`${l.id}: world/${scene}.json has no return scene, so after the game the page falls back to the passage scene (manifest says ${l.returnTo ? l.returnTo.scene : "nothing"})`);
         else if (!l.returnTo || l.returnTo.scene !== jl.scene) err(`${l.id}: returnTo differs from world/${scene}.json`);
       } else if (l.to.scene !== jl.scene || l.to.door !== jl.door || !same(l.to.arrive, jl.arrive) || !same(l.to.face, jl.face)) err(`${l.id}: differs from the stair link in world/${scene}.json`);
@@ -147,7 +159,8 @@ export function buildRegistry(doc) {
   const {errors} = checkManifest(doc);
   if (errors.length) throw new Error("invalid world manifest:\n  " + errors.join("\n  "));
   const builtScenes = doc.areas.filter(a => a.status === "built").flatMap(a => (a.scenes || []).map(s => ({...s, area: a.id})));
-  const floors = {}, pageScenes = {}, loot = {}, presence = {};
+  const floors = {}, pageScenes = {}, loot = {}, presence = {}, gamePlaces = {}, gameOf = new Map();
+  for (const a of doc.areas) if (a.status === "built" && a.coop === true) { gameOf.set(a.id, placeIds(a).map(r => `${a.id}:${r}`)); for (const r of placeIds(a)) gamePlaces[`${a.id}:${r}`] = {area: a.id, room: r}; }
   for (const s of builtScenes) {
     if (s.multiplayer) floors[s.id] = s.floorY;
     if (s.presence) presence[s.id] = s.floorY;
@@ -169,7 +182,13 @@ export function buildRegistry(doc) {
     while (todo.length) {
       const from = todo.pop();
       for (const l of links) {
-        if (l.status !== "built" || l.soloOnly || l.from.scene !== from || !l.to.scene || seen.has(l.to.scene)) continue;
+        if (l.status !== "built" || l.soloOnly || l.from.scene !== from) continue;
+        if (!l.to.scene && gameOf.has(l.to.area)) {                                                   // a gate into a coop game: all of that game's places (they have no links out)
+          const r = requirementsMet(l, flags);
+          if (r.ok) gameOf.get(l.to.area).forEach(p => seen.add(p)); else r.missing.forEach(f => missing.add(f));
+          continue;
+        }
+        if (!l.to.scene || seen.has(l.to.scene)) continue;
         const r = requirementsMet(l, flags);
         if (r.ok) { seen.add(l.to.scene); todo.push(l.to.scene); } else r.missing.forEach(f => missing.add(f));
       }
@@ -177,7 +196,7 @@ export function buildRegistry(doc) {
     return seen.has(scene) ? {ok: true, missing: []} : {ok: false, missing: [...missing]};
   };
   return deepFreeze({
-    presence, canReach,
+    presence, gamePlaces, canReach,
     chamber, chambers: [...chamberScenes.keys()],
     manifest: structuredClone(doc),
     floors, pageScenes, loot,
