@@ -24,6 +24,8 @@ const stage = ({dist, d1, back = 900, clear = 12}) => page.evaluate(({dist, d1, 
     const [x, z] = cells[Math.floor(Math.random() * cells.length)], a = Math.random() * 6.28, fx = -Math.sin(a), fz = -Math.cos(a);
     const o = [x, g.S.floor + g.P.eye, z], d = [fx, 0, fz];
     if (!g.rayClear(o, d, clear + 0.5) || !g.rayClear([x, g.S.floor + 1.0, z], d, clear + 0.5) || g.collide({x: x + fx * dist, y: g.S.floor + 0.02, z: z + fz * dist}) || g.collide({x, y: g.S.floor + 0.02, z})) continue;
+    let walk = true; for (let k = 0.25; k <= clear && walk; k += 0.25) { const c = g.cellOf(x + fx * k, z + fz * k); walk = c >= 0 && !!g.S.nav[c]; }          // a knockback stops where the nav cell under it is not walkable (shared/horn.js knockEnd), so every cell along the line must be
+    if (!walk) continue;
     g.P.p.set(x, g.S.floor + 0.02, z); g.P.v.set(0, 0, 0); g.P.yaw = a; g.P.pitch = 0; g.P.imm = 1e9;
     g.monsters.forEach((m, i) => { m.cfg = {...m.cfg, patrol: 0, alert: 0, chase: 0}; m.state = "patrol"; m.stunT = 0; m.hp = m.cfg.hp; const k = i === 0 ? dist : i === 1 ? d1 : null; if (k !== undefined && k !== null) m.pos.set(x + fx * k, m.fy, z + fz * k); else if (back < 800) m.pos.set(x - fx * back, m.fy, z - fz * back); else m.pos.set(x + 900, m.fy, z + 900); });
     return true;
@@ -48,7 +50,7 @@ try {
   await page.keyboard.press("Digit5"); s = await st(); check("key 5 holds it", s.held === "horn", JSON.stringify(s));
 
   // the blast: monsters 4 m and 7 m ahead (both in the cone), a third 30 m behind, the cone clear for 12 m
-  check("monsters 4 m and 7 m ahead and one 30 m behind", await stage({dist: 4, d1: 7, back: 30}));
+  check("monsters 4 m and 7 m ahead and one 30 m behind", await stage({dist: 4, d1: 7, back: 30, clear: 14}));
   let before = await ahead();
   check("the blast fires", await page.evaluate(() => window.__game.blowHorn()));
   let after = await ahead(); s = await st();
