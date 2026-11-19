@@ -330,7 +330,12 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server flies the rocket and owns the burst, the mist and who was in it.
 
-### 4.6 Optical laser pointer dissector [PROPOSAL] (model: `Scraplight_Blaster`)
+### 4.6 Optical laser pointer dissector [BUILT, solo Going back in] (model: `Scraplight_Blaster`)
+
+**Built (session 25):** `shared/laser.js` and `shared/laser.test.js` (the climb, the battery, the heat, the swap, the dot), `rayMonster`'s optional range and `MonsterSim.provoke` in `shared/monsters.js`, `laser` 1.25 on the pale traveler in `world/monsters.json`, the page (`index.html`: hold left click or RT for the beam, hold right click or LT for the dot, a red line and a red dot, the HUD line `LASER 92%  SPARE ×1`, the crouch pace while the beam is on, packs, death), `tools/laser_test.mjs`. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* the heat cools at the rate it built while the beam is off, so 3 s on, 3 s off, 3 s on does not overheat; the dot makes no heat but is locked while the laser is overheated; meeting a different monster starts the climb at once (no 0.3 s wait); letting go of the trigger loses the climb after the same 0.3 s; a pack pickup's 25% goes to the loaded pack only and is lost if that is full; a hurt monster that was not chasing runs at where you stood and gives up like any lost chase; the beam and the dot stop on the floor (the floor is not a collider) and on walls and shut doors; the dot's lure is refreshed every 0.4 s while you hold it.
+- *Not built:* the Market (it starts in the locker with a full pack and one spare; nothing sells packs yet); the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`).
+- *The locker:* with ten gear rows the E slot's swap is on the **E key** in the panel (number keys 1 to 9 and 0 are the ten gear rows).
 
 - **What it is.** A lens assembly on a drum, fed by battery packs. At low power it is a red dot on the far wall, and things go and look at it. At full power it takes things apart quietly.
 - **Role.** Silent, long range, and the game's title as a mechanic: look over there.

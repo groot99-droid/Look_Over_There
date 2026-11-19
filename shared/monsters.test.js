@@ -163,3 +163,11 @@ test("shove moves a monster to a spot and drops its path; the clawed shrug off h
   m.shove(b[0], b[1]); assert.equal(m.pos.x, b[0]); assert.equal(m.pos.z, b[1]); assert.equal(m.path.length, 0); assert.equal(m.target, null);
   assert.equal(cfgOf("clawed").knockback, 0.5); for (const k of ["creature", "sinew", "pale_traveler"]) assert.equal(cfgOf(k).knockback, undefined);
 });
+
+test("rayMonster takes a range (the laser's 30 m); provoke turns a patrolling monster into a chaser heading for a point", () => {
+  const W = {floor: 0, boxes: [], grid: new Map(), doors: [], nav: null}, m = {pos: {x: 0, z: -28}, fy: 0, cfg: {height: 2}};
+  assert.equal(rayMonster(W, [m], [0, 1.5, 0], [0, 0, -1]), null, "28 m is past the ray's 25 m"); assert.equal(rayMonster(W, [m], [0, 1.5, 0], [0, 0, -1], 30).m, m);
+  const {m: s, env, b} = setup(8, "creature", "L4"); s.yaw += Math.PI;                         // facing away: it does not see the player
+  s.provoke(b[0], b[1], 1); assert.equal(s.state, "chase"); assert.deepEqual(s.last, [b[0], b[1]]); assert.equal(s.tgt, 1);
+  const x0 = s.pos.x, z0 = s.pos.z; s.wait = 0; tick(s, env, [], 1); assert.ok(Math.hypot(s.pos.x - x0, s.pos.z - z0) > 1, "it runs toward where the beam came from");
+});
