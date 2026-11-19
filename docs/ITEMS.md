@@ -312,7 +312,12 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server owns the capacitors and the stun.
 
-### 4.5 Almond water aerosol rocket launcher [PROPOSAL] (model: `Scrapyard_Blaster`)
+### 4.5 Almond water aerosol rocket launcher [BUILT, solo Going back in] (model: `Scrapyard_Blaster`)
+
+**Built (session 24):** `shared/rocket.js` and `shared/rocket.test.js` (the ammo, the arming, the blast falloff, the mist), `shared/flight.js` (the projectile the dart already used, now shared: `shared/dart.test.js` is unchanged and passes), the page (`index.html`: the rocket in the air, the burst and the mist, the HUD line `ROCKETS ● ○ ○`, no running while you hold it, death), `tools/rocket_test.mjs`. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* a rocket that meets nothing ends at 40 m and bursts there (it is not lost); "within 5 m of you" is measured as 5 m of flight from where it left, so a rocket that hits something close to you is a dud but one that lands near you after you walk up to it is not (and then hurts you); the blast ignores walls, like the tripwire's; the mist is 2.5 m out from the burst and keeps re-slowing what stands in it, so a monster leaves it slowed for 0.3 s more; you take one hit of 35 if you are within 5 m of an armed burst (the usual second of grace applies); the launcher is not given an aim on right click (no weapon but the ray has one yet).
+- *Not built:* the Market (the launcher starts in the locker with one rocket, and nothing sells more; a pack gives none by design); the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`); the right-click aim; other players in the blast (solo has none).
+- *The locker:* it has nine rows now, so its E-slot key is the tenth: **0** (the panel shows 0).
 
 - **What it is.** A shoulder tube with aerosol cans strapped on. One loud answer to a room that has gone wrong.
 - **Role.** The big area burst. Very loud, very few shots.

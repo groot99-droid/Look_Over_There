@@ -45,7 +45,7 @@ try {
 
   // the locker: a third arsenal weapon is refused until you leave one
   await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); }); await frames(2);
-  check("the locker lists eight pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 8);
+  check("the locker lists nine pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 9);
   await page.click('#station button[data-gear="baton"]'); s = await st();
   check("taking the baton as a third weapon is refused", !s.owned.includes("baton") && s.stash.includes("baton"), JSON.stringify(s));
   await page.click('#station button[data-gear="crossbow"]'); await page.click('#station button[data-gear="baton"]'); s = await st();
