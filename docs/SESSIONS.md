@@ -29,7 +29,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 22 | Build the propane flamethrower and the Burning status | Round 4 | 21 | **built, merged** (PR #49): `shared/flame.js`, `MonsterSim.burn`, solo only. Rooms and the Market are not touched |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
-| 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | not started |
+| 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | **slice 1 (the design note, `docs/ROUND.md` section D) in the draft PR for `claude/games-in-parties`**; no code yet, waits for the owner's answers to its three questions (defaults stated) |
 
 Update this table in the last commit of each session.
 
