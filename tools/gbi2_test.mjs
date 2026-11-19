@@ -37,6 +37,7 @@ try {
   let s = await st();
   check("Going back in starts with the ray, the cloak, the crossbow and the driver carried, and the crossbow's bolts", ["gun", "cloak", "crossbow", "driver"].every(i => s.owned.includes(i)) && s.bolts === 4, JSON.stringify(s));
   check("the crossbow is a fourth thing to hold (key 4)", await page.evaluate(() => { const g = window.__game; g.setHeld("crossbow"); return g.HELD.item === "crossbow"; }));
+  check("the held crossbow is the owner's Meshy model, with the code-made one hidden", await page.waitForFunction(() => { const b = window.__game.BOW; return !!b.model && b.art.visible === false && b.pivot.visible; }, null, {timeout: 30000}).then(() => true, () => false));
 
   // the ray only banishes: the monster is still there after a ray shot
   check("a clear 6 m line was found", await lineUp());
