@@ -260,7 +260,7 @@ test("a room reaches a game's places through its gate, and only that game's", ()
 test("coop is checked: it needs a built game with rooms or stages, and its gate must then not say soloOnly", () => {
   bad(d => { d.areas.find(a => a.id === "rdwe").coop = "yes"; }, /coop must be true/);
   bad(d => { const a = d.areas.find(a => a.id === "rdwe"); a.coop = true; delete a.rooms; }, /coop needs rooms or spine/);
-  bad(d => { d.areas.find(a => a.id === "forest" || a.id === "dreamcore_forest").coop = true; }, /only a built area can be coop/);
+  bad(d => { d.areas.find(a => a.id === "hotel").coop = true; }, /only a built area can be coop/);          // the hotel is still planned (the dreamcore forest, the first example here, is built now)
   bad(d => { d.areas.find(a => a.id === "rdwe").coop = true; }, /soloOnly/);          // coop game, but its gate still says soloOnly: say which one
   const d = withCoop(["rdwe"]); const gate = d.links.find(l => l.to.area === "rdwe" && l.connector === "gate" && l.status === "built");
   gate.to.room = "nowhere"; assert.ok(validateManifest(d).some(m => /nowhere/.test(m)), "a gate into a room the game does not have");
