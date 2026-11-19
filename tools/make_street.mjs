@@ -1,4 +1,5 @@
-// Makes world/street.json and world/apartment.json, the collision files for the City's Hallam Row and your apartment, from shared/city.js (the same layout the page draws).
+// Makes world/street.json and world/apartment.json, the collision files for the City's Hallam Row and your apartment, from shared/city.js (the same layout the page draws),
+// the other City buildings' from their own modules, and world/forest.json and world/meadow.json from shared/forest.js.
 // Usage: node tools/make_street.mjs   (rewrites both); shared/city.test.js fails if the file is out of date.
 import fs from "node:fs";
 import path from "node:path";
@@ -6,8 +7,9 @@ import {streetDoc, apartmentDoc, groceryDoc, mallDoc} from "../shared/city.js";
 import {museumDoc} from "../shared/museum.js";
 import {factoryDoc} from "../shared/factory.js";
 import {labDoc} from "../shared/lab.js";
+import {forestDoc, meadowDoc} from "../shared/forest.js";
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-for (const [name, doc] of [["street", streetDoc()], ["apartment", apartmentDoc()], ["main_floor", groceryDoc()], ["entrance", mallDoc()], ["galleries", museumDoc()], ["factory_floor", factoryDoc()], ["laboratory", labDoc()]]) {
+for (const [name, doc] of [["street", streetDoc()], ["apartment", apartmentDoc()], ["main_floor", groceryDoc()], ["entrance", mallDoc()], ["galleries", museumDoc()], ["factory_floor", factoryDoc()], ["laboratory", labDoc()], ["forest", forestDoc()], ["meadow", meadowDoc()]]) {
   fs.writeFileSync(path.join(root, `world/${name}.json`), JSON.stringify(doc));
   console.log(`world/${name}.json: ${doc.colliders.length} colliders`);
 }
