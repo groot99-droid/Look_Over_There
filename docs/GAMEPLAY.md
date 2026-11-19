@@ -125,7 +125,7 @@ The gun is `models/gun.glb` (Meshy's "Error Deletion Ray", 10k triangles). It is
 **How it is built (the architecture).**
 - `shared/loot.js` (pure, with tests): lockers and ammo packs per floor, taken once; the same rules in the server and in solo play, like `shared/fuses.js`.
 - Server: relays loot state to the floor (late joiners get it on arrival), checks a `shot` (the ray must start near the shooter, and the server takes the round) and resolves it on its own monsters. A banish is a position jump in the snapshot (clients snap a monster that moves more than 8 m) plus a `zap` message so every client plays the effect.
-- Client: the held gun (scaled to about 0.55 m, bottom right, a short recoil kick and a cyan flash from the tip), a small cross-hair, a round counter, lockers and packs drawn in code like the fuses, and the other players seen holding it.
+- Client: the held gun (scaled to about 0.55 m, bottom right, a short recoil kick and a cyan flash from the tip), a small cross-hair, a round counter, lockers drawn in code, ammo packs drawn with the owner's Meshy model (`models/ammo_pack.glb`, an upright case 0.4 m tall; the code-made box stays if it cannot load), and the other players seen holding it.
 - Monster: a `banish(spot)` method and the placement rule above.
 - Bots: a bot with rounds fires at a chasing monster that is within 12 m, in sight, when its escape margin is under 2 s, and the bait uses it to pull a monster off the runner's way. Then rerun `tools/bots.mjs` and compare downs per floor with and without the gun: the first real test of the idea.
 
