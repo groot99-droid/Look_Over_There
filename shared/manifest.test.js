@@ -23,7 +23,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
     gbi_L4_4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
-    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0}, main_floor: {glbs: [], floor: 0}, entrance: {glbs: [], floor: 0}, galleries: {glbs: [], floor: 0}, factory_floor: {glbs: [], floor: 0}, laboratory: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
+    street: {glbs: [], floor: 0}, apartment: {glbs: [], floor: 0}, main_floor: {glbs: [], floor: 0}, entrance: {glbs: [], floor: 0}, galleries: {glbs: [], floor: 0}, factory_floor: {glbs: [], floor: 0}, laboratory: {glbs: [], floor: 0}, forest: {glbs: [], floor: 0}, meadow: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
@@ -196,7 +196,7 @@ test("the City's street is on the page, never a floor the server runs, and the b
 
 // ---- presence (session 17): page scenes a room's players can be in together. The server relays who is there and where, and runs nothing.
 test("presence scenes: the parking lot is one, the floors and the chambers are not, and the field is checked", () => {
-  assert.deepEqual(REGISTRY.presence, {parking_lot: 9.6, street: 0, apartment: 0}, "the lot, the street and the apartment are places a room can be in, each at its floor height");
+  assert.deepEqual(REGISTRY.presence, {parking_lot: 9.6, street: 0, apartment: 0, forest: 0, meadow: 0}, "the lot, the street, the apartment, the forest and the meadow are places a room can be in, each at its floor height");
   for (const id of ["B1", "L4", "gbi_L4_4", "main_floor", "playground"]) assert.equal(REGISTRY.presence[id], undefined, id);
   assert.equal(REGISTRY.floors.parking_lot, undefined, "the server still runs nothing there");
   bad(d => { d.areas.find(a => a.id === "overworld").scenes[0].presence = "yes"; }, /parking_lot: presence must be true/);

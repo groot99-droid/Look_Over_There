@@ -66,7 +66,12 @@ export const FARWAY = {
         {id: "gbi_L3_1", floorY: 6.4, multiplayer: true, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
       ],
     },
-    stub("dreamcore_forest", "Dreamcore forest and meadow", "planned", ["forest", "meadow"]),
+    {
+      // the dreamcore forest and meadow (shared/forest.js): the road from the parking lot, a path north through the trees, then the meadow with the shed and the house.
+      // Both are presence scenes: a room's players see each other walk there. The house's door is Right Door, Wrong Exit (solo only); the shed is locked until its addon.
+      id: "dreamcore_forest", name: "Dreamcore forest and meadow", status: "built", tone: "dreamcore",
+      scenes: [{id: "forest", floorY: 0, files: ["world/forest.json"], presence: true}, {id: "meadow", floorY: 0, files: ["world/meadow.json"], presence: true}],
+    },
     {
       // v0 (session 9): Hallam Row as a blockout street, reached by the bus. Its layout and the day clock are in shared/city.js; world/street.json is made from it by tools/make_street.mjs.
       id: "city", name: "City", status: "built", tone: "liminal",
@@ -143,8 +148,17 @@ export const FARWAY = {
     // returnTo carries where you stand when you come back out. Open store hours still apply (the street's doors shut at 20:00).
     {id: "city.666>intern", status: "built", connector: "doors", soloOnly: true, requires: ["job_intern"], from: {area: "city", scene: "street", door: "w666"}, to: {area: "intern"},
      returnTo: {area: "city", scene: "street", arrive: [-6.2, 0.0, -127.0], face: [1.0, 0.0]}, note: "A shift at The Intern. Needs the accepted application."},
-    plan("overworld.road>forest", {area: "overworld", scene: "road"}, {area: "dreamcore_forest", scene: "forest"}, "walk"),
-    plan("forest.house>rdwe", {area: "dreamcore_forest", scene: "meadow", door: "house_door"}, {area: "rdwe", room: "dining"}, "gate", {soloOnly: true}),
+    // the road to the forest (built without the Overworld's own road scene yet): a signpost by the parking lot's north-west hedge, F walks you down it; a signpost at the road's end walks you back
+    {id: "overworld.lot>forest", status: "built", connector: "walk", from: {area: "overworld", scene: "parking_lot", door: "forest_road"}, to: {area: "dreamcore_forest", scene: "forest", arrive: [0.0, 0.0, 6.0], face: [0.0, -1.0]},
+     note: "The road to the forest. You arrive where it ends among the trees, facing up the path."},
+    {id: "forest.road>lot", status: "built", connector: "walk", from: {area: "dreamcore_forest", scene: "forest", door: "road_back"}, to: {area: "overworld", scene: "parking_lot", arrive: [-30.0, 9.6, 93.0], face: [0.0, -1.0]}},
+    // the forest's path ends in a bright gap: walking through it is the way into the meadow, and walking back out of the meadow's south edge is the way back
+    {id: "forest.gap>meadow", status: "built", connector: "walk", from: {area: "dreamcore_forest", scene: "forest", door: "gap"}, to: {area: "dreamcore_forest", scene: "meadow", arrive: [0.0, 0.0, 6.0], face: [0.0, -1.0]}},
+    {id: "meadow.gap>forest", status: "built", connector: "walk", from: {area: "dreamcore_forest", scene: "meadow", door: "gap"}, to: {area: "dreamcore_forest", scene: "forest", arrive: [0.0, 0.0, -86.0], face: [0.0, 1.0]}},
+    plan("overworld.road>forest", {area: "overworld", scene: "road"}, {area: "dreamcore_forest", scene: "forest"}, "walk", {note: "The Overworld's own road scene, when it is built, replaces the signpost walk (overworld.lot>forest)."}),
+    // the house's front door: Right Door, Wrong Exit, solo only (as its gate in L4's exterior is); you come back out on the path in front of the house
+    {id: "forest.house>rdwe", status: "built", connector: "doors", soloOnly: true, from: {area: "dreamcore_forest", scene: "meadow", door: "house_door"}, to: {area: "rdwe", room: "dining"},
+     returnTo: {area: "dreamcore_forest", scene: "meadow", arrive: [0.0, 0.0, -57.5], face: [0.0, 1.0]}, note: "The house is much bigger inside."},
     plan("forest.shed>addon", {area: "dreamcore_forest", scene: "meadow", door: "shed"}, {area: "future_addon_shed"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
     plan("overworld.treehouse>addon", {area: "overworld", scene: "tree_house"}, {area: "future_addon_treehouse"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
     plan("city.street>hotel_lobby", {area: "city", scene: "street"}, {area: "hotel", scene: "lobby"}, "doors"),
