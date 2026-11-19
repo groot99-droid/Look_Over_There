@@ -33,6 +33,7 @@ try {
   check("solo: no room, you are the host", await p.evaluate(() => !window.__game.net.on && window.__game.net.host()));
   check("solo: three fuses and a locked stair door on B1", await p.evaluate(() => { const g = window.__game; return g.FZ.vis.items.length === 3 && g.isLocked(g.upDoor()); }));
   check("without models/fuse.glb the placeholder stays", await p.evaluate(() => !window.__game.FZ.vis.items[0].o.userData.model));
+  await until("the ammo packs on B1 are drawn with the owner's model (models/ammo_pack.glb)", p, () => { const v = window.__game.LT.vis; return !!v && v.packs.length > 0 && v.packs.every(k => !!k.o.userData.model); });
   // a monster that loses sight runs to where it last saw you (not to where you are now) and gives up soon; running tires you
   const chase = await p.evaluate(() => {
     const g = window.__game, m = g.monsters[0]; m.los = () => true; m.state = "patrol"; m.path = [];
