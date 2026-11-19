@@ -97,6 +97,7 @@ Wrong Exit maze, keycard doors everywhere else, hardest boss (The Registrar), Ad
 - Road, then forest, then a meadow with the shed, then the house. The shed is in the forest, not in the Overworld.
 - The shed is an entrance and a puzzle. The tree house is a puzzle and an entrance. Both lead to their own addons later.
 - The house is much bigger inside.
+- **v0 is built** (`shared/forest.js`, scenes `forest` and `meadow`): a signpost by the parking lot's north-west hedge walks you down the road (F, as the bus is taken; the Overworld's own road scene is still planned). The forest is a winding path north through pastel trees under a pink haze; a bright gap at its end leads into the meadow (you walk through it, and back out the meadow's south edge). The meadow has flowers, the shed beside the path (the owner's Meshy model, `models/world/shed.glb`; locked: its puzzle and addon come later) and the house at the end (the owner's "moonlit cabin", `models/world/cottage.glb`). The house's door is Right Door, Wrong Exit, solo only as its other gate is, and you come back out in front of the house. Both scenes are presence scenes: a party sees each other walk there. Blockout trees and flowers; no groundskeepers, puzzles or sounds yet. [BUILT]
 
 ### Look Over There [SETTLED unless tagged]
 
