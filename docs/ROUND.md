@@ -67,7 +67,7 @@ A player who joins during PLAYING skips the lobby and spawns with the group. A r
 | RND-32 | The server tick averages under 5 ms with a full room. It measured 0.31 ms with 8 bots. Measure again at 10. | BUILT at 8, CHANGE at 10 | `node tools/bots.mjs 8` prints the tick time. |
 | RND-33 | Each socket has a message budget (a burst of 240, 90 a second, a kick past 600). | BUILT | `server/server.test.js` |
 
-## C. Going back in (planned)
+## C. Going back in (partly built: each requirement's status is in the table)
 
 A 20-wave run: 5 floors, 4 chambers each, top down: L4, L3, L2, L1, B1. A chamber is as big as an original floor.
 
@@ -80,7 +80,7 @@ A 20-wave run: 5 floors, 4 chambers each, top down: L4, L3, L2, L1, B1. A chambe
 | GBI-5 | Doors can be closed, trapped or barricaded, and nothing else. Players can crawl into vents. Monsters never use vents. | NEW | |
 | GBI-6 | A safe house on every floor holds a shop, a stash, a save, crafting and a respawn point. | NEW | |
 | GBI-7 | A locker (one per safe house and one per chamber) shows your loadout and lets you change it. After you die it returns your weapons and gear for free. It does not return ammo, consumables or perks. Those are bought back at the Market or a safe house. The existing one-time loot locker on B1 needs a different name. | PART BUILT: one per chamber, alone and in a room (each player's loadout is kept by the server); no safe house, no Market | `tools/gbi2_test.mjs` dies and checks what the locker returns; `server/gbi.test.js`, `tools/gbi_mp_test.mjs` |
-| GBI-8 | Lethal weapons come from the arsenal (ten weapons, three consumables). Each needs its own ammo rule. The ray, the cloak and the beacon stay non-lethal. Q and E (LB and RB) are consumable slots. | PART BUILT: the hunting crossbow, and the Q/E slots with the three consumables. Seven weapons are not built. | `shared/crossbow.test.js`, `shared/consumables.test.js`, `tools/gbi2_test.mjs`, `tools/gbi3_test.mjs` |
+| GBI-8 | Lethal weapons come from the arsenal (ten weapons, three consumables). Each needs its own ammo rule. The ray, the cloak and the beacon stay non-lethal. Q and E (LB and RB) are consumable slots. | PART BUILT: five weapons (the hunting crossbow; the pneumatic bolt driver, stun baton, moth jelly dart and propane flamethrower from sessions 19 to 22, solo only), the two-weapon carry cap, and the Q/E slots with the three consumables. Not built: the rocket launcher, laser dissector, rebar shear, frequency horn and gravity gauntlet (rules proposed in `docs/ITEMS.md`). | `shared/crossbow.test.js`, `shared/driver.test.js`, `shared/baton.test.js`, `shared/dart.test.js`, `shared/flame.test.js`, `shared/loadout.test.js`, `shared/consumables.test.js`, `tools/gbi2_test.mjs`, `tools/gbi3_test.mjs`, `tools/driver_test.mjs`, `tools/baton_test.mjs`, `tools/dart_test.mjs`, `tools/flame_test.mjs` |
 | GBI-9 | Money comes from clearing chambers and from kills and revives. Level comes from achievements. Money and items are shared with the rest of the game. Progress is its own save. | NEW | |
 | GBI-10 | Per-run score goes to an online leaderboard, with personal and overall bests. | NEW | `docs/BACKEND.md` |
 | GBI-11 | The 20 waves stay 20 when floors are added, by sampling. | NEW | |
