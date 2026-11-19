@@ -119,7 +119,7 @@ export class MonsterSim {
     if (this.path.length && speed > 0) {
       const [tx, tz] = this.path[0], dx = tx - this.pos.x, dz = tz - this.pos.z, dd = Math.hypot(dx, dz);
       const door = this.closedDoorAhead(dx / (dd || 1), dz / (dd || 1));
-      if (door && door.link) { this.path = []; this.doorT = 0; }                                       // monsters never use the stair doors: give that route up rather than stand there
+      if (door && (door.link || door.chained)) { this.path = []; this.doorT = 0; }                     // monsters never use the stair doors, nor a chained one: give that route up rather than stand there
       else if (door) { this.doorT += dt; if (this.doorT > 0.5) { env.openDoor(door); this.doorT = 0; } }       // they have to open doors too
       else {
         this.doorT = 0;
