@@ -1,6 +1,6 @@
 # models/items/
 
-The owner's Meshy AI models for the arsenal, the consumables, the dealer items, the grocery food and two extras (24 files). **Three are loaded by the game so far**: the land mine and the nail-bomb tripwire (as the floor traps, scaled to 0.46 m and 0.45 m) and the hunting crossbow (held, 0.42 m long, its -X front turned to face away from you); the other 21 are not, and wiring each one in is separate work. The rules for them are in `docs/ITEMS.md`.
+The owner's Meshy AI models for the arsenal, the consumables, the dealer items, the grocery food and two extras (24 files). **Seven are loaded by the game so far**: the land mine and the nail-bomb tripwire (as the floor traps, scaled to 0.46 m and 0.45 m) and the five held weapons of Going back in: the hunting crossbow (0.42 m), pneumatic bolt driver (0.4 m), stun baton (0.5 m), moth jelly dart (0.5 m) and propane flamethrower (0.55 m). The baton's front is +X in its file; the other four point along -X. The other 17 are not loaded, and wiring each one in is separate work. The rules for them are in `docs/ITEMS.md`.
 
 ## How they were prepared
 

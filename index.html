@@ -238,6 +238,7 @@ import {BINS, TRASH, routeEnds, nearBin, trashPay} from "./shared/trash.js";
 import {LAB, BENCH, shiftEnds as benchEnds, newBench, stationNear, useStation, labelOf, cardText, benchPay} from "./shared/lab.js";
 import {FACTORY, KINDS, LINE, shiftEnds as lineEnds, newLine, stepLine, pickUp as pickPart, binNear, drop as dropPart, linePay} from "./shared/factory.js";
 import {MUSEUM, GUARD, shiftEnds as guardEnds, newExhibits, exhibitAt, stepExhibits, setBack, homeCount, guardPay} from "./shared/museum.js";
+import {FOREST, MEADOW, FOREST_ROAD_LOT, pathX, forestTrees, meadowTrees, meadowFlowers, inForestGap, inMeadowGap, seeded} from "./shared/forest.js";
 import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed as hungerCrossed, faint as faintNeeds, capacity as cartCap, takeCart, addToCart, cartTotal, checkout as checkoutCart, putBack, eat as eatFood, pay as payNeeds, REST, rest as restNeeds, restCrossed, passOut, tired as isTired, steal as stealCart, caught as caughtStealing} from "./shared/needs.js";
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
@@ -447,7 +448,9 @@ async function loadScene(id, arrival) {
   }
   S.shutter = null;
   if (id === "L4") { S.shutter = {n: [-2.7, 9.6, 27.0], x: [2.7, 13.0, 27.5], off: POWER.on}; boxes.push(S.shutter); }       // the store's glass doors: shut until the power is on (the opening has no collider in the model)
-  if (id === OW_SCENE) { overworldProps(root); busStopLotProps(root); }
+  if (id === OW_SCENE) { overworldProps(root); busStopLotProps(root); forestRoadLotProps(root); }
+  if (id === FOREST_SCENE) forestProps(root);
+  if (id === MEADOW_SCENE) meadowProps(root);
   CITY.st = carryStalker(CITY.st, hourAt(CITY.t), id); CITY.mesh = null;                          // slice 10: at night it waits outside your apartment; otherwise it belongs to one visit to the street
   if (id === CITY_SCENE) cityProps(root);
   if (id === APT_SCENE) apartmentProps(root);
@@ -459,6 +462,7 @@ async function loadScene(id, arrival) {
   closeComputer();                                                                               // a scene change never leaves the computer up
   if (id !== OW_SCENE && OW.open) { OW.open = false; $("options").style.display = "none"; }                 // leaving the lot (the bus, a reload of the scene) must not leave the store-doors screen up
   cityLook(true);                                                                               // the City's sky and clock on arrival; every other scene gets the default look back
+  forestLook(id);                                                                              // the forest's and the meadow's pastel sky and haze (and none anywhere else)
   indexBoxes(S);
   S.nav = buildNav(cfg.floor);
   spawnMonsters();
@@ -1041,7 +1045,15 @@ function packMesh() {
   const o = new THREE.Group(), box = new THREE.Mesh(new THREE.BoxGeometry(.3, .15, .2), new THREE.MeshBasicMaterial({color: 0x5a5e3c}));
   box.position.y = .08; const stripe = new THREE.Mesh(new THREE.BoxGeometry(.31, .04, .21), new THREE.MeshBasicMaterial({color: 0x40d8ff})); stripe.position.y = .09;
   const halo = cyanGlow(.7, .7, .6), beacon = cyanGlow(.25, 1.8, .3); halo.position.y = .3; beacon.position.y = .9; o.add(box, stripe, halo, beacon);
-  Object.assign(o.userData, {halo, beacon}); return o;
+  Object.assign(o.userData, {halo, beacon});
+  // the owner's Meshy model (models/ammo_pack.glb): an upright case with "AMMO PACK" on its +Z face, stood on the floor 0.4 m tall; the code-made box and stripe stay if it cannot load. The glow and the beacon stay either way
+  loadModel("ammo_pack").then(g => {
+    if (!g) return;
+    const m = SkeletonUtils.clone(g.scene), bb = new THREE.Box3().setFromObject(m, true), k = 0.4 / (bb.getSize(new THREE.Vector3()).y || 1), c = bb.getCenter(new THREE.Vector3());
+    m.scale.setScalar(k); m.position.set(-c.x * k, -bb.min.y * k, -c.z * k);
+    const w = new THREE.Group(); w.add(m); o.add(w); box.visible = false; stripe.visible = false; o.userData.model = w;
+  });
+  return o;
 }
 function buildLootVisuals() {
   LT.vis = null; if (!S.root || !LOOT[S.id]) return;
@@ -1691,11 +1703,23 @@ function fireBow() {
   return true;
 }
 // ---- the pneumatic bolt driver (shared/driver.js): its own nails and a pressure gauge; a hit hurts (monsters have health in this mode), it does not kill outright.
+// a held weapon's Meshy model (models/items/<id>.glb), laid along the view: `front` is the end of the file's X axis the weapon points along (-1 or +1), `len` its length in metres.
+// Fronts, read from side renders: the bolt driver, dart and flamethrower point along -X (like the crossbow and the ray gun); the stun baton's prongs are at +X.
+// The code-made shape is kept in W.art and hidden once the model is in; if the file cannot load it stays. The kick and bob move W.pivot, so they apply to the model.
+function heldModel(W, id, len, front) {
+  loadModel(id).then(g => {
+    if (!g) return;
+    const m = SkeletonUtils.clone(g.scene), bb = new THREE.Box3().setFromObject(m, true), c = bb.getCenter(new THREE.Vector3());
+    m.position.set(-c.x, -c.y, -c.z); m.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.material.side = THREE.DoubleSide; } });
+    const w = new THREE.Group(); w.add(m); w.scale.setScalar(len / (bb.getSize(new THREE.Vector3()).x || 1)); w.rotation.y = front < 0 ? -Math.PI / 2 : Math.PI / 2;
+    W.pivot.add(w); W.model = w; W.art.visible = false;
+  });
+}
 const DRV = {st: newDriver(0), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .8}), body = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.1, 0.42), mat(0x8a5a2a));
   const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.2, 10), mat(0x6e7a6a)); tank.rotation.x = Math.PI / 2; tank.position.set(0, -0.09, 0.05);
   const gauge = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.02, 12), mat(0xd8d8c8)); gauge.rotation.z = Math.PI / 2; gauge.position.set(0.045, 0.02, 0.1);
-  DRV.pivot.add(body, tank, gauge); DRV.pivot.position.set(0.22, -0.3, -0.5); DRV.pivot.visible = false; camera.add(DRV.pivot); }
+  DRV.art = new THREE.Group(); DRV.art.add(body, tank, gauge); DRV.pivot.add(DRV.art); heldModel(DRV, "items/pneumatic_bolt_driver", 0.4, -1); DRV.pivot.position.set(0.22, -0.3, -0.5); DRV.pivot.visible = false; camera.add(DRV.pivot); }
 function fireDriver() {
   if (!GB.load || !carries(GB.load, "driver") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
@@ -1713,7 +1737,7 @@ const BAT = {st: newBaton(), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), rod = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.62, 8), mat(0x3a3a38)); rod.rotation.x = Math.PI / 2;
   const bank = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.16), mat(0x8a6a3a)); bank.position.set(0, 0.0, 0.2);
   const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.3, 5), mat(0xc84a3a)); wire.rotation.x = Math.PI / 2; wire.position.set(0.04, 0.03, 0.05);
-  BAT.pivot.add(rod, bank, wire); BAT.pivot.position.set(0.24, -0.28, -0.5); BAT.pivot.visible = false; camera.add(BAT.pivot); }
+  BAT.art = new THREE.Group(); BAT.art.add(rod, bank, wire); BAT.pivot.add(BAT.art); heldModel(BAT, "items/stun_baton_capacitor", 0.5, 1); BAT.pivot.position.set(0.24, -0.28, -0.5); BAT.pivot.visible = false; camera.add(BAT.pivot); }
 function swingBaton() {
   if (!GB.load || !carries(GB.load, "baton") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
@@ -1743,7 +1767,7 @@ function dischargeBaton() {
 const DART = {st: newDart(0), kick: 0, pivot: new THREE.Group(), flights: []};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), body = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.5), mat(0x6a5a40));
   const syringe = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.24, 10), new THREE.MeshStandardMaterial({color: 0xe8a020, roughness: .3, emissive: 0x6a3a00})); syringe.rotation.x = Math.PI / 2; syringe.position.set(0, 0.075, -0.05);
-  DART.pivot.add(body, syringe); DART.pivot.position.set(0.22, -0.3, -0.5); DART.pivot.visible = false; camera.add(DART.pivot); }
+  DART.art = new THREE.Group(); DART.art.add(body, syringe); DART.pivot.add(DART.art); heldModel(DART, "items/moth_jelly_dart", 0.5, -1); DART.pivot.position.set(0.22, -0.3, -0.5); DART.pivot.visible = false; camera.add(DART.pivot); }
 function clearFlights() { for (const f of DART.flights) if (f.mesh) S.root.remove(f.mesh); DART.flights.length = 0; }
 function fireDart() {
   if (!GB.load || !carries(GB.load, "dart") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1771,7 +1795,7 @@ const FLAME = {st: newFlame(), on: false, pivot: new THREE.Group(), fx: [], hitT
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), frame = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.07, 0.5), mat(0x4a4a46));
   const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.26, 12), mat(0x2f6fd0)); tank.rotation.x = Math.PI / 2; tank.position.set(0, -0.09, 0.08);
   const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.12, 8), mat(0x1c1c1a)); nozzle.rotation.x = Math.PI / 2; nozzle.position.set(0, 0.01, -0.3);
-  FLAME.pivot.add(frame, tank, nozzle); FLAME.pivot.position.set(0.22, -0.3, -0.5); FLAME.pivot.visible = false; camera.add(FLAME.pivot); }
+  FLAME.art = new THREE.Group(); FLAME.art.add(frame, tank, nozzle); FLAME.pivot.add(FLAME.art); heldModel(FLAME, "items/propane_flamethrower", 0.55, -1); FLAME.pivot.position.set(0.22, -0.3, -0.5); FLAME.pivot.visible = false; camera.add(FLAME.pivot); }
 function clearFlames() { for (const f of FLAME.fx) S.root.remove(f.o); FLAME.fx.length = 0; }
 function swapCanister() {
   if (!GB.load || !carries(GB.load, "flame") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -2003,6 +2027,133 @@ function busStopLotProps(root) {                                                
   const g = new THREE.Group(), [sx, sz] = BUS_LOT.shelter; shelter(g, BUS_LOT.shelter, S.floor); root.add(g);
   boxes.push({n: [sx - 0.7, S.floor, sz - 0.3], x: [sx + 0.7, S.floor + 0.9, sz + 0.3]});
 }
+// ---------------------------------------------------------------- the dreamcore forest and meadow (layout and rules: shared/forest.js; collision: world/forest.json, world/meadow.json)
+// "Happy and dreamlike, but fake" (docs/WORLD.md): pastel trees with plastic crowns, a pink haze, a path through them. The road to it is a signpost in the parking lot (F, as the bus).
+// The path's end is a bright gap: walk through it into the meadow, where the shed (locked until its addon) stands beside the path and the house at its end; the house's door is
+// Right Door, Wrong Exit (solo only). Both scenes are presence scenes: a room's players see each other walk there, and nothing else is shared.
+const FOREST_SCENE = "forest", MEADOW_SCENE = "meadow", FOREST_SCENES = [FOREST_SCENE, MEADOW_SCENE];
+const FOREST_LOOK = {bg: 0xf4d8ec, fog: new THREE.Fog(0xf4d8ec, 22, 105), light: 1.55, lightColor: 0xfff0f8};
+const CROWN_COLORS = [0xf7b8d2, 0xbfe8d4, 0xd4c4f4, 0xffd8b0, 0xfff4c0, 0xa8d8f0];
+const FLOWER_COLORS = [0xff8fbf, 0xfff07a, 0xb8a0ff, 0xffffff, 0x8fe0ff];
+const HEMI_GROUND = HEMI.groundColor.getHex();                                                  // the light from below everywhere else (a dark ground); the forest's is pink, so the crowns stay pastel underneath
+function forestLook(id) {
+  if (!FOREST_SCENES.includes(id)) { if (scene.fog === FOREST_LOOK.fog) { scene.fog = null; HEMI.groundColor.set(HEMI_GROUND); } return; }
+  scene.background.set(FOREST_LOOK.bg); scene.fog = FOREST_LOOK.fog; HEMI.intensity = FOREST_LOOK.light; HEMI.color.set(FOREST_LOOK.lightColor); HEMI.groundColor.set(0xf0c8dc);
+}
+// a signpost: a post and an arrow board with words on both faces (the board reads from the side it is seen from)
+function signpost(g, x, z, y, text, yaw) {
+  const post = boxMesh([x - 0.07, y, z - 0.07], [x + 0.07, y + 2.2, z + 0.07], 0xe8d8c8); g.add(post);
+  const board = new THREE.Group(); board.position.set(x, y + 1.85, z); board.rotation.y = yaw;
+  for (const side of [0, Math.PI]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.34), new THREE.MeshBasicMaterial({map: signTexture(text)})); p.rotation.y = side; p.position.z = side ? -0.02 : 0.02; board.add(p); }
+  g.add(board); return board;
+}
+// many trees at once: one instanced trunk and one instanced crown, each crown its own pastel
+function treeInstances(g, trees, y, rnd) {
+  const trunkGeo = new THREE.CylinderGeometry(1, 1.15, 1, 7), crownGeo = new THREE.IcosahedronGeometry(1, 1);
+  const trunks = new THREE.InstancedMesh(trunkGeo, new THREE.MeshLambertMaterial({color: 0xf0e2d4}), trees.length);
+  const crowns = new THREE.InstancedMesh(crownGeo, new THREE.MeshLambertMaterial({color: 0xffffff, emissive: 0x302028}), trees.length * 2);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), pos = new THREE.Vector3(), col = new THREE.Color();
+  trees.forEach(([x, z, r], i) => {
+    const h = 3.2 + rnd() * 2.6;
+    trunks.setMatrixAt(i, m.compose(pos.set(x, y + h / 2, z), q.identity(), sc.set(r, h, r)));
+    for (let k = 0; k < 2; k++) {
+      const cr = 1.5 + rnd() * 1.2 - k * 0.45;
+      crowns.setMatrixAt(i * 2 + k, m.compose(pos.set(x + (rnd() - 0.5) * 0.5, y + h + cr * 0.6 + k * 1.3, z + (rnd() - 0.5) * 0.5), q.identity(), sc.set(cr, cr * 0.9, cr)));
+      crowns.setColorAt(i * 2 + k, col.set(CROWN_COLORS[Math.floor(rnd() * CROWN_COLORS.length)]));
+    }
+  });
+  trunks.instanceMatrix.needsUpdate = true; crowns.instanceMatrix.needsUpdate = true; crowns.instanceColor.needsUpdate = true;
+  trunks.frustumCulled = false; crowns.frustumCulled = false; g.add(trunks, crowns);
+}
+// a soft ground with a winding path ribbon on it (the path's middle line is pathX)
+function pathRibbon(g, y, z0, z1, xOf, w, color) {
+  const pts = []; for (let z = z0; z >= z1; z -= 1) pts.push([xOf(z), z]);
+  const pos = [], idx = [];
+  pts.forEach(([x, z], i) => { pos.push(x - w / 2, y + 0.012, z, x + w / 2, y + 0.012, z); if (i) { const a = (i - 1) * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); } });
+  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({color, side: THREE.DoubleSide})); g.add(mesh);
+}
+// a few big soft clouds overhead, and the sun's glow: the fake sky
+function dreamSky(g, y) {
+  const sun = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xfff6d0, transparent: true, opacity: 0.9, depthWrite: false, fog: false})); sun.scale.set(60, 60, 1); sun.position.set(-60, y + 70, -160); g.add(sun);
+  const rnd = seeded(31);
+  for (let i = 0; i < 14; i++) {
+    const c = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false, fog: false}));
+    c.scale.set(30 + rnd() * 30, 10 + rnd() * 6, 1); c.position.set((rnd() - 0.5) * 220, y + 38 + rnd() * 20, -40 - rnd() * 160); g.add(c);
+  }
+}
+// a Meshy building from models/world/ stood on the floor at `b.at`, `b.height` tall, turned by `b.yaw`; `done` gets the group (tests look for it)
+function placeBuilding(g, id, b, y, done) {
+  loadModel(id).then(gl => {
+    if (!gl) return;
+    const m = SkeletonUtils.clone(gl.scene), bb = new THREE.Box3().setFromObject(m, true), k = b.height / (bb.getSize(new THREE.Vector3()).y || 1), c = bb.getCenter(new THREE.Vector3());
+    m.position.set(-c.x, -bb.min.y, -c.z); m.traverse(o => { if (o.isMesh) o.frustumCulled = false; });
+    const w = new THREE.Group(); w.add(m); w.scale.setScalar(k); w.rotation.y = b.yaw; w.position.set(b.at[0], y, b.at[1]); g.add(w); done(w);
+  });
+}
+const FST = {shed: null, house: null, heightOf: o => { const b = new THREE.Box3().setFromObject(o); return b.max.y - b.min.y; }, hazy: () => scene.fog === FOREST_LOOK.fog};          // the tests read the buildings' heights and the haze through these
+// the parking lot's end of the road: a signpost by the north-west hedge
+function forestRoadLotProps(root) {
+  const g = new THREE.Group(), [px, pz] = FOREST_ROAD_LOT.post, y = S.floor;
+  signpost(g, px, pz, y, "THE FOREST  >", 0); root.add(g);
+  boxes.push({n: [px - 0.1, y, pz - 0.1], x: [px + 0.1, y + 2.2, pz + 0.1]});
+}
+function forestProps(root) {
+  const g = new THREE.Group(), y = S.floor, [hx, hz] = FOREST.half, z0 = FOREST.cz - hz, z1 = FOREST.cz + hz, rnd = seeded(FOREST.seed + 1);
+  g.add(boxMesh([-hx - 30, y - 0.2, z0 - 30], [hx + 30, y - 0.01, z1 + 30], 0xbfe8c0));                     // the grass, past the edge too, so the haze has something to sit on
+  pathRibbon(g, y, z1, -96, z => pathX(z), 2.6, 0xf0d8b8);                                                          // the path: the road's end, then up through the trees
+  treeInstances(g, forestTrees(), y, rnd);
+  const ring = []; for (let x = -hx - 8; x <= hx + 8; x += 3.4) { ring.push([x, z0 - 3 - rnd() * 3, 0.3], [x, z1 + 3 + rnd() * 3, 0.3]); } for (let z = z0; z <= z1; z += 3.4) ring.push([-hx - 3 - rnd() * 3, z, 0.3], [hx + 3 + rnd() * 3, z, 0.3]);
+  treeInstances(g, ring.filter(([x, z]) => !(z < z0 && Math.abs(x) < 6)), y, rnd);                         // a wall of trees round the edge, open only behind the gap
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xffffff, transparent: true, opacity: 0.95, depthWrite: false, fog: false})); glow.scale.set(14, 9, 1); glow.position.set(0, y + 3, FOREST.gap.z - 6); g.add(glow);   // the bright gap
+  const [bx, bz] = FOREST.back.at; signpost(g, bx, bz, y, "< PARKING LOT", Math.PI / 2);
+  dreamSky(g, y);
+  root.add(g);
+}
+function meadowProps(root) {
+  const g = new THREE.Group(), y = S.floor, [hx, hz] = MEADOW.half, z0 = MEADOW.cz - hz, z1 = MEADOW.cz + hz, rnd = seeded(MEADOW.seed + 1);
+  g.add(boxMesh([-hx - 30, y - 0.2, z0 - 30], [hx + 30, y - 0.01, z1 + 30], 0xc8f0b8));
+  pathRibbon(g, y, z1, MEADOW.house.door.at[1] - 0.5, () => 0, 2.4, 0xf0d8b8);                                       // the path from the trees to the house's door
+  pathRibbon(g, y, MEADOW.shed.at[1] + 1.2, MEADOW.shed.at[1] - 1.2, () => (MEADOW.shed.door.at[0] - 0.2) / 2, Math.abs(MEADOW.shed.door.at[0]) - 1, 0xf0d8b8);   // a short spur to the shed's door
+  treeInstances(g, meadowTrees(), y, rnd);
+  const fl = meadowFlowers(), heads = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.11, 0), new THREE.MeshLambertMaterial({color: 0xffffff, emissive: 0x281828}), fl.length);
+  const m = new THREE.Matrix4(), col = new THREE.Color();
+  fl.forEach(([x, z, c], i) => { heads.setMatrixAt(i, m.makeTranslation(x, y + 0.16 + (i % 3) * 0.05, z)); heads.setColorAt(i, col.set(FLOWER_COLORS[c])); });
+  heads.instanceMatrix.needsUpdate = true; heads.instanceColor.needsUpdate = true; heads.frustumCulled = false; g.add(heads);
+  FST.shed = null; FST.house = null;
+  placeBuilding(g, "world/shed", MEADOW.shed, y, w => { FST.shed = w; });
+  placeBuilding(g, "world/cottage", MEADOW.house, y, w => { FST.house = w; });
+  const lamp = new THREE.PointLight(0xffd8a0, 8, 10, 1.6); lamp.position.set(MEADOW.house.door.at[0], y + 2.6, MEADOW.house.door.at[1] + 0.6); g.add(lamp);   // the porch light
+  dreamSky(g, y);
+  root.add(g);
+}
+// walking through a gap takes you on (the arrival on the other side is outside that side's gap, so it does not bounce you back)
+function forestTick() {
+  if (loading || inGame) return;
+  if (S.id === FOREST_SCENE && inForestGap(P.p.x, P.p.z)) rideLink(FOREST_SCENE, "gap");
+  else if (S.id === MEADOW_SCENE && inMeadowGap(P.p.x, P.p.z)) rideLink(MEADOW_SCENE, "gap");
+}
+// what F does here, as a prompt (null: nothing of the forest's is near)
+function forestPrompt() {
+  if (S.id === OW_SCENE && nearXZ(...FOREST_ROAD_LOT.at, FOREST_ROAD_LOT.reach)) return "Press F to walk the road to the forest";
+  if (S.id === FOREST_SCENE && nearXZ(...FOREST.back.at, FOREST.back.reach)) return "Press F to walk back to the parking lot";
+  if (S.id !== MEADOW_SCENE) return null;
+  if (nearXZ(...MEADOW.house.door.at, MEADOW.house.door.reach)) return roomShut(REGISTRY.linkFrom(MEADOW_SCENE, "house_door")) ? "The house: a solo place for now (not in a room)" : "Press F to open the door";
+  if (nearXZ(...MEADOW.shed.door.at, MEADOW.shed.door.reach)) return "The shed is locked. Something inside is waiting for its puzzle.";
+  return null;
+}
+function tryForest(ride) {
+  if (S.id === OW_SCENE && nearXZ(...FOREST_ROAD_LOT.at, FOREST_ROAD_LOT.reach)) return ride(OW_SCENE, "forest_road");
+  if (S.id === FOREST_SCENE && nearXZ(...FOREST.back.at, FOREST.back.reach)) return ride(FOREST_SCENE, "road_back");
+  if (S.id !== MEADOW_SCENE) return false;
+  if (nearXZ(...MEADOW.house.door.at, MEADOW.house.door.reach)) {
+    const l = REGISTRY.linkFrom(MEADOW_SCENE, "house_door");
+    if (roomShut(l)) { toast("The house is a solo place for now. It does not open while you are in a room.", 4200); return true; }
+    enterGame({game: l.to.area, room: l.to.room, scene: l.returnTo.scene, arrive: l.returnTo.arrive, face: l.returnTo.face}); return true;
+  }
+  if (nearXZ(...MEADOW.shed.door.at, MEADOW.shed.door.reach)) { toast("The shed is locked. Something inside is waiting for its puzzle.", 3600); return true; }
+  return false;
+}
 // In a room (session 17) the street and the apartment are presence scenes: you see the others walk, and that is all that is shared. Said once, on arrival.
 function roomCityNote() {
   if (!net.on || net.toldCity) return; net.toldCity = true;
@@ -2205,6 +2356,7 @@ const nearCityDoor = () => S.id === CITY_SCENE ? DOORS.find(d => nearXZ(d.x, d.z
 function cityPrompt() {
   if (PC.open) return "";
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return roomShut(REGISTRY.linkFrom(OW_SCENE, "bus_stop")) ? "The bus does not take a room yet" : "Press F to take the bus to Hallam Row";
+  const fp = forestPrompt(); if (fp !== null) return fp;
   if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
   if (S.id === LAB_SCENE) {
     if (nearXZ(...LAB.door.at, LAB.door.reach)) return CITY.lb.active ? "Press F to leave your post early (no pay)" : "Press F to leave";
@@ -2255,6 +2407,7 @@ function tryCity() {
   if (loading) return false;
   const ride = (scene, door) => { const l = REGISTRY.linkFrom(scene, door); if (roomShut(l)) { toast("That does not open in a room yet"); return true; } loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face}); return true; };
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return ride(OW_SCENE, "bus_stop");
+  if (tryForest(ride)) return true;
   if (S.id === APT_SCENE) {
     if (nearXZ(...APARTMENT.door.at, APARTMENT.door.reach)) return ride(APT_SCENE, "front_door");
     if (nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach)) { openComputer(); return true; }
@@ -3117,7 +3270,7 @@ function audioTick(dt) {
     return {id: p.id, x: p.x, y: p.y, z: p.z, moving: p.moving, run: p.run, crouch: p.crouch, blocked: !!p.audBlocked}; }), levelMix(S.id).step);
 }
 function sim(dt, t) {
-  update(dt); hpHud(dt); audioTick(dt); exitCheck(); overworldTick(); cityTick(dt); if ((seenT -= dt) <= 0) { seenT = 0.2; updateSeen(ctime()); } updatePeers(dt); drawAlert(); animateAlarm(dt); animateFuses(t); animateLoot(); camHud(); animateGun(dt); animateCloak(dt); animateBeacons(dt); animatePower(dt); updatePrompt(); renderKp(); netTick(dt);
+  update(dt); hpHud(dt); audioTick(dt); exitCheck(); overworldTick(); forestTick(); cityTick(dt); if ((seenT -= dt) <= 0) { seenT = 0.2; updateSeen(ctime()); } updatePeers(dt); drawAlert(); animateAlarm(dt); animateFuses(t); animateLoot(); camHud(); animateGun(dt); animateCloak(dt); animateBeacons(dt); animatePower(dt); updatePrompt(); renderKp(); netTick(dt);
 }
 const BOT = new URLSearchParams(location.search).has("bot");
 function step(dtOverride) {
@@ -3150,7 +3303,7 @@ FIN.t0 = performance.now();
 await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {FST, FOREST_SCENES, tryForest, forestPrompt, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
