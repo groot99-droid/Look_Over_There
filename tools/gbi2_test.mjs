@@ -78,7 +78,7 @@ try {
   check("the chamber has a loadout locker and you can reach it", !!stn && stn.near, JSON.stringify(stn));
   await page.evaluate(() => window.__game.doAction()); await frames(2);
   const panel = await page.evaluate(() => ({open: window.__game.STN.open, shown: getComputedStyle(document.getElementById("station")).display !== "none", rows: document.querySelectorAll("#station button[data-gear]").length}));
-  check("the action button opens the panel, which lists the gear", panel.open && panel.shown && panel.rows === 7, JSON.stringify(panel));
+  check("the action button opens the panel, which lists the gear", panel.open && panel.shown && panel.rows === 10, JSON.stringify(panel));
   const m0 = await page.evaluate(() => window.__game.monsters.length);
   await frames(10);
   check("the game is paused while it is open", (await page.evaluate(() => window.__game.monsters.length)) === m0);
@@ -93,7 +93,7 @@ try {
   await page.evaluate(() => { const g = window.__game; g.LT.rounds = 5; g.BOW.st.bolts = 4; g.die(); });
   await frames(100);
   s = await st();
-  check("after a death you carry no gear, no rays and no bolts", s.owned.length === 0 && s.rounds === 0 && s.bolts === 0 && s.carry.length === 0 && s.stash.length === 7, JSON.stringify(s));
+  check("after a death you carry no gear, no rays and no bolts", s.owned.length === 0 && s.rounds === 0 && s.bolts === 0 && s.carry.length === 0 && s.stash.length === 10, JSON.stringify(s));
   await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); });
   for (const gear of ["gun", "cloak", "crossbow", "driver"]) await page.click(`#station button[data-gear="${gear}"]`);
   await page.keyboard.press("Escape");
