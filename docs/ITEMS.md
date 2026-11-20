@@ -350,16 +350,24 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server owns the charge, the heat, the damage climb per target, and the dot's lure.
 
-### 4.7 Hydraulic rebar shear [PROPOSAL] (model: `Rustborn_Rebar_Cannon`)
+### 4.7 Hydraulic rebar shear [BUILT, solo Going back in] (model: `Rustborn_Rebar_Cannon`)
+
+**Built (session 26, with the owner):** `shared/shear.js` and `shared/shear.test.js` (the spool, the ready window, fresh and worn cuts, the reset by hand, the fluid), `shared/barricade.js` and `shared/barricade.test.js` (the chained door and the supply cage), a chained door is a wall to the nav (`buildNav` in `shared/world.js`) and to monsters (`shared/monsters.js`), the page (`index.html`: the spool on left click or RT, the reset on right click or LT, the HUD line `SHEAR ● ● ● ○ SPARE ×0`, the cage, the chain, packs, the slower walk, death), `tools/shear_test.mjs`. The owner changed the design (below is the new one): a fresh spring kills anything four times, then it is worn and has to be reset by hand.
+- *Readings I made where the text was open:* a worn cut on empty air costs nothing but still owes the reset; letting go before the motor has spooled does nothing and spends nothing; held ready past 3 s the motor winds down and has to spool again; the reset is held only while the cut button is not; a pack's 2 cuts go into the loaded cartridge (the spring is fresh again, no reset owed); with a spare carried, the last fresh cut swaps it in by itself in 2 s; you come back from a death worn, but the first worn cut is yours (the reset is owed after it); a cut bites the nearest of a monster (30 degree arc) or a shut barricade (70 degrees, it is big) within 2.0 m; "helpless" is stunned, or slowed by anything (jelly, fire, the rocket's mist), or held (ready for the gauntlet).
+- *The chained door:* neither chamber has a door between two parts of the open floor, only stair doors. The fourth floor chamber's stair door is the way back, so it has no chained door. The third floor chamber chains the door of its dead-end stairwell, and one ammo pack waits inside so a cut is worth spending. The rule picks a door only if every spot that matters (where you start, the locker, the cage, the loot, the monsters, the stairs) stays reachable with it chained. A real shortcut door will be used as soon as a chamber has one. **Owner to decide** if this is the barricade you wanted.
+- *Not built:* the spare cartridge has a rule (`addSpare`, tested) but no source until the Market sells it; the med kit in the cage (two ammo packs until the med kit exists); vent grilles and padlocks; Secret Operations; the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`; no cage or chain in a room).
 
 - **What it is.** A heavy jaw on a hydraulic cylinder with a motor. Built to cut steel bar. It does not care what is in the jaw.
 - **Role.** The melee finisher, and the tool that opens what is shut.
 - **Where and price.** Market, $70.
-- **Slot and controls.** Arsenal slot. Hold left click / RT to spool the motor (1.0 s), let go to cut. Right click / LT does nothing.
-- **What it does.** Once spooled you can hold it ready for up to 3 s. Letting go cuts the nearest thing in a 2.0 m reach and a 30 degree arc: 200 damage to one monster, which kills any of the four kinds. 1.5 s before you can spool again. The same cut opens one barricade, chain, padlock or vent grille (Going back in's doors can be barricaded: `docs/WORLD.md`), and in Secret Operations cuts a camera's cable or a breaker's feed without setting it off. You walk at 0.8 of your speed while it is in your hands.
+- **Slot and controls.** Arsenal slot. Hold left click / RT to spool the motor (1.0 s), let go to cut. Hold right click / LT for 3 s to reset a worn jaw.
+- **What it does.** Once spooled you can hold it ready for up to 3 s. Letting go cuts the nearest thing in a 2.0 m reach and a 30 degree arc. 1.5 s before you can spool again. You walk at 0.8 of your speed while it is in your hands.
+  - **Fresh spring (4 cuts).** 200 damage: one cut kills any of the four kinds.
+  - **Worn spring (after the fourth cut, until fluid is refilled).** A cut kills only a monster that is stunned, slowed or held; one moving freely takes 100. After every worn cut the jaw must be reset by hand: hold right click / LT for 3 s (letting go early starts over).
+  - **Barricades.** Each chamber has a chained supply cage (two ammo packs inside) and may have a chained door. Only a cut opens one, fresh or worn; a fresh cut spends a cut. A chained door is a wall to monsters too. Later: padlocks, vent grilles, and in Secret Operations a camera's cable or a breaker's feed.
 - **Noise.** N2 while the motor spools and for the cut.
-- **Ammo.** Hydraulic fluid: a cartridge is 4 cuts. Start with one loaded; carry two spare; a pack gives 2 cuts; a cartridge is $3. A cut on empty air still uses one. Lost on death.
-- **Downside.** A chasing monster crosses the gap between your 2.0 m and its 1.0 m in under a fifth of a second. Alone it is a timing gamble; it wants a stunned, slowed or lured target, so it pairs with the flash-vial, the baton, the jelly dart and the beacon.
+- **Ammo.** Hydraulic fluid: a cartridge is 4 cuts. Start with one loaded and no spare; carry two spare at most (swapped in by itself in 2 s); a pack gives 2 cuts; a cartridge is $3. A fresh cut on empty air still uses one. Lost on death.
+- **Downside.** A chasing monster crosses the gap between your 2.0 m and its 1.0 m in under a fifth of a second. Alone it is a timing gamble; it wants a stunned, slowed or lured target, so it pairs with the flash-vial, the baton, the jelly dart and the beacon. Worn, that pairing is the only way it still kills.
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server owns the spool clock, the fluid, the kill and which barricade or cable was cut.
 
@@ -625,7 +633,7 @@ Prices and hunger values do not change. The ids do not change, so saves keep wor
 | 4 | Stun baton | Melee stun, free ammo | 1.8 m | one (4 m burst) | 25 + 4 s stun | N1 | 3 capacitors, self-charging | $45 | arm's length, cannot kill fast |
 | 5 | Rocket launcher | Big area burst | 40 m, 5 m blast | all in blast | 150 falling to 50 | N5 | 3 rockets at $8 | $180 | calls the floor, hurts you, walk only |
 | 6 | Laser dissector | Silent long range; the distraction dot | 30 m | one | 15 rising to 60 a second | N0 | battery, 12.5 s | $110 | stand still, one target, overheats |
-| 7 | Rebar shear | Melee finisher; opens barricades | 2.0 m | one | 200 | N2 | fluid, 4 cuts | $70 | 1 s spool, timing |
+| 7 | Rebar shear | Melee finisher; opens barricades | 2.0 m | one | 200 (worn: 100, or 200 on a helpless one) | N2 | fluid, 4 cuts | $70 | 1 s spool, timing; worn: 3 s reset |
 | 8 | Frequency horn | Loud lure and shove | 10 m cone | all in cone | 0 | N5 / N4 | 6 blasts, free recharge at a locker | $55 | kills nothing, calls everything |
 | 9 | Moth jelly dart | Silent damage over time | 30 m | one, spreads on death | 150 over 10 s | N0 | 5 darts at $3 | $60 | slow to kill, slow dart |
 | 10 | Gravity gauntlet | Movement and shove | 2.0 m; 9 m leap | one | 30 (+30 into a wall) | N1 / N2 | 3 springs, self-winding | $50 + $100 | arm's length, weak damage |
@@ -690,7 +698,7 @@ Statuses: Burning 10 a second, slow 0.6, 4 s. Jellied 15 a second, slow 0.5, 10 
 | Stun baton | 1.8 m, 60 degrees | 25, stun 4 s | 0.6 s | capacitors 3 / 3 / none / free | recharge 8 s each; discharge 4 m, 15, stun 3 s, dead 20 s |
 | Rocket launcher | 40 m at 25 m/s | 150 within 2 m to 50 at 5 m | 3.5 s | rockets 1 / 3 / none / $8 | arms at 5 m; self hit 35 within 5 m; mist 6 s; no running |
 | Laser dissector | 30 m | 15 to 60 a second over 2 s | held | battery 100% + 1 spare / 2 spares / +25% / $5 | 8% a second; overheat after 5 s for 3 s; dot 0.5% a second, lures within 12 m; move at 2.2 m/s |
-| Rebar shear | 2.0 m, 30 degrees | 200 | 1.0 s spool + 1.5 s | cuts 4 / 4 + 2 cartridges / +2 / $3 | hold ready 3 s; walk x0.8 |
+| Rebar shear | 2.0 m, 30 degrees | 200 (worn: 100, or 200 helpless) | 1.0 s spool + 1.5 s (worn: + 3 s reset) | cuts 4 / 4 + 2 cartridges / +2 / $3 | hold ready 3 s; walk x0.8; built |
 | Frequency horn | 10 m, 60 degrees | 0 | 4 s | blasts 6 / 6 + 1 spare / none / $4, free at a locker | knockback 6 m, stun 2 s; call 25 m |
 | Moth jelly dart | 30 m at 35 m/s | 15 a second for 10 s | 2.5 s | darts 3 / 5 / +1 / $3 | spreads within 4 m on death for 5 s |
 | Gauntlet | 2.0 m | 30, +30 into a wall | 0.8 s | springs 3 / 3 / none / free | rewind 5 s each; knockback 5 m (8 m lit); stun 1 s; leap 9 m, 3 m high, 2 springs |
@@ -770,7 +778,7 @@ Rules for all of it: the pure rules go in `shared/` with a unit test that fails 
 | Stun baton | new `shared/baton.js` | capacitors recharge one at a time, a hit needs one, the discharge needs three and locks for 20 s, the sinew is stunned 6 s |
 | Rocket launcher | new `shared/rocket.js` (flight, arming distance, blast falloff, mist) | a dud inside 5 m, 150 at 2 m and 50 at 5 m, the shooter is hit inside 5 m, the alert reaches 40 m |
 | Laser dissector | new `shared/laser.js` | the damage climb and its reset after 0.3 s, overheat at 5 s, battery drain, the dot lures a patrolling monster and not a chasing one |
-| Rebar shear | new `shared/shear.js`; the chamber's barricades (GBI-5, not built) | spool then cut, the 3 s hold, a cut on air costs fluid, a barricade opens |
+| Rebar shear | BUILT: `shared/shear.js`, `shared/barricade.js` (the chained cage and door) | spool then cut, the 3 s hold, a cut on air costs fluid, the worn spring and its reset, a barricade opens |
 | Frequency horn | new `shared/horn.js`; `shared/monsters.js` (knockback) | cone membership, 6 m and 3 m knockbacks, the wall stop, the free recharge at a locker, the call's 25 m |
 | Moth jelly dart | new `shared/dart.js`; `shared/monsters.js` (Jellied) | 150 over 10 s, a second dart restarts and does not stack, the spread on death, the kill is credited to the shooter |
 | Gauntlet | new `shared/gauntlet.js`; the player's movement in `index.html` (session 12's region: say so in the PR) | charges rewind, the leap needs the lenses and two charges, the wall bonus, the landing spot is checked |
