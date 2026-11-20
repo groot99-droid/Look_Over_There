@@ -41,7 +41,7 @@ try {
   let s = await st();
   check("the laser waits in the locker with a full pack and one spare", !s.owned.includes("laser") && s.stash.includes("laser") && s.charge === 1 && s.spares === 1, JSON.stringify(s));
   await page.evaluate(() => { const g = window.__game, x = g.STN.spot; g.P.p.set(x[0], g.S.floor + 0.02, x[1] + 1.0); g.P.v.set(0, 0, 0); g.doAction(); }); await frames(2);
-  check("the locker lists ten pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 10);
+  check("the locker lists eleven pieces of gear", (await page.evaluate(() => document.querySelectorAll("#station button[data-gear]").length)) === 11);
   await page.keyboard.press("e"); s = await st(); check("the locker's E key swaps the E slot (it stays open)", s.e === "wire" && await page.evaluate(() => window.__game.STN.open), JSON.stringify(s));
   await page.keyboard.press("e");
   await page.click('#station button[data-gear="driver"]'); await page.keyboard.press("0"); await page.keyboard.press("Escape"); s = await st();
