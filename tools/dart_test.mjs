@@ -72,7 +72,7 @@ try {
   await page.evaluate(() => window.__game.startGoingBackIn()); await settled(start);            // a fresh chamber: three monsters again
   await page.evaluate(() => { const g = window.__game; g.P.imm = 1e9; g.setHeld(g.owned().includes("dart") ? "dart" : null); });
   check("two monsters 6 m and 7.5 m ahead, the third far away", await stage(6, [7.5]));
-  await page.evaluate(() => { const g = window.__game; g.GB.load = {carry: ["gun", "cloak", "crossbow", "dart"], stash: ["driver", "baton", "flame"]}; g.DART.st.darts = 3; g.monsters[0].hp = 6; });
+  await page.evaluate(() => { const g = window.__game; g.GB.load = {carry: ["gun", "cloak", "crossbow", "dart"], stash: ["driver", "baton", "flame", "horn", "rocket", "laser"]}; g.DART.st.darts = 3; g.monsters[0].hp = 6; });
   await fire(); await frames(14);   // arrives, 6 health: dead in under half a second of jelly
   await frames(12);
   const sp = await page.evaluate(() => { const g = window.__game; return {mons: g.monsters.length, first: g.monsters[0] && g.monsters[0].jellyT, far: g.monsters[1] && g.monsters[1].jellyT}; });

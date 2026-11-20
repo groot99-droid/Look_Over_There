@@ -175,7 +175,7 @@
 <div id="hud"></div>
 <div id="camhud"></div><div id="buzz"></div><div id="cloak"><b>CLOAK · V</b><i></i></div><div id="cloakfx"></div><div id="beacons"></div><div id="hp"><b>HP</b><i></i></div><div id="hurt"></div><div id="stam"><i></i></div><div id="alarm"></div><div id="redpulse"></div>
 <div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-walk" type="button" hidden>Walk out to the parking lot</button><button id="r-again" type="button">Play again</button></div></div>
-<div id="station"><div class="card"><h2>LOCKER</h2><p>Your loadout. Click a piece (or press its number) to carry it or leave it here: two weapons at most besides the ray and the cloak. The last number swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
+<div id="station"><div class="card"><h2>LOCKER</h2><p>Your loadout. Click a piece (or press its number) to carry it or leave it here: two weapons at most besides the ray and the cloak. E swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
 <div id="qz"><div class="card"><div id="qz-title"></div><p id="qz-prompt"></p><div id="qz-tray"></div><div id="qz-bins"></div><div id="qz-foot"><button id="qz-next" type="button"></button><button id="qz-cancel" type="button">Close (Esc)</button></div></div></div>
 <div id="shift"><div class="card"><h2 id="sh-title"></h2><p id="sh-text"></p><button id="sh-work" type="button">Work the shift</button><button id="sh-close" type="button">Not now (Esc)</button></div></div>
 <div id="pc"><div class="card"><div id="pc-tabs"></div><h2 id="pc-title"></h2><pre id="pc-body"></pre><div id="pc-actions"></div><button id="pc-close" type="button">Close (Esc or F)</button></div></div>
@@ -243,6 +243,9 @@ import {HUNGER, MONEY, FOODS, newNeeds, drain as drainNeeds, sleepDrain, crossed
 import {wavePlan, startWave, killed} from "./shared/gbi.js";
 import {newBow, addBolts, tick as bowTick, shoot as bowShoot, killShot, MAX_BOLTS, START_BOLTS, PACK_BOLTS, SHOT_NOISE_S as BOW_NOISE_S} from "./shared/crossbow.js";
 import {newKit, setE, useSlot, addPack as kitPack, lost as kitLost, placeTrap, springs, flashLanding, FLASH_STUN_S, FLASH_R, FLASH_THROW_M, WIRE_NOISE_R, MAX as KIT_MAX} from "./shared/consumables.js";
+import {newLaser, beam as laserBeam, dot as laserDot, idle as laserIdle, addCharge as laserAdd, lost as laserLost, dmgMul as laserMul, dotHears, RANGE_M as LASER_RANGE, PACK_CHARGE as LASER_PACK} from "./shared/laser.js";
+import {newRocket, addRockets, tick as rocketTickState, fire as rocketShoot, lost as rocketLost, newFlight as newRocketFlight, stepFlight as stepRocket, armed as rocketArmed, blastTargets as rocketTargets, inMist, START_ROCKETS, MAX_ROCKETS, MIST_S, MIST_SLOW, MIST_R, NOISE_R as ROCKET_NOISE_R, BLAST_R as ROCKET_BLAST_R} from "./shared/rocket.js";
+import {newHorn, tick as hornTickState, blast as hornBlast, call as hornCall, recharge as hornRecharge, lost as hornLost, blastTargets, knockEnd, knockDist, within as hornWithin, STUN_S as HORN_STUN_S, CALL_R, BLAST_NOISE_R, BLAST_RANGE_M, BLAST_ARC_DEG, BLASTS} from "./shared/horn.js";
 import {newFlame, tick as flameTickState, burn as flameBurn, startSwap as flameSwap, addFuel, lost as flameLost, coneTargets, blockedAtFeet, burnSecs, DPS as FLAME_DPS, BURN_S, BURN_DPS, BURN_SLOW, FUEL_PER_S, PACK_FUEL, BURST_NOISE_R as FLAME_NOISE_R, CONE_M} from "./shared/flame.js";
 import {newDart, addDarts, tick as dartTick, shoot as dartShoot, lost as dartLost, newFlight, stepFlight, spreadTargets, START_DARTS, MAX_DARTS, PACK_DARTS, JELLY_S, JELLY_DPS, JELLY_SLOW, SPREAD_S, RANGE_M as DART_RANGE} from "./shared/dart.js";
 import {newBaton, tick as batTick, swing as batSwing, discharge as batDischarge, swingTarget, dischargeTargets, stunFor, CAPS as BAT_CAPS, SWING_DMG, SWING_STUN_S, BURST_DMG, BURST_STUN_S, BURST_NOISE_R, DEAD_S, HIT_NOISE_S as BAT_NOISE_S} from "./shared/baton.js";
@@ -839,14 +842,14 @@ function useDoor() {
 //   Y: tap to take out what you carry (tap again to rotate), hold for the wheel · RT / left click: use what you hold (fire / cloak on-off / roll a beacon)
 //   LT / right click: the gun aims; with the cloak or a beacon in hand it is the secondary ability · LB / RB (Q / E): the flash-vial, and the land mine or tripwire (Going back in only; empty in the Original) · 4: the hunting crossbow, 5: the pneumatic bolt driver (Going back in only)
 //   D-pad up / View / Tab / M: the handheld map (the camera feeds have no controls for now)
-const HELD = {mouseFire: false, padFire: false, item: null, yAt: 0, yDown: false, wheel: false, sel: 0, aimBtn: false, padAim: false};
+const HELD = {mouseAlt: false, padAlt: false, mouseFire: false, padFire: false, item: null, yAt: 0, yDown: false, wheel: false, sel: 0, aimBtn: false, padAim: false};
 const AIM = {on: false, fov: 75, fovAim: 42};
 let crouchLatch = false;
-const ITEM_NAMES = {gun: "RAY GUN", cloak: "CLOAK", beacon: "AFK BEACON", crossbow: "HUNTING CROSSBOW", driver: "PNEUMATIC BOLT DRIVER", baton: "STUN BATON", dart: "MOTH JELLY DART", flame: "PROPANE FLAMETHROWER"};
-const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT / click: on/off · LT / right click: short circuit (5 min offline, stuns monsters near you)", beacon: "RT / click: roll it · LT / right click: reverse the frequency", crossbow: "RT / click: shoot a bolt (it kills; slow reload)", driver: "RT / click: a nail (weaker as the air runs down, which refills when you stop)", baton: "RT / click: swing (it hurts and stuns, 3 capacitors) · LT / right click: discharge (all three: stuns everything near you, then dead for 20 s)", dart: "RT / click: a dart (slow: lead a moving target; the jelly burns it for 10 s and slows it)", flame: "hold RT / click: burn (6 m cone, 10 s of fuel; it calls the floor, and switches your cloak off) · LT / right click: swap in the spare canister (2.5 s)"};
-const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon", GB.load && carries(GB.load, "crossbow") && "crossbow", GB.load && carries(GB.load, "driver") && "driver", GB.load && carries(GB.load, "baton") && "baton", GB.load && carries(GB.load, "dart") && "dart", GB.load && carries(GB.load, "flame") && "flame"].filter(Boolean);
+const ITEM_NAMES = {gun: "RAY GUN", cloak: "CLOAK", beacon: "AFK BEACON", crossbow: "HUNTING CROSSBOW", driver: "PNEUMATIC BOLT DRIVER", baton: "STUN BATON", dart: "MOTH JELLY DART", flame: "PROPANE FLAMETHROWER", horn: "FREQUENCY HORN", rocket: "ROCKET LAUNCHER", laser: "LASER DISSECTOR"};
+const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT / click: on/off · LT / right click: short circuit (5 min offline, stuns monsters near you)", beacon: "RT / click: roll it · LT / right click: reverse the frequency", crossbow: "RT / click: shoot a bolt (it kills; slow reload)", driver: "RT / click: a nail (weaker as the air runs down, which refills when you stop)", baton: "RT / click: swing (it hurts and stuns, 3 capacitors) · LT / right click: discharge (all three: stuns everything near you, then dead for 20 s)", dart: "RT / click: a dart (slow: lead a moving target; the jelly burns it for 10 s and slows it)", flame: "hold RT / click: burn (6 m cone, 10 s of fuel; it calls the floor, and switches your cloak off) · LT / right click: swap in the spare canister (2.5 s)", horn: "RT / click: blast (10 m cone: throws monsters back and stuns them 2 s; the whole floor within 40 m hears it) · LT / right click: the call (free: everything within 25 m comes to look at where you stand)", rocket: "RT / click: fire a rocket (it bursts on the first thing it meets: 150 close, 50 at 5 m, a slowing mist, a bang the floor hears; it hurts you inside 5 m, and under 5 m of flight it is a dud) · you cannot run while you hold it", laser: "hold RT / click: the beam (silent, 30 m; it cuts faster the longer it stays on one target; overheats after 5 s; you move slowly) · hold LT / right click: the dot (monsters that are not chasing go and look at it)"};
+const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon", GB.load && carries(GB.load, "crossbow") && "crossbow", GB.load && carries(GB.load, "driver") && "driver", GB.load && carries(GB.load, "baton") && "baton", GB.load && carries(GB.load, "dart") && "dart", GB.load && carries(GB.load, "flame") && "flame", GB.load && carries(GB.load, "horn") && "horn", GB.load && carries(GB.load, "rocket") && "rocket", GB.load && carries(GB.load, "laser") && "laser"].filter(Boolean);
 function setHeld(it) {
-  HELD.item = it || null; AIM.on = false; HELD.mouseFire = false;
+  HELD.item = it || null; AIM.on = false; HELD.mouseFire = false; HELD.mouseAlt = false;
   toast(HELD.item ? `Holding: ${ITEM_NAMES[it]}   ${ITEM_HINT[it]}` : "Hands empty", 2600);
 }
 function rotateHeld() {
@@ -868,8 +871,8 @@ function yTick() {
   if (HELD.yDown && !HELD.wheel && performance.now() - HELD.yAt > 350) { HELD.wheel = true; const k = wheelEntries().indexOf(HELD.item || "hands"); HELD.sel = k < 0 ? 0 : k; renderWheel(); }
 }
 const wheelMove = d => { if (HELD.wheel) { const n = wheelEntries().length; HELD.sel = (HELD.sel + d + n) % n; renderWheel(); } };
-const usePrimary = () => HELD.item === "gun" ? fire() : HELD.item === "cloak" ? toggleCloak() : HELD.item === "beacon" ? throwBeacon() : HELD.item === "crossbow" ? fireBow() : HELD.item === "driver" ? fireDriver() : HELD.item === "baton" ? swingBaton() : HELD.item === "dart" ? fireDart() : HELD.item === "flame" ? (HELD.mouseFire = true) : (toast("Nothing in your hands: tap Y"), false);
-const useSecondary = () => HELD.item === "cloak" ? cloakShortCircuit() : HELD.item === "beacon" ? reverseBeacon() : HELD.item === "baton" ? dischargeBaton() : HELD.item === "flame" ? swapCanister() : false;
+const usePrimary = () => HELD.item === "gun" ? fire() : HELD.item === "cloak" ? toggleCloak() : HELD.item === "beacon" ? throwBeacon() : HELD.item === "crossbow" ? fireBow() : HELD.item === "driver" ? fireDriver() : HELD.item === "baton" ? swingBaton() : HELD.item === "dart" ? fireDart() : HELD.item === "flame" || HELD.item === "laser" ? (HELD.mouseFire = true) : HELD.item === "horn" ? blowHorn() : HELD.item === "rocket" ? fireRocket() : (toast("Nothing in your hands: tap Y"), false);
+const useSecondary = () => HELD.item === "cloak" ? cloakShortCircuit() : HELD.item === "beacon" ? reverseBeacon() : HELD.item === "baton" ? dischargeBaton() : HELD.item === "flame" ? swapCanister() : HELD.item === "horn" ? callHorn() : false;
 function useConsumable(slot) {
   if (!GB.kit) { toast(slot === 0 ? "Your support slot (LB / Q) is empty" : "Your combat / objective slot (RB / E) is empty"); return false; }       // the Original has no consumables
   if (dead || loading || FIN.out || KPUI.open || devOn.v || STN.open || myCarry() >= 0) return false;
@@ -895,7 +898,7 @@ addEventListener("keydown", e => {
   }
   if (STN.open) {                                                            // the locker panel takes the keyboard while it is up
     e.preventDefault();
-    if (/^Digit[1-8]$/.test(e.code)) stationToggle(+e.code.slice(5) - 1); else if (e.code === "Escape" || e.code === "KeyX" || e.code === "KeyF") closeStation();
+    if (/^Digit[1-9]$/.test(e.code)) stationToggle(+e.code.slice(5) - 1); else if (e.code === "Digit0") stationToggle(9); else if (e.code === "KeyE") stationToggle(gearList().length); else if (e.code === "Escape" || e.code === "KeyX" || e.code === "KeyF") closeStation();
     return;
   }
   keys[e.code] = true;
@@ -921,9 +924,9 @@ addEventListener("blur", () => { for (const k in keys) keys[k] = false; HELD.aim
 renderer.domElement.addEventListener("mousedown", e => {
   if (document.pointerLockElement !== renderer.domElement || dead || inGame) return;
   if (e.button === 0) usePrimary();
-  else if (e.button === 2) { if (HELD.item === "gun") HELD.aimBtn = true; else useSecondary(); }
+  else if (e.button === 2) { if (HELD.item === "gun") HELD.aimBtn = true; else if (HELD.item === "laser") HELD.mouseAlt = true; else useSecondary(); }
 });
-addEventListener("mouseup", e => { if (e.button === 2) HELD.aimBtn = false; if (e.button === 0) HELD.mouseFire = false; });
+addEventListener("mouseup", e => { if (e.button === 2) HELD.aimBtn = false; if (e.button === 0) HELD.mouseFire = false; if (e.button === 2) HELD.mouseAlt = false; });
 renderer.domElement.addEventListener("contextmenu", e => e.preventDefault());
 renderer.domElement.addEventListener("click", () => { if (![...navigator.getGamepads()].some(g => g)) renderer.domElement.requestPointerLock?.(); });
 addEventListener("mousemove", e => {
@@ -957,8 +960,9 @@ function pad() {
     HELD.padFire = down(7); if (edge(7)) usePrimary();       // RT: use what you hold (held down, the flamethrower burns)
     const lt = down(6), ltEdge = lt && !padPrev[6]; padPrev[6] = lt;
     HELD.padAim = lt && HELD.item === "gun";                  // LT: the gun aims while it is held ...
-    if (ltEdge && HELD.item !== "gun") useSecondary();        // ... and with the cloak or a beacon it is the secondary ability
-  } else { HELD.padAim = false; HELD.yDown = false; HELD.padFire = false; }
+    HELD.padAlt = lt && HELD.item === "laser";               // ... the laser's dot is held ...
+    if (ltEdge && HELD.item !== "gun" && HELD.item !== "laser") useSecondary();        // ... and with the cloak or a beacon it is the secondary ability
+  } else { HELD.padAim = false; HELD.yDown = false; HELD.padFire = false; HELD.padAlt = false; }
   const k = AIM.on ? 0.45 : 1, still = HELD.wheel;
   return {mx: dz(a[0] || 0), mz: dz(a[1] || 0), lx: still ? 0 : dz(a[2] || 0, 0.12) * k, ly: still ? 0 : dz(a[3] || 0, 0.12) * k, jump: down(0), use: down(2), run: down(11)};          // right-stick click runs (hold)
 }
@@ -1073,11 +1077,14 @@ function animateLoot() {
     v.packs.forEach((it, i) => { const gone = st.packs[i] !== 0; it.o.visible = !gone; if (gone) return; const k = fade(it); it.o.userData.halo.material.opacity = 0.6 * k; it.o.userData.beacon.material.opacity = 0.3 * k; });
   }
   const eb = $("beacons"); eb.style.display = BC.have ? "block" : "none"; if (BC.have) eb.textContent = `BEACON ×${BC.have}  [G]`;
-  const el = $("ammo"), bow = GB.load && carries(GB.load, "crossbow"), drv = GB.load && carries(GB.load, "driver"), bat = GB.load && carries(GB.load, "baton"), dart = GB.load && carries(GB.load, "dart"), flame = GB.load && carries(GB.load, "flame"), kit = GB.kit;
+  const el = $("ammo"), bow = GB.load && carries(GB.load, "crossbow"), drv = GB.load && carries(GB.load, "driver"), bat = GB.load && carries(GB.load, "baton"), dart = GB.load && carries(GB.load, "dart"), flame = GB.load && carries(GB.load, "flame"), horn = GB.load && carries(GB.load, "horn"), rocket = GB.load && carries(GB.load, "rocket"), laser = GB.load && carries(GB.load, "laser"), kit = GB.kit;
   const lines = [kit && `Q ${KIT_NAMES.flash} ×${kit.n.flash}   E ${KIT_NAMES[kit.e]} ×${kit.n[kit.e]}`,
     LT.gun && `RAY  ${"● ".repeat(LT.rounds)}${"○ ".repeat(Math.max(0, 3 - LT.rounds))}${LT.rounds}/${MAX_ROUNDS}`,
     bow && `BOW  ${BOW.st.bolts}/${MAX_BOLTS}${BOW.st.cool > 0 ? "  reloading" : ""}`,
     drv && `NAILS  ${DRV.st.nails}/${MAX_NAILS}  AIR ${"▮".repeat(DRV.st.air)}${"▯".repeat(DRV_GAUGE - DRV.st.air)}`,
+    laser && `LASER  ${Math.round(LASER.st.charge * 100)}%  SPARE ×${LASER.st.spares}${LASER.st.swapT > 0 ? `  swapping ${LASER.st.swapT.toFixed(1)} s` : LASER.st.lock > 0 ? `  OVERHEATED ${LASER.st.lock.toFixed(1)} s` : LASER.st.heat > 3 ? "  hot" : ""}`,
+    rocket && `ROCKETS  ${"● ".repeat(ROCKET.st.rockets)}${"○ ".repeat(MAX_ROCKETS - ROCKET.st.rockets)}${ROCKET.st.cool > 0 ? "  reloading" : ""}`,
+    horn && `HORN  ${"▮".repeat(HORN.st.charge)}${"▯".repeat(BLASTS - HORN.st.charge)}  ${HORN.st.charge}/${BLASTS}${HORN.st.spare ? "  SPARE" : ""}${HORN.st.swapT > 0 ? `  swapping ${HORN.st.swapT.toFixed(1)} s` : HORN.st.coolB > 0 ? `  ${Math.ceil(HORN.st.coolB)} s` : ""}`,
     flame && `FUEL  ${Math.round(FLAME.st.fuel * 100)}%  SPARE ${Math.round(FLAME.st.spare * 100)}%${FLAME.st.swapT > 0 ? `  swapping ${FLAME.st.swapT.toFixed(1)} s` : ""}`,
     dart && `DARTS  ${DART.st.darts}/${MAX_DARTS}${DART.st.cool > 0 ? "  reloading" : ""}`,
     bat && `BATON  ${"● ".repeat(BAT.st.caps)}${"○ ".repeat(BAT_CAPS - BAT.st.caps)}${BAT.st.dead > 0 ? `  dead ${Math.ceil(BAT.st.dead)} s` : ""}`].filter(Boolean);
@@ -1132,19 +1139,25 @@ function heldHud(dt) {
   for (const it of [...heldSeen]) if (!o.includes(it)) heldSeen.delete(it);
   if (HELD.item && !o.includes(HELD.item)) HELD.item = null;
   const el = $("held"), show = !loading && !dead && !FIN.results && !!HELD.item;
-  el.style.display = show ? "block" : "none"; if (show) el.innerHTML = `<b>${ITEM_NAMES[HELD.item]}${HELD.item === "gun" ? " · " + LT.rounds : HELD.item === "beacon" ? " ×" + BC.have : HELD.item === "crossbow" ? " · " + BOW.st.bolts : HELD.item === "driver" ? " · " + DRV.st.nails : HELD.item === "baton" ? " · " + BAT.st.caps : HELD.item === "dart" ? " · " + DART.st.darts : HELD.item === "flame" ? " · " + Math.round(FLAME.st.fuel * 100) + "%" : ""}</b>${ITEM_HINT[HELD.item]}`;
+  el.style.display = show ? "block" : "none"; if (show) el.innerHTML = `<b>${ITEM_NAMES[HELD.item]}${HELD.item === "gun" ? " · " + LT.rounds : HELD.item === "beacon" ? " ×" + BC.have : HELD.item === "crossbow" ? " · " + BOW.st.bolts : HELD.item === "driver" ? " · " + DRV.st.nails : HELD.item === "baton" ? " · " + BAT.st.caps : HELD.item === "dart" ? " · " + DART.st.darts : HELD.item === "flame" ? " · " + Math.round(FLAME.st.fuel * 100) + "%" : HELD.item === "horn" ? " · " + HORN.st.charge : HELD.item === "rocket" ? " · " + ROCKET.st.rockets : HELD.item === "laser" ? " · " + Math.round(LASER.st.charge * 100) + "%" : ""}</b>${ITEM_HINT[HELD.item]}`;
   $("reticle").style.display = AIM.on ? "block" : "none";
   stunFx = Math.max(0, stunFx - dt * 1.6); $("stunfx").style.opacity = stunFx;
 }
 function animateGun(dt) {
   heldHud(dt);
-  BOW.st = bowTick(BOW.st, dt); BOW.kick = Math.max(0, BOW.kick - dt * 5); DRV.st = drvTick(DRV.st, dt); DRV.kick = Math.max(0, DRV.kick - dt * 8); BAT.st = batTick(BAT.st, dt); BAT.kick = Math.max(0, BAT.kick - dt * 6); DART.st = dartTick(DART.st, dt); DART.kick = Math.max(0, DART.kick - dt * 5); dartFlights(dt); flameTick(dt);
+  BOW.st = bowTick(BOW.st, dt); BOW.kick = Math.max(0, BOW.kick - dt * 5); DRV.st = drvTick(DRV.st, dt); DRV.kick = Math.max(0, DRV.kick - dt * 8); BAT.st = batTick(BAT.st, dt); BAT.kick = Math.max(0, BAT.kick - dt * 6); DART.st = dartTick(DART.st, dt); DART.kick = Math.max(0, DART.kick - dt * 5); dartFlights(dt); flameTick(dt); HORN.st = hornTickState(HORN.st, dt); HORN.kick = Math.max(0, HORN.kick - dt * 4); ROCKET.st = rocketTickState(ROCKET.st, dt); ROCKET.kick = Math.max(0, ROCKET.kick - dt * 3); rocketFlights(dt); laserTick(dt);
   GUN.cool = Math.max(0, GUN.cool - dt); P.shotT = Math.max(0, P.shotT - dt); GUN.kick = Math.max(0, GUN.kick - dt * 7);
   if (net.on) for (const p of net.peers.values()) if (p.shotT > 0) p.shotT -= dt;
   GUN.pivot.visible = !!LT.gun && HELD.item === "gun" && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
   if (GUN.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; GUN.pivot.position.set(0.22, -0.3 + bob, -0.5 + GUN.kick * 0.07); GUN.pivot.rotation.x = GUN.kick * 0.12; }
   BOW.pivot.visible = HELD.item === "crossbow" && !!GB.load && carries(GB.load, "crossbow") && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
   if (BOW.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; BOW.pivot.position.set(0.22, -0.3 + bob, -0.5 + BOW.kick * 0.09); BOW.pivot.rotation.x = BOW.kick * 0.1; }
+  LASER.pivot.visible = HELD.item === "laser" && !!GB.load && carries(GB.load, "laser") && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
+  if (LASER.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; LASER.pivot.position.set(0.22, -0.3 + bob, -0.5); }
+  ROCKET.pivot.visible = HELD.item === "rocket" && !!GB.load && carries(GB.load, "rocket") && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
+  if (ROCKET.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; ROCKET.pivot.position.set(0.2, -0.26 + bob, -0.5 + ROCKET.kick * 0.1); ROCKET.pivot.rotation.x = ROCKET.kick * 0.12; }
+  HORN.pivot.visible = HELD.item === "horn" && !!GB.load && carries(GB.load, "horn") && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
+  if (HORN.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; HORN.pivot.position.set(0.22, -0.3 + bob, -0.5 + HORN.kick * 0.08); HORN.pivot.rotation.x = HORN.kick * 0.1; }
   FLAME.pivot.visible = HELD.item === "flame" && !!GB.load && carries(GB.load, "flame") && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
   if (FLAME.pivot.visible) { const bob = P.moving ? Math.sin(performance.now() / (P.running ? 90 : 160)) * (P.running ? 0.012 : 0.006) : 0; FLAME.pivot.position.set(0.22, -0.3 + bob, -0.5 + (FLAME.on ? 0.02 * Math.sin(performance.now() / 30) : 0)); }
   DART.pivot.visible = HELD.item === "dart" && !!GB.load && carries(GB.load, "dart") && !dead && !loading && !devOn.v && myCarry() < 0 && !FIN.results;
@@ -1282,8 +1295,8 @@ function setLoot(scene, st, by, k) {
     else if (k === "pack") {
       LT.rounds = roundsAfterPack(LT.rounds);
       if (GB.kit) GB.kit = kitPack(GB.kit);                                                                       // a pack also refills the Q and E items
-      const hasBow = GB.load && carries(GB.load, "crossbow"), hasDrv = GB.load && carries(GB.load, "driver"), hasDart = GB.load && carries(GB.load, "dart"), hasFlame = GB.load && carries(GB.load, "flame");
-      if (hasBow) BOW.st = addBolts(BOW.st, PACK_BOLTS); if (hasDrv) DRV.st = addNails(DRV.st, PACK_NAILS); if (hasDart) DART.st = addDarts(DART.st, PACK_DARTS); if (hasFlame) FLAME.st = addFuel(FLAME.st, PACK_FUEL);                      // a pack feeds each weapon you carry (the arsenal's own ammo, docs/ITEMS.md 1.6)
+      const hasBow = GB.load && carries(GB.load, "crossbow"), hasDrv = GB.load && carries(GB.load, "driver"), hasDart = GB.load && carries(GB.load, "dart"), hasFlame = GB.load && carries(GB.load, "flame"), hasLaser = GB.load && carries(GB.load, "laser");
+      if (hasBow) BOW.st = addBolts(BOW.st, PACK_BOLTS); if (hasDrv) DRV.st = addNails(DRV.st, PACK_NAILS); if (hasDart) DART.st = addDarts(DART.st, PACK_DARTS); if (hasFlame) FLAME.st = addFuel(FLAME.st, PACK_FUEL); if (hasLaser) LASER.st = laserAdd(LASER.st, LASER_PACK);                      // a pack feeds each weapon you carry (the arsenal's own ammo, docs/ITEMS.md 1.6)
       toast(`Ammo: ${LT.rounds} rounds${hasBow ? `, ${BOW.st.bolts} bolts` : ""}${hasDrv ? `, ${DRV.st.nails} nails` : ""}${hasDart ? `, ${DART.st.darts} darts` : ""}${hasFlame ? `, ${Math.round(FLAME.st.fuel * 100)}% propane` : ""}`);
     }
   }
@@ -1623,7 +1636,7 @@ const GB = {mode: null, wave: null, load: null, kit: null};                     
 const GBI = REGISTRY.modes.going_back_in;
 function startChamber(ch) {
   GB.mode = ch ? "going_back_in" : null; GB.wave = null; if (!ch) { GB.load = null; GB.kit = null; STN.spot = null; }
-  TRAPS.list.length = 0; TRAPS.flashes.length = 0; clearFlights(); clearFlames();       // traps stay in the chamber they were set in; a dart in the air does not
+  TRAPS.list.length = 0; TRAPS.flashes.length = 0; clearFlights(); clearFlames(); clearRockets();       // traps stay in the chamber they were set in; a dart in the air does not
   if (!ch || net.on) return;                                            // in a room the wave is the server's: gbWave builds it when the server says
   GB.wave = startWave(ch, performance.now());
   for (const p of wavePlan(S, monCfg, ch, [[P.p.x, P.p.z]])) monsters.push(new Monster(p.cfg, S.id, p.x, p.z));
@@ -1668,7 +1681,7 @@ function gbKill(m) {
 }
 async function startGoingBackIn() {                                    // from the options screen at the store doors
   closeOptions();
-  GB.load = newLoadout(["gun", "cloak", "crossbow", "driver"], SOLO_GEAR); BAT.st = newBaton(); DART.st = newDart(START_DARTS); FLAME.st = newFlame(); LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); BC.have = 0; BOW.st = newBow(START_BOLTS); DRV.st = newDriver(START_NAILS); GB.kit = newKit();          // starting gear: the Market does not exist yet, so the crossbow and the bolt driver start in your hands (two weapons at most; the stun baton, the moth jelly dart and the propane flamethrower wait in the locker) (default; the owner may change it)
+  GB.load = newLoadout(["gun", "cloak", "crossbow", "driver"], SOLO_GEAR); BAT.st = newBaton(); DART.st = newDart(START_DARTS); FLAME.st = newFlame(); HORN.st = newHorn(); ROCKET.st = newRocket(START_ROCKETS); LASER.st = newLaser(); LT.gun = true; LT.rounds = GUN_ROUNDS; CL.have = true; CL.st = newCloak(); BC.have = 0; BOW.st = newBow(START_BOLTS); DRV.st = newDriver(START_NAILS); GB.kit = newKit();          // starting gear: the Market does not exist yet, so the crossbow and the bolt driver start in your hands (two weapons at most; the stun baton, the moth jelly dart, the propane flamethrower, the frequency horn, the rocket launcher and the laser dissector wait in the locker) (default; the owner may change it)
   await loadScene(GBI.startChamber);
 }
 
@@ -1823,6 +1836,116 @@ function flameTick(dt) {
     sp.position.set(o[0] + d[0] * 0.6, o[1] + d[1] * 0.6 - 0.15, o[2] + d[2] * 0.6); sp.scale.setScalar(0.4); S.root.add(sp); FLAME.fx.push({o: sp, v, t: 0});
   }
 }
+// ---- the frequency horn (shared/horn.js): a blast throws what is in front of you back and stuns it, and the whole floor hears it; the call draws everything near; it hurts nothing. A locker recharges it for free.
+const HORN = {st: newHorn(), kick: 0, pivot: new THREE.Group()};
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .55, metalness: .3}), bell = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.025, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({color: 0xb0a070, roughness: .5, metalness: .5, side: THREE.DoubleSide}));
+  bell.rotation.x = -Math.PI / 2; bell.position.set(0, 0.02, -0.18);
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.16), mat(0x34383c)); box.position.set(0, -0.08, 0.08);
+  HORN.pivot.add(bell, box); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
+function hornRings(x, z, dx, dz, reach) {                                    // rings spreading along the cone, or one ring round you for the call
+  for (let k = 1; k <= 5; k++) {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xd8f0ff, depthWrite: false, transparent: true, opacity: 0.9})); sp.scale.set(2, 2, 1);
+    sp.position.set(x + dx * reach * k / 5, S.floor + 1.3, z + dz * reach * k / 5); S.root.add(sp); TRAPS.flashes.push({o: sp, t: -0.05 * k});
+  }
+}
+function blowHorn() {
+  if (!GB.load || !carries(GB.load, "horn") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
+  if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
+  const r = hornBlast(HORN.st);
+  if (!r.ok) { if (r.why === "empty") { toast("The battery is flat: a locker recharges it for free", 2200); AUD.play("gun_dry"); } else if (r.why === "swapping") toast("Swapping batteries…", 1400); return false; }
+  HORN.st = r.horn; HORN.kick = 1;
+  const o = [P.p.x, P.p.y + P.eye, P.p.z], f = [-Math.sin(P.yaw), -Math.cos(P.yaw)], hit = blastTargets(S, monsters, o, f);
+  for (const m of hit) { const [x, z] = knockEnd(S, m, [P.p.x, P.p.z], knockDist(m.cfg)); m.shove(x, z); m.stun(HORN_STUN_S); }
+  for (const m of hornWithin(monsters, P.p.x, P.p.y, P.p.z, BLAST_NOISE_R)) m.alert(P.p.x, P.p.z);                 // the loudest thing there is: all of them come to look
+  hornRings(P.p.x, P.p.z, f[0], f[1], BLAST_RANGE_M); AUD.play("zap", {pos: [P.p.x, S.floor + 1, P.p.z], loud: true, rate: 0.35});
+  toast(hit.length ? `The horn blasts: ${hit.length} thrown back and stunned. The floor heard it` : "The horn blasts. The floor heard it", 2200);
+  return true;
+}
+function callHorn() {
+  if (!GB.load || !carries(GB.load, "horn") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
+  const r = hornCall(HORN.st);
+  if (!r.ok) return false;                                                    // cooling: nothing happens
+  HORN.st = r.horn; HORN.kick = 0.5;
+  const heard = hornWithin(monsters, P.p.x, P.p.y, P.p.z, CALL_R); for (const m of heard) m.alert(P.p.x, P.p.z);
+  hornRings(P.p.x, P.p.z, 0, 0, 0.1); AUD.play("beacon_end", {pos: [P.p.x, S.floor + 1, P.p.z], rate: 0.45});
+  toast(heard.length ? `The call: ${heard.length} coming to look` : "The call: nothing near enough to hear it", 1800);
+  return true;
+}
+// ---- the rocket launcher (shared/rocket.js): a rocket bursts on the first thing it meets; the blast hurts, a mist slows, the bang is heard far off, and it hurts you too inside 5 m. Under 5 m of flight it is a dud.
+const ROCKET = {st: newRocket(0), kick: 0, pivot: new THREE.Group(), flights: [], mists: []};
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), tube = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 12), mat(0x5a6a50)); tube.rotation.x = Math.PI / 2;
+  for (const [x, y] of [[0.075, 0.07], [-0.075, 0.07], [0, -0.09]]) { const can = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), mat(0xd8c070)); can.rotation.x = Math.PI / 2; can.position.set(x, y, 0.05); ROCKET.pivot.add(can); }
+  ROCKET.pivot.add(tube); ROCKET.pivot.position.set(0.2, -0.26, -0.5); ROCKET.pivot.visible = false; camera.add(ROCKET.pivot); }
+function clearRockets() { for (const f of ROCKET.flights) if (f.mesh) S.root.remove(f.mesh); ROCKET.flights.length = 0; for (const m of ROCKET.mists) S.root.remove(m.o); ROCKET.mists.length = 0; }
+function fireRocket() {
+  if (!GB.load || !carries(GB.load, "rocket") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
+  if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
+  const r = rocketShoot(ROCKET.st);
+  if (!r.ok) { if (r.why === "empty") { toast("Out of rockets", 1800); AUD.play("gun_dry"); } return false; }                // reloading: nothing happens
+  ROCKET.st = r.rocket; ROCKET.kick = 1;
+  const cp = Math.cos(P.pitch), d = [-Math.sin(P.yaw) * cp, Math.sin(P.pitch), -Math.cos(P.yaw) * cp];
+  const f = newRocketFlight([P.p.x + d[0] * 0.6, P.p.y + P.eye + d[1] * 0.6 - 0.1, P.p.z + d[2] * 0.6], d);
+  f.mesh = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 6), new THREE.MeshBasicMaterial({color: 0xffe0a0})); f.mesh.position.set(f.x, f.y, f.z); S.root.add(f.mesh); ROCKET.flights.push(f);
+  AUD.play("gun", {rate: 0.5, priority: true}); return true;
+}
+function rocketBurst(f) {
+  if (!rocketArmed(f)) { toast("The rocket was too close to arm: it drops", 1800); return; }          // a dud: nothing happens, and it is lost
+  const x = f.x, z = f.z, y = S.floor;
+  const hit = rocketTargets(monsters, x, y, z), slain = [];
+  for (const {m, dmg} of hit) if (m.hurt(dmg)) slain.push(m);
+  for (const m of slain) killMonster(m);
+  if (Math.abs(P.p.y - y) < 1.6 && Math.hypot(P.p.x - x, P.p.z - z) <= ROCKET_BLAST_R) applyHit(HIT_DMG);          // it hurts you too inside 5 m
+  for (const m of monsters) if (Math.hypot(m.pos.x - x, m.pos.z - z) <= ROCKET_NOISE_R) m.alert(x, z);          // the bang: everything within 40 m comes to look
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xff9a30, depthWrite: false, transparent: true, opacity: 1})); sp.scale.set(2, 2, 1); sp.position.set(x, y + 1.2, z); S.root.add(sp); TRAPS.flashes.push({o: sp, t: 0});
+  const mist = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xf0e8b0, depthWrite: false, transparent: true, opacity: 0.45})); mist.scale.set(MIST_R * 2, MIST_R * 2, 1); mist.position.set(x, y + 0.9, z); S.root.add(mist); ROCKET.mists.push({o: mist, x, z, y, t: 0});
+  AUD.play("zap", {pos: [x, y + 1, z], loud: true, rate: 0.3}); toast(slain.length ? `The rocket bursts: ${slain.length} down, ${hit.length - slain.length} hurt` : hit.length ? `The rocket bursts: ${hit.length} hurt` : "The rocket bursts: nothing near it", 2200);
+}
+function rocketFlights(dt) {
+  for (let k = ROCKET.flights.length - 1; k >= 0; k--) {
+    let f = ROCKET.flights[k], gone = false;
+    for (let left = Math.min(dt, 0.25); left > 1e-6 && !gone; left -= 0.02) { const r = stepRocket(S, monsters, f, Math.min(0.02, left)); f = {...r.f, mesh: f.mesh}; gone = r.gone; }
+    if (gone) { S.root.remove(f.mesh); ROCKET.flights.splice(k, 1); rocketBurst(f); } else { f.mesh.position.set(f.x, f.y, f.z); ROCKET.flights[k] = f; }
+  }
+  for (let k = ROCKET.mists.length - 1; k >= 0; k--) {                         // the mist: what stands in it is slowed to half while it lasts
+    const m = ROCKET.mists[k]; m.t += dt;
+    for (const mon of inMist(monsters, m.x, m.y, m.z)) mon.slow(MIST_SLOW, 0.3);
+    m.o.material.opacity = 0.45 * Math.max(0, 1 - Math.max(0, m.t - MIST_S + 1.5) / 1.5);
+    if (m.t >= MIST_S) { S.root.remove(m.o); ROCKET.mists.splice(k, 1); }
+  }
+}
+// ---- the laser dissector (shared/laser.js): hold for a silent beam whose damage climbs on one target; hold the other button for a dot that monsters go and look at.
+const LASER = {st: newLaser(), on: false, dotOn: false, pivot: new THREE.Group(), line: null, spot: null, lureT: 0, msgT: 0};
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .5, metalness: .4}), drum = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.14, 14), mat(0x50545a)); drum.rotation.z = Math.PI / 2; drum.position.set(0, 0, 0.08);
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.3, 12), mat(0x24262a)); lens.rotation.x = Math.PI / 2; lens.position.set(0, 0.01, -0.15);
+  const pack = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.12), mat(0xb03a2a)); pack.position.set(0, -0.08, 0.1);
+  LASER.pivot.add(drum, lens, pack); LASER.pivot.position.set(0.22, -0.3, -0.5); LASER.pivot.visible = false; camera.add(LASER.pivot);
+  LASER.line = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 6), new THREE.MeshBasicMaterial({color: 0xff2a2a, transparent: true, opacity: 0.85, depthWrite: false})); LASER.line.visible = false; scene.add(LASER.line);
+  LASER.spot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({color: 0xff3030})); LASER.spot.visible = false; scene.add(LASER.spot); }
+function laserReach(o, d) { let lo = 0, hi = d[1] < -1e-3 ? Math.min(LASER_RANGE, (o[1] - S.floor - 0.03) / -d[1]) : LASER_RANGE;          // the floor is not a collider box: the beam and the dot stop on it
+  if (rayClear(o, d, hi)) return hi; for (let k = 0; k < 8; k++) { const mid = (lo + hi) / 2; if (rayClear(o, d, mid)) lo = mid; else hi = mid; } return lo; }
+function laserTick(dt) {
+  LASER.msgT = Math.max(0, LASER.msgT - dt); LASER.on = false; LASER.dotOn = false; LASER.line.visible = false; LASER.spot.visible = false;
+  const can = HELD.item === "laser" && GB.load && carries(GB.load, "laser") && !dead && !loading && !KPUI.open && !FIN.out && !devOn.v && !STN.open && myCarry() < 0;
+  const wantBeam = can && (HELD.mouseFire || HELD.padFire), wantDot = can && !wantBeam && (HELD.mouseAlt || HELD.padAlt);
+  if (!wantBeam && !wantDot) { LASER.st = laserIdle(LASER.st, dt); return; }
+  const o = [P.p.x, P.p.y + P.eye, P.p.z], cp = Math.cos(P.pitch), d = [-Math.sin(P.yaw) * cp, Math.sin(P.pitch), -Math.cos(P.yaw) * cp];
+  const say = why => { if (LASER.msgT <= 0) { LASER.msgT = 1.5; toast(why === "empty" ? "The battery is flat" : why === "overheated" ? "Overheated" : "Swapping battery packs…", 1400); } LASER.st = laserIdle(LASER.st, dt); };
+  if (wantBeam) {
+    const hit = rayMonsterW(S, monsters, o, d, LASER_RANGE), r = laserBeam(LASER.st, dt, hit ? hit.m : null);
+    if (!r.ok) return say(r.why);
+    LASER.st = r.laser; LASER.on = true;
+    const t = hit ? hit.t : laserReach(o, d), e = [o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t];
+    if (hit) { if (hit.m.hurt(r.dmg * laserMul(hit.m.cfg))) killMonster(hit.m); else hit.m.provoke(P.p.x, P.p.z, net.id); }          // it knows where that came from
+    const fx = d[0], fz = d[2], a = new THREE.Vector3(o[0] + fx * 0.45 - fz * 0.2, o[1] - 0.22, o[2] + fz * 0.45 + fx * 0.2), b = new THREE.Vector3(e[0], e[1], e[2]), len = a.distanceTo(b);
+    if (len > 0.2) { LASER.line.visible = true; LASER.line.position.copy(a).lerp(b, 0.5); LASER.line.scale.y = len; LASER.line.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize()); }
+    return;
+  }
+  const r = laserDot(LASER.st, dt); if (!r.ok) return say(r.why);
+  LASER.st = r.laser; LASER.dotOn = true;
+  const t = Math.max(0, laserReach(o, d) - 0.15), p = [o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t];
+  LASER.spot.visible = true; LASER.spot.position.set(p[0], p[1], p[2]); LASER.dotAt = p;
+  if ((LASER.lureT -= dt) <= 0) { LASER.lureT = 0.4; for (const m of dotHears(S, monsters, p)) m.alert(p[0], p[2]); }          // look over there
+}
 // a monster is dead for good (a bolt, a mine, a blast): gone from the floor, and counted toward the wave
 function killMonster(m, count) {                                       // count: in a room, the server's {kills, cleared}
   const i = monsters.indexOf(m); if (i < 0) return;
@@ -1874,7 +1997,7 @@ function trapTick(dt) {
 // ---- the loadout locker (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is. (Name still open: docs/WORLD.md.)
 const STN = {open: false, spot: null, mesh: null, sel: 0};
 const gearList = () => net.on ? GEAR : SOLO_GEAR;                  // the locker rows: a room runs the first three; the bolt driver is solo only so far (the server does not own its nails)
-const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow", driver: "Pneumatic bolt driver", baton: "Stun baton", dart: "Moth jelly dart", flame: "Propane flamethrower"};
+const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow", driver: "Pneumatic bolt driver", baton: "Stun baton", dart: "Moth jelly dart", flame: "Propane flamethrower", horn: "Frequency horn", rocket: "Almond water rocket launcher", laser: "Laser pointer dissector"};
 function buildStation(ch) {
   STN.spot = null; STN.mesh = null; if (!ch) return;                      // the spot is seeded from the scene, so everyone in a room finds the locker in the same place
   const home = floorSpots(1, 9910, [[8, 6, 4], [4, 2, 2], [2, 1, 0]])[0]; if (!home) return;
@@ -1883,10 +2006,10 @@ function buildStation(ch) {
 }
 const nearStation = () => STN.spot && !dead && !loading && !STN.open && Math.abs(S.floor - P.p.y) < 1.5 && Math.hypot(STN.spot[0] - P.p.x, STN.spot[1] - P.p.z) < 1.8 ? STN.spot : null;
 function tryStation() { if (!nearStation()) return false; openStation(); return true; }
-function openStation() { STN.open = true; STN.sel = 0; document.exitPointerLock?.(); renderStation(); $("station").style.display = "flex"; }
+function openStation() { HORN.st = hornRecharge(HORN.st); STN.open = true; STN.sel = 0; document.exitPointerLock?.(); renderStation(); $("station").style.display = "flex"; }
 function closeStation() { STN.open = false; $("station").style.display = "none"; }
 function renderStation() {
-  const rows = $("st-rows"); rows.innerHTML = gearList().map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i + 1}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>${gearList().length + 1}  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
+  const rows = $("st-rows"); rows.innerHTML = gearList().map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i + 1}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>E  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
   rows.querySelectorAll("button").forEach(b => { b.onclick = () => stationToggle(b.dataset.slot ? gearList().length : gearList().indexOf(b.dataset.gear)); });
   $("st-close").onclick = closeStation;
 }
@@ -1907,7 +2030,7 @@ function syncGear() {
 // a death in the mode: the gear is in the locker; ammo, rays, bolts and beacons are gone (docs/WORLD.md, "Death in Going back in")
 function gbDeath() {
   if (!GB.load) return;
-  GB.load = lockerDied(GB.load); if (GB.kit) GB.kit = kitLost(GB.kit); LT.rounds = 0; BOW.st = newBow(0); DRV.st = drvLost(); DART.st = dartLost(); FLAME.st = flameLost(); BC.have = 0; syncGear();
+  GB.load = lockerDied(GB.load); if (GB.kit) GB.kit = kitLost(GB.kit); LT.rounds = 0; BOW.st = newBow(0); DRV.st = drvLost(); DART.st = dartLost(); FLAME.st = flameLost(); HORN.st = hornLost(); ROCKET.st = rocketLost(); LASER.st = laserLost(); BC.have = 0; syncGear();
   toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
 }
 
@@ -3184,14 +3307,14 @@ function update(dt) {
   P.moving = Math.hypot(fwd, side) > 0.2;
   const runKey = !reviving && !KPUI.open && (keys.KeyR || g.run);                                // hold R (or the right stick) to run: faster than any monster, and loud; running stands you up
   if (P.tired && P.stam >= RUN_RESUME) P.tired = false;
-  P.running = !!(runKey && P.moving && !P.tired && P.stam > 0);
+  P.running = !!(runKey && P.moving && !P.tired && P.stam > 0 && HELD.item !== "rocket");          // the rocket launcher is too heavy to run with
   if (P.running) { crouchLatch = false; P.crouch = false; }
   AIM.on = HELD.item === "gun" && (HELD.aimBtn || HELD.padAim) && !dead && !loading;
   { const target = AIM.on ? AIM.fovAim : AIM.fov; if (Math.abs(camera.fov - target) > 0.05) { camera.fov += (target - camera.fov) * Math.min(1, dt * 12); camera.updateProjectionMatrix(); } }
   P.stam = Math.max(0, Math.min(1, P.stam + (P.running ? -dt / RUN_S : dt / RECOVER_S)));
   if (P.running && P.stam <= 0) { P.tired = true; P.running = false; }
   $("stam").style.opacity = P.stam < 0.999 ? 1 : 0; $("stam").firstElementChild.style.width = P.stam * 100 + "%"; $("stam").firstElementChild.style.background = P.tired ? "#a55" : "#cdb";
-  const sp = (P.crouch ? CROUCH_SPEED : P.running ? RUN_SPEED : WALK_SPEED) * dt;
+  const sp = (P.crouch || LASER.on ? CROUCH_SPEED : P.running ? RUN_SPEED : WALK_SPEED) * dt;          // the laser's beam holds you to a crouch's pace
   let wx = -Math.sin(P.yaw) * fwd + Math.cos(P.yaw) * side, wz = -Math.cos(P.yaw) * fwd - Math.sin(P.yaw) * side;
   const mag = Math.min(1, Math.hypot(wx, wz)), l = Math.hypot(wx, wz) || 1;
   wx = wx / l * mag * sp; wz = wz / l * mag * sp;
@@ -3264,7 +3387,7 @@ FIN.t0 = performance.now();
 await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {FST, FOREST_SCENES, tryForest, forestPrompt, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {FST, FOREST_SCENES, tryForest, forestPrompt, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>

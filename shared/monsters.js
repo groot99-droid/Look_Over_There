@@ -149,6 +149,8 @@ export class MonsterSim {
     }
     return false;
   }
+  provoke(x, z, id = null) { if (this.state === "chase") return; this.state = "chase"; this.lost = 0; this.last = [x, z]; this.tgt = id; this.repath = 0; }          // something hurt it from over there (the laser): it runs at the spot, and gives up as any lost chase does
+  shove(x, z) { this.pos.x = x; this.pos.z = z; this.path = []; this.target = null; }                // thrown to a spot (the frequency horn): where it was going no longer applies
   slow(k, secs) {                                                            // every speed times k for secs: the strongest slow wins, they do not stack
     if (this.slowT <= 0 || k < this.slowK) { this.slowK = k; this.slowT = secs; } else if (k === this.slowK) this.slowT = Math.max(this.slowT, secs);
   }
@@ -199,13 +201,13 @@ export function spawnPlan(W, monCfg, level) {
 
 // ---- the ray gun's side of things
 // the nearest monster on o's floor that the ray from o along d (unit) hits: {m, t} or null
-export function rayMonster(W, monsters, o, d) {
+export function rayMonster(W, monsters, o, d, range = SHOT_RANGE) {          // range: the ray's own by default; the laser reaches further
   let best = null;
   for (const m of monsters) {
     if (Math.abs(o[1] - 1.5 - m.fy) > 1.6) continue;
     for (const f of [0.15, 0.5, 0.85]) {                                    // three points up the body stand for a capsule
       const q = [m.pos.x - o[0], m.fy + f * (m.cfg.height || 2.2) - o[1], m.pos.z - o[2]], t = q[0] * d[0] + q[1] * d[1] + q[2] * d[2];
-      if (t < 0.3 || t > SHOT_RANGE) continue;
+      if (t < 0.3 || t > range) continue;
       if (Math.hypot(q[0] - d[0] * t, q[1] - d[1] * t, q[2] - d[2] * t) < HIT_R && (!best || t < best.t) && rayClear(W, o, d, t)) best = {m, t};
     }
   }

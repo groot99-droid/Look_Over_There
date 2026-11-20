@@ -1,5 +1,5 @@
 {
-  "_note": "One monster kind per floor. hp = health in Going back in (docs/ITEMS.md 1.4; a weapon that hurts takes it, a kill removes the monster; the Original never hurts one). batonStun = how much longer the stun baton's stun lasts on it (docs/ITEMS.md 4.4). burnTime = how long a burn lasts on it compared with the others (docs/ITEMS.md 4.3). glb = animated, textured model; anim maps roles to the clip names inside it; yawOffset turns it to face the way it walks (Meshy models face +Z: 3.14159); perLevel = how many patrol each floor.",
+  "_note": "One monster kind per floor. hp = health in Going back in (docs/ITEMS.md 1.4; a weapon that hurts takes it, a kill removes the monster; the Original never hurts one). batonStun = how much longer the stun baton's stun lasts on it (docs/ITEMS.md 4.4). burnTime = how long a burn lasts on it compared with the others (docs/ITEMS.md 4.3). knockback = how far a shove carries it compared with the others (docs/ITEMS.md 4.8). laser = how much of the laser's damage it takes (docs/ITEMS.md 4.6). glb = animated, textured model; anim maps roles to the clip names inside it; yawOffset turns it to face the way it walks (Meshy models face +Z: 3.14159); perLevel = how many patrol each floor.",
   "monsters": [
     {
       "name": "sinew",
@@ -27,6 +27,7 @@
     {
       "name": "pale_traveler",
       "hp": 80,
+      "laser": 1.25,
       "glb": "monsters/pale_traveler.glb",
       "height": 2.0,
       "yawOffset": 3.14159,
@@ -47,6 +48,7 @@
     {
       "name": "clawed",
       "hp": 100,
+      "knockback": 0.5,
       "glb": "monsters/clawed.glb",
       "height": 2.2,
       "yawOffset": 3.14159,

@@ -312,7 +312,12 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server owns the capacitors and the stun.
 
-### 4.5 Almond water aerosol rocket launcher [PROPOSAL] (model: `Scrapyard_Blaster`)
+### 4.5 Almond water aerosol rocket launcher [BUILT, solo Going back in] (model: `Scrapyard_Blaster`)
+
+**Built (session 24):** `shared/rocket.js` and `shared/rocket.test.js` (the ammo, the arming, the blast falloff, the mist), `shared/flight.js` (the projectile the dart already used, now shared: `shared/dart.test.js` is unchanged and passes), the page (`index.html`: the rocket in the air, the burst and the mist, the HUD line `ROCKETS ● ○ ○`, no running while you hold it, death), `tools/rocket_test.mjs`. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* a rocket that meets nothing ends at 40 m and bursts there (it is not lost); "within 5 m of you" is measured as 5 m of flight from where it left, so a rocket that hits something close to you is a dud but one that lands near you after you walk up to it is not (and then hurts you); the blast ignores walls, like the tripwire's; the mist is 2.5 m out from the burst and keeps re-slowing what stands in it, so a monster leaves it slowed for 0.3 s more; you take one hit of 35 if you are within 5 m of an armed burst (the usual second of grace applies); the launcher is not given an aim on right click (no weapon but the ray has one yet).
+- *Not built:* the Market (the launcher starts in the locker with one rocket, and nothing sells more; a pack gives none by design); the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`); the right-click aim; other players in the blast (solo has none).
+- *The locker:* it has nine rows now, so its E-slot key is the tenth: **0** (the panel shows 0).
 
 - **What it is.** A shoulder tube with aerosol cans strapped on. One loud answer to a room that has gone wrong.
 - **Role.** The big area burst. Very loud, very few shots.
@@ -325,7 +330,12 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server flies the rocket and owns the burst, the mist and who was in it.
 
-### 4.6 Optical laser pointer dissector [PROPOSAL] (model: `Scraplight_Blaster`)
+### 4.6 Optical laser pointer dissector [BUILT, solo Going back in] (model: `Scraplight_Blaster`)
+
+**Built (session 25):** `shared/laser.js` and `shared/laser.test.js` (the climb, the battery, the heat, the swap, the dot), `rayMonster`'s optional range and `MonsterSim.provoke` in `shared/monsters.js`, `laser` 1.25 on the pale traveler in `world/monsters.json`, the page (`index.html`: hold left click or RT for the beam, hold right click or LT for the dot, a red line and a red dot, the HUD line `LASER 92%  SPARE ×1`, the crouch pace while the beam is on, packs, death), `tools/laser_test.mjs`. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* the heat cools at the rate it built while the beam is off, so 3 s on, 3 s off, 3 s on does not overheat; the dot makes no heat but is locked while the laser is overheated; meeting a different monster starts the climb at once (no 0.3 s wait); letting go of the trigger loses the climb after the same 0.3 s; a pack pickup's 25% goes to the loaded pack only and is lost if that is full; a hurt monster that was not chasing runs at where you stood and gives up like any lost chase; the beam and the dot stop on the floor (the floor is not a collider) and on walls and shut doors; the dot's lure is refreshed every 0.4 s while you hold it.
+- *Not built:* the Market (it starts in the locker with a full pack and one spare; nothing sells packs yet); the model (a placeholder is drawn in code); rooms (solo only, `SOLO_GEAR`).
+- *The locker:* with ten gear rows the E slot's swap is on the **E key** in the panel (number keys 1 to 9 and 0 are the ten gear rows).
 
 - **What it is.** A lens assembly on a drum, fed by battery packs. At low power it is a red dot on the far wall, and things go and look at it. At full power it takes things apart quietly.
 - **Role.** Silent, long range, and the game's title as a mechanic: look over there.
@@ -353,7 +363,11 @@ All ten: bought at the Market, kept for good, returned free by the locker, used 
 - **Where it works.** Going back in, Secret Operations.
 - **In a room.** The server owns the spool clock, the fluid, the kill and which barricade or cable was cut.
 
-### 4.8 Sound-amplified frequency horn [PROPOSAL] (model: `Junkyard_Sonic_Blaster`)
+### 4.8 Sound-amplified frequency horn [BUILT, solo Going back in] (model: `Junkyard_Sonic_Blaster`)
+
+**Built (session 23):** `shared/horn.js` and `shared/horn.test.js` (the battery, the two cooldowns, the cone, the knockback), `shared/cone.js` (the cone test, now shared with the flamethrower), `MonsterSim.shove` and `knockback` on the clawed in `world/monsters.json`, the page (`index.html`: the blast on left click or RT, the call on right click or LT, rings along the cone, the HUD line `HORN ▮▮▮▮▮▯ 5/6`, a free recharge each time you open the locker, death), `tools/horn_test.mjs`. Everything below is as built except what this note lists.
+- *Readings I made where the text was open:* the blast and the call have separate cooldowns (a blast does not stop a call and the other way round); a knocked-back monster is moved at once, in quarter-metre steps straight away from you, and stops 0.5 m before anything solid or at the edge of the walkable floor; opening the locker recharges the battery whether the horn is in your hands or in the locker, so taking it out always gives a full one; a monster already chasing is not drawn by the call or the blast (the alert never takes a chaser off its chase), but is still thrown and stunned by a blast; the blast's noise and the call's reach are measured from where you stand, on your floor.
+- *Not built:* the spare battery has a rule (`addSpare`, the automatic 3 s swap, both tested) but no source until the Market sells it ($4); the Market; the model (a placeholder is drawn in code; `models/items/frequency_horn.glb` is not loaded); rooms (solo only, `SOLO_GEAR`); the unkillable monsters' halved knockback (no such monster is in the mode yet).
 
 - **What it is.** A dented megaphone horn wired to a car battery box. It hurts nothing. It moves everything, and then everything comes.
 - **Role.** The loud lure and the shove. No damage at all.
