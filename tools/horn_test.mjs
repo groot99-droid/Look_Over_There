@@ -60,8 +60,8 @@ try {
   check("the one 30 m behind heard it (within 40 m) and goes to look", after[2].state === "search" && after[2].stun === 0, JSON.stringify(after));
   check("a second blast at once does nothing", (await page.evaluate(() => window.__game.blowHorn())) === false && (await st()).charge === 5);
 
-  // the clawed grip the floor: half as far
-  await stage({dist: 4, d1: 7}); await fresh();
+  // the clawed grip the floor: half as far (the second monster is still thrown the full 6 m, 7 to 13 m, so the line must be clear past 13 m, as in the first case)
+  await stage({dist: 4, d1: 7, clear: 14}); await fresh();
   await page.evaluate(() => { const m = window.__game.monsters[0]; m.cfg = {...m.cfg, knockback: 0.5}; });
   await page.evaluate(() => window.__game.blowHorn()); after = await ahead();
   check("a monster with knockback 0.5 (the clawed) goes 3 m, not 6", Math.abs(after[0].d - 7) < 0.4 && Math.abs(after[1].d - 13) < 0.4, JSON.stringify(after));
