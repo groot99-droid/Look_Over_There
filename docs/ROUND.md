@@ -43,7 +43,7 @@ A player who joins during PLAYING skips the lobby and spawns with the group. A r
 | RND-12 | A party is a room (the same mode and the same code). Where you are is separate from who you party with: ten players can split across floors, chambers and games in any number of groups, and each player can join or leave a place at any time. A player can jump to a friend. | PART BUILT: the party key is mode plus code, and `{t:"goto",to:id}` returns a friend's place and spot: a floor, or a page scene the manifest marks `presence` (the parking lot, Hallam Row, the apartment), refused with the missing flag if you may not enter it. In the page, P lists the party with where each player is and a Go button (session 17; `tools/world_mp_test.mjs`). Rooms cannot enter chambers, games or the City's other interiors yet. | Ten clients in one party stand in three different places, and a late joiner goes to a friend's place. |
 | RND-13 | The server can list open rooms for a mode: code, mode, players, phase, floor furthest along. | BUILT | `GET /rooms?mode=original` returns only open, non-full rooms. |
 | RND-14 | Until RND-15 lands the two game gates are solo only. A manifest link marks this with `soloOnly`, and the page reads the flag instead of hard-coding it. | CHANGE | A test asserts the toast comes from the manifest flag. |
-| RND-15 | Co-op inside a game (Right Door, Wrong Exit, the Intern) is optional, never required. A player may enter a game alone or with friends, and friends can pop in at any time. Each game runs one instance per party, and the players inside it see each other. A game's gate stops being solo only once the game supports this. | NEW | Two clients enter Right Door, Wrong Exit separately and meet in one instance. |
+| RND-15 | Co-op inside a game (Right Door, Wrong Exit, the Intern) is optional, never required. A player may enter a game alone or with friends, and friends can pop in at any time. Each game runs one instance per party, and the players inside it see each other. A game's gate stops being solo only once the game supports this. | SLICE 2 BUILT (section D): the manifest and server can hold game places (`coop` areas, `REGISTRY.gamePlaces`, `goto` through them, a player in a game does not hold the finish); both games still `soloOnly` until the page draws other players | Two clients enter Right Door, Wrong Exit separately and meet in one instance. |
 
 ### Results, deaths and ranking
 
@@ -131,6 +131,37 @@ Not built: waves that scale with the party (every wave is the manifest's count, 
 - *Refills:* each ammo pack adds one flash-vial and one of the E item, up to the cap. The Market does not exist yet, so there is no other source.
 - *Death:* all consumables are gone and the locker does not return them (docs/WORLD.md). Traps already set stay until a monster springs them, and are cleared when you change chamber.
 - *Controls:* Q and RB-side E are as `docs/GAMEPLAY.md` says (LB / Q support, RB / E combat). `tools/controls_test.mjs` still passes. In the Original the slots stay empty.
+
+## D. Co-op inside the games (design note, session 11)
+
+Status: **design only, no code yet.** Written first, as `docs/SESSIONS.md` asks, so the owner can change a default before it is built. Everything marked *Default* is what the build will do unless told otherwise.
+
+**What exists.** A room is a party of up to 10 (RND-12). A player's place is separate from the party. Since session 17 a place can be a *presence scene*: the server relays position snapshots between the players whose `scene` string is the same and runs no rules there (`presencePlace`, `presenceSnap` in `server/server.js`; `REGISTRY.presence` and `REGISTRY.canReach` in `shared/registry.js`). The two games are solo only today: `soloOnly` on their gate links, and the page refuses the door in a room. Each game draws itself in its own renderer, hidden behind the page's: Right Door, Wrong Exit (`games/rdwe/walk.js`, a chain of rooms walked one after another, `enterGame` can start the chain at any room) and the Intern (`games/intern/`, an iframe with its own three.js, nine spine stages S0 to S8).
+
+**The idea.** A game room is just one more presence scene. Nothing about the game's own rules moves to the server.
+
+1. **A place inside a game.** `rdwe:<room>` (`rdwe:dining`, `rdwe:teal`, ...) and `intern:<stage>` (`intern:S3`). The manifest lists them as the `places` of the game's area, each with `presence: true`; `REGISTRY.canReach` reaches a game place through the gate link (once its `soloOnly` is dropped) and, from there, any place of the same game. The server accepts a player's place only if `canReach` says so, as it does for the parking lot.
+2. **One instance per party, game and place.** The party is the room, so the instance is "this room's players whose place is `rdwe:teal`". The server already broadcasts a snapshot only to players with the same place string, so two players in `rdwe:teal` see each other and a third in `rdwe:hallway` does not. No instance object is created or destroyed.
+3. **Who is in it.** Whoever's place string matches. A player may enter alone (nobody else is in the place) or with friends (they walk through the gate, or "go to a friend" in a game: `goto` returns the friend's place and the page calls `enterGame` at that room). Friends can arrive and leave at any time, because arriving is changing a place string.
+4. **What is shared.** Presence and positions only: where each player is, which way they face, crouching, moving. Each player's puzzles, pickups, ending and progress through the chain stay their own page's state. *Default for version 1, as in session 11's brief.* Shared puzzle state comes later and is a separate decision per game.
+5. **Leaving.** A player who finishes or quits a game goes back to L4 at the gate's arrival point (the fix of session 2); their place changes to `L4`, and the others in the game see them vanish. Nothing in the others' game ends, because nothing else was shared. A player who disconnects is removed from their place as for any floor.
+6. **How the others are drawn.** Each game draws other players in its own scene, not the page's:
+   - Right Door, Wrong Exit: the page hands `walk.start` a list of peers (position, yaw, colour) that it updates from the room's snapshots, and the walk draws a plain figure for each in the walker's scale (`RDWE_SCALE`, so a player is the same size to everyone). Its own position goes out through the page's existing state message, with the game's place as the `scene`.
+   - The Intern: the page and the iframe talk by `postMessage`, as they already do for `intern-ending`. The page posts peers into the iframe and the iframe posts its player's position out; the iframe draws figures in its own scene (scaled by `INTERN_SCALE`).
+7. **Soundless and harmless.** Other players are shown but have no collision, cannot touch or hurt anyone and make no game-affecting noise. *Default.* (Footsteps heard in the Intern's drone would change a game built around silence; revisit with the owner.)
+8. **The round outside.** A player inside a game is not on a floor, so the Original's finish must decide what to do with them. *Default:* a player in a game does not block the round: the finish waits for the players on floors, and a player still inside a game when it ends is not ranked, and gets the results on their return. Alternative, if the owner prefers: they count as present and the round waits. Chosen so that one player in a long game cannot hold a room hostage.
+9. **Room size and the server.** The 10 cap, name tags, colours and the message budget are the room's, unchanged. Presence snapshots are sent at the page's usual state rate. The server holds no game state, so there is nothing new to measure for the tick.
+10. **`soloOnly`.** The manifest flag is dropped per game only when that game's slice below passes its test. The page already reads the flag (session 2), and the manifest check already requires a built link that a room can follow to end in `multiplayer` or `presence` scenes.
+
+**Order of work** (each slice its own commit, tested):
+1. This note.
+2. Server and manifest: game places as presence scenes, `canReach` and `goto` through them, tests. `soloOnly` stays.
+3. Right Door, Wrong Exit in a room: peers drawn in its scene; `tools/games_party_test.mjs` has two clients enter the game separately, meet in one place, and leave without breaking the other's game. Then drop `soloOnly` on its gate.
+4. The Intern: the postMessage bridge and the same test. Then drop its `soloOnly`.
+
+**Not in this session.** Shared puzzle state, shared endings, voice or text between players in a game, games reached from the Overworld's forest or the city (their links stay planned), and the City's job shifts, which stay solo.
+
+**Questions for the owner** (each has the default above): (a) are other players audible in the Intern, or only visible; (b) does a player inside a game block the round's finish; (c) should a player be able to jump into a friend's *Intern* stage, or only to Right Door, Wrong Exit rooms (the Intern's stages build on each other's state).
 
 ## Decisions
 

@@ -226,3 +226,44 @@ test("canReach: which scenes a room's player may be in, by the flags they hold",
   for (const id of REGISTRY.chambers) assert.deepEqual(REGISTRY.canReach(id, [], "going_back_in"), {ok: true, missing: []}, id);
   for (const id of ["L4", "B1", "parking_lot", "street", "apartment"]) assert.equal(REGISTRY.canReach(id, REGISTRY.manifest.flags, "going_back_in").ok, false, `${id} is not a scene of a going_back_in room`);
 });
+
+// ---- co-op inside the games (session 11, slice 2): a game area marked `coop` has a place for each of its rooms or stages, and a room can follow its gate into it.
+// The shipped manifest leaves both games solo only until each game can show other players (slices 3 and 4), so these use a copy with co-op switched on.
+const withCoop = (games = ["rdwe", "intern"]) => {
+  const d = clone(FARWAY);
+  for (const a of d.areas) if (games.includes(a.id)) a.coop = true;
+  for (const l of d.links) if (l.connector === "gate" && l.status === "built" && games.includes(l.to.area)) delete l.soloOnly;
+  return d;
+};
+test("shipped: both games are solo only, so a room has no game places", () => {
+  assert.deepEqual(REGISTRY.gamePlaces, {});
+  assert.equal(REGISTRY.canReach("rdwe:dining", REGISTRY.manifest.flags).ok, false);
+  assert.deepEqual(checkManifest(FARWAY, {worldDocs: worldDocs()}).warnings, []);
+});
+test("a coop game has a place per room (Right Door, Wrong Exit) or stage (the Intern), named area:room", () => {
+  assert.deepEqual(validateManifest(withCoop()), []);
+  const r = buildRegistry(withCoop());
+  assert.deepEqual(Object.keys(r.gamePlaces).filter(p => p.startsWith("rdwe:")), ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"].map(x => `rdwe:${x}`));
+  assert.deepEqual(Object.keys(r.gamePlaces).filter(p => p.startsWith("intern:")), ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"].map(x => `intern:${x}`));
+  assert.deepEqual(r.gamePlaces["rdwe:teal"], {area: "rdwe", room: "teal"});
+});
+test("a room reaches a game's places through its gate, and only that game's", () => {
+  const rdwe = buildRegistry(withCoop(["rdwe"]));
+  assert.deepEqual(rdwe.canReach("rdwe:teal", [], "original"), {ok: true, missing: []}, "from the gate, any room of the game");
+  assert.equal(rdwe.canReach("intern:S3", [], "original").ok, false, "the Intern is still solo only here");
+  assert.equal(rdwe.canReach("rdwe:nowhere", [], "original").ok, false);
+  const both = buildRegistry(withCoop());
+  assert.equal(both.canReach("intern:S3", [], "original").ok, true);
+  assert.equal(both.canReach("rdwe:dining", [], "going_back_in").ok, false, "a Going back in room has no gate to the games");
+  assert.equal(both.canReach("L4", [], "original").ok, true, "and the way back is still there");
+});
+test("coop is checked: it needs a built game with rooms or stages, and its gate must then not say soloOnly", () => {
+  bad(d => { d.areas.find(a => a.id === "rdwe").coop = "yes"; }, /coop must be true/);
+  bad(d => { const a = d.areas.find(a => a.id === "rdwe"); a.coop = true; delete a.rooms; }, /coop needs rooms or spine/);
+  bad(d => { d.areas.find(a => a.id === "hotel").coop = true; }, /only a built area can be coop/);          // the hotel is still planned (the dreamcore forest, the first example here, is built now)
+  bad(d => { d.areas.find(a => a.id === "rdwe").coop = true; }, /soloOnly/);          // coop game, but its gate still says soloOnly: say which one
+  const d = withCoop(["rdwe"]); const gate = d.links.find(l => l.to.area === "rdwe" && l.connector === "gate" && l.status === "built");
+  gate.to.room = "nowhere"; assert.ok(validateManifest(d).some(m => /nowhere/.test(m)), "a gate into a room the game does not have");
+  const solo = clone(FARWAY); solo.links.find(l => l.to.area === "rdwe" && l.connector === "gate" && l.status === "built").soloOnly = false;
+  assert.ok(validateManifest(solo).some(m => /neither multiplayer nor presence|soloOnly/.test(m)), "a gate a room can follow into a game that is not coop");
+});
