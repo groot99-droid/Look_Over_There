@@ -107,11 +107,13 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
 
   const gbi = (doc.modes || {}).going_back_in;                                                       // chambers: each one sits on a floor of the mode, its `next` is another chamber, and the start is one
   const chamberIds = new Set(chambers.map(c => c.id));
+  const chamberAt = new Map();                                                                         // one chamber per place in the run: a floor and an index name it
   for (const c of chambers) {
     const at = `scene ${c.id}`, ch = c.chamber;
     if (!isObj(ch) || !gbi) continue;
     if (!gbi.floors.includes(ch.floor)) err(`${at}: chamber floor ${ch.floor} is not a floor of going_back_in`);
     if (gbi.chambersPerFloor !== undefined && ch.index > gbi.chambersPerFloor) err(`${at}: chamber index ${ch.index} is past chambersPerFloor ${gbi.chambersPerFloor}`);
+    { const k = `${ch.floor} ${ch.index}`; if (chamberAt.has(k)) err(`${at}: chamber ${ch.index} of ${ch.floor} is already ${chamberAt.get(k)}`); else chamberAt.set(k, c.id); }
     if (ch.next !== undefined && !chamberIds.has(ch.next)) err(`${at}: chamber.next ${ch.next} is not a chamber`);
     if (ch.next !== undefined && ch.stairsDown === undefined) err(`${at}: chamber.next needs chamber.stairsDown`);
   }

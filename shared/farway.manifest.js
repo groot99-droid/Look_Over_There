@@ -60,6 +60,9 @@ export const FARWAY = {
     {
       // Going back in, slice 1: two chambers made from existing floors (tools/make_chambers.mjs writes their world files). `chamber.floor` and `index` place it in the run (wave number =
       // floor position x chambersPerFloor + index); the 4th chamber of a floor has the stairs down, to the next floor's first. `multiplayer`: a going_back_in room's server runs them as floors (session 16).
+      // Which chamber the existing floor is (docs/ROUND.md, GBI-1): on L4 it is the 4th (it has the real stairs down); on L3, L2, L1 and B1 it is the 1st (the stairs from the floor
+      // above arrive in its real stairwell). So the 15 new chambers are L4's 1 to 3 and 2 to 4 of the other four floors; the 4th of L3, L2 and L1 gets a stair door of its own, and
+      // B1's 4th is wave 20, the run's end, with no stairs.
       id: "gbi", name: "Going back in", status: "built", tone: "backrooms",
       scenes: [
         {id: "gbi_L4_4", floorY: 9.6, multiplayer: true, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
