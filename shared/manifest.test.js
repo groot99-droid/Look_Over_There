@@ -183,6 +183,13 @@ test("a bad chamber is caught", () => {
   bad(d => { d.modes.going_back_in.startChamber = "L3"; }, /startChamber L3 is not a chamber/);
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.floor = "L9"; }, /not a floor of going_back_in/);
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.index = 5; }, /past chambersPerFloor/);
+  // a backdrop: equirect pictures of what lies past a scene the page loads; a day one, and maybe a night one
+  { const d = clone(FARWAY), st = d.areas.find(a => a.id === "city").scenes.find(x => x.id === "street"); st.backdrop = {day: "world/backdrops/street_day.webp", night: "world/backdrops/street_night.webp"};
+    assert.deepEqual(validateManifest(d), []); assert.deepEqual(buildRegistry(d).pageScenes.street.backdrop, st.backdrop); assert.equal(buildRegistry(clone(FARWAY)).pageScenes.street.backdrop, undefined); }
+  bad(d => { d.areas.find(a => a.id === "city").scenes[0].backdrop = {night: "world/x.webp"}; }, /backdrop needs a day picture/);
+  bad(d => { d.areas.find(a => a.id === "city").scenes[0].backdrop = {day: "../x.webp"}; }, /backdrop needs a day picture/);
+  bad(d => { d.areas.find(a => a.id === "city").scenes[0].backdrop = {day: "world/x.webp", dusk: "world/y.webp"}; }, /backdrop needs a day picture/);
+  bad(d => { d.areas.find(a => a.id === "city").scenes.find(x => x.id === "bus_stop").backdrop = {day: "world/x.webp"}; }, /a backdrop needs a scene the page loads/);
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.next = "nope"; }, /is not a chamber/);
   bad(d => { delete d.areas.find(a => a.id === "gbi").scenes[0].chamber.wave; }, /chamber needs a floor/);
 });
