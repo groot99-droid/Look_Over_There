@@ -35,6 +35,7 @@ For every scene:
   - the saved `blender/scenes/<scene>.blend` (Git LFS takes it automatically: `.gitattributes` has `*.blend`).
 
 ### 1. `apartment` (the pilot)
+- **Status:** built and in the game. The Blender session's build is `world/apartment.glb` with two lightmaps (`docs/renders/apartment/README.md` has its numbers and sources). The page loads it through the manifest, shows the baked light through `applyLightmaps` in `index.html`, and no longer draws the box room.
 - **Layout:**
   - The room spans x −3 to 3 and z −2.5 to 2.5, and is 2.8 m high.
   - The bed, desk and fridge sit at their boxes in `APARTMENT`.
@@ -147,6 +148,7 @@ For every scene:
 ### R1. Lightmaps
 - **Where they go:** each mesh gets a second UV set (TEXCOORD_1, lightmap-packed, 8 px margin). The bake goes to separate images under `world/lightmaps/<scene>_<n>.webp`: at most four per scene, each at most 2048², 8-bit WebP q90.
 - **How the page finds them:** each material that uses one carries the custom properties `lightmap` (the path) and `lightmap_intensity`. Export with Include → Custom Properties, so these land in glTF `extras`. The coordinator's page code then sets `material.lightMap` with `channel = 1`.
+- **How the page shows them (as built for the pilot):** `applyLightmaps` swaps each such material for an unlit one that shows its texture times the lightmap. The page's own lights still light the players and the things drawn in code, and do not light the room twice. So a baked material's normal, roughness and metal maps are not used by the page: put what matters into the base colour and the bake. Materials without a lightmap (lamps, glass, backdrops) stay as exported.
 - **Why this way:** it keeps the base textures shareable and lets the page switch a map off (night, the mall's emergency set). Baking light into the base colour would light the scene twice under the page's own lights.
 - **Bake settings:** Cycles on the GPU, 512 to 1024 samples, OIDN denoise. Texel density is about 32 px/m indoors and 8 to 12 px/m outdoors.
 - **AO-only scenes** (street, meadow; the forest's trees): the same slot holds an AO bake.
