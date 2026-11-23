@@ -1907,7 +1907,7 @@ const HORN = {st: newHorn(), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .55, metalness: .3}), bell = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.025, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({color: 0xb0a070, roughness: .5, metalness: .5, side: THREE.DoubleSide}));
   bell.rotation.x = -Math.PI / 2; bell.position.set(0, 0.02, -0.18);
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.16), mat(0x34383c)); box.position.set(0, -0.08, 0.08);
-  HORN.pivot.add(bell, box); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
+  HORN.art = new THREE.Group(); HORN.art.add(bell, box); HORN.pivot.add(HORN.art); heldModel(HORN, "items/frequency_horn", 0.45, -1); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
 function hornRings(x, z, dx, dz, reach) {                                    // rings spreading along the cone, or one ring round you for the call
   for (let k = 1; k <= 5; k++) {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xd8f0ff, depthWrite: false, transparent: true, opacity: 0.9})); sp.scale.set(2, 2, 1);
@@ -1939,9 +1939,9 @@ function callHorn() {
 }
 // ---- the rocket launcher (shared/rocket.js): a rocket bursts on the first thing it meets; the blast hurts, a mist slows, the bang is heard far off, and it hurts you too inside 5 m. Under 5 m of flight it is a dud.
 const ROCKET = {st: newRocket(0), kick: 0, pivot: new THREE.Group(), flights: [], mists: []};
-{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), tube = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 12), mat(0x5a6a50)); tube.rotation.x = Math.PI / 2;
-  for (const [x, y] of [[0.075, 0.07], [-0.075, 0.07], [0, -0.09]]) { const can = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), mat(0xd8c070)); can.rotation.x = Math.PI / 2; can.position.set(x, y, 0.05); ROCKET.pivot.add(can); }
-  ROCKET.pivot.add(tube); ROCKET.pivot.position.set(0.2, -0.26, -0.5); ROCKET.pivot.visible = false; camera.add(ROCKET.pivot); }
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), tube = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 12), mat(0x5a6a50)); tube.rotation.x = Math.PI / 2; ROCKET.art = new THREE.Group();
+  for (const [x, y] of [[0.075, 0.07], [-0.075, 0.07], [0, -0.09]]) { const can = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), mat(0xd8c070)); can.rotation.x = Math.PI / 2; can.position.set(x, y, 0.05); ROCKET.art.add(can); }
+  ROCKET.art.add(tube); ROCKET.pivot.add(ROCKET.art); heldModel(ROCKET, "items/almond_water_rocket_launcher", 0.7, -1); ROCKET.pivot.position.set(0.2, -0.26, -0.5); ROCKET.pivot.visible = false; camera.add(ROCKET.pivot); }
 function clearRockets() { for (const f of ROCKET.flights) if (f.mesh) S.root.remove(f.mesh); ROCKET.flights.length = 0; for (const m of ROCKET.mists) S.root.remove(m.o); ROCKET.mists.length = 0; }
 function fireRocket() {
   if (!GB.load || !carries(GB.load, "rocket") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1984,7 +1984,7 @@ const LASER = {st: newLaser(), on: false, dotOn: false, pivot: new THREE.Group()
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .5, metalness: .4}), drum = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.14, 14), mat(0x50545a)); drum.rotation.z = Math.PI / 2; drum.position.set(0, 0, 0.08);
   const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.3, 12), mat(0x24262a)); lens.rotation.x = Math.PI / 2; lens.position.set(0, 0.01, -0.15);
   const pack = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.12), mat(0xb03a2a)); pack.position.set(0, -0.08, 0.1);
-  LASER.pivot.add(drum, lens, pack); LASER.pivot.position.set(0.22, -0.3, -0.5); LASER.pivot.visible = false; camera.add(LASER.pivot);
+  LASER.art = new THREE.Group(); LASER.art.add(drum, lens, pack); LASER.pivot.add(LASER.art); heldModel(LASER, "items/laser_pointer_dissector", 0.3, -1); LASER.pivot.position.set(0.22, -0.3, -0.5); LASER.pivot.visible = false; camera.add(LASER.pivot);
   LASER.line = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 6), new THREE.MeshBasicMaterial({color: 0xff2a2a, transparent: true, opacity: 0.85, depthWrite: false})); LASER.line.visible = false; scene.add(LASER.line);
   LASER.spot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({color: 0xff3030})); LASER.spot.visible = false; scene.add(LASER.spot); }
 function laserReach(o, d) { let lo = 0, hi = d[1] < -1e-3 ? Math.min(LASER_RANGE, (o[1] - S.floor - 0.03) / -d[1]) : LASER_RANGE;          // the floor is not a collider box: the beam and the dot stop on it
@@ -2018,7 +2018,8 @@ const SHEAR = {st: newShear(), was: false, pivot: new THREE.Group(), kick: 0, ms
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), body = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.11, 0.34), mat(0xb8411e));
   const jawA = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.05, 0.16), mat(0x3a3a3a)), jawB = jawA.clone(); jawA.position.set(-0.03, 0, -0.24); jawB.position.set(0.03, 0, -0.24);
   const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.1, 10), mat(0x2a2a2a)); motor.rotation.z = Math.PI / 2; motor.position.set(0, 0.07, 0.06);
-  SHEAR.jaws = [jawA, jawB]; SHEAR.pivot.add(body, jawA, jawB, motor); SHEAR.pivot.position.set(0.22, -0.3, -0.5); SHEAR.pivot.visible = false; camera.add(SHEAR.pivot); }
+  SHEAR.jaws = [jawA, jawB]; SHEAR.art = new THREE.Group(); SHEAR.art.add(body, jawA, jawB, motor); SHEAR.pivot.add(SHEAR.art); heldModel(SHEAR, "items/hydraulic_rebar_shear", 0.55, -1);   // the model is one piece: the code-made jaws still open and close, unseen, and the cut shows in the pivot's kick and buzz
+  SHEAR.pivot.position.set(0.22, -0.3, -0.5); SHEAR.pivot.visible = false; camera.add(SHEAR.pivot); }
 function shearTick(dt) {
   SHEAR.msgT = Math.max(0, SHEAR.msgT - dt); SHEAR.kick = Math.max(0, SHEAR.kick - dt * 4);
   SHEAR.st = shearTickState(SHEAR.st, dt);
