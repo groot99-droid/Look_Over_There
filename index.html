@@ -327,6 +327,33 @@ function disposeTree(root) {
   });
 }
 async function loadGlb(url) { return new Promise((res, rej) => loader.load(url, res, undefined, rej)); }
+// Baked light (docs/BLENDER.md, R1): a scene built in Blender names its lightmaps in each material's glTF extras (`lightmap`: the image's path, `lightmap_intensity`: its factor), on the
+// second UV set. Such a material is swapped for an unlit one that shows its texture times the baked light, so the page's own lights (the hemisphere light that the players, the
+// monsters and the things drawn in code need) do not light the room a second time. Materials without a lightmap (lamps, glass, a backdrop) are left as they are.
+// Returns how many materials were baked; a lightmap that cannot be loaded leaves its material as the file had it.
+const texLoader = new THREE.TextureLoader();
+async function applyLightmaps(gltfs) {
+  const maps = new Map(), done = new Map(); let n = 0;
+  const lightmap = url => maps.get(url) || maps.set(url, new Promise(res => texLoader.load(url, t => { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.channel = 1; res(t); }, undefined, () => res(null)))).get(url);
+  const jobs = [];
+  for (const g of gltfs) g.scene.traverse(o => {
+    if (!o.isMesh || Array.isArray(o.material) || !o.material.userData || !o.material.userData.lightmap || !o.geometry.attributes.uv1) return;
+    jobs.push((async () => {
+      const src = o.material, tex = await lightmap(src.userData.lightmap); if (!tex) return;
+      let m = done.get(src);
+      if (!m) {
+        m = new THREE.MeshBasicMaterial({name: src.name, color: src.color, map: src.map, transparent: src.transparent, opacity: src.opacity, alphaTest: src.alphaTest, side: src.side, depthWrite: src.depthWrite,
+          vertexColors: src.vertexColors, lightMap: tex, lightMapIntensity: src.userData.lightmap_intensity || 1});
+        m.userData = {...src.userData, baked: true}; done.set(src, m); n++;
+        for (const k of ["normalMap", "roughnessMap", "metalnessMap", "aoMap", "emissiveMap"]) if (src[k] && src[k] !== src.map) src[k].dispose();
+        src.dispose();
+      }
+      o.material = m;
+    })());
+  });
+  await Promise.all(jobs);
+  return n;
+}
 // ---------------------------------------------------------------- transition passages: every door pair is joined by a short walkable corridor (built here, no model)
 const PASSAGE_TINT = {B1: 0x7aa7a0, L1: 0xd9c36a, L2: 0xc9b27a, L3: 0xe8e4d8, L4: 0xcfd8dc, rdwe: 0x4a7a3e, intern: 0x4a4a52};
 const PASSAGE_LEN = 10, PASSAGE_W = 2.4, PASSAGE_H = 2.7;
@@ -431,11 +458,12 @@ async function loadScene(id, arrival) {
   const cfg = passage ? {glbs: [], floor: 0} : SCENES[id], doc = passage ? {colliders: passage.cols, doors: passage.doors, cameras: [], markers: []} : await (await fetch(`world/${id}.json`)).json();
   const root = passage ? passage.root : new THREE.Group();
   const gl = await Promise.all(cfg.glbs.map(loadGlb));
+  const baked = await applyLightmaps(gl);
   if (passage) id = "T";
   for (const g of gl) { g.scene.traverse(o => { if (o.isMesh) { o.matrixAutoUpdate = false; o.updateMatrix(); } }); root.add(g.scene); }
   scene.add(root);
   const chamber = passage ? null : REGISTRY.chamber(id);
-  Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
+  Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, baked, grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
   applySky(id, root);
   boxes.length = 0; doors.length = 0;
   for (const c of doc.colliders) boxes.push({n: c.min, x: c.max});
@@ -2664,6 +2692,11 @@ function apartmentProps(root) {
   const g = new THREE.Group(), [hx, hz] = APARTMENT.half, h = APARTMENT.h, wall = 0xd8cfc0, M = (c, o = {}) => new THREE.MeshLambertMaterial({color: c, ...o});
   CITY.doors = []; CITY.mats = {window: new THREE.MeshBasicMaterial({color: 0x9ec8ee}), screen: new THREE.MeshLambertMaterial({color: 0x102030, emissive: 0x4a9ad8, emissiveIntensity: 0.9})};
   const slab = (min, max, mat) => { const m = boxMesh(min, max, 0); m.material = mat; g.add(m); return m; };
+  if (SCENES[APT_SCENE].glbs.length) {                                       // the room is the Blender build (world/apartment.glb, docs/BLENDER.md): its light is baked, so no lamp is added here.
+    slab([1.5, 0.88, -2.166], [2.1, 1.3, -2.1595], CITY.mats.screen);       // the page keeps the computer's screen, in the monitor's opening
+    root.traverse(o => { if (o.isMesh && o.material.name === "Window_Glass") CITY.mats.window = o.material; });   // the pane takes the hour's sky, as the blockout's window did
+    root.add(g); return;
+  }
   slab([-hx, -0.05, -hz], [hx, 0, hz], M(0x7a6048)); slab([-hx, h, -hz], [hx, h + 0.05, hz], M(0xeeeae0));                                                       // floor, ceiling
   for (const [a, b] of [[[-hx, 0, -hz - 0.05], [hx, h, -hz]], [[-hx, 0, hz], [hx, h, hz + 0.05]], [[-hx - 0.05, 0, -hz], [-hx, h, hz]], [[hx, 0, -hz], [hx + 0.05, h, hz]]]) slab(a, b, M(wall));   // walls (seen from inside)
   const w = APARTMENT.window; slab([hx - 0.02, w.y[0], w.z[0]], [hx - 0.01, w.y[1], w.z[1]], CITY.mats.window);                                                      // the window: the colour of the sky
