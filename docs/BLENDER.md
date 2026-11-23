@@ -241,3 +241,5 @@ For every scene:
 - **The forest** is built from tree variants, because the trunks' places are fixed by its seed; there are no unique trees.
 - **Group C** waits for gameplay layouts.
 - **Art direction** comes from the text of `docs/WORLD.md`. The owner can send the reference photos it names if they want a closer match.
+
+Part 2, the planned areas built Blender first (the hotel, the rest of the grocery and the mall, the Overworld, the Going back in chambers, Right Door, Wrong Exit and Secret Operations), is in `docs/BLENDER_AREAS.md`.
