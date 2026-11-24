@@ -44,7 +44,7 @@ Nothing in this session changed game code, models or the manifest.
 | A shot's noise | the shooter counts as running for 0.5 s (ray) or 0.25 s (crossbow), even when crouched | `shared/monsters.js` (`SHOT_NOISE_S`), `shared/crossbow.js` (`SHOT_NOISE_S`) |
 | A loud event | every monster within a radius goes to look unless it is already chasing: 25 m for the tripwire, 40 m for the L1 switches | `shared/consumables.js` (`WIRE_NOISE_R`), `server/floorsim.js` (`ALERT_R`) |
 | Keys | 1 ray, 2 cloak, 3 beacon, 4 crossbow. Y rotates (tap) or opens a wheel (hold). Left click or RT uses what you hold. Right click or LT aims the ray, or is the secondary of the cloak and beacon. Q and E (LB and RB) are the consumable slots. F or X is the action button | `index.html` (the `keydown` handler), `tools/controls_test.mjs` |
-| Death in Going back in | all gear goes to the locker and comes back free; ray rounds, bolts, beacons and consumables are gone | `shared/loadout.js`, `shared/consumables.js` (`lost`), `index.html` |
+| Death in Going back in | all gear goes to the locker (on screen: the Lost and Found, the name settled on 2026-11-24) and comes back free; ray rounds, bolts, beacons and consumables are gone | `shared/loadout.js`, `shared/consumables.js` (`lost`), `index.html` |
 | Money | you start the City with $20 | `shared/needs.js` (`MONEY.start`) |
 | Pay | Intern $0 to $30 a shift; trash route up to $20; museum up to $20; factory $0 to $20; lab $0 to $20; a true anomaly report $5 once each, a false one costs $2 | `shared/pay.js`, `shared/trash.js`, `shared/museum.js`, `shared/factory.js`, `shared/lab.js`, `shared/anomalies.js` |
 
