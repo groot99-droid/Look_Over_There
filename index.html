@@ -903,6 +903,7 @@ function useDoor() {
 //   Y: tap to take out what you carry (tap again to rotate), hold for the wheel · RT / left click: use what you hold (fire / cloak on-off / roll a beacon)
 //   LT / right click: the gun aims; with the cloak or a beacon in hand it is the secondary ability · LB / RB (Q / E): the flash-vial, and the land mine or tripwire (Going back in only; empty in the Original) · 4: the hunting crossbow, 5: the pneumatic bolt driver (Going back in only)
 //   D-pad up / View / Tab / M: the handheld map (the camera feeds have no controls for now)
+const HELD_MODELS = {};                                                     // item id -> its weapon's model loader, run the first time it is held (see heldModel)
 const HELD = {mouseAlt: false, padAlt: false, mouseFire: false, padFire: false, item: null, yAt: 0, yDown: false, wheel: false, sel: 0, aimBtn: false, padAim: false};
 const AIM = {on: false, fov: 75, fovAim: 42};
 let crouchLatch = false;
@@ -911,6 +912,7 @@ const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT 
 const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon", GB.load && carries(GB.load, "crossbow") && "crossbow", GB.load && carries(GB.load, "driver") && "driver", GB.load && carries(GB.load, "baton") && "baton", GB.load && carries(GB.load, "dart") && "dart", GB.load && carries(GB.load, "flame") && "flame", GB.load && carries(GB.load, "horn") && "horn", GB.load && carries(GB.load, "rocket") && "rocket", GB.load && carries(GB.load, "laser") && "laser", GB.load && carries(GB.load, "shear") && "shear"].filter(Boolean);
 function setHeld(it) {
   HELD.item = it || null; AIM.on = false; HELD.mouseFire = false; HELD.mouseAlt = false;
+  if (HELD.item && HELD_MODELS[HELD.item]) HELD_MODELS[HELD.item]();                 // the first time a weapon is in hand, its model is fetched
   toast(HELD.item ? `Holding: ${ITEM_NAMES[it]}   ${ITEM_HINT[it]}` : "Hands empty", 2600);
 }
 function rotateHeld() {
@@ -1781,8 +1783,12 @@ function fireBow() {
 // a held weapon's Meshy model (models/items/<id>.glb), laid along the view: `front` is the end of the file's X axis the weapon points along (-1 or +1), `len` its length in metres.
 // Fronts, read from side renders: the bolt driver, dart and flamethrower point along -X (like the crossbow and the ray gun); the stun baton's prongs are at +X.
 // The code-made shape is kept in W.art and hidden once the model is in; if the file cannot load it stays. The kick and bob move W.pivot, so they apply to the model.
-function heldModel(W, id, len, front) {
-  loadModel(id).then(g => {
+// The model is fetched the first time the weapon is held (setHeld), not when the page starts: these weapons are Going back in's, and nobody in the Original should download them.
+function heldModel(W, id, len, front, item) {
+  let asked = false;
+  HELD_MODELS[item] = () => { if (asked) return; asked = true; load(); };
+  queueMicrotask(() => { if (HELD.item === item) HELD_MODELS[item](); });   // already in hand when the weapon was built
+  const load = () => loadModel(id).then(g => {
     if (!g) return;
     const m = SkeletonUtils.clone(g.scene), bb = new THREE.Box3().setFromObject(m, true), c = bb.getCenter(new THREE.Vector3());
     m.position.set(-c.x, -c.y, -c.z); m.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.material.side = THREE.DoubleSide; } });
@@ -1794,7 +1800,7 @@ const DRV = {st: newDriver(0), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .8}), body = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.1, 0.42), mat(0x8a5a2a));
   const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.2, 10), mat(0x6e7a6a)); tank.rotation.x = Math.PI / 2; tank.position.set(0, -0.09, 0.05);
   const gauge = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.02, 12), mat(0xd8d8c8)); gauge.rotation.z = Math.PI / 2; gauge.position.set(0.045, 0.02, 0.1);
-  DRV.art = new THREE.Group(); DRV.art.add(body, tank, gauge); DRV.pivot.add(DRV.art); heldModel(DRV, "items/pneumatic_bolt_driver", 0.4, -1); DRV.pivot.position.set(0.22, -0.3, -0.5); DRV.pivot.visible = false; camera.add(DRV.pivot); }
+  DRV.art = new THREE.Group(); DRV.art.add(body, tank, gauge); DRV.pivot.add(DRV.art); heldModel(DRV, "items/pneumatic_bolt_driver", 0.4, -1, "driver"); DRV.pivot.position.set(0.22, -0.3, -0.5); DRV.pivot.visible = false; camera.add(DRV.pivot); }
 function fireDriver() {
   if (!GB.load || !carries(GB.load, "driver") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
@@ -1812,7 +1818,7 @@ const BAT = {st: newBaton(), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), rod = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.62, 8), mat(0x3a3a38)); rod.rotation.x = Math.PI / 2;
   const bank = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.16), mat(0x8a6a3a)); bank.position.set(0, 0.0, 0.2);
   const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.3, 5), mat(0xc84a3a)); wire.rotation.x = Math.PI / 2; wire.position.set(0.04, 0.03, 0.05);
-  BAT.art = new THREE.Group(); BAT.art.add(rod, bank, wire); BAT.pivot.add(BAT.art); heldModel(BAT, "items/stun_baton_capacitor", 0.5, 1); BAT.pivot.position.set(0.24, -0.28, -0.5); BAT.pivot.visible = false; camera.add(BAT.pivot); }
+  BAT.art = new THREE.Group(); BAT.art.add(rod, bank, wire); BAT.pivot.add(BAT.art); heldModel(BAT, "items/stun_baton_capacitor", 0.5, 1, "baton"); BAT.pivot.position.set(0.24, -0.28, -0.5); BAT.pivot.visible = false; camera.add(BAT.pivot); }
 function swingBaton() {
   if (!GB.load || !carries(GB.load, "baton") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
@@ -1842,7 +1848,7 @@ function dischargeBaton() {
 const DART = {st: newDart(0), kick: 0, pivot: new THREE.Group(), flights: []};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), body = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.5), mat(0x6a5a40));
   const syringe = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.24, 10), new THREE.MeshStandardMaterial({color: 0xe8a020, roughness: .3, emissive: 0x6a3a00})); syringe.rotation.x = Math.PI / 2; syringe.position.set(0, 0.075, -0.05);
-  DART.art = new THREE.Group(); DART.art.add(body, syringe); DART.pivot.add(DART.art); heldModel(DART, "items/moth_jelly_dart", 0.5, -1); DART.pivot.position.set(0.22, -0.3, -0.5); DART.pivot.visible = false; camera.add(DART.pivot); }
+  DART.art = new THREE.Group(); DART.art.add(body, syringe); DART.pivot.add(DART.art); heldModel(DART, "items/moth_jelly_dart", 0.5, -1, "dart"); DART.pivot.position.set(0.22, -0.3, -0.5); DART.pivot.visible = false; camera.add(DART.pivot); }
 function clearFlights() { for (const f of DART.flights) if (f.mesh) S.root.remove(f.mesh); DART.flights.length = 0; }
 function fireDart() {
   if (!GB.load || !carries(GB.load, "dart") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1870,7 +1876,7 @@ const FLAME = {st: newFlame(), on: false, pivot: new THREE.Group(), fx: [], hitT
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), frame = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.07, 0.5), mat(0x4a4a46));
   const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.26, 12), mat(0x2f6fd0)); tank.rotation.x = Math.PI / 2; tank.position.set(0, -0.09, 0.08);
   const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.12, 8), mat(0x1c1c1a)); nozzle.rotation.x = Math.PI / 2; nozzle.position.set(0, 0.01, -0.3);
-  FLAME.art = new THREE.Group(); FLAME.art.add(frame, tank, nozzle); FLAME.pivot.add(FLAME.art); heldModel(FLAME, "items/propane_flamethrower", 0.55, -1); FLAME.pivot.position.set(0.22, -0.3, -0.5); FLAME.pivot.visible = false; camera.add(FLAME.pivot); }
+  FLAME.art = new THREE.Group(); FLAME.art.add(frame, tank, nozzle); FLAME.pivot.add(FLAME.art); heldModel(FLAME, "items/propane_flamethrower", 0.55, -1, "flame"); FLAME.pivot.position.set(0.22, -0.3, -0.5); FLAME.pivot.visible = false; camera.add(FLAME.pivot); }
 function clearFlames() { for (const f of FLAME.fx) S.root.remove(f.o); FLAME.fx.length = 0; }
 function swapCanister() {
   if (!GB.load || !carries(GB.load, "flame") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1907,7 +1913,7 @@ const HORN = {st: newHorn(), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .55, metalness: .3}), bell = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.025, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({color: 0xb0a070, roughness: .5, metalness: .5, side: THREE.DoubleSide}));
   bell.rotation.x = -Math.PI / 2; bell.position.set(0, 0.02, -0.18);
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.16), mat(0x34383c)); box.position.set(0, -0.08, 0.08);
-  HORN.pivot.add(bell, box); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
+  HORN.art = new THREE.Group(); HORN.art.add(bell, box); HORN.pivot.add(HORN.art); heldModel(HORN, "items/frequency_horn", 0.38, -1, "horn"); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
 function hornRings(x, z, dx, dz, reach) {                                    // rings spreading along the cone, or one ring round you for the call
   for (let k = 1; k <= 5; k++) {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xd8f0ff, depthWrite: false, transparent: true, opacity: 0.9})); sp.scale.set(2, 2, 1);
@@ -1939,9 +1945,9 @@ function callHorn() {
 }
 // ---- the rocket launcher (shared/rocket.js): a rocket bursts on the first thing it meets; the blast hurts, a mist slows, the bang is heard far off, and it hurts you too inside 5 m. Under 5 m of flight it is a dud.
 const ROCKET = {st: newRocket(0), kick: 0, pivot: new THREE.Group(), flights: [], mists: []};
-{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), tube = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 12), mat(0x5a6a50)); tube.rotation.x = Math.PI / 2;
-  for (const [x, y] of [[0.075, 0.07], [-0.075, 0.07], [0, -0.09]]) { const can = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), mat(0xd8c070)); can.rotation.x = Math.PI / 2; can.position.set(x, y, 0.05); ROCKET.pivot.add(can); }
-  ROCKET.pivot.add(tube); ROCKET.pivot.position.set(0.2, -0.26, -0.5); ROCKET.pivot.visible = false; camera.add(ROCKET.pivot); }
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), tube = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 12), mat(0x5a6a50)); tube.rotation.x = Math.PI / 2; ROCKET.art = new THREE.Group();
+  for (const [x, y] of [[0.075, 0.07], [-0.075, 0.07], [0, -0.09]]) { const can = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), mat(0xd8c070)); can.rotation.x = Math.PI / 2; can.position.set(x, y, 0.05); ROCKET.art.add(can); }
+  ROCKET.art.add(tube); ROCKET.pivot.add(ROCKET.art); heldModel(ROCKET, "items/almond_water_rocket_launcher", 0.7, -1, "rocket"); ROCKET.pivot.position.set(0.2, -0.26, -0.5); ROCKET.pivot.visible = false; camera.add(ROCKET.pivot); }
 function clearRockets() { for (const f of ROCKET.flights) if (f.mesh) S.root.remove(f.mesh); ROCKET.flights.length = 0; for (const m of ROCKET.mists) S.root.remove(m.o); ROCKET.mists.length = 0; }
 function fireRocket() {
   if (!GB.load || !carries(GB.load, "rocket") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1984,7 +1990,7 @@ const LASER = {st: newLaser(), on: false, dotOn: false, pivot: new THREE.Group()
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .5, metalness: .4}), drum = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.14, 14), mat(0x50545a)); drum.rotation.z = Math.PI / 2; drum.position.set(0, 0, 0.08);
   const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.3, 12), mat(0x24262a)); lens.rotation.x = Math.PI / 2; lens.position.set(0, 0.01, -0.15);
   const pack = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.12), mat(0xb03a2a)); pack.position.set(0, -0.08, 0.1);
-  LASER.pivot.add(drum, lens, pack); LASER.pivot.position.set(0.22, -0.3, -0.5); LASER.pivot.visible = false; camera.add(LASER.pivot);
+  LASER.art = new THREE.Group(); LASER.art.add(drum, lens, pack); LASER.pivot.add(LASER.art); heldModel(LASER, "items/laser_pointer_dissector", 0.3, -1, "laser"); LASER.pivot.position.set(0.22, -0.3, -0.5); LASER.pivot.visible = false; camera.add(LASER.pivot);
   LASER.line = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 6), new THREE.MeshBasicMaterial({color: 0xff2a2a, transparent: true, opacity: 0.85, depthWrite: false})); LASER.line.visible = false; scene.add(LASER.line);
   LASER.spot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({color: 0xff3030})); LASER.spot.visible = false; scene.add(LASER.spot); }
 function laserReach(o, d) { let lo = 0, hi = d[1] < -1e-3 ? Math.min(LASER_RANGE, (o[1] - S.floor - 0.03) / -d[1]) : LASER_RANGE;          // the floor is not a collider box: the beam and the dot stop on it
@@ -2018,7 +2024,8 @@ const SHEAR = {st: newShear(), was: false, pivot: new THREE.Group(), kick: 0, ms
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), body = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.11, 0.34), mat(0xb8411e));
   const jawA = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.05, 0.16), mat(0x3a3a3a)), jawB = jawA.clone(); jawA.position.set(-0.03, 0, -0.24); jawB.position.set(0.03, 0, -0.24);
   const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.1, 10), mat(0x2a2a2a)); motor.rotation.z = Math.PI / 2; motor.position.set(0, 0.07, 0.06);
-  SHEAR.jaws = [jawA, jawB]; SHEAR.pivot.add(body, jawA, jawB, motor); SHEAR.pivot.position.set(0.22, -0.3, -0.5); SHEAR.pivot.visible = false; camera.add(SHEAR.pivot); }
+  SHEAR.jaws = [jawA, jawB]; SHEAR.art = new THREE.Group(); SHEAR.art.add(body, jawA, jawB, motor); SHEAR.pivot.add(SHEAR.art); heldModel(SHEAR, "items/hydraulic_rebar_shear", 0.55, -1, "shear");   // the model is one piece: the code-made jaws still open and close, unseen, and the cut shows in the pivot's kick and buzz
+  SHEAR.pivot.position.set(0.22, -0.3, -0.5); SHEAR.pivot.visible = false; camera.add(SHEAR.pivot); }
 function shearTick(dt) {
   SHEAR.msgT = Math.max(0, SHEAR.msgT - dt); SHEAR.kick = Math.max(0, SHEAR.kick - dt * 4);
   SHEAR.st = shearTickState(SHEAR.st, dt);
