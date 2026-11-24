@@ -49,7 +49,7 @@ Round 4: 15 to 22, all merged by 2026-11-16 (PRs #41 to #49)
 
 Also merged outside the sessions on 2026-11-16: the 24 item models (PR #45), the fuse model (PR #50), the land mine and tripwire models (PR #51), and a lobby fix (PR #52). Status as of 2026-11-19.
 
-- **Round 4 starts with a playtest by the owner.** Nothing from sessions 6, 8, 9 or 12 has been played by a person yet. Sessions 16 and 17 were planned to wait for that; both were merged on 2026-11-16 without it, so the owner's playtest and open decisions (the score formula, the name of the Going back in locker, "different truths per area", whether the crossbow starts in your hands) still apply to what is now on `main`.
+- **Round 4 starts with a playtest by the owner.** Nothing from sessions 6, 8, 9 or 12 has been played by a person yet. Sessions 16 and 17 were planned to wait for that; both were merged on 2026-11-16 without it, so the owner's playtest and open decisions ("different truths per area", whether the crossbow starts in your hands; the score formula and the locker's name, the Lost and Found, were settled on 2026-11-24) still apply to what is now on `main`.
 
 - **The game does not need the backend to be built.** Session 5 waits until there are players who want saved progress or a ranking across players, or until the server log is not enough data. Until then the Original-complete flag lives in the browser and the best time is per browser.
 - **Session 12 matters most for whether the game is fun.** The Original is untuned (see its brief), and a bigger world does not help if the opening floor is too punishing.
