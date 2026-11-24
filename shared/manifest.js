@@ -3,7 +3,7 @@
 //
 // A manifest is {manifestVersion: 1, flags, connectors, modes, areas, links}.
 //   area  {id, name, status: "built" | "planned" | "reserved", soloOnly?, coop?, rooms?: [id], spine?: [id], scenes?: [scene], ...}
-//   scene {id, floorY?, files?, multiplayer?, presence?, puzzle?: "fuses" | "switches" | "keypad", powerSource?, loot?: {lockers, packs}, chamber?: {floor, index, wave: {monsters, kind}, stairsDown?, next?}}
+//   scene {id, floorY?, files?, backdrop?: {day, night?} (equirect pictures of what lies past the scene), multiplayer?, presence?, puzzle?: "fuses" | "switches" | "keypad", powerSource?, loot?: {lockers, packs}, chamber?: {floor, index, wave: {monsters, kind}, stairsDown?, next?}}
 //   link  {id, from: {area, scene?, door?}, to: {area, scene?, room?, door?, arrive?, face?}, connector, status, requires?: [flag], soloOnly?, returnTo?, note?}
 //   mode  {status, area, floors, players: {min, max}, finish?: {scene, ...}, chambersPerFloor?, waves?, startChamber?}
 // `multiplayer` is a floor the server runs (monsters, puzzles, health). `presence: true` is a page scene a room's players can be in together: the server only relays who is
@@ -54,6 +54,8 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
       if (s.puzzle !== undefined && !PUZZLES.includes(s.puzzle)) err(`${at}: puzzle must be one of ${PUZZLES.join(", ")}`);
       if (s.loot !== undefined && !(isObj(s.loot) && isCount(s.loot.lockers) && isCount(s.loot.packs))) err(`${at}: loot needs whole-number lockers and packs`);
       if (s.files !== undefined && !(Array.isArray(s.files) && s.files.every(isFile))) err(`${at}: files must be relative paths without ..`);
+      if (s.backdrop !== undefined && !(isObj(s.backdrop) && isFile(s.backdrop.day) && (s.backdrop.night === undefined || isFile(s.backdrop.night)) && Object.keys(s.backdrop).every(k => k === "day" || k === "night"))) err(`${at}: backdrop needs a day picture (a relative path without ..) and may have a night one`);
+      if (s.backdrop !== undefined && s.files === undefined) err(`${at}: a backdrop needs a scene the page loads (files)`);
       if (s.chamber !== undefined) {                                                                 // Going back in: a chamber is a scene with a wave (checked against the modes below)
         const c = s.chamber;
         if (!(isObj(c) && isId(c.floor) && Number.isInteger(c.index) && c.index >= 1 && isObj(c.wave) && isCount(c.wave.monsters) && c.wave.monsters >= 1 && isId(c.wave.kind))) err(`${at}: chamber needs a floor, an index from 1, and a wave with monsters and kind`);
@@ -166,7 +168,7 @@ export function buildRegistry(doc) {
   for (const s of builtScenes) {
     if (s.multiplayer) floors[s.id] = s.floorY;
     if (s.presence) presence[s.id] = s.floorY;
-    if (s.files) pageScenes[s.id] = {glbs: s.files.filter(f => f.endsWith(".glb")), floor: s.floorY};
+    if (s.files) pageScenes[s.id] = {glbs: s.files.filter(f => f.endsWith(".glb")), floor: s.floorY, ...(s.backdrop ? {backdrop: s.backdrop} : {})};
     if (s.loot) loot[s.id] = {lockers: s.loot.lockers, packs: s.loot.packs};
   }
   const links = doc.links || [], modeGbi = (doc.modes || {}).going_back_in, chamberScenes = new Map(builtScenes.filter(s => s.chamber).map(s => [s.id, s]));
