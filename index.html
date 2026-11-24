@@ -1787,6 +1787,7 @@ function fireBow() {
 function heldModel(W, id, len, front, item) {
   let asked = false;
   HELD_MODELS[item] = () => { if (asked) return; asked = true; load(); };
+  queueMicrotask(() => { if (HELD.item === item) HELD_MODELS[item](); });   // already in hand when the weapon was built
   const load = () => loadModel(id).then(g => {
     if (!g) return;
     const m = SkeletonUtils.clone(g.scene), bb = new THREE.Box3().setFromObject(m, true), c = bb.getCenter(new THREE.Vector3());
