@@ -183,6 +183,7 @@ test("a bad chamber is caught", () => {
   bad(d => { d.modes.going_back_in.startChamber = "L3"; }, /startChamber L3 is not a chamber/);
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.floor = "L9"; }, /not a floor of going_back_in/);
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.index = 5; }, /past chambersPerFloor/);
+  bad(d => { const sc = d.areas.find(a => a.id === "gbi").scenes; sc[1].chamber.floor = sc[0].chamber.floor; sc[1].chamber.index = sc[0].chamber.index; }, /chamber 4 of L4 is already gbi_L4_4/);   // one chamber per floor and index
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.next = "nope"; }, /is not a chamber/);
   bad(d => { delete d.areas.find(a => a.id === "gbi").scenes[0].chamber.wave; }, /chamber needs a floor/);
 });
