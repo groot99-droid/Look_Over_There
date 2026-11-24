@@ -190,6 +190,7 @@ test("a bad chamber is caught", () => {
   bad(d => { d.areas.find(a => a.id === "city").scenes[0].backdrop = {day: "../x.webp"}; }, /backdrop needs a day picture/);
   bad(d => { d.areas.find(a => a.id === "city").scenes[0].backdrop = {day: "world/x.webp", dusk: "world/y.webp"}; }, /backdrop needs a day picture/);
   bad(d => { d.areas.find(a => a.id === "city").scenes.find(x => x.id === "bus_stop").backdrop = {day: "world/x.webp"}; }, /a backdrop needs a scene the page loads/);
+  bad(d => { const sc = d.areas.find(a => a.id === "gbi").scenes; sc[1].chamber.floor = sc[0].chamber.floor; sc[1].chamber.index = sc[0].chamber.index; }, /chamber 4 of L4 is already gbi_L4_4/);   // one chamber per floor and index
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.next = "nope"; }, /is not a chamber/);
   bad(d => { delete d.areas.find(a => a.id === "gbi").scenes[0].chamber.wave; }, /chamber needs a floor/);
 });
