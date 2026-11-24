@@ -7,6 +7,7 @@ shared/farway.manifest.js   the data (edit this)
 shared/manifest.js          pure functions: check, build the lookups, merge an addon, evaluate a link's requirements
 shared/registry.js          builds the lookups once at load; an invalid manifest stops the game and the server at start
 tools/manifest.mjs          check | scenes | links | export
+tools/worlddoc.mjs          check <file ...> | links <file>      a layout file (world/<scene>.json) before it reaches the game: shape, standing room, doors against the links (shared/worlddoc.js)
 shared/manifest.test.js     the tests
 ```
 
