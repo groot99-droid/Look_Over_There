@@ -19,6 +19,10 @@ the gallery spots) is placed relative to those numbers: the skylights and the fr
 
 What the page draws itself is left out (docs/BLENDER.md, contract 4): the six statues and their name plates. The statues are here only as hidden
 stand-ins (the `Standins` collection), so the spots' bake has their shadows on the plinths; they are never exported.
+
+Version 2 takes its look from the owner's Chronicle Museum (Earth_Worldbuild, _Museum: web/js/procroom.js, doors.js, matlib.js, build_layout.py): its moulding
+profiles (skirting, dado, picture rail, cornice), wall and trim colours, salon-grid hang with bevelled frames chosen by era, picture lights, door sconces,
+chandeliers and laylights, block pedestals, the Doric pediment door, and its Poly Haven chandelier and bench (CC0, copied into blender/models/galleries/).
 """
 import json
 import math
@@ -86,7 +90,7 @@ TILES = {}
 def image(fn, srgb=True):
     key = (fn, srgb)
     if key not in IMG_CACHE:
-        im = bpy.data.images.load(str(TEX / fn))
+        im = bpy.data.images.load(str(TEX / fn if "/" not in fn else ROOT / fn))      # a bare name is in TEX; a path is from the repo root
         im.colorspace_settings.name = "sRGB" if srgb else "Non-Color"
         IMG_CACHE[key] = im
     return IMG_CACHE[key]
@@ -144,18 +148,31 @@ def material(name, color=(0.5, 0.5, 0.5), rough=0.8, metal=0.0, diff=None, tint=
     return m
 
 
+CHANDELIER = "blender/models/galleries/ph-chandelier-02/Chandelier_02_1k.gltf"          # Poly Haven, CC0 (the Chronicle Museum's hall chandelier)
+BENCH = "blender/models/galleries/ph-bench/painted_wooden_bench_1k.gltf"   # Poly Haven, CC0 (the Chronicle Museum's hall bench)
+
+
 def make_materials():
-    material("Floor_Parquet", diff="herringbone_parquet_diff_1k.jpg", tint=(0.78, 0.70, 0.62), rough=0.6, tile=3.4)
+    """The Chronicle Museum's palette (Earth_Worldbuild _Museum, web/js/matlib.js and build_layout.ROOM_STYLE), on this hall's CC0 textures: a classical red wall
+    (its Classical Antiquity room, lifted a little for a night bake), cream painted trim (#efe6d6), a white ceiling, dark marble skirting and plinth dies under white
+    marble lips, gilt (#f0c56a), brass (#d3a35d), dark wood and black lacquer frames."""
+    material("Floor_Parquet", diff="herringbone_parquet_diff_1k.jpg", tint=(0.80, 0.70, 0.60), rough=0.6, tile=3.4)
     material("Floor_Marble", diff="marble_01_diff_1k.jpg", tint=(0.80, 0.80, 0.78), rough=0.25, tile=1.5)
-    material("Wall_Paint", diff="plastered_wall_04_diff_1k.jpg", tint=(0.62, 0.17, 0.15), rough=0.9, tile=3.2)
+    material("Wall_Paint", diff="plastered_wall_04_diff_1k.jpg", tint=(0.60, 0.19, 0.12), rough=0.9, tile=3.2)
     material("Ceiling_Paint", diff="plastered_wall_04_diff_1k.jpg", tint=(1.0, 0.97, 0.90), rough=0.95, tile=3.2)
-    material("Wainscot_Wood", diff="dark_wood_diff_1k.jpg", tint=(0.85, 0.80, 0.78), rough=0.5, tile=0.9)
+    material("Wainscot_Wood", diff="dark_wood_diff_1k.jpg", tint=(0.85, 0.78, 0.74), rough=0.5, tile=0.9)
     material("Door_Wood", diff="dark_wood_diff_1k.jpg", rough=0.5, tile=0.9)
-    material("Trim_Paint", color=(0.56, 0.53, 0.47), rough=0.55)
-    material("Plinth_Paint", diff="plastered_wall_04_diff_1k.jpg", tint=(0.40, 0.39, 0.38), rough=0.7, tile=1.6)
-    material("Frame_Gold", color=(0.50, 0.34, 0.11), rough=0.35, metal=0.9)
+    material("Trim_Paint", diff="plastered_wall_04_diff_1k.jpg", tint=(0.95, 0.88, 0.76), rough=0.6, tile=1.0)
+    material("Skirting_Marble", diff="marble_01_diff_1k.jpg", tint=(0.11, 0.095, 0.09), rough=0.3, tile=1.0)
+    material("Marble_Dark", diff="marble_01_diff_1k.jpg", tint=(0.12, 0.10, 0.095), rough=0.3, tile=1.0)
+    material("Marble_White", diff="marble_01_diff_1k.jpg", tint=(0.95, 0.93, 0.89), rough=0.3, tile=1.0)
+    material("Frame_Gold", color=(0.87, 0.56, 0.14), rough=0.32, metal=0.9)
+    material("Frame_Wood", diff="dark_wood_diff_1k.jpg", tint=(0.75, 0.62, 0.55), rough=0.45, tile=0.6)
+    material("Frame_Black", color=(0.014, 0.013, 0.013), rough=0.25)
     material("Metal_Dark", color=(0.03, 0.03, 0.035), rough=0.4, metal=0.8)
-    material("Metal_Brass", color=(0.55, 0.38, 0.12), rough=0.35, metal=0.9)
+    material("Metal_Brass", color=(0.65, 0.37, 0.11), rough=0.38, metal=0.9)
+    material("Chandelier_Gilt", diff=CHANDELIER.rsplit("/", 1)[0] + "/textures/Chandelier_02_diff_1k.jpg", rough=0.35, metal=0.8)
+    material("Bench_Paint", diff=BENCH.rsplit("/", 1)[0] + "/textures/painted_wooden_bench_diff_1k.jpg", rough=0.6)
     material("Lamp_Emit", color=(1.0, 0.85, 0.62), rough=0.4, emit=((1.0, 0.80, 0.55), 14.0))
     material("Skylight_Glass", color=(0.05, 0.07, 0.10), rough=0.2, emit=((0.10, 0.14, 0.26), 0.6), alpha=0.6)
     material("Standin_Stone", color=(0.48, 0.46, 0.42), rough=0.8)
@@ -204,7 +221,7 @@ def box_uv(bm, tile):
             lp[uvl].uv = (u / tile, v / tile)
 
 
-def finish(name, bm, mat, coll, smooth=False, tile=None, sharp_deg=35, keep_uv=False):
+def finish(name, bm, mat, coll, smooth=False, tile=None, sharp_deg=35, keep_uv=False, recalc=True):
     for e in bm.edges:
         if smooth and len(e.link_faces) == 2:
             e.smooth = e.calc_face_angle(0.0) < math.radians(sharp_deg)
@@ -212,7 +229,7 @@ def finish(name, bm, mat, coll, smooth=False, tile=None, sharp_deg=35, keep_uv=F
             e.smooth = not (len(e.link_faces) == 2 and e.calc_face_angle(0.0) > math.radians(1))
     for f in bm.faces:
         f.smooth = smooth
-    if not keep_uv:                                   # a lone panel keeps the winding it was built with (it faces the room)
+    if recalc and not keep_uv:                        # a lone panel (or an open sweep) keeps the winding it was built with (it faces the room)
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     if not bm.loops.layers.uv.get("UVMap"):
         bm.loops.layers.uv.new("UVMap")
@@ -230,10 +247,10 @@ def finish(name, bm, mat, coll, smooth=False, tile=None, sharp_deg=35, keep_uv=F
 ART = STANDIN = None
 
 
-def part(name, mat, build, smooth=False, tile=None, coll=None):
+def part(name, mat, build, smooth=False, tile=None, coll=None, recalc=True):
     bm = bmesh.new()
     build(bm)
-    return finish(name, bm, mat, coll or ART, smooth, tile)
+    return finish(name, bm, mat, coll or ART, smooth, tile, recalc=recalc)
 
 
 # wall frames: a wall is named by its inward normal; ALONG is the game axis that runs along it, OUT the coordinate of its inner face
@@ -292,9 +309,19 @@ def build_shell():
     part("Ceiling_Museum", "Ceiling_Paint", ceiling)
 
 
+def ceil_ring(bm, x0, x1, z0, z1, t, y0, y1):
+    """A rectangular band under the ceiling, outer edges x0..x1, z0..z1, `t` wide, from y0 to y1: the long sides full length, the short ones between them
+    (no two boxes share a face, so nothing flickers)."""
+    cube(bm, (x0, y0, z0), (x1, y1, z0 + t))
+    cube(bm, (x0, y0, z1 - t), (x1, y1, z1))
+    cube(bm, (x0, y0, z0 + t), (x0 + t, y1, z1 - t))
+    cube(bm, (x1 - t, y0, z0 + t), (x1, y1, z1 - t))
+
+
 def build_skylights():
-    """Four skylights over the middle aisle, between the plinth rows: a dark metal frame lining each opening, glazing bars, and a frosted pane (Skylight_Glass:
-    transparent and faintly lit, no lightmap). The moon of the bake shines in through them."""
+    """Four skylights over the middle aisle, between the plinth rows, dressed as the Chronicle Museum's laylights (its FX laylight: a lit pane in a painted trim
+    frame): a cream coffer of two stepped bands round each opening, a dark metal frame lining it, glazing bars, and a frosted pane (Skylight_Glass: transparent and
+    faintly lit, no lightmap). The moon of the bake shines in through them."""
     y0, y1 = COLLIDERS["Ceiling_Museum"]["min"][1], COLLIDERS["Ceiling_Museum"]["max"][1]
     s, t = SKY_HALF, 0.03
 
@@ -314,150 +341,295 @@ def build_skylights():
             quad(bm, (-s, y1 - 0.025, zc + s), (s, y1 - 0.025, zc + s), (s, y1 - 0.025, zc - s), (-s, y1 - 0.025, zc - s))
     part("Skylight_Pane", "Skylight_Glass", panes, tile=1.0)
 
+    def coffers(bm):
+        for zc in BAYS:
+            ceil_ring(bm, -s - 0.34, s + 0.34, zc - s - 0.34, zc + s + 0.34, 0.20, y0 - 0.035, y0)       # the outer flat band
+            ceil_ring(bm, -s - 0.14, s + 0.14, zc - s - 0.14, zc + s + 0.14, 0.14, y0 - 0.08, y0)        # the inner, deeper step, flush with the opening
+    part("Laylight_Coffers", "Trim_Paint", coffers)
 
-def build_trim():
-    """Skirting, the dado rail, the picture rail, the cornice, and the door (a closed double leaf in its architrave: the page's
-    door prompt at door.at is unchanged)."""
+
+# ---------------------------------------------------------------- mouldings (the Chronicle Museum's profiles, procroom.js PROFILES, scaled to a 5 m hall)
+# A profile is a closed polygon of (u, y): u metres out from the wall face, y the height. It is swept along a wall run and mitred at the corners.
+SKIRT_P = [(0, 0), (0.035, 0), (0.035, 0.2), (0.025, 0.215), (0.032, 0.245), (0.02, 0.27), (0, 0.28)]
+DADO_P = [(0, DADO - 0.05), (0.04, DADO - 0.05), (0.055, DADO - 0.025), (0.04, DADO + 0.025), (0, DADO + 0.03)]
+RAIL_P = [(0, RAIL - 0.07), (0.035, RAIL - 0.07), (0.048, RAIL - 0.04), (0.03, RAIL), (0, RAIL)]
+_CORNICE_7M = [(0, 6.5), (0.03, 6.5), (0.03, 6.58), (0.08, 6.63), (0.08, 6.7), (0.15, 6.76), (0.17, 6.84), (0.3, 6.93), (0.36, 7.0), (0, 7.0)]
+CORNICE_P = [(u * 0.8, H - (7.0 - v) * 0.8) for u, v in _CORNICE_7M]          # the room cornice (6.5 to 7 m there): 0.4 m tall, 0.29 m deep here
+PILASTER_X = DOOR_W / 2 + 0.22 + 0.12                                          # inner edge of the door's flat pilasters, from the door's centre
+PILASTER_W = 0.32
+MOULD_GAP = PILASTER_X + PILASTER_W                                            # the skirting, dado and wainscot stop at the pilasters' outer edges
+
+
+def wall_runs(gap):
+    """The hall's wall runs for a sweep: (p0, p1, inward normal, normal of the wall at p0's corner or None, the same at p1), plan points (x, z) on the inner faces.
+    With `gap` the south wall is cut at the door (from door.at's x - gap to + gap)."""
+    W, N, E, S = (1, 0), (0, 1), (-1, 0), (0, -1)
+    runs = [((-HX, Z1), (-HX, Z0), W, S, N), ((-HX, Z0), (HX, Z0), N, W, E), ((HX, Z0), (HX, Z1), E, N, S)]
+    if gap:
+        dx = DOOR[0]
+        runs += [((HX, Z1), (dx + gap, Z1), S, E, None), ((dx - gap, Z1), (-HX, Z1), S, None, W)]
+    else:
+        runs.append(((HX, Z1), (-HX, Z1), S, E, W))
+    return runs
+
+
+def sweep_run(bm, run, profile):
+    """Sweep a closed profile along one wall run, mitred where the run meets another wall (the offset there runs along both normals), capped at both ends."""
+    p0, p1, n, a0, a1 = run
+    rings = []
+    for (px, pz), adj in ((p0, a0), (p1, a1)):
+        off = (n[0] + adj[0], n[1] + adj[1]) if adj else n
+        rings.append([bm.verts.new(B((px + u * off[0], y, pz + u * off[1]))) for u, y in profile])
+    a, b = rings
+    m = len(profile)
+    for j in range(m):
+        k = (j + 1) % m
+        bm.faces.new((a[j], b[j], b[k], a[k]))
+    bm.faces.new(a)
+    bm.faces.new(list(reversed(b)))
+
+
+def build_mouldings():
+    """The Chronicle Museum's room mouldings: a dark marble skirting (its hall's), a cream dado rail capping a panelled dark wood wainscot, a cream picture rail, and
+    its stepped room cornice. Each is a profile swept along the walls and mitred at the corners. The skirting and the wainscot panels reach above 0.2 m, so they are
+    one piece per wall (each lies within 5 cm of its wall); the rails and the cornice are one piece each (lower than 0.2 m, or overhead)."""
+    for i, run in enumerate(wall_runs(MOULD_GAP)):
+        part(f"Skirting_{i}", "Skirting_Marble", lambda bm: sweep_run(bm, run, SKIRT_P))
+    part("Trim_Dado", "Trim_Paint", lambda bm: [sweep_run(bm, r, DADO_P) for r in wall_runs(MOULD_GAP)])
+    part("Trim_PictureRail", "Trim_Paint", lambda bm: [sweep_run(bm, r, RAIL_P) for r in wall_runs(None)])
+    part("Cornice", "Trim_Paint", lambda bm: [sweep_run(bm, r, CORNICE_P) for r in wall_runs(None)])
+    part("Cornice_Frieze", "Trim_Paint", lambda bm: [sweep_run(bm, r, [(0, H - 0.52), (0.022, H - 0.52), (0.022, H - 0.46), (0, H - 0.46)]) for r in wall_runs(None)])
+
+    # the wainscot's raised panels: bolection rings 1.5 cm proud between the skirting and the dado, about 1.25 m apart
     dx = DOOR[0]
-    gap = (dx - DOOR_W / 2 - 0.25, dx + DOOR_W / 2 + 0.25)            # the door and its architrave on the south wall
-
-    def runs(normal):
-        ax, _ = WALLS[normal]
+    lo_y, hi_y = 0.36, DADO - 0.10
+    for n in WALLS:
+        ax, _ = WALLS[n]
         lo, hi = (Z0, Z1) if ax == "z" else (-HX, HX)
-        if normal == "-z":
-            return [(lo, gap[0]), (gap[1], hi)]
-        return [(lo, hi)]
+        spans = [(lo, hi)] if n != "-z" else [(lo, dx - MOULD_GAP), (dx + MOULD_GAP, hi)]
 
-    def skirt(bm):
-        for n in WALLS:
-            for a0, a1 in runs(n):
-                wall_box(bm, n, a0, a1, 0.0, 0.16, 0.0, 0.022)
-    part("Trim_Skirting", "Wainscot_Wood", skirt)
+        def panels(bm, spans=spans, n=n):
+            for s0, s1 in spans:
+                k = max(1, round((s1 - s0) / 1.25))
+                w = (s1 - s0) / k
+                for i in range(k):
+                    a0, a1 = s0 + i * w + 0.09, s0 + (i + 1) * w - 0.09
+                    t = 0.045
+                    wall_box(bm, n, a0, a1, lo_y, lo_y + t, 0.0, 0.015)
+                    wall_box(bm, n, a0, a1, hi_y - t, hi_y, 0.0, 0.015)
+                    wall_box(bm, n, a0, a0 + t, lo_y + t, hi_y - t, 0.0, 0.015)
+                    wall_box(bm, n, a1 - t, a1, lo_y + t, hi_y - t, 0.0, 0.015)
+        part(f"Wainscot_Panels_{WALL_NAME[n]}", "Wainscot_Wood", panels)
 
-    def dado(bm):
-        for n in WALLS:
-            for a0, a1 in runs(n):
-                wall_box(bm, n, a0, a1, DADO - 0.05, DADO + 0.02, 0.0, 0.04)
-    part("Trim_Dado", "Wainscot_Wood", dado)
 
-    def rail(bm):
-        for n in WALLS:
-            ax, _ = WALLS[n]
-            lo, hi = (Z0, Z1) if ax == "z" else (-HX, HX)
-            wall_box(bm, n, lo, hi, RAIL - 0.04, RAIL, 0.0, 0.03)
-    part("Trim_PictureRail", "Metal_Brass", rail)
+def prism(bm, normal, a, w, y0, h, d0, d1):
+    """A triangular prism on a wall (a pediment): base `w` wide centred on `a` at height y0, apex h above, from d0 to d1 into the room."""
+    pts = [(a - w / 2, y0), (a + w / 2, y0), (a, y0 + h)]
+    f = [bm.verts.new(B(on_wall(normal, x, y, d1))) for x, y in pts]
+    b = [bm.verts.new(B(on_wall(normal, x, y, d0))) for x, y in pts]
+    bm.faces.new(f)
+    bm.faces.new(list(reversed(b)))
+    for i in range(3):
+        j = (i + 1) % 3
+        bm.faces.new((f[i], b[i], b[j], f[j]))
 
-    def cornice(bm):
-        for n in WALLS:
-            ax, _ = WALLS[n]
-            lo, hi = (Z0, Z1) if ax == "z" else (-HX, HX)
-            wall_box(bm, n, lo, hi, H - 0.30, H, 0.0, 0.04)
-            wall_box(bm, n, lo, hi, H - 0.20, H, 0.0, 0.10)
-            wall_box(bm, n, lo, hi, H - 0.09, H, 0.0, 0.17)
-            wall_box(bm, n, lo, hi, H - 0.36, H - 0.30, 0.0, 0.025)
-    part("Cornice", "Trim_Paint", cornice)
 
+def build_door():
+    """The door, in the Chronicle Museum's Doric pediment surround (doors.js, `doric-pediment`: white marble casing, gilt accents, columns and a pediment). Below head
+    height everything stays within 5 cm of the wall, so its columns are flat pilasters here; the entablature and the pediment above the door project 12 cm. The leaves
+    are a closed double door (the page's prompt at door.at is unchanged), and the EXIT sign sits on the frieze."""
+    dx = DOOR[0]
     x0, x1 = dx - DOOR_W / 2, dx + DOOR_W / 2
+    cw = 0.22
 
-    def architrave(bm):
-        wall_box(bm, "-z", x0 - 0.22, x0, 0.0, DOOR_H + 0.22, 0.0, 0.045)
-        wall_box(bm, "-z", x1, x1 + 0.22, 0.0, DOOR_H + 0.22, 0.0, 0.045)
-        wall_box(bm, "-z", x0 - 0.22, x1 + 0.22, DOOR_H, DOOR_H + 0.22, 0.0, 0.045)
-        wall_box(bm, "-z", x0 - 0.30, x1 + 0.30, DOOR_H + 0.22, DOOR_H + 0.30, 0.0, 0.045)      # the head's cap
-    part("Door_Architrave", "Door_Wood", architrave)
+    def casing(bm):
+        wall_box(bm, "-z", x0 - cw, x0, 0.0, DOOR_H + cw, 0.0, 0.03)
+        wall_box(bm, "-z", x1, x1 + cw, 0.0, DOOR_H + cw, 0.0, 0.03)
+        wall_box(bm, "-z", x0 - cw, x1 + cw, DOOR_H, DOOR_H + cw, 0.0, 0.03)
+    part("Door_Casing", "Marble_White", casing)
+
+    def pilasters(bm):
+        for k in (-1, 1):
+            a0, a1 = sorted((dx + k * PILASTER_X, dx + k * (PILASTER_X + PILASTER_W)))
+            wall_box(bm, "-z", a0 - 0.03, a1 + 0.03, 0.0, 0.30, 0.0, 0.045)                       # the base block
+            wall_box(bm, "-z", a0, a1, 0.30, DOOR_H + 0.02, 0.0, 0.032)                           # the shaft
+            for f in range(3):                                                                    # three flutes, as raised fillets between them
+                c = a0 + (f + 1) * (a1 - a0) / 4
+                wall_box(bm, "-z", c - 0.012, c + 0.012, 0.42, DOOR_H - 0.10, 0.032, 0.040)
+    part("Door_Pilasters", "Marble_White", pilasters)
+
+    def capitals(bm):
+        for k in (-1, 1):
+            a0, a1 = sorted((dx + k * PILASTER_X, dx + k * (PILASTER_X + PILASTER_W)))
+            wall_box(bm, "-z", a0 - 0.04, a1 + 0.04, DOOR_H + 0.02, DOOR_H + 0.12, 0.0, 0.05)
+            wall_box(bm, "-z", a0 - 0.06, a1 + 0.06, DOOR_H + 0.12, DOOR_H + 0.22, 0.0, 0.06)
+    part("Door_Capitals", "Frame_Gold", capitals)
+
+    ew = PILASTER_X + PILASTER_W + 0.12                     # the entablature's half-width
+    y = DOOR_H + 0.22
+
+    def entablature(bm):
+        wall_box(bm, "-z", dx - ew, dx + ew, y, y + 0.12, 0.0, 0.075)                             # architrave
+        wall_box(bm, "-z", dx - ew, dx + ew, y + 0.12, y + 0.32, 0.0, 0.06)                       # frieze
+        wall_box(bm, "-z", dx - ew - 0.05, dx + ew + 0.05, y + 0.32, y + 0.40, 0.0, 0.13)         # cornice
+        prism(bm, "-z", dx, 2 * ew + 0.1, y + 0.40, 0.58, 0.0, 0.13)                              # the pediment
+    part("Door_Entablature", "Marble_White", entablature)
+    part("Door_Tympanum", "Trim_Paint", lambda bm: prism(bm, "-z", dx, 2 * ew - 0.45, y + 0.47, 0.42, 0.13, 0.135))
 
     def leaves(bm):
         for a0, a1 in ((x0, dx - 0.004), (dx + 0.004, x1)):
             wall_box(bm, "-z", a0, a1, 0.0, DOOR_H, 0.0, 0.035)
-            for (yy0, yy1) in ((0.18, 1.05), (1.25, DOOR_H - 0.18)):                         # two raised fields per leaf
+            for (yy0, yy1) in ((0.18, 1.05), (1.25, DOOR_H - 0.18)):                              # two raised fields per leaf
                 wall_box(bm, "-z", a0 + 0.14, a1 - 0.14, yy0, yy1, 0.035, 0.045)
     part("Door_Leaves", "Door_Wood", leaves)
 
     def hardware(bm):
         for a in (dx - 0.06, dx + 0.035):
-            wall_box(bm, "-z", a, a + 0.025, 0.85, 1.25, 0.035, 0.048)                         # pull handles
+            wall_box(bm, "-z", a, a + 0.025, 0.85, 1.25, 0.035, 0.048)                             # pull handles
         for a0, a1 in ((x0 + 0.2, dx - 0.2), (dx + 0.2, x1 - 0.2)):
-            wall_box(bm, "-z", a0, a1, 0.0, 0.22, 0.035, 0.04)                                # kick plates
+            wall_box(bm, "-z", a0, a1, 0.0, 0.22, 0.035, 0.04)                                    # kick plates
     part("Door_Hardware", "Metal_Brass", hardware)
 
 
+EXIT_Y = DOOR_H + 0.22 + 0.22                              # the EXIT sign's centre: on the door's frieze
+
+
+def build_exit_sign():
+    """An EXIT sign on the door's frieze (own drawing: a pixel font on green), in a dark box; the sign face is emissive and carries no lightmap."""
+    dx = DOOR[0]
+    part("Exit_Housing", "Metal_Dark", lambda bm: wall_box(bm, "-z", dx - 0.22, dx + 0.22, EXIT_Y - 0.09, EXIT_Y + 0.09, 0.0, 0.085))
+    panel("Exit_Face", "Sign_Exit", on_wall("-z", dx, EXIT_Y, 0.0855), "-z", 0.40, 0.15)
+
+
+SCONCES = []         # game points of the sconces' bulbs: filled by build_sconces, used by the lights
+
+
+def build_sconces():
+    """The Chronicle Museum's door sconces (procroom.js, `sconce`: a brass wall plate, an arm, a cup and a bulb), one either side of the door at 2.6 m."""
+    SCONCES.clear()
+    dx = DOOR[0]
+    for k in (-1, 1):
+        SCONCES.append(on_wall("-z", dx + k * (PILASTER_X + PILASTER_W + 0.62), 2.62, 0.30))
+
+    def brass(bm):
+        for p in SCONCES:
+            a = p[0]
+            cyl(bm, on_wall("-z", a, 2.52, 0.0), on_wall("-z", a, 2.52, 0.02), 0.09, 0.09, 16)    # the plate
+            cyl(bm, on_wall("-z", a, 2.52, 0.02), on_wall("-z", a, 2.52, 0.28), 0.018, 0.018, 10)  # the arm
+            cyl(bm, (p[0], 2.50, p[2]), (p[0], 2.60, p[2]), 0.035, 0.06, 14)                      # the cup
+    part("Sconce_Brass", "Metal_Brass", brass, smooth=True)
+    part("Sconce_Bulbs", "Lamp_Emit", lambda bm: [sphere(bm, p, 0.05, 12) for p in SCONCES], smooth=True)
+
+
 def build_plinths():
-    """The six plinths, at MUSEUM.homes: a dark painted block on a recessed black toe, the size of their colliders (0.9 m square, 0.6 m high). The page
-    hangs each statue's name plate on the face toward the hall, so that face is plain."""
-    def body(bm, x, z):
-        cube(bm, (x - P, 0.05, z - P), (x + P, PLINTH_H - 0.025, z + P))
-        cube(bm, (x - P - 0.012, PLINTH_H - 0.025, z - P - 0.012), (x + P + 0.012, PLINTH_H, z + P + 0.012))   # the top's lip
+    """The six plinths, at MUSEUM.homes, as the Chronicle Museum's block pedestals (procroom.js, a `marble_dark` body under a `marble_white` lip), here with a white
+    marble base too: the size of their colliders (0.9 m square, 0.6 m high). The page hangs each statue's name plate on the face toward the hall, so that face is
+    plain. (Its column pedestals do not fit here: the page's plate needs a flat face, and a round shaft would leave the collider's corners bare.)"""
+    def base(bm, x, z):
+        cube(bm, (x - P - 0.02, 0.0, z - P - 0.02), (x + P + 0.02, 0.05, z + P + 0.02))
+        cube(bm, (x - P - 0.005, 0.05, z - P - 0.005), (x + P + 0.005, 0.11, z + P + 0.005))
+
+    def cap(bm, x, z):
+        cube(bm, (x - P - 0.005, 0.50, z - P - 0.005), (x + P + 0.005, 0.535, z + P + 0.005))
+        cube(bm, (x - P - 0.02, 0.535, z - P - 0.02), (x + P + 0.02, PLINTH_H, z + P + 0.02))
     for i, (x, z) in enumerate(HOMES):
-        part(f"Plinth_{i}_Body", "Plinth_Paint", lambda bm: body(bm, x, z))
-        part(f"Plinth_{i}_Toe", "Metal_Dark", lambda bm: cube(bm, (x - P + 0.02, 0.0, z - P + 0.02), (x + P - 0.02, 0.05, z + P - 0.02)))
+        part(f"Plinth_{i}_Base", "Marble_White", lambda bm: base(bm, x, z))
+        part(f"Plinth_{i}_Die", "Marble_Dark", lambda bm: cube(bm, (x - P + 0.025, 0.11, z - P + 0.025), (x + P - 0.025, 0.50, z + P - 0.025)))
+        part(f"Plinth_{i}_Cap", "Marble_White", lambda bm: cap(bm, x, z))
 
 
-def ring(bm, normal, a0, a1, y0, y1, t, d0, d1):
-    """A rectangular ring on a wall (a frame's moulding): outer edges a0..a1, y0..y1, `t` wide, from d0 to d1 into the room. Its front is one flat ring, so it
-    unwraps as one lightmap island, not four bars."""
-    outer = [(a0, y0), (a1, y0), (a1, y1), (a0, y1)]
-    inner = [(a0 + t, y0 + t), (a1 - t, y0 + t), (a1 - t, y1 - t), (a0 + t, y1 - t)]
-    def V(p, d):
-        return bm.verts.new(B(on_wall(normal, p[0], p[1], d)))
-    of, inf = [V(p, d1) for p in outer], [V(p, d1) for p in inner]
-    ob, ib = [V(p, d0) for p in outer], [V(p, d0) for p in inner]
-    for i in range(4):
-        j = (i + 1) % 4
-        bm.faces.new((of[i], of[j], inf[j], inf[i]))          # the front
-        bm.faces.new((ob[i], ob[j], of[j], of[i]))            # the outer side
-        bm.faces.new((inf[i], inf[j], ib[j], ib[i]))          # the inner side (the sight edge)
+# ---------------------------------------------------------------- frames: the Chronicle Museum's salon hang and its frame styles by era
+# A frame profile is (s, u): s metres in from the frame's outer edge, u out from the wall; it starts and ends on the wall (u = 0). Every one is at most 4.5 cm
+# deep, so a frame that reaches below head height stays within 5 cm of its wall (the layout check's rule).
+FRAME_STYLES = {
+    "gilt-ornate": ("Frame_Gold", [(0, 0), (0, 0.02), (0.012, 0.03), (0.03, 0.041), (0.05, 0.045), (0.068, 0.04), (0.08, 0.03), (0.088, 0.034), (0.096, 0.03),
+                                   (0.11, 0.02), (0.125, 0.015), (0.14, 0.011), (0.14, 0)]),
+    "gilt-simple": ("Frame_Gold", [(0, 0), (0, 0.02), (0.018, 0.036), (0.042, 0.04), (0.066, 0.03), (0.09, 0.016), (0.09, 0)]),
+    "dark-wood": ("Frame_Wood", [(0, 0), (0, 0.03), (0.01, 0.036), (0.058, 0.036), (0.075, 0.02), (0.075, 0)]),
+    "black-lacquer": ("Frame_Black", [(0, 0), (0, 0.034), (0.006, 0.04), (0.05, 0.04), (0.05, 0)]),
+    "thin-metal": ("Metal_Dark", [(0, 0), (0, 0.028), (0.022, 0.028), (0.022, 0)]),
+}
+SMALL = {"gilt-ornate": "gilt-simple", "gilt-simple": "dark-wood", "dark-wood": "dark-wood", "black-lacquer": "thin-metal"}     # build_layout.ROOM_STYLE frame_small
+BAY_ERA = ["gilt-simple", "gilt-ornate", "dark-wood", "black-lacquer"]   # the bays from the door north: Renaissance, Baroque, 19th century, modern (the Chronicle's order)
+SALON = [(0.0, 1.75, 1.6, 1.2, "main"), (-1.45, 1.6, 0.7, 0.9, "small"), (1.45, 1.6, 0.7, 0.9, "small"),        # (along, centre y, w, h, role): the eye row ...
+         (-1.2, 2.75 + 0.275, 0.75, 0.55, "small"), (0.0, 2.75 + 0.35, 0.95, 0.7, "main"), (1.2, 2.75 + 0.275, 0.75, 0.55, "small")]   # ... and the row above it,
+#                                                                                                             bottom-aligned on 2.75 m (build_layout._vertical)
 
 
-def frame_bars(bm, normal, a, yc, w, h, bar, depth):
-    """An empty picture frame on a wall: an outer moulding `bar` wide and a raised inner lip, `depth` proud in all."""
+def frame_sweep(bm, normal, a, yc, w, h, profile):
+    """A bevelled picture frame: `profile` swept round the w x h rectangle centred on (a, yc) of the wall, mitred at the corners (procroom.js frameGeometry's
+    cushion moulding). Open at the back (it lies on the wall); built facing the room."""
     a0, a1, y0, y1 = a - w / 2, a + w / 2, yc - h / 2, yc + h / 2
-    ring(bm, normal, a0, a1, y0, y1, bar, 0.0, depth * 0.7)
-    i = bar * 0.35
-    ring(bm, normal, a0 + i, a1 - i, y0 + i, y1 - i, bar * 0.4, depth * 0.7, depth)
+    rings = []
+    for s, u in profile:
+        rings.append([bm.verts.new(B(on_wall(normal, p, q, u))) for p, q in ((a0 + s, y0 + s), (a1 - s, y0 + s), (a1 - s, y1 - s), (a0 + s, y1 - s))])
+    new = []
+    for j in range(len(profile) - 1):
+        r, t = rings[j], rings[j + 1]
+        for i in range(4):
+            k = (i + 1) % 4
+            new.append(bm.faces.new((r[i], r[k], t[k], t[i])))
+    # make the outer side (the first segment) face away from the frame's centre; everything else then faces the room
+    f = new[0]
+    f.normal_update()
+    c = B(on_wall(normal, a, yc, 0.0))
+    if f.normal.dot(f.calc_center_median() - c) < 0:
+        bmesh.ops.reverse_faces(bm, faces=new)
 
 
-FRAMES = []          # (normal, along, centre y, w, h): filled by build_frames, used by the lights
+FRAMES = []          # (normal, along, centre y, w, h, style, lit): filled by build_frames, used by the lights
 
 
 def build_frames():
-    """Empty gilded frames: one in each bay of the long walls (halfway between the plinths), two either side of the door, and a large one on the north wall at the
-    end of the hall. Each hangs from the picture rail on two brass wires and has a brass picture light over it. Frames are 4.5 cm deep, so they stay within
-    5 cm of the wall (the layout check's rule for art that reaches below head height)."""
+    """The frames, empty (docs/BLENDER.md: "picture rails and empty frames"; the paintings were taken down, and their pale ghosts are on the walls). They hang as the
+    Chronicle Museum hangs its works: a salon grid in each bay of the long walls (halfway between the plinths), a large work centred at eye height, smaller ones
+    either side and a row above bottom-aligned on a shared line; the frame style follows the era, bay by bay from the door north, as the Chronicle's rooms do
+    (gilt simple, gilt ornate, dark wood, black lacquer; the small works in the era's lighter frame). A grand gilt frame and two smaller ones on the north wall, two
+    beside the door. The main frames have brass picture lights; the row above hangs on brass wires from the picture rail."""
     FRAMES.clear()
     for n in ("+x", "-x"):
-        for zb in BAYS:
-            FRAMES.append((n, zb, 2.3, 1.7, 1.25, 0.11))
+        for era, zb in zip(BAY_ERA, sorted(BAYS, reverse=True)):
+            for da, yc, w, h, role in SALON:
+                st = era if role == "main" else SMALL[era]
+                FRAMES.append((n, zb + da, yc, w, h, st, role == "main" and yc < 2.5))
     dx = DOOR[0]
     for k in (-1, 1):
-        FRAMES.append(("-z", dx + k * (DOOR_W / 2 + 1.55), 2.15, 1.25, 0.95, 0.09))
-    FRAMES.append(("+z", 0.0, 2.7, 3.3, 2.4, 0.15))
+        FRAMES.append(("-z", dx + k * 4.0, 2.15, 1.25, 0.95, "gilt-simple", True))
+    FRAMES.append(("+z", 0.0, 2.7, 3.3, 2.4, "gilt-ornate", True))
+    for k in (-1, 1):
+        FRAMES.append(("+z", k * 3.4, 2.3, 1.0, 1.3, "gilt-simple", True))
 
-    for i, (n, a, yc, w, h, bar) in enumerate(FRAMES):
-        part(f"Frame_{i}", "Frame_Gold", lambda bm: frame_bars(bm, n, a, yc, w, h, bar, 0.045))
+    for i, (n, a, yc, w, h, st, lit) in enumerate(FRAMES):
+        mat, prof = FRAME_STYLES[st]
+        part(f"Frame_{i}", mat, lambda bm: frame_sweep(bm, n, a, yc, w, h, prof), recalc=False)
 
     def wires(bm):
-        for n, a, yc, w, h, bar in FRAMES:
+        for n, a, yc, w, h, st, lit in FRAMES:
+            if yc < 2.5:
+                continue
             top = yc + h / 2
             for k in (-1, 1):
-                p0 = on_wall(n, a + k * w * 0.32, RAIL - 0.03, 0.02)
+                p0 = on_wall(n, a + k * w * 0.32, RAIL - 0.06, 0.02)
                 p1 = on_wall(n, a + k * w * 0.18, top, 0.02)
                 cyl(bm, p0, p1, 0.002, 0.002, 4, cap=False)
-                cyl(bm, on_wall(n, a + k * w * 0.32, RAIL - 0.045, 0.018), on_wall(n, a + k * w * 0.32, RAIL - 0.01, 0.018), 0.008, 0.008, 6)   # the rail hook
+                cyl(bm, on_wall(n, a + k * w * 0.32, RAIL - 0.075, 0.018), on_wall(n, a + k * w * 0.32, RAIL - 0.04, 0.018), 0.008, 0.008, 6)   # the rail hook
     part("Frame_Wires", "Metal_Brass", wires)
 
+    lit = [f for f in FRAMES if f[6]]
+
     def picture_lights(bm):
-        for n, a, yc, w, h, bar in FRAMES:
+        for n, a, yc, w, h, st, _ in lit:
             top = yc + h / 2 + 0.12
-            lw = min(0.7, w * 0.4)
+            lw = min(0.9, w * 0.45)
             wall_box(bm, n, a - 0.04, a + 0.04, top - 0.03, top + 0.06, 0.0, 0.02)                        # the wall plate
             cyl(bm, on_wall(n, a, top + 0.015, 0.01), on_wall(n, a, top + 0.08, 0.20), 0.009, 0.009, 8)   # the arm
             cyl(bm, on_wall(n, a - lw / 2, top + 0.08, 0.22), on_wall(n, a + lw / 2, top + 0.08, 0.22), 0.032, 0.032, 16)   # the hood
     part("Picture_Lights", "Metal_Brass", picture_lights, smooth=True)
 
     def bulbs(bm):
-        for n, a, yc, w, h, bar in FRAMES:
+        for n, a, yc, w, h, st, _ in lit:
             top = yc + h / 2 + 0.12
-            lw = min(0.7, w * 0.4)
+            lw = min(0.9, w * 0.45)
             cyl(bm, on_wall(n, a - lw / 2 + 0.02, top + 0.055, 0.205), on_wall(n, a + lw / 2 - 0.02, top + 0.055, 0.205), 0.012, 0.012, 8)
     part("Picture_Light_Tubes", "Lamp_Emit", bulbs, smooth=True)
 
@@ -473,9 +645,9 @@ def build_tracks():
     part("Track_Rails", "Metal_Dark", lambda bm: [cube(bm, (k * TRACK_X - 0.025, yt - 0.035, Z0 + 0.6), (k * TRACK_X + 0.025, yt, Z1 - 0.6)) for k in (-1, 1)])
     for i, (x, z) in enumerate(HOMES):
         k = 1 if x > 0 else -1
-        SPOTS.append((f"Spot_Plinth_{i}", (k * TRACK_X, yt - 0.22, z), (x, PLINTH_H + 0.85, z), 950.0, 34.0))
+        SPOTS.append((f"Spot_Plinth_{i}", (k * TRACK_X, yt - 0.22, z), (x, PLINTH_H + 0.85, z), SPOT_W, 34.0))
     for k in (-1, 1):
-        SPOTS.append((f"Spot_North_{'E' if k > 0 else 'W'}", (k * TRACK_X, yt - 0.22, Z0 + 1.4), (k * 0.9, 2.7, Z0), 750.0, 30.0))
+        SPOTS.append((f"Spot_North_{'E' if k > 0 else 'W'}", (k * TRACK_X, yt - 0.22, Z0 + 1.4), (k * 0.9, 2.7, Z0), SPOT_W * 0.8, 30.0))
 
     def heads(bm):
         for _, piv, aim, _, _ in SPOTS:
@@ -495,12 +667,107 @@ def build_tracks():
     part("Spot_Lenses", "Lamp_Emit", lenses, smooth=True)
 
 
-def build_exit_sign():
-    """An EXIT sign over the door (own drawing: a pixel font on green), on a dark box; the sign face is emissive and carries no lightmap."""
-    dx = DOOR[0]
-    y = DOOR_H + 0.55
-    part("Exit_Housing", "Metal_Dark", lambda bm: wall_box(bm, "-z", dx - 0.22, dx + 0.22, y - 0.09, y + 0.09, 0.0, 0.07))
-    panel("Exit_Face", "Sign_Exit", on_wall("-z", dx, y, 0.0705), "-z", 0.40, 0.15)
+# ---------------------------------------------------------------- the Poly Haven models: chandeliers and benches
+def load_model(path):
+    """Import a glTF once and keep its meshes as bmesh templates in Blender space, one per material index, with the model's own UVs as UVMap; the imported
+    objects, materials and images are removed again (the build uses its own materials)."""
+    before = (set(bpy.data.objects), set(bpy.data.meshes), set(bpy.data.materials), set(bpy.data.images))
+    bpy.ops.import_scene.gltf(filepath=str(ROOT / path))
+    obs = [o for o in bpy.data.objects if o not in before[0]]
+    parts = {}
+    for o in obs:
+        if o.type != "MESH":
+            continue
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        bm.transform(o.matrix_world)
+        uv = bm.loops.layers.uv.active or bm.loops.layers.uv[0]
+        for lay in [lay for lay in bm.loops.layers.uv if lay.name != uv.name]:
+            bm.loops.layers.uv.remove(lay)
+        for idx in sorted({f.material_index for f in bm.faces}):
+            t = bm.copy()
+            bmesh.ops.delete(t, geom=[f for f in t.faces if f.material_index != idx], context="FACES")
+            for f in t.faces:
+                f.material_index = 0                                             # one material per art object (else the exporter splits a primitive off)
+            parts.setdefault(o.data.materials[idx].name, []).append(t)          # keyed by the model's material name
+        bm.free()
+    for o in obs:
+        bpy.data.objects.remove(o)
+    for kind, old in zip((bpy.data.meshes, bpy.data.materials, bpy.data.images), before[1:]):
+        for d in [d for d in kind if d not in old]:
+            kind.remove(d)
+    return parts
+
+
+def place(templates, mats_and_names, matrices, coll=None):
+    """One art object per material: every template mesh, once per matrix (Blender space), with the model's UVs kept (as UVMap)."""
+    out = []
+    for key, (mat, name) in mats_and_names.items():
+        bm = bmesh.new()
+        for M in matrices:
+            for t in templates[key]:
+                me = bpy.data.meshes.new("tmp")
+                t.to_mesh(me)
+                me.uv_layers[0].name = "UVMap"
+                n0 = len(bm.verts)
+                bm.from_mesh(me)
+                bpy.data.meshes.remove(me)
+                bm.verts.ensure_lookup_table()
+                bmesh.ops.transform(bm, matrix=M, verts=bm.verts[n0:])
+        out.append(finish(name, bm, mat, coll or ART, smooth=True, sharp_deg=60, keep_uv=True))
+    return out
+
+
+CHAIN = 0.85         # from the ceiling to the chandelier's top
+CHANDELIERS = []     # game points of each chandelier's lamp ring: filled by build_chandeliers, used by the lights
+
+
+def build_chandeliers():
+    """Three Poly Haven chandeliers (Chandelier_02, CC0: the Chronicle Museum's hall chandelier) down the middle of the hall, one over each pair of plinths, between
+    the laylights, on brass chains from ceiling roses. Its brass is one material (Chandelier_Gilt, the model's diffuse map); its bulbs are Lamp_Emit."""
+    CHANDELIERS.clear()
+    tpl = load_model(CHANDELIER)
+    allv = [v.co for ts in tpl.values() for t in ts for v in t.verts]
+    top, bot = max(v.z for v in allv), min(v.z for v in allv)
+    ring = sum(v.co.z for t in tpl["Chandelier_02_bulb"] for v in t.verts) / sum(len(t.verts) for t in tpl["Chandelier_02_bulb"])   # the bulbs' mean height
+    y_top = H - CHAIN
+    mats = []
+    for z in ROWS:
+        mats.append(Matrix.Translation(B((0.0, y_top - top, z))))
+        CHANDELIERS.append((0.0, y_top - top + ring, z))
+    place(tpl, {"Chandelier_02": ("Chandelier_Gilt", "Chandelier_Body"), "Chandelier_02_bulb": ("Lamp_Emit", "Chandelier_Bulbs")}, mats)
+    for ts in tpl.values():
+        for t in ts:
+            t.free()
+
+    def chains(bm):
+        for z in ROWS:
+            cyl(bm, (0, H, z), (0, H - 0.05, z), 0.10, 0.08, 20)                       # the ceiling rose
+            cyl(bm, (0, H - 0.05, z), (0, y_top - 0.01, z), 0.012, 0.012, 8)          # the chain (a rod)
+    part("Chandelier_Chains", "Metal_Brass", chains, smooth=True)
+    print(f"CHANDELIER top {top:.3f} bottom {bot:.3f}: hangs from {y_top:.2f} to {y_top - (top - bot):.2f} m")
+
+
+BENCHES = [(-0.31, -4.0, "+x"), (0.31, -4.0, "-x"), (-0.31, -10.0, "+x"), (0.31, -10.0, "-x")]   # (x, z, the side its back faces): back to back under two laylights
+
+
+def build_benches():
+    """Four Poly Haven benches (painted_wooden_bench, CC0: the Chronicle Museum's hall bench), back to back in pairs in the middle aisle under the second and third
+    laylights, facing the salon walls. The collision file has no bench, so they are decor_* (passable): the coordinator may add two bench colliders (README)."""
+    tpl = load_model(BENCH)
+    vs = [v.co for t in tpl["painted_wooden_bench"] for v in t.verts]
+    hi = [v for v in vs if v.z > 0.6]
+    back_y = sum(v.y for v in hi) / len(hi)               # the backrest's side of the model (Blender y)
+    mats = []
+    for x, z, back in BENCHES:
+        want = 1 if back == "+x" else -1                  # the Blender x direction the back faces (game x is Blender x)
+        # turn the model about z so that its length runs along the hall (Blender y) and its back's side (model y sign) points to `want` on Blender x
+        ang = -math.pi / 2 if (back_y > 0) == (want > 0) else math.pi / 2
+        mats.append(Matrix.Translation(B((x, 0.0, z))) @ Matrix.Rotation(ang, 4, "Z"))
+    place(tpl, {"painted_wooden_bench": ("Bench_Paint", "decor_benches")}, mats)
+    for ts in tpl.values():
+        for t in ts:
+            t.free()
 
 
 # ---------------------------------------------------------------- generated images (own work, numpy, fixed seeds)
@@ -672,24 +939,36 @@ def add_lights():
         ob, d = light(name, "SPOT", tuple(Vector(piv) + d3 * 0.14), power, warm, 0.035)
         d.spot_size, d.spot_blend = math.radians(cone), 0.45
         ob.rotation_euler = B(d3).to_track_quat("-Z", "Y").to_euler()
-    for i, (n, a, yc, w, h, bar) in enumerate(FRAMES):          # the picture lights: wide, soft, down onto the frame
+    for i, (n, a, yc, w, h, st, lit) in enumerate(FRAMES):     # the picture lights over the lit frames: wide, soft, down onto the frame and its neighbours
+        if not lit:
+            continue
         top = yc + h / 2 + 0.12
         pos = on_wall(n, a, top + 0.04, 0.21)
         aim = on_wall(n, a, yc - h * 0.25, 0.0)
         d3 = (Vector(aim) - Vector(pos)).normalized()
-        ob, d = light(f"Picture_Light_{i}", "SPOT", pos, 90.0 if w < 3 else 180.0, (1.0, 0.74, 0.48), 0.12)
-        d.spot_size, d.spot_blend = math.radians(120), 0.8
+        ob, d = light(f"Picture_Light_{i}", "SPOT", pos, PICTURE_W * (2.0 if w > 3 else 1.0), (1.0, 0.76, 0.52), 0.12)
+        d.spot_size, d.spot_blend = math.radians(130), 0.8
         ob.rotation_euler = B(d3).to_track_quat("-Z", "Y").to_euler()
+    for i, p in enumerate(CHANDELIERS):                          # the chandeliers: a warm point light in each lamp ring (the bulbs glow as well)
+        ob, d = light(f"Chandelier_Light_{i}", "POINT", p, CHANDELIER_W, (1.0, 0.82, 0.60), 0.22)
+    for i, p in enumerate(SCONCES):
+        ob, d = light(f"Sconce_Light_{i}", "POINT", (p[0], p[1] + 0.02, p[2]), SCONCE_W, (1.0, 0.78, 0.54), 0.06)
     ob, d = light("Moon", "SUN", (0, 20, CZ), MOON_W, (0.62, 0.74, 1.0), 0.0)
     d.angle = math.radians(1.0)
     ob.rotation_euler = B((0.42, -1.0, 0.18)).to_track_quat("-Z", "Y").to_euler()     # from high in the west-south-west: the squares land east of the aisle
-    ob, d = light("Exit_Glow", "AREA", on_wall("-z", DOOR[0], DOOR_H + 0.55, 0.09), 1.5, (0.3, 1.0, 0.45), 0.0)
+    ob, d = light("Exit_Glow", "AREA", on_wall("-z", DOOR[0], EXIT_Y, 0.10), 1.5, (0.3, 1.0, 0.45), 0.0)
     d.shape, d.size, d.size_y = "RECTANGLE", 0.40, 0.15
     ob.rotation_euler = B((0, 0, -1)).to_track_quat("-Z", "Y").to_euler()
 
 
-MOON_W = 1.4
-WORLD_STRENGTH = 25.0
+# The light levels. Version 2 is brighter than the first (whose stills read too dark at exposure 0): chandeliers and door sconces as the Chronicle Museum
+# lights its rooms, stronger picture lights and spots, and a brighter moon and night sky through the laylights.
+SPOT_W = 1100.0
+PICTURE_W = 140.0
+CHANDELIER_W = 380.0
+SCONCE_W = 45.0
+MOON_W = 2.6
+WORLD_STRENGTH = 40.0
 
 
 def setup_world():
@@ -769,11 +1048,15 @@ def build_all():
     textured("Decal_Ghost", mk_image("Wall_Ghost", ghost_pixels()), alpha=True)
     build_shell()
     build_skylights()
-    build_trim()
+    build_mouldings()
+    build_door()
     build_plinths()
     build_frames()
     build_tracks()
     build_exit_sign()
+    build_sconces()
+    build_chandeliers()
+    build_benches()
     build_ghosts()
     build_standins()
     add_lights()
@@ -783,12 +1066,16 @@ def build_all():
 
 # ---------------------------------------------------------------- bake
 GROUPS = [["Floor_Parquet", "Floor_Marble", "Ceiling_Paint"],                                  # 0: the floor and the ceiling
-          ["Wall_Paint", "Wainscot_Wood", "Trim_Paint", "Decal_Ghost"],                          # 1: the walls, their wainscot, skirting, rails and cornice
-          ["Plinth_Paint", "Frame_Gold", "Door_Wood"],                                           # 2: the plinths, the frames, the door
-          ["Metal_Dark", "Metal_Brass"]]        # 3: tracks, spot heads, picture lights, rails: they sit next to the lights, so their texels run far hotter
-                                                #    than the rest and get their own map (and their own lightmap_intensity) instead of crushing the others
-PAGES = [896, 1152, 768, 1152]          # each map's fixed page size (px): the smallest page that gave >= 30 px/m. Fixed, because Blender's island
-                                        # packer is not exactly repeatable and map 3 sat right on the 30 px/m line (1024 or 1152 from run to run)
+          ["Wall_Paint", "Wainscot_Wood", "Trim_Paint", "Skirting_Marble", "Decal_Ghost"],       # 1: the walls, wainscot, skirting, rails, cornice, coffers
+          ["Marble_Dark", "Marble_White", "Frame_Gold", "Frame_Wood", "Frame_Black", "Door_Wood", "Bench_Paint"],   # 2: plinths, frames, the door, benches
+          ["Metal_Dark", "Metal_Brass", "Chandelier_Gilt"]]   # 3: tracks, spot heads, picture lights, sconces, chandeliers: they sit next to the lights, so their
+                                                #    texels run far hotter than the rest and get their own map (and lightmap_intensity) instead of crushing the others
+PAGES = [896, 1536, 1024, 1152]        # each map's fixed page size (px), from a first run with None: the smallest page that gave >= 30 px/m. Fixed, because
+                                        # Blender's island packer is not exactly repeatable
+WHITE_CAP = 12.0                        # a map's white point is its 99.5th percentile texel, but at most 12 x its 90th: on the fittings' map the few texels beside
+                                        # the bulbs run some 40 x hotter than the rest and would push the rest into the bottom 8-bit levels; they clip instead
+KEEP_UV_LM = {"Chandelier_Gilt": 0.16}  # lightmapped through the model's own UVs, in a corner of its map this wide (its 64k triangles would make thousands of
+                                        # smart-project islands); the three chandeliers share those texels, as they hang in the same light
 SHELL_PREFIX = ("Wall_", "Floor_", "Ceiling_")
 
 
@@ -916,13 +1203,23 @@ def uv_area(ob, layer):
 def lightmap_uv(objs, page=None):
     """One shared atlas for `objs`: smart-project islands, equal texel density, packed with MARGIN_PX; on `page` px, or else the smallest square
     page that gives >= 30 px/m."""
-    for o in objs:
+    keep = [o for o in objs if o.name in KEEP_UV_LM]
+    corner = max([KEEP_UV_LM[o.name] for o in keep], default=0.0)
+    objs = [o for o in objs if o not in keep]
+    for o in objs + keep:
         uvs = o.data.uv_layers
         if "lightmap" in uvs:
             uvs.remove(uvs["lightmap"])
-        uvs.new(name="lightmap")
+        uvs.new(name="lightmap", do_init=o in keep)               # the kept ones start as a copy of UVMap
         uvs.active = uvs["lightmap"]
         uvs["lightmap"].active_render = True
+    for o in keep:                                                 # the model's UVs, fitted into the corner square [1 - corner, 1] x [0, corner]
+        d = o.data.uv_layers["lightmap"].data
+        us = np.array([x.uv for x in d])
+        lo, hi = us.min(axis=0), us.max(axis=0)
+        sc = (corner - 2 * MARGIN_PX / (page or 2048)) / max(hi - lo)
+        us = (us - lo) * sc + np.array([1 - corner + MARGIN_PX / (page or 2048), MARGIN_PX / (page or 2048)])
+        d.foreach_set("uv", us.ravel())
     select_only(objs)
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
@@ -932,6 +1229,12 @@ def lightmap_uv(objs, page=None):
     for S in ((page,) if page else (512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1792, 2048)):
         bpy.ops.uv.pack_islands(rotate=True, margin_method="FRACTION", margin=MARGIN_PX / S, shape_method="CONCAVE")
         bpy.ops.object.mode_set(mode="OBJECT")
+        if corner:                                                 # the packed islands shrink into the square beside the kept corner
+            f = 1 - corner
+            for o in objs:
+                d = o.data.uv_layers["lightmap"].data
+                us = np.array([x.uv for x in d]) * f
+                d.foreach_set("uv", us.ravel())
         a3 = sum(area3d(o) for o in objs)
         au = sum(uv_area(o, "lightmap") for o in objs)
         dens = S * math.sqrt(au / a3)
@@ -1022,7 +1325,7 @@ def stage_bake():
         rgb = a[..., :3]
         peak = rgb.max(axis=2)
         pc = np.percentile(peak[peak > 1e-5], [50, 90, 99, 99.5, 100]) if (peak > 1e-5).any() else [1.0] * 5
-        scale = float(pc[3])                                 # the 99.5th percentile of the lit texels maps to white; the few hotter ones (right under a spot) clip
+        scale = float(min(pc[3], WHITE_CAP * pc[1]))         # the 99.5th percentile of the lit texels maps to white (at most WHITE_CAP x the 90th); hotter ones clip
         print('  texel percentiles p50 p90 p99 p99.5 max:', [round(float(v), 3) for v in pc])
         out = np.ones((S, S, 4), np.float32)
         out[..., :3] = srgb_encode(rgb / scale)
@@ -1107,6 +1410,9 @@ def scrub_private():
             if p.identifier.startswith("use_stamp") and not p.is_readonly:
                 setattr(sc.render, p.identifier, False)
     base = BLEND.parent
+    for im in bpy.data.images:                                    # the glTF importer packs the models' textures under their absolute paths:
+        if im.packed_file and not im.filepath.replace("\\", "/").startswith("//generated/"):
+            im.unpack(method="REMOVE")                            # unpack them (the files are in blender/models/), so the path goes relative below
     for im in bpy.data.images:
         if im.packed_file or im.source != "FILE" or not im.filepath:
             continue
@@ -1214,7 +1520,7 @@ def stage_render():
     }
     plan = look_cam("plan", (0, H + 8, CZ), None, ortho=(Z1 - Z0) + 1.2, roll=-math.pi / 2)
     arts = list(bpy.data.collections["Art"].objects) + list(bpy.data.collections["Standins"].objects)
-    cut_plan = [o for o in arts if o.name.startswith(("Ceiling_", "Skylight_", "Track_", "Spot_", "Cornice"))]
+    cut_plan = [o for o in arts if o.name.startswith(("Ceiling_", "Skylight_", "Track_", "Spot_", "Cornice", "Laylight_", "Chandelier_"))]
     todo = [(k, v, (1920, 1080)) for k, v in shots.items()] + [("4_plan", plan, (1800, 900))]
     for key, cam, (w, h) in todo:
         if which not in ("all", key):
