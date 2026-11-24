@@ -15,11 +15,14 @@ export const results = run => run.exits.map(e => ({...e}));
 export const fmtTime = ms => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
 
 // ---- the score and the run record (RND-21, RND-27)
-// PLACEHOLDER numbers: the owner has not confirmed them. They live here and nowhere else, so changing the formula means changing this one object.
+// Confirmed 2026-11-24 (the owner left the formula to the coordinator; docs/ROUND.md RND-27). They live here and nowhere else, so changing the formula means changing this one object.
 export const SCORE = {base: 1000, perRevive: 150, perDeath: 100, perStepMs: 5000, perStep: 1};
 // 1000, plus 150 per revive, minus 100 per death, minus 1 per 5 s of round time, never below 0
 export const score = ({deaths = 0, revives = 0, ms = 0}) =>
   Math.max(0, SCORE.base + SCORE.perRevive * revives - SCORE.perDeath * deaths - SCORE.perStep * Math.floor(Math.max(0, ms) / SCORE.perStepMs));
+// A board's order (RND-27): the higher score first, then the faster time; equal on both keeps the given order. Entries are {score, ms, ...}; returns a new array.
+// The results screen does not use it: it lists players in the order they walked out (the race), with the score beside each.
+export const rankBoard = entries => entries.map((e, i) => [e, i]).sort(([a, i], [b, j]) => (b.score - a.score) || (a.ms - b.ms) || (i - j)).map(([e]) => e);
 // One finished round as plain data. `players` are {char, place, ms, downs, deaths, revives, shots} (extra fields, names above all, are dropped on purpose:
 // the log carries no player names). `floors` are [{scene, ms}] in the order the room first used them.
 export function runRecord({roomCode, mode, startedAt, endedAt, floors = [], players = []}) {

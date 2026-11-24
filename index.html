@@ -175,7 +175,7 @@
 <div id="hud"></div>
 <div id="camhud"></div><div id="buzz"></div><div id="cloak"><b>CLOAK · V</b><i></i></div><div id="cloakfx"></div><div id="beacons"></div><div id="hp"><b>HP</b><i></i></div><div id="hurt"></div><div id="stam"><i></i></div><div id="alarm"></div><div id="redpulse"></div>
 <div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-walk" type="button" hidden>Walk out to the parking lot</button><button id="r-again" type="button">Play again</button></div></div>
-<div id="station"><div class="card"><h2>LOCKER</h2><p>Your loadout. Click a piece (or press its number) to carry it or leave it here: two weapons at most besides the ray and the cloak. E swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
+<div id="station"><div class="card"><h2>LOST AND FOUND</h2><p>Your loadout. Click a piece (or press its number) to carry it or leave it here: two weapons at most besides the ray and the cloak. E swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
 <div id="qz"><div class="card"><div id="qz-title"></div><p id="qz-prompt"></p><div id="qz-tray"></div><div id="qz-bins"></div><div id="qz-foot"><button id="qz-next" type="button"></button><button id="qz-cancel" type="button">Close (Esc)</button></div></div></div>
 <div id="shift"><div class="card"><h2 id="sh-title"></h2><p id="sh-text"></p><button id="sh-work" type="button">Work the shift</button><button id="sh-close" type="button">Not now (Esc)</button></div></div>
 <div id="pc"><div class="card"><div id="pc-tabs"></div><h2 id="pc-title"></h2><pre id="pc-body"></pre><div id="pc-actions"></div><button id="pc-close" type="button">Close (Esc or F)</button></div></div>
@@ -976,7 +976,7 @@ addEventListener("keydown", e => {
   if (e.code === "KeyE") useConsumable(1);
   if (/^Digit[1-5]$/.test(e.code) && (e.code !== "Digit5" || GB.load)) {
     const k = +e.code.slice(5), it = k <= 3 ? ["gun", "cloak", "beacon"][k - 1] : GB.load ? arsenalCarried(GB.load)[k - 4] : "crossbow";           // keys 4 and 5: the first and the second arsenal weapon you carry (docs/ITEMS.md 1.3)
-    if (it && owned().includes(it)) setHeld(it); else toast(it ? `You do not have the ${ITEM_NAMES[it].toLowerCase()}` : `Weapon slot ${k - 3} is empty (the locker holds the rest: two weapons at most)`);
+    if (it && owned().includes(it)) setHeld(it); else toast(it ? `You do not have the ${ITEM_NAMES[it].toLowerCase()}` : `Weapon slot ${k - 3} is empty (the Lost and Found holds the rest: two weapons at most)`);
   }
   if (e.code === "KeyH") document.getElementById("help").classList.toggle("on");
   if (e.code === "KeyN") toast(AUD.toggleMute() ? "Sound off" : "Sound on");
@@ -1562,7 +1562,7 @@ function updatePrompt() {
     }
   }
   if (!pz && !dead && !loading && !reviveTarget() && nearPower()) msg = "Press E to switch on the power";
-  if (!msg && !dead && !loading && !reviveTarget() && nearStation()) msg = "Press E to open the locker";
+  if (!msg && !dead && !loading && !reviveTarget() && nearStation()) msg = "Press E to open the Lost and Found";
   if (!msg && !dead && !loading && !reviveTarget()) msg = cityPrompt();
   if (!msg && !dead && !loading && !reviveTarget()) { const n = nearLoot(); if (n) msg = n.k === "locker" ? (LT.gun ? "You already carry a gun" : "Press E to open the locker") : n.k === "beacon" ? (BC.have >= MAX_BEACONS ? "You cannot carry more beacons" : "Press E to take the AFK Beacon") : (LT.rounds >= MAX_ROUNDS ? "You cannot carry more ammo" : "Press E to take the ammo pack (+3)"); }
   el.textContent = msg; el.style.display = msg ? "block" : "none";
@@ -1739,7 +1739,7 @@ function gbMe(m) {
   if (m.kit) GB.kit = {n: {...m.kit.n}, e: m.kit.e};
   if (HELD.item && !owned().includes(HELD.item)) setHeld(null);
   if (STN.open) renderStation();
-  if (m.respawn) toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
+  if (m.respawn) toast("Your gear is in the Lost and Found. The ammo and consumables are gone.", 4200);
 }
 // the server killed a monster of the wave (somebody's bolt or trap): it is gone here too, and the count is the server's
 function gbKill(m) {
@@ -1924,7 +1924,7 @@ function blowHorn() {
   if (!GB.load || !carries(GB.load, "horn") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
   const r = hornBlast(HORN.st);
-  if (!r.ok) { if (r.why === "empty") { toast("The battery is flat: a locker recharges it for free", 2200); AUD.play("gun_dry"); } else if (r.why === "swapping") toast("Swapping batteries…", 1400); return false; }
+  if (!r.ok) { if (r.why === "empty") { toast("The battery is flat: the Lost and Found recharges it for free", 2200); AUD.play("gun_dry"); } else if (r.why === "swapping") toast("Swapping batteries…", 1400); return false; }
   HORN.st = r.horn; HORN.kick = 1;
   const o = [P.p.x, P.p.y + P.eye, P.p.z], f = [-Math.sin(P.yaw), -Math.cos(P.yaw)], hit = blastTargets(S, monsters, o, f);
   for (const m of hit) { const [x, z] = knockEnd(S, m, [P.p.x, P.p.z], knockDist(m.cfg)); m.shove(x, z); m.stun(HORN_STUN_S); }
@@ -2158,7 +2158,7 @@ function trapTick(dt) {
   }
   for (let i = TRAPS.flashes.length - 1; i >= 0; i--) { const f = TRAPS.flashes[i]; f.t += dt; f.o.material.opacity = Math.max(0, 1 - f.t / 0.6); f.o.scale.setScalar(2 + f.t * 8); if (f.t > 0.6) { S.root.remove(f.o); TRAPS.flashes.splice(i, 1); } }
 }
-// ---- the loadout locker (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is. (Name still open: docs/WORLD.md.)
+// ---- the loadout locker, called the Lost and Found in the game (docs/ROUND.md, decision of 2026-11-24) (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is.
 const STN = {open: false, spot: null, mesh: null, sel: 0};
 const gearList = () => net.on ? GEAR : SOLO_GEAR;                  // the locker rows: a room runs the first three; the bolt driver is solo only so far (the server does not own its nails)
 const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow", driver: "Pneumatic bolt driver", baton: "Stun baton", dart: "Moth jelly dart", flame: "Propane flamethrower", horn: "Frequency horn", rocket: "Almond water rocket launcher", laser: "Laser pointer dissector", shear: "Hydraulic rebar shear"};
@@ -2182,7 +2182,7 @@ function stationToggle(i) {
   if (i === gearList().length && GB.kit) { GB.kit = setE(GB.kit, GB.kit.e === "mine" ? "wire" : "mine"); renderStation(); return; }          // the E slot: land mine or tripwire
   const g = gearList()[i]; if (!g || !GB.load) return;
   if (net.on) { net.send({t: "gear", a: carries(GB.load, g) ? "leave" : "take", g}); return; }          // in a room the loadout is the server's: its answer (`me`) redraws this
-  if (!carries(GB.load, g) && !canTake(GB.load, g) && ARSENAL.includes(g)) { toast("Two weapons at most: leave one in the locker first", 2600); return; }
+  if (!carries(GB.load, g) && !canTake(GB.load, g) && ARSENAL.includes(g)) { toast("Two weapons at most: leave one in the Lost and Found first", 2600); return; }
   GB.load = carries(GB.load, g) ? lockerLeave(GB.load, g) : lockerTake(GB.load, g); syncGear(); renderStation();
 }
 // the loadout decides what you hold: the page's own flags follow it (ammo is not part of it)
@@ -2195,7 +2195,7 @@ function syncGear() {
 function gbDeath() {
   if (!GB.load) return;
   GB.load = lockerDied(GB.load); if (GB.kit) GB.kit = kitLost(GB.kit); LT.rounds = 0; BOW.st = newBow(0); DRV.st = drvLost(); DART.st = dartLost(); FLAME.st = flameLost(); HORN.st = hornLost(); ROCKET.st = rocketLost(); LASER.st = laserLost(); SHEAR.st = shearLost(); BC.have = 0; syncGear();
-  toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
+  toast("Your gear is in the Lost and Found. The ammo and consumables are gone.", 4200);
 }
 
 // ---------------------------------------------------------------- the Overworld, v0: the parking lot after the Original (session 6)

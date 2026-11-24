@@ -315,8 +315,8 @@ The smallest version where the world feels real:
 
 ## 10. Still open
 
-1. The score formula, and whether a board ranks by time or by score.
-2. Name for the Going back in locker, since the existing locker is a one-time pickup.
+1. Settled 2026-11-24: the score formula stays (`docs/ROUND.md`, RND-27) and a board ranks by score, the faster time breaking a tie.
+2. Settled 2026-11-24: the Going back in locker is called the Lost and Found in the game.
 3. Ranking: deaths, an online leaderboard and accounts need a backend the owner has not chosen yet.
 4. Company names for the Hallam Row jobs, if you want them.
 5. Lore truths per area.
