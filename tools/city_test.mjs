@@ -84,6 +84,8 @@ try {
   check("5 s of play in the apartment is 5 s on the clock", Math.abs((await st()).t - tApt - 5) < 1);
   const apt = await page.evaluate(() => { const g = window.__game, c = (x, z) => !!g.collide({x, y: 0.02, z}); return {bed: c(-1.8, -1.4), desk: c(1.8, -2.0), wall: c(3.1, 0), middle: c(0, 0), door: c(1.5, 2.1)}; });
   check("the bed, the desk and the walls are solid; the middle of the room and the spot by the door are clear", apt.bed && apt.desk && apt.wall && !apt.middle && !apt.door, JSON.stringify(apt));
+  const art = await page.evaluate(() => { const g = window.__game, S = g.S; let baked = 0, lights = 0, screen = false, uv1 = true; S.root.traverse(o => { if (o.isLight) lights++; if (!o.isMesh) return; if (o.material === g.CITY.mats.screen) screen = true; if (o.material.userData && o.material.userData.baked) { baked++; if (!o.material.lightMap || o.material.lightMap.channel !== 1 || !o.geometry.attributes.uv1) uv1 = false; } }); return {n: S.baked, baked, lights, screen, uv1}; });
+  check("the apartment is the Blender build: its materials carry the baked light on the second UV set, the page adds no lamp of its own, and the computer's screen is still the page's", art.n >= 20 && art.baked >= 20 && art.uv1 && art.lights === 0 && art.screen, JSON.stringify(art));
   await shot("apartment");
   await stand(APARTMENT.computer.at[0], 0.02, APARTMENT.computer.at[1], 0); await frames(5);
   check("at the desk you are offered the computer", /use the computer/.test(await prompt()), await prompt());
