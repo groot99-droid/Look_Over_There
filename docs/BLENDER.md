@@ -21,6 +21,21 @@ This plan covers every scene the page loads today. For each one it says what to 
    Build scripts read that file. No one copies coordinates by hand.
 3. **Axes.** The game uses metres with y up. The glTF exporter's default (+Y up) maps a game point (x, y, z) to Blender (x, −z, y). Each build checks this once with a marker cube at the arrival point.
 4. **Things that move or change stay in code.** The Blender file leaves them out, or holds them only as stand-ins for the bakes and renders that are never exported. Each scene below lists them. Anything the page toggles gets its own material, named so the page can find it: lamp heads that light at night (`Lamp_Emit`), lit windows (`Window_Lit`), the mall's emergency lights (`Emergency_Emit`).
+   What the page keeps drawing in each scene, so the Blender file must leave it out:
+
+   | Scene | The page draws |
+   |---|---|
+   | `apartment` | The computer's screen |
+   | `galleries` | The six statues and their name plates |
+   | `laboratory` | The station signs and the B2 sign |
+   | `factory_floor` | The parts, the belt's top surface and the bin signs |
+   | `main_floor` | The food on the shelves, the carts in the corral, the camera's head and the price signs |
+   | `entrance` | Nothing |
+   | `street` | Each door's sign, status lamp and roller shutter; the PHARMACY sign, the pedestrians, the ghost window and the watchers |
+   | `forest` | The signpost back to the lot and the glow in the gap |
+   | `meadow` | The shed, the house and the porch light |
+
+   In every scene with a model the page adds no lamp of its own, apart from the meadow's porch light.
 5. **The owner's models are not touched.** `models/world/shed.glb`, `models/world/cottage.glb`, the item models and the characters keep their geometry. If they must appear in a bake (shadows, contact AO) or a render, they are linked in as stand-ins and not exported, because the page loads them itself. The owner disliked slimmed models, so nothing of theirs is decimated.
 6. **Sources.** Use CC0 textures, HDRIs and scans (Poly Haven, ambientCG) or the author's own work, with each source and its licence listed in the scene's README. Paid generation (Meshy) and GPU rentals need the owner's go-ahead first. The reference photos named in `docs/WORLD.md` are AI-generated: use them as references, not as textures, until the generator's terms are checked.
 
@@ -62,7 +77,7 @@ For every scene:
   - Five stations (sink, scale, centrifuge, freezer, log book) stand at `LAB.stations`, each a 1.2 m square.
   - A sealed door in the north wall at (0, −6) reads "B2 · AUTHORISED STAFF ONLY". It is the way toward Secret Operations, so build it as a real-looking door that does not open.
 - **Look:** clinical white, strip lights, a steel bench at each station.
-- **Code keeps:** the station labels and highlights.
+- **Code keeps:** the station signs and the B2 sign, which hang at 2.3 m and 2.8 m. Leave those spots clear.
 - **Light:** full bake.
 
 ### 4. `factory_floor`
@@ -71,7 +86,7 @@ For every scene:
   - The belt runs from x −8 to 8 at z −3. It is 1.2 m wide with its top at 0.9 m, and a reject chute sits past its east end.
   - Three bins (gears, bolts, springs) stand at (−5, 2.5), (0, 2.5) and (5, 2.5), each 1.2 m square.
 - **Look:** an old works hall with sodium high-bays, a painted safety line and a steel truss roof.
-- **Code keeps:** the moving parts, and the belt's top surface, which scrolls. Build the belt's frame and rollers only, up to 0.88 m.
+- **Code keeps:** the moving parts, the belt's top surface (the top 6 cm) and the sign over each bin. Build the belt's frame and rollers only, up to 0.84 m.
 - **Light:** full bake.
 
 ### 5. `main_floor` (the grocery)
@@ -84,7 +99,8 @@ For every scene:
 - **Look:** the same room as the end of Right Door, Wrong Exit, a little bigger: tiled floor, fluorescent tubes, a red-cart feel (IMG_3027 is the reference).
 - **Code keeps:**
   - The food on the shelves. Its models come later, in lighter versions.
-  - The cart.
+  - The three carts in the corral.
+  - The price sign over each shelf.
   - The camera head and its red light. Build only the wall bracket.
 - **Light:** full bake by day. The store is shown out at closing, so it is never seen at night.
 
@@ -105,9 +121,10 @@ For every scene:
   - Each building in `BUILDINGS` has its side, z range, depth, height and colour. The tower is 38 m tall.
   - The doors are at x = ±8, at each building's `door.z`.
   - Lamp posts stand at `LAMP_ZS`, and the bus shelter at (7, 5).
-- **Look:** a run-down street of brick and render, shop signs at each address, sidewalks with kerbs and drains.
+- **Look:** a run-down street of brick and render, shopfronts at each address, sidewalks with kerbs and drains. The page hangs each door's address sign over it, so leave the wall above each door plain.
 - **Code keeps:**
-  - the PHARMACY sign's letters, which change as you pass;
+  - each door's address sign, its green or red status lamp and its roller shutter;
+  - the PHARMACY sign, which changes as you pass;
   - the six pedestrians, the stalker and the window watchers;
   - the trash bins on the route from 41, and the bus.
 
@@ -128,7 +145,7 @@ For every scene:
   - The bright gap into the meadow is at z −92.
 - **Look:** pastel dreamcore, under pink haze. The page keeps the fog (22 to 105 m) and the sky colour `#f4d8ec`.
 - **Trees:** build three to five variants and export them with GPU instancing (`EXT_mesh_gpu_instancing`; three.js r160 loads it). Bake their AO into each variant's own texture. Bake the ground's AO with every tree in place.
-- **Code keeps:** the signpost's text and the gap's walk-through.
+- **Code keeps:** the signpost back to the lot (post and board), the glow in the gap and the gap's walk-through. Do not model the signpost.
 - **Backdrops:** more forest past the edge walls, and a glow at the gap (R3).
 
 ### 9. `meadow`
@@ -151,7 +168,12 @@ For every scene:
 - **How the page shows them (as built for the pilot):** `applyLightmaps` swaps each such material for an unlit one that shows its texture times the lightmap. The page's own lights still light the players and the things drawn in code, and do not light the room twice. So a baked material's normal, roughness and metal maps are not used by the page: put what matters into the base colour and the bake. Materials without a lightmap (lamps, glass, backdrops) stay as exported.
 - **Why this way:** it keeps the base textures shareable and lets the page switch a map off (night, the mall's emergency set). Baking light into the base colour would light the scene twice under the page's own lights.
 - **Bake settings:** Cycles on the GPU, 512 to 1024 samples, OIDN denoise. Texel density is about 32 px/m indoors and 8 to 12 px/m outdoors.
-- **AO-only scenes** (street, meadow; the forest's trees): the same slot holds an AO bake.
+- **A second light set** (the mall's emergency lights): the same material also carries `lightmap_night` and `lightmap_night_intensity`. The page swaps to it when the mall locks at 20:00 and back in the morning.
+- **AO-only scenes** (street, meadow, forest): the material carries `aomap` and `aomap_intensity` in place of `lightmap`. The page keeps that material lit, so the sun and the sky still light it, and uses the bake as its ambient occlusion on the second UV set.
+- **Toggled materials** keep the emissive strength they were exported with. The page switches them fully on or off:
+  - `Window_Lit` is on at night.
+  - `Lamp_Emit` is on from dusk on the street, and off while the mall is locked.
+  - `Emergency_Emit` is on only while the mall is locked.
 
 ### R2. Review renders
 - **What:** three stills per scene, 1920×1080:
@@ -163,7 +185,9 @@ For every scene:
 
 ### R3. Edge-of-world backdrops
 `docs/WORLD.md`: "The edge of the world is a fake 2D render of more world that looks real."
-- **What:** equirectangular panoramas rendered from each scene's centre with the playable area hidden, 4096×2048 WebP. The page uses them as the scene background, in place of the flat colour.
+- **What:** equirectangular panoramas rendered from each scene's centre with the playable area hidden, 4096×2048 WebP, in `world/backdrops/<scene>_day.webp` and `<scene>_night.webp`.
+- **Orientation:** the picture's middle column faces north (game −z) and its right-hand side faces east (+x).
+- **How the page shows them:** the coordinator names them in the scene's manifest entry (`backdrop: {day, night}`). The page draws the picture on a sphere round the camera, behind everything, and swaps to the night one by the clock. In the forest and the meadow a backdrop replaces the page's own sun and clouds, so paint the sky into it.
 - **Which scenes:**
   - `parking_lot` and the Overworld: the endless hills and the town beyond the hedges;
   - `forest` and `meadow`;
