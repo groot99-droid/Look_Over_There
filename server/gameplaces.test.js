@@ -30,11 +30,13 @@ const kind = t => m => m.t === t;
 async function join(srv, room, name) { const c = client(srv.port); await c.open; c.send({t: "join", room, name}); const w = await c.next(kind("welcome")); return Object.assign(c, {id: w.id, welcome: w}); }
 const sees = async (srv, room, c, scene) => { const end = Date.now() + 2000; while (Date.now() < end) { if (srv.rooms.get(room).players.get(c.id).scene === scene) return true; await new Promise(r => setTimeout(r, 10)); } return false; };
 
-test("shipped: a game place is refused, because both games are solo only", async () => {
+test("shipped: a place in Right Door, Wrong Exit is accepted, one in the Intern is refused (it is still solo only)", async () => {
   const srv = await createServer(), a = await join(srv, "G0", "Ann");
-  a.send({t: "s", scene: "rdwe:teal", x: 1, y: 0, z: 2, yaw: 0});
+  a.send({t: "s", scene: "intern:S3", x: 1, y: 0, z: 2, yaw: 0});
   await new Promise(r => setTimeout(r, 150));
   assert.equal(srv.rooms.get("G0").players.get(a.id).scene, null);
+  a.send({t: "s", scene: "rdwe:teal", x: 1, y: 0, z: 2, yaw: 0});
+  assert.ok(await sees(srv, "G0", a, "rdwe:teal"));
   await srv.close();
 });
 

@@ -33,7 +33,7 @@ Read first: `docs/WORLD.md` (what Farway is), `docs/ROUND.md` (what a round must
 | 26 | Build the hydraulic rebar shear (the owner's design) and the chamber barricades | Round 4 | 25 | **built**, draft PR on `claude/rebar-shear`, stacked on session 25's `claude/laser-dissector`: `shared/shear.js`, `shared/barricade.js`, a chained door is a wall to the nav, solo only. Rooms and the Market are not touched |
 | 5 | Backend: Postgres, anonymous accounts, Discord sign-in, leaderboard | Later | 3 | decided, plan in `docs/BACKEND.md`; not started |
 | 10 | Editor for scenes and links | Later | 1 | not started |
-| 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | **slices 1 and 2 in the draft PR for `claude/games-in-parties`** (design note; manifest `coop` areas and game places, server relay, tests): both games still solo only. Slices 3 (Right Door, Wrong Exit drawn in a room) and 4 (the Intern) are next; the owner chose the defaults for the three open questions |
+| 11 | Games inside parties (co-op in Right Door, Wrong Exit and the Intern) | Later | 4 | **slices 1 and 2 merged** (PR #55); **slice 3 in the draft PR for `claude/games-in-parties`**: Right Door, Wrong Exit played in a party room (other players drawn, `soloOnly` dropped on its gate, jump to a friend inside the game, results held until you are back out). Slice 4 (the Intern) is next |
 
 Update this table in the last commit of each session.
 
