@@ -1907,7 +1907,7 @@ const HORN = {st: newHorn(), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .55, metalness: .3}), bell = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.025, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({color: 0xb0a070, roughness: .5, metalness: .5, side: THREE.DoubleSide}));
   bell.rotation.x = -Math.PI / 2; bell.position.set(0, 0.02, -0.18);
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.16), mat(0x34383c)); box.position.set(0, -0.08, 0.08);
-  HORN.art = new THREE.Group(); HORN.art.add(bell, box); HORN.pivot.add(HORN.art); heldModel(HORN, "items/frequency_horn", 0.45, -1); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
+  HORN.art = new THREE.Group(); HORN.art.add(bell, box); HORN.pivot.add(HORN.art); heldModel(HORN, "items/frequency_horn", 0.38, -1); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
 function hornRings(x, z, dx, dz, reach) {                                    // rings spreading along the cone, or one ring round you for the call
   for (let k = 1; k <= 5; k++) {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xd8f0ff, depthWrite: false, transparent: true, opacity: 0.9})); sp.scale.set(2, 2, 1);
