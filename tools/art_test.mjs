@@ -1,13 +1,15 @@
 // The page is ready for a scene built in Blender (docs/BLENDER.md): when a scene has a model, the box room and the page's own lamps go, and only what moves and what the rules
 // name is drawn; baked light shows unlit on the second UV set, with a night set the mall swaps to; an AO-only bake stays lit; lamp heads, lit windows and emergency lights follow
 // the clock; and a backdrop picture is drawn round the camera, swapped at night. No real build exists for these scenes yet, so a tiny model (tools/fixtures, made by
-// make_art_fixture.mjs) stands in for each, through the page's ART_TEST hook. With no model every scene must draw as it always did.
+// make_art_fixture.mjs) stands in for each, through the page's ART_TEST hook. With no model every scene must draw as it always did; a scene the game lists a real model
+// for is also loaded as the game has it, and must show that model's baked light with no box room and no lamp of the page's.
 // Needs Playwright + Chromium and internet for three.js from unpkg. Usage: node tools/art_test.mjs
 import {createRequire} from "node:module";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 import {createServer} from "../server/server.js";
 import {secondsAt, DOORS} from "../shared/city.js";
+import {REGISTRY} from "../shared/registry.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 const FIX = path.join(path.dirname(fileURLToPath(import.meta.url)), "fixtures");
 let failed = 0;
@@ -23,6 +25,7 @@ try {
   const frames = n => page.evaluate(n => { for (let i = 0; i < n; i++) window.__game.sim(0.05, i); }, n);
   const setT = (h, d = 2) => page.evaluate(t => { window.__game.CITY.t = t; window.__game.CITY.ui = 0; }, secondsAt(h, d));
   const ART = {glbs: ["fixtures/art_room.glb"]};
+  const NONE = {glbs: []};                         // the scene as it draws with no model of its own (the box room), whether or not the game lists one
   // load a scene, with the stand-in model (and maybe a backdrop) or as the game has it
   const load = async (id, art, pos = [0, 0, 0]) => {
     await page.evaluate(([id, art, pos]) => { const g = window.__game; for (const k of Object.keys(g.ART_TEST)) delete g.ART_TEST[k]; if (art) g.ART_TEST[id] = art; return g.loadScene(id, {pos, face: [0, -1]}); }, [id, art, pos]);
@@ -51,12 +54,16 @@ try {
     ["entrance", "the mall", {signs: 0, solids: 0}, "nothing of its own"],
   ];
   for (const [id, name, want, kept] of ROOMS) {
-    await load(id, null); const plain = await look();
+    await load(id, NONE); const plain = await look();
     check(`${name} with no model draws as it always did: its box room and its own lamp`, plain.lights >= 1 && plain.solids > 6 && plain.n === 0 && plain.baked === 0, JSON.stringify(plain));
     await load(id, ART); const a = await look();
     check(`${name} with a model: the box room and the page's lamps are gone`, a.lights === 0 && a.solids < plain.solids && (want.solids === undefined || a.solids === want.solids), JSON.stringify(a));
     check(`${name} with a model: the page keeps ${kept}`, a.signs === want.signs && (id === "entrance" || a.signs === plain.signs), JSON.stringify({signs: a.signs, was: plain.signs, solids: a.solids}));
     check(`${name}: the model's baked material shows unlit on the second UV set, and its AO one stays lit`, a.n === 1 && a.baked === 1 && a.bakedOk && a.ao === 1 && a.aoOk, JSON.stringify(a));
+    if (REGISTRY.pageScenes[id].glbs.length) {                          // the game's own Blender build (docs/BLENDER.md): as the game loads it
+      await load(id, null); const own = await look();
+      check(`${name} as the game has it: its own model's baked light, no box room, no lamp of the page's, and the page keeps ${kept}`, own.lights === 0 && own.n > 0 && own.baked === own.n && own.bakedOk && (want.solids === undefined || own.solids === want.solids) && own.signs === want.signs, JSON.stringify(own));
+    }
   }
   const kept = await page.evaluate(async () => {
     const g = window.__game, inTree = o => { for (let p = o; p; p = p.parent) if (p === g.S.root) return true; return false; }, out = {};
@@ -109,8 +116,8 @@ try {
   const mf = await page.evaluate(() => { let inst = 0, lights = 0; window.__game.S.root.traverse(o => { if (o.isInstancedMesh) inst += o.count; if (o.isLight) lights++; }); return {inst, lights}; });
   check("the meadow with a model: the page's trees and flowers are gone; the shed, the house and the porch light stay", md && mf.inst === 0 && mf.lights === 1, JSON.stringify(mf));
 
-  // and once the stand-in is taken away, a scene is the game's own again
-  await load("laboratory", null); const again = await look();
+  // and once the stand-in is taken away and no model is listed, the lab is its box room again
+  await load("laboratory", NONE); const again = await look();
   check("without the model the lab is its box room again", again.lights === 1 && again.solids > 6 && again.n === 0, JSON.stringify(again));
   check("no page errors", errors.length === 0, errors.slice(0, 3).join(" | "));
 } catch (e) { console.log("ERROR", e.message); failed++; }
