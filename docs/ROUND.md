@@ -160,7 +160,7 @@ Status: **design only, no code yet.** Written first, as `docs/SESSIONS.md` asks,
 **Order of work** (each slice its own commit, tested):
 1. This note.
 2. Server and manifest: game places as presence scenes, `canReach` and `goto` through them, tests. `soloOnly` stays.
-3. Right Door, Wrong Exit in a room: peers drawn in its scene; `tools/games_party_test.mjs` has two clients enter the game separately, meet in one place, and leave without breaking the other's game. Then drop `soloOnly` on its gate.
+3. Right Door, Wrong Exit in a room: peers drawn in its scene; `tools/games_party_test.mjs` has two clients enter the game separately, meet in one place, go on through all seven rooms (each its own place, each inside the server's position limits), and leave without breaking the other's game; a round that ends while one is in the game shows that one the results on the way back. Then drop `soloOnly` on its gate.
 4. The Intern: the postMessage bridge and the same test. Then drop its `soloOnly`.
 
 **Not in this session.** Shared puzzle state, shared endings, voice or text between players in a game, games reached from the Overworld's forest or the city (their links stay planned), and the City's job shifts, which stay solo.
