@@ -13,11 +13,14 @@
 //   start(id, elements, opts)          -> Promise<'reached' | 'skipped' | 'cancelled'>
 //   skip()                             -> ends the current walk as 'skipped'
 //   cancel()                           -> tears the current walk down without resolving as reached
+//   start's opts.coop = { peers(), onFrame(pos, yaw) }  (a party room, session 11): peers() lists the other players in this room of the game as {id, x, y, z, yaw, color},
+//                        drawn as plain figures; onFrame is called every simulated tick with the walker's position and heading, for the page to send to the room
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { createControls, EYE_HEIGHT, setPlayerScale } from './controls.js';
 import { disposeScene } from './build.js';
 import { createPlay } from './play.js';
+import { createPeerFigures } from './peers.js';
 import * as sound from './sound.js';
 
 const SCENES = {
@@ -213,6 +216,7 @@ export async function start(id, elements, opts = {}) {
   let pendingUse = false;
   const requestUse = () => { if (play) pendingUse = true; };
   controls.onUse(requestUse);
+  const figures = opts.coop ? createPeerFigures(scene, EYE_HEIGHT) : null;
   // A tap made while the other thumb holds the joystick gets no click from the browser, so a
   // touch is taken on pointerup; the click that may follow a single-finger tap is then ignored.
   let lastTouchUse = -Infinity;
@@ -337,6 +341,7 @@ export async function start(id, elements, opts = {}) {
       // an endless floor: the scene may wrap the player back onto its tile
       if (built.wrap && built.wrap(p)) controls.update(0);
       if (built.update) built.update(p, dt, camera, ctx);
+      if (opts.coop) { opts.coop.onFrame(p, controls.getLook().yaw); figures.update(opts.coop.peers(), dt); }
       if (play) {
         play.update(p);
         if (pendingUse) { pendingUse = false; play.use(ctx); play.update(p); }
@@ -433,6 +438,7 @@ export async function start(id, elements, opts = {}) {
       useButton.removeEventListener('pointerup', onUsePointerUp);
       useButton.removeEventListener('click', onUseButton);
     }
+    if (figures) figures.dispose();
     scene.remove(camera);
     // Free the room. A revisit rebuilds it (the loop returns to the title card first).
     prepared.delete(id);
@@ -448,6 +454,7 @@ export async function start(id, elements, opts = {}) {
 
   current = {
     finish, step, sim, setLoop, use, controls, camera, built, scene, ctx,
+    peerCount: () => figures ? figures.count() : 0, peerPositions: () => figures ? figures.positions() : [],
     get state() { return state; },
     get target() { return play ? play.target : null; },
   };

@@ -8,9 +8,9 @@ const stair = (scene, door, to, toDoor, arrive, face) => ({
   id: `lot.${scene}.${door}`, status: "built", connector: "stair_door",
   from: {area: "lot", scene, door}, to: {area: "lot", scene: to, door: toDoor, arrive, face},
 });
-// a door that opens one of the two games. Rooms cannot enter games yet, so both are solo only.
-const gate = (door, game, to, returnScene) => ({
-  id: `lot.L4.${door}`, status: "built", connector: "gate", soloOnly: true,
+// a door that opens one of the two games. A room can enter Right Door, Wrong Exit (coop, session 11); the Intern is still solo only.
+const gate = (door, game, to, returnScene, soloOnly = true) => ({
+  id: `lot.L4.${door}`, status: "built", connector: "gate", soloOnly,
   from: {area: "lot", scene: "L4", door}, to: {area: game, ...to}, returnTo: {area: "lot", scene: returnScene},
 });
 const plan = (id, from, to, connector, extra = {}) => ({id, status: "planned", connector, from, to, ...extra});
@@ -46,7 +46,7 @@ export const FARWAY = {
         {id: "L4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/L4.json"], multiplayer: true, powerSource: true, loot: {lockers: 0, packs: 3}},
       ],
     },
-    {id: "rdwe", name: "Right Door, Wrong Exit", status: "built", soloOnly: true, tone: "dreamcore", rooms: ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"]},
+    {id: "rdwe", name: "Right Door, Wrong Exit", status: "built", coop: true, tone: "dreamcore", rooms: ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"]},
     {id: "intern", name: "The Intern", status: "built", soloOnly: true, tone: "liminal", spine: ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"]},
     {
       // v0 is one scene: the parking lot with the table and chairs as the spawn, the store doors, and one sky mode. The other scenes are designed, not built (they have no files).
@@ -123,7 +123,7 @@ export const FARWAY = {
     stair("L3", "DoorLeaf_Stair_L2_L3_down", "L2", "DoorLeaf_Stair_L2_L3_up", [-16.478, 6.4, -14.278], [0.0, 1.0]),
     stair("L3", "DoorLeaf_Stair_L3_L4_up", "L4", "DoorLeaf_Stair_L3_L4_down", [16.0, 9.6, 7.2], [0.0, -1.0]),
     stair("L4", "DoorLeaf_Stair_L3_L4_down", "L3", "DoorLeaf_Stair_L3_L4_up", [16.0, 9.6, 8.0], [0.0, 1.0]),
-    gate("DoorLeaf_Gate_RDW", "rdwe", {room: "dining", arrive: [-121.2, 9.6, 63.6], face: [0.0, 1.0]}, "L4"),
+    gate("DoorLeaf_Gate_RDW", "rdwe", {room: "dining", arrive: [-121.2, 9.6, 63.6], face: [0.0, 1.0]}, "L4", false),          // a room can enter it (session 11): coop, see docs/ROUND.md section D
     gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4"),
 
     // Going back in: the stairs down from the 4th chamber of L4 to the first chamber of L3. One way (the chamber's own `up` door has no link). Arrival is on L3's floor (6.4).

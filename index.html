@@ -291,9 +291,9 @@ function openDoor(dr, byPlayer) {
   if (dr.target !== 0) return;
   if (dr.chained) { if (byPlayer) toast("Chained shut: a rebar shear cuts the chain"); return; }          // nobody opens a chained door, monsters neither (shared/barricade.js)
   if (dr.link && !byPlayer) return;                           // monsters do not use the stair doors
-  if (dr.link && dr.link.game && net.on && (gateEntry(dr.link) || {}).soloOnly !== false) { toast("That door does not open in a room"); return; }          // the manifest says which gates are solo only (all of them for now)
+  if (dr.link && dr.link.game && net.on && roomShutGate(dr.link)) { toast("That door does not open in a room"); return; }          // the manifest says which gates are solo only (the Intern's; Right Door, Wrong Exit is coop)
   if (dr.link && isLocked(dr)) { doorLocked(); return; }
-  dr.target = 1; dr.at = performance.now(); AUD.play(dr.link ? "door_open" : "door_creak", {pos: [dr.cx, dr.cy + 1, dr.cz], loud: true}); if (dr.link && !net.on && (dr.link.game || S.id === "T")) pendingLink = dr;                  // the game gates lead into a walkable passage (solo only)
+  dr.target = 1; dr.at = performance.now(); AUD.play(dr.link ? "door_open" : "door_creak", {pos: [dr.cx, dr.cy + 1, dr.cz], loud: true}); if (dr.link && (!net.on || (dr.link.game && !roomShutGate(dr.link)) || S.id === "T") && (dr.link.game || S.id === "T")) pendingLink = dr;                  // the game gates lead into a walkable passage (solo, or in a room for a coop game)
   else if (dr.link) addPortal(dr, P.p.toArray());                                                  // a stair door opens onto its hallway: step into the doorway to cross
   else if (net.on) net.send({t: "door", scene: S.id, name: dr.d.name, open: 1});
 }
@@ -572,6 +572,22 @@ const RDWE_ORDER = ["dining", "hallway", "teal", "teal2", "flooded", "trampoline
 const mkEl = (tag = "div") => document.createElement(tag);                          // detached elements: the original HUD stays invisible
 // the manifest's entry for a game gate (its soloOnly flag and where the player returns to); world/L4.json links carry the game and arrival, the manifest the rest
 const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === l.game && JSON.stringify(x.to.arrive) === JSON.stringify(l.arrive));
+// in a room, a game gate the manifest does not mark coop-ready (soloOnly) stays shut; an unknown gate is shut too
+const roomShutGate = l => { const e = gateEntry(l); return !e || !!e.soloOnly; };
+// the room's view of me while I am inside a game: where, and which room of the game (the place the server relays by: `rdwe:teal`), sent from the game's own loop because the page's does not run
+const GN = {place: null, t: 0, last: null};
+function gameNetTick(pos, yaw) {
+  if (!net.on || !GN.place) return;
+  const now = performance.now(); if (now - GN.t < 1000 / 15) return; GN.t = now;
+  const moving = GN.last ? Math.hypot(pos.x - GN.last[0], pos.z - GN.last[2]) > 0.002 : false; GN.last = [pos.x, pos.y, pos.z];
+  net.send({t: "s", scene: GN.place, x: r2(pos.x), y: r2(pos.y), z: r2(pos.z), yaw: r2(yaw), moving: moving ? 1 : 0});
+}
+function leaveGameNet() {
+  if (net.on && GN.place) { const p = GN.last || [0, 0, 0]; net.send({t: "s", scene: null, x: r2(p[0]), y: r2(p[1]), z: r2(p[2]), yaw: 0}); }          // on the way back: nobody should see a ghost in the game for the seconds the floor loads
+  GN.place = null; GN.last = null;
+}
+// the other players of this room of the game, with the last position the server gave us
+const gamePeers = () => net.on && GN.place ? [...net.peers.values()].filter(p => p.scene === GN.place && Number.isFinite(p.tx)).map(p => ({id: p.id, x: p.tx, y: p.ty, z: p.tz, yaw: p.tyaw, color: p.color})) : [];
 async function enterGame(l) {
   if (inGame) return;
   inGame = l.game; loading = true; devOn.v = false;
@@ -585,7 +601,9 @@ async function enterGame(l) {
     const joy = mkEl(); const knob = mkEl(); knob.className = "knob"; joy.appendChild(knob);
     const els = {mount, fade: gf, objective: mkEl(), hint: mkEl(), joystick: joy, readout: mkEl(), tally: mkEl(), use: mkEl("button")};
     for (let i = Math.max(0, RDWE_ORDER.indexOf(l.room)); i < RDWE_ORDER.length; i++) {
-      result = await walk.start(RDWE_ORDER[i], els, {sound: true, scale: RDWE_SCALE});
+      const coop = net.on && !roomShutGate(l) ? {peers: gamePeers, onFrame: gameNetTick} : undefined;          // in a party room: other players are drawn, and ours is sent
+      GN.place = coop ? `rdwe:${RDWE_ORDER[i]}` : null; GN.t = 0; GN.last = null;
+      result = await walk.start(RDWE_ORDER[i], els, {sound: true, scale: RDWE_SCALE, coop});
       if (result !== "reached") break;
     }
     walk.cancel();
@@ -602,12 +620,14 @@ async function enterGame(l) {
     gf.style.opacity = 1; await new Promise(r => setTimeout(r, 650));
     fr.remove();
   }
+  leaveGameNet();
   mount.style.display = "none"; renderer.domElement.style.display = "block";
   inGame = null;
   // back to the floor the gate is on: the manifest's returnTo, else the link's own scene. S.id is the passage "T" here, which has no scene file.
   const ret = (gateEntry(l) || {}).returnTo;
   await loadScene((ret && ret.scene) || l.scene || "L4", {pos: l.arrive, face: l.face});
   gf.style.opacity = 0;
+  if (net.heldResults) { const rows = net.heldResults; net.heldResults = null; showResults(rows); }
   return ending;
 }
 const levelOfY = () => S.id;
@@ -3228,7 +3248,7 @@ function onNet(m) {
     case "zap": { const mo = monsters[m.i]; if (m.scene !== S.id || !mo) break; if (!net.host()) { mo.pos.set(m.to[0], mo.fy, m.to[1]); mo.glitchT = GLITCH_S; } flashAt(m.from[0], m.from[1]); flashAt(m.to[0], m.to[1]); AUD.play("zap", {pos: [m.to[0], S.floor + 1.2, m.to[1]], loud: true}); break; }
     case "alarm": startAlarm(m.ms); break;
     case "exited": FIN.exited.set(m.id, m); if (m.id !== net.id) toast(`${m.name} is out (place ${m.place})`); break;
-    case "results": showResults(m.rows); break;
+    case "results": if (inGame) net.heldResults = m.rows; else showResults(m.rows); break;          // a player inside a game gets the results on the way back (docs/ROUND.md section D)
     case "keypad": setKeypad(m.scene, {found: m.found, solved: m.solved, fails: m.fails, lockMs: m.lockMs}); break;
     case "wave": gbWave(m); break;
     case "kill": gbKill(m); break;                                    // a monster of the wave is dead for good, for everyone
@@ -3244,7 +3264,7 @@ function onNet(m) {
 // checks the same before it answers. Your own City rules still hold: at night the bus does not run, so there is no way out of (or back into) the City by a friend either.
 const PT = {open: false};
 const PLACE_NAMES = {parking_lot: "the parking lot", street: "Hallam Row", apartment: "an apartment on Hallam Row"};
-const placeName = id => !id ? "on the way somewhere" : PLACE_NAMES[id] || (REGISTRY.chamber(id) ? `Going back in: wave ${REGISTRY.chamber(id).wave.no}` : REGISTRY.floors[id] !== undefined ? `Look Over There, floor ${id}` : id);
+const placeName = id => !id ? "on the way somewhere" : PLACE_NAMES[id] || (REGISTRY.gamePlaces[id] ? `${REGISTRY.area(REGISTRY.gamePlaces[id].area).name}: ${REGISTRY.gamePlaces[id].room}` : null) || (REGISTRY.chamber(id) ? `Going back in: wave ${REGISTRY.chamber(id).wave.no}` : REGISTRY.floors[id] !== undefined ? `Look Over There, floor ${id}` : id);
 const nightBound = scene => inCity() !== CITY_SCENES.includes(scene) && inCity() && dangerous(hourAt(CITY.t));          // leaving the City at night, by your own clock
 // may you go to this player now? {ok, why}
 function gotoState(p) {
@@ -3277,9 +3297,11 @@ function goToFriend(id) {
 async function arriveAtFriend(m) {
   const p = net.peers.get(m.id), name = p ? p.name : "your friend";
   if (m.refused) { toast(`You cannot go to ${name} yet${(m.missing || []).includes("original_complete") ? ": finish the Original first" : ""}.`, 4200); return; }
-  if (loading || dead || inGame || !SCENES[m.scene] || !REGISTRY.canReach(m.scene, heldFlags(), net.mode).ok || nightBound(m.scene)) return;
+  const gp = REGISTRY.gamePlaces[m.scene];          // a friend inside a game (Right Door, Wrong Exit): walk in at their room. The way back is the gate's.
+  if (loading || dead || inGame || (!gp && !SCENES[m.scene]) || !REGISTRY.canReach(m.scene, heldFlags(), net.mode).ok || nightBound(m.scene)) return;
   if (FIN.results) { $("results").style.display = "none"; FIN.results = null; FIN.out = false; }          // from the results screen, as the walk out does
   if (S.id === CITY_SCENE && CITY.tr.active && m.scene !== CITY_SCENE) endTrash("left");                // leaving the street ends a trash route, as the bus does
+  if (gp) { const g = REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === gp.area && !x.soloOnly); if (!g) return; toast(`You are with ${name}: ${placeName(m.scene)}.`); await enterGame({game: gp.area, room: gp.room, scene: g.returnTo.scene, arrive: g.to.arrive, face: g.to.face}); return; }
   const pos = [m.x, m.y, m.z];
   if (m.scene === S.id) teleport(pos); else await loadScene(m.scene, {pos});
   toast(`You are with ${name}: ${placeName(m.scene)}.`);
