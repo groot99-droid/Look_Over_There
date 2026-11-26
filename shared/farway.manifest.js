@@ -100,7 +100,7 @@ export const FARWAY = {
     {
       // slice 16 (session 9): the factory floor worker's shift, behind 330 Hallam Row. One hall with a conveyor belt, blockout; you are only in it during your shift.
       id: "factory", name: "Factory (330 Hallam Row)", status: "built", tone: "liminal",
-      scenes: [{id: "factory_floor", floorY: 0, files: ["world/factory_floor.json"]}],
+      scenes: [{id: "factory_floor", floorY: 0, files: ["world/factory_floor.glb", "world/factory_floor.json"]}],
     },
     {
       // slice 17 (session 9): the laboratory worker's shift, behind 214 Hallam Row. One room of stations, blockout, with a sealed door marked B2 (Secret Operations is planned).
