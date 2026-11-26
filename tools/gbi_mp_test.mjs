@@ -137,7 +137,7 @@ try {
   check("Ann opens the locker with the action button", await a.evaluate(() => { const g = window.__game; return !!g.nearStation() && g.tryStation() && g.STN.open; }));
   await a.click('#st-rows button[data-gear="crossbow"]');
   await serverUntil("leaving the crossbow in the locker is the server's change, and only Ann's", () => !pa.ps.gbi.load.carry.includes("crossbow") && pb.ps.gbi.load.carry.includes("crossbow"), () => JSON.stringify([pa.ps.gbi.load, pb.ps.gbi.load]));
-  await until("Ann's page shows it in the locker and no longer offers it to hold", a, () => { const g = window.__game; return !g.GB.load.carry.includes("crossbow") && !g.owned().includes("crossbow") && /IN LOCKER/.test(document.querySelector('#st-rows button[data-gear="crossbow"]').textContent); }, null, () => view(a));
+  await until("Ann's page shows it left in the Lost and Found and no longer offers it to hold", a, () => { const g = window.__game; return !g.GB.load.carry.includes("crossbow") && !g.owned().includes("crossbow") && /LEFT HERE/.test(document.querySelector('#st-rows button[data-gear="crossbow"]').textContent); }, null, () => view(a));
   check("without it in hand a bolt cannot be shot", await a.evaluate(() => window.__game.fireBow() === false));
   await a.click('#st-rows button[data-gear="crossbow"]');
   await until("she takes it back", a, () => window.__game.GB.load.carry.includes("crossbow") && /CARRIED/.test(document.querySelector('#st-rows button[data-gear="crossbow"]').textContent), null, () => view(a));
