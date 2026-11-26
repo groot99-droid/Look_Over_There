@@ -15,19 +15,22 @@ const page = await (await browser.newContext({viewport: {width: 900, height: 700
 const settled = id => page.waitForFunction(i => window.__game.S.id === i && !window.__game.loading, id, {timeout: 180000});
 const frames = n => page.evaluate(n => { for (let i = 0; i < n; i++) window.__game.sim(0.05, i); }, n);
 const st = () => page.evaluate(() => { const g = window.__game, l = g.LASER.st, m = g.monsters[0]; return {owned: g.owned(), held: g.HELD.item, charge: +l.charge.toFixed(3), spares: l.spares, swapT: l.swapT, lock: +l.lock.toFixed(2), heat: +l.heat.toFixed(2), mons: g.monsters.length, hp: m ? +m.hp.toFixed(1) : null, state: m ? m.state : null, kills: g.GB.wave && g.GB.wave.kills, shotT: g.P.shotT, stash: g.GB.load && g.GB.load.stash, e: g.GB.kit.e}; });
-// stand somewhere with a clear line of `clear` m at eye and body height; monster 0 is d0 m ahead, standing still (speeds zero); the others far away
-const stage = (d0, clear = d0 + 1) => page.evaluate(([d0, clear]) => {
+// stand somewhere with a clear line of `clear` m at eye and body height; monster 0 is d0 m ahead, standing still (speeds zero); the others far away.
+// `walk` m: the walker's body must also fit at every half metre of the way ahead (a low box the two rays pass over would stop a walk short)
+const stage = (d0, clear = d0 + 1, walk = 0) => page.evaluate(([d0, clear, walk]) => {
   const g = window.__game, cells = g.mainRegion().map(g.cellXZ);
   for (let t = 0; t < 40000; t++) {
     const [x, z] = cells[Math.floor(Math.random() * cells.length)], a = Math.random() * 6.28, fx = -Math.sin(a), fz = -Math.cos(a);
     const o = [x, g.S.floor + g.P.eye, z], d = [fx, 0, fz];
     if (!g.rayClear(o, d, clear) || !g.rayClear([x, g.S.floor + 1.0, z], d, clear) || g.collide({x: x + fx * d0, y: g.S.floor + 0.02, z: z + fz * d0}) || g.collide({x, y: g.S.floor + 0.02, z})) continue;
+    let blocked = false; for (let k = 0.5; k <= walk; k += 0.5) if (g.collide({x: x + fx * k, y: g.S.floor + 0.02, z: z + fz * k})) { blocked = true; break; }
+    if (blocked) continue;
     g.P.p.set(x, g.S.floor + 0.02, z); g.P.v.set(0, 0, 0); g.P.yaw = a; g.P.pitch = 0; g.P.imm = 1e9;
     g.monsters.forEach((m, i) => { m.cfg = {...m.cfg, patrol: 0, alert: 0, chase: 0, sight: 0}; m.state = "patrol"; m.path = []; m.stunT = 0; m.hp = m.cfg.hp; if (i === 0) m.pos.set(x + fx * d0, m.fy, z + fz * d0); else m.pos.set(x + 900, m.fy, z + 900); });
     return true;
   }
   return false;
-}, [d0, clear]);
+}, [d0, clear, walk]);
 // hold a button for n sim frames of 0.05 s in one go (the page's own frame loop would otherwise run in the gaps)
 const holdFor = (which, n) => page.evaluate(([which, n]) => { const g = window.__game; g.HELD[which] = true; for (let i = 0; i < n; i++) g.sim(0.05, i); g.HELD[which] = false; }, [which, n]);
 const fresh = () => page.evaluate(() => { const g = window.__game; g.LASER.st = {charge: 1, spares: 1, swapT: 0, heat: 0, lock: 0, target: null, onT: 0, offT: 0}; });
@@ -75,9 +78,9 @@ try {
   check("an overheated laser does no damage", (await page.evaluate(() => window.__game.monsters[0].hp)) === hpLock);
 
   // you move at a crouch's pace while the beam is on
-  await stage(8, 14); await fresh();
+  await stage(8, 14, 6); await fresh();
   const walked = on => page.evaluate(on => { const g = window.__game; g.P.v.set(0, 0, 0); const x0 = g.P.p.x, z0 = g.P.p.z; g.keys.KeyW = true; g.HELD.mouseFire = on; for (let i = 0; i < 20; i++) g.sim(0.05, i); g.keys.KeyW = false; g.HELD.mouseFire = false; return Math.hypot(g.P.p.x - x0, g.P.p.z - z0); }, on);
-  const slow = await walked(true); await stage(8, 14); await page.evaluate(() => window.__game.setHeld("laser")); const quick = await walked(false);
+  const slow = await walked(true); await stage(8, 14, 6); await page.evaluate(() => window.__game.setHeld("laser")); const quick = await walked(false);
   check("with the beam on you cover about 2.2 m in a second, against about 4 m without", slow > 1.6 && slow < 2.6 && quick > 3.2, JSON.stringify({slow, quick}));
 
   // the dot: a patrolling monster 5 m to the side of where you point goes to look; a chasing one does not
