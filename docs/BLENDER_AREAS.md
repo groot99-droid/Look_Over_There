@@ -232,10 +232,11 @@ Part 1's list comes first. Then one area at a time, greybox PR first:
 7. Right Door, Wrong Exit;
 8. Secret Operations.
 
-## What the owner still has to supply (none of it blocks greyboxing)
+## What the owner chose on 2026-11-24: the defaults
 
-- **The reference photos** named above (IMG_2903, 2909, 2910, 2984 to 2991, 2999, 3008, 3010, 3012, 3014, 3015, 3027, 3036, and the PNG redesign). They are not in the repo. Until they arrive, the scene is built from its description.
-- **The four Overworld skies.**
-- **The room list for Right Door, Wrong Exit,** or a pick from the proposed one.
+- **The reference photos** named above (IMG_2903, 2909, 2910, 2984 to 2991, 2999, 3008, 3010, 3012, 3014, 3015, 3027, 3036, and the PNG redesign) are not in the repo. Build each scene from its description; if the photos arrive later, they correct the look, not the layout.
+- **The four Overworld skies** are the defaults: clear day, sunset, night and painted, as R3 backdrops. The owner can replace any of them.
+- **Right Door, Wrong Exit:** propose the room list, one line and one greybox per room. The owner picks the rooms to dress from the greyboxes.
+- **The apartment's window** stays as built: the glass takes the hour's tint, and the street behind it stays a fixed dusk.
 
 Two things the plan builds for that the game cannot do yet: crawling (vents) and swimming (the pool routes). The art is built; the routes stay shut until the game has them.
