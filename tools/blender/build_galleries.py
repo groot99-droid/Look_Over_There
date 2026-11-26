@@ -23,6 +23,13 @@ stand-ins (the `Standins` collection), so the spots' bake has their shadows on t
 Version 2 takes its look from the owner's Chronicle Museum (Earth_Worldbuild, _Museum: web/js/procroom.js, doors.js, matlib.js, build_layout.py): its moulding
 profiles (skirting, dado, picture rail, cornice), wall and trim colours, salon-grid hang with bevelled frames chosen by era, picture lights, door sconces,
 chandeliers and laylights, block pedestals, the Doric pediment door, and its Poly Haven chandelier and bench (CC0, copied into blender/models/galleries/).
+
+The wing (2026-11-24): two doorways in the middle bay of the long walls (z = -10) lead to the side galleries, scene `galleries_wing`
+(tools/blender/build_galleries_wing.py): a Doric doorway in the west wall to the natural-history hall, an arched one in the east wall to the history
+gallery. They are cut into the walls here: Wall_W and Wall_E of the collision file are each split around a 1.8 by 2.6 m (Doric) or 1.8 by 2.1 m
+(arched, under a fixed tympanum) opening, and the two pairs of closed leaves (DoorLeaf_wing_w_A/B, DoorLeaf_wing_e_A/B, their own nodes in the
+GLB, origin at the hinge) are written to the file's `doors`. `--stage export` writes world/galleries.json: the layout's file with exactly those two
+changes. Link_/Arrive_ empties (the `Layout` collection) mark where the page's links should start and arrive; they are not in the file.
 """
 import json
 import math
@@ -74,6 +81,32 @@ DOOR_W, DOOR_H = 2.4, 2.6                     # the blockout's door (index.html 
 TRACK_X = HX - 3.4                            # the two lighting tracks, parallel to the long walls
 SKY_HALF = 1.3                                # a skylight is 2.6 m square
 DADO, RAIL = 0.95, 4.1                        # dado rail and picture rail heights
+SIDE_Z = ROWS[1] - STEP / 2                   # the wing's doorways: the middle bay of the long walls (z = -10)
+SIDE_W = 1.8                                  # each a pair of 0.9 m leaves, as the wing's side of the same doorway
+SIDE_DOORS = [("+x", "doric", "wing_w", 2.6, "NATURAL HISTORY"), ("-x", "arch", "wing_e", 2.1, "HISTORY GALLERY")]   # (wall, style, door id, leaves' top, plaque)
+SIDE_GAP = SIDE_W / 2 + 0.22 + 0.12 + 0.32    # the mouldings and the wainscot panels stop this far either side of a doorway's centre (its pilasters' outer edge)
+
+
+def hall_colliders():
+    """The layout's colliders with the two doorways cut: Wall_W and Wall_E each become the piece south of the opening (keeping the name), the piece
+    north of it (_N) and the head over it (_Head). Everything else is the layout's, in its order."""
+    out = []
+    for c in L["world"]["colliders"]:
+        door = [d for d in SIDE_DOORS if c["s"] == "Wall_" + ("W" if d[0] == "+x" else "E")]
+        if not door:
+            out.append(c)
+            continue
+        top = door[0][3]
+        a0, a1 = SIDE_Z - SIDE_W / 2, SIDE_Z + SIDE_W / 2
+        mn, mx = c["min"], c["max"]
+        out.append({"s": c["s"], "min": [mn[0], mn[1], a1], "max": [mx[0], mx[1], mx[2]]})
+        out.append({"s": c["s"] + "_N", "min": [mn[0], mn[1], mn[2]], "max": [mx[0], mx[1], a0]})
+        out.append({"s": c["s"] + "_Head", "min": [mn[0], top, a0], "max": [mx[0], mx[1], a1]})
+    return out
+
+
+HALL_COLLIDERS = hall_colliders()
+COLLIDERS = {c["s"]: c for c in HALL_COLLIDERS}
 
 
 def B(p):
@@ -292,8 +325,9 @@ def build_shell():
         if not s.startswith("Wall_"):
             continue
         mn, mx = c["min"], c["max"]
-        part(s, "Wall_Paint", lambda bm: cube(bm, (mn[0], DADO, mn[2]), (mx[0], mx[1], mx[2])))
-        part(s + "_Lower", "Wainscot_Wood", lambda bm: cube(bm, (mn[0], mn[1], mn[2]), (mx[0], DADO, mx[2])))
+        part(s, "Wall_Paint", lambda bm: cube(bm, (mn[0], max(DADO, mn[1]), mn[2]), (mx[0], mx[1], mx[2])))
+        if mn[1] < DADO:                                                                        # a doorway's head piece is all paint
+            part(s + "_Lower", "Wainscot_Wood", lambda bm: cube(bm, (mn[0], mn[1], mn[2]), (mx[0], DADO, mx[2])))
 
     c = COLLIDERS["Ceiling_Museum"]
     mn, mx = c["min"], c["max"]
@@ -360,11 +394,16 @@ PILASTER_W = 0.32
 MOULD_GAP = PILASTER_X + PILASTER_W                                            # the skirting, dado and wainscot stop at the pilasters' outer edges
 
 
-def wall_runs(gap):
+def wall_runs(gap, side=False):
     """The hall's wall runs for a sweep: (p0, p1, inward normal, normal of the wall at p0's corner or None, the same at p1), plan points (x, z) on the inner faces.
-    With `gap` the south wall is cut at the door (from door.at's x - gap to + gap)."""
+    With `gap` the south wall is cut at the door (from door.at's x - gap to + gap); with `side` the long walls are cut at the wing's doorways (SIDE_GAP)."""
     W, N, E, S = (1, 0), (0, 1), (-1, 0), (0, -1)
-    runs = [((-HX, Z1), (-HX, Z0), W, S, N), ((-HX, Z0), (HX, Z0), N, W, E), ((HX, Z0), (HX, Z1), E, N, S)]
+    if side:
+        g = SIDE_GAP
+        runs = [((-HX, Z1), (-HX, SIDE_Z + g), W, S, None), ((-HX, SIDE_Z - g), (-HX, Z0), W, None, N), ((-HX, Z0), (HX, Z0), N, W, E),
+                ((HX, Z0), (HX, SIDE_Z - g), E, N, None), ((HX, SIDE_Z + g), (HX, Z1), E, None, S)]
+    else:
+        runs = [((-HX, Z1), (-HX, Z0), W, S, N), ((-HX, Z0), (HX, Z0), N, W, E), ((HX, Z0), (HX, Z1), E, N, S)]
     if gap:
         dx = DOOR[0]
         runs += [((HX, Z1), (dx + gap, Z1), S, E, None), ((dx - gap, Z1), (-HX, Z1), S, None, W)]
@@ -393,9 +432,9 @@ def build_mouldings():
     """The Chronicle Museum's room mouldings: a dark marble skirting (its hall's), a cream dado rail capping a panelled dark wood wainscot, a cream picture rail, and
     its stepped room cornice. Each is a profile swept along the walls and mitred at the corners. The skirting and the wainscot panels reach above 0.2 m, so they are
     one piece per wall (each lies within 5 cm of its wall); the rails and the cornice are one piece each (lower than 0.2 m, or overhead)."""
-    for i, run in enumerate(wall_runs(MOULD_GAP)):
+    for i, run in enumerate(wall_runs(MOULD_GAP, side=True)):
         part(f"Skirting_{i}", "Skirting_Marble", lambda bm: sweep_run(bm, run, SKIRT_P))
-    part("Trim_Dado", "Trim_Paint", lambda bm: [sweep_run(bm, r, DADO_P) for r in wall_runs(MOULD_GAP)])
+    part("Trim_Dado", "Trim_Paint", lambda bm: [sweep_run(bm, r, DADO_P) for r in wall_runs(MOULD_GAP, side=True)])
     part("Trim_PictureRail", "Trim_Paint", lambda bm: [sweep_run(bm, r, RAIL_P) for r in wall_runs(None)])
     part("Cornice", "Trim_Paint", lambda bm: [sweep_run(bm, r, CORNICE_P) for r in wall_runs(None)])
     part("Cornice_Frieze", "Trim_Paint", lambda bm: [sweep_run(bm, r, [(0, H - 0.52), (0.022, H - 0.52), (0.022, H - 0.46), (0, H - 0.46)]) for r in wall_runs(None)])
@@ -407,6 +446,8 @@ def build_mouldings():
         ax, _ = WALLS[n]
         lo, hi = (Z0, Z1) if ax == "z" else (-HX, HX)
         spans = [(lo, hi)] if n != "-z" else [(lo, dx - MOULD_GAP), (dx + MOULD_GAP, hi)]
+        if n in ("+x", "-x"):                                                                   # the wing's doorways
+            spans = [(lo, SIDE_Z - SIDE_GAP), (SIDE_Z + SIDE_GAP, hi)]
 
         def panels(bm, spans=spans, n=n):
             for s0, s1 in spans:
@@ -489,6 +530,245 @@ def build_door():
         for a0, a1 in ((x0 + 0.2, dx - 0.2), (dx + 0.2, x1 - 0.2)):
             wall_box(bm, "-z", a0, a1, 0.0, 0.22, 0.035, 0.04)                                    # kick plates
     part("Door_Hardware", "Metal_Brass", hardware)
+
+
+# ---------------------------------------------------------------- the wing's two doorways
+DOORS_C = LAYOUT_C = None
+NVEC = {"+x": (1, 0, 0), "-x": (-1, 0, 0), "+z": (0, 0, 1), "-z": (0, 0, -1)}       # into the hall
+ADIR = {"+x": (0, 0, 1), "-x": (0, 0, 1), "+z": (1, 0, 0), "-z": (1, 0, 0)}         # the way `a` (along the wall) runs
+
+
+def door_leaf(normal, a0, a1, top, hinge_end, name):
+    """One leaf of a side doorway: its own object (the Doors collection) with its origin at the hinge, so the page can find it by name and swing it;
+    3.5 cm proud of the wall with two raised fields. Custom properties for the collision file's `doors` (closed_yaw_deg: the leaf's local +X runs
+    from the hinge along it, as the page reads it; swing_deg turns it into the hall)."""
+    bm = bmesh.new()
+    wall_box(bm, normal, a0, a1, 0.0, top, 0.0, 0.035)
+    for yy0, yy1 in ((0.18, top * 0.38), (top * 0.45, top - 0.18)):
+        wall_box(bm, normal, a0 + 0.12, a1 - 0.12, yy0, yy1, 0.035, 0.045)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    meet = a1 - 0.06 if hinge_end == 0 else a0 + 0.035                          # a wooden pull by the meeting edge: part of the leaf, so it swings with it
+    wall_box(bm, normal, meet, meet + 0.025, 0.95, 1.3, 0.045, 0.058)
+    bm.loops.layers.uv.new("UVMap")
+    box_uv(bm, TILES["Door_Wood"])
+    hinge = on_wall(normal, a0 if hinge_end == 0 else a1, 0.0, 0.0)
+    runs_dir = Vector(ADIR[normal]) * (1 if hinge_end == 0 else -1)            # game direction from the hinge along the leaf
+    th = math.atan2(-runs_dir.z, runs_dir.x)                                     # three.js: local +X -> (cos th, -sin th)
+    into = Vector(NVEC[normal])
+    swing = 95.0 if math.sin(math.atan2(-into.z, into.x) - th) > 0 else -95.0    # turning by +95 from th must head into the hall
+    M = Matrix.Translation(B(hinge)) @ Matrix.Rotation(th, 4, "Z")
+    bmesh.ops.transform(bm, matrix=M.inverted(), verts=bm.verts)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    me.materials.append(MATS["Door_Wood"])
+    ob = bpy.data.objects.new(name, me)
+    ob.matrix_world = M
+    DOORS_C.objects.link(ob)
+    ob["width"] = round(a1 - a0, 3)
+    ob["height"] = round(top, 3)
+    ob["closed_yaw_deg"] = round(math.degrees(th), 1)
+    ob["swing_deg"] = swing
+    ob["state"] = "closed"
+    return ob
+
+
+def layout_empty(name, pos, face=None):
+    ob = bpy.data.objects.new(name, None)
+    ob.location = B(pos)
+    if face:
+        ob.rotation_euler = (0, 0, math.atan2(face[0], face[1]))                 # its -Y axis looks the game way `face`
+    ob.empty_display_size = 0.3
+    LAYOUT_C.objects.link(ob)
+    return ob
+
+
+def doric_side(normal, a, w, h, tag):
+    """The Doric pediment surround of the main door (build_door), on a long wall, around a w x h opening; the pediment stays under the picture rail."""
+    pil_x = w / 2 + 0.22 + 0.12
+    cw = 0.22
+
+    def casing(bm):
+        wall_box(bm, normal, a - w / 2 - cw, a - w / 2, 0.0, h + cw, 0.0, 0.03)
+        wall_box(bm, normal, a + w / 2, a + w / 2 + cw, 0.0, h + cw, 0.0, 0.03)
+        wall_box(bm, normal, a - w / 2 - cw, a + w / 2 + cw, h, h + cw, 0.0, 0.03)
+    part(f"Door_{tag}_Casing", "Marble_White", casing)
+
+    def pilasters(bm):
+        for k in (-1, 1):
+            a0, a1 = sorted((a + k * pil_x, a + k * (pil_x + PILASTER_W)))
+            wall_box(bm, normal, a0 - 0.03, a1 + 0.03, 0.0, 0.30, 0.0, 0.045)
+            wall_box(bm, normal, a0, a1, 0.30, h + 0.02, 0.0, 0.032)
+            for f in range(3):
+                c = a0 + (f + 1) * (a1 - a0) / 4
+                wall_box(bm, normal, c - 0.012, c + 0.012, 0.42, h - 0.10, 0.032, 0.040)
+    part(f"Door_{tag}_Pilasters", "Marble_White", pilasters)
+
+    def capitals(bm):
+        for k in (-1, 1):
+            a0, a1 = sorted((a + k * pil_x, a + k * (pil_x + PILASTER_W)))
+            wall_box(bm, normal, a0 - 0.04, a1 + 0.04, h + 0.02, h + 0.12, 0.0, 0.05)
+            wall_box(bm, normal, a0 - 0.06, a1 + 0.06, h + 0.12, h + 0.22, 0.0, 0.06)
+    part(f"Door_{tag}_Capitals", "Frame_Gold", capitals)
+    ew = pil_x + PILASTER_W + 0.12
+    y = h + 0.22
+
+    def entablature(bm):
+        wall_box(bm, normal, a - ew, a + ew, y, y + 0.12, 0.0, 0.075)
+        wall_box(bm, normal, a - ew, a + ew, y + 0.12, y + 0.32, 0.0, 0.06)
+        wall_box(bm, normal, a - ew - 0.05, a + ew + 0.05, y + 0.32, y + 0.40, 0.0, 0.13)
+        prism(bm, normal, a, 2 * ew + 0.1, y + 0.40, 0.50, 0.0, 0.13)
+    part(f"Door_{tag}_Entablature", "Marble_White", entablature)
+    part(f"Door_{tag}_Tympanum", "Trim_Paint", lambda bm: prism(bm, normal, a, 2 * ew - 0.45, y + 0.47, 0.36, 0.13, 0.135))
+    return y + 0.22                                                              # the frieze's middle: the plaque's height
+
+
+def arch_ring(bm, normal, a, spr, r0, r1, d0, d1, seg=20):
+    """A semicircular ring on a wall (centre a, springing line spr, radii r0..r1, d0..d1 into the hall): one closed block per segment."""
+    for i in range(seg):
+        t0, t1 = math.pi * i / seg, math.pi * (i + 1) / seg
+        pts = []
+        for d in (d0, d1):
+            for rr, t in ((r0, t0), (r1, t0), (r1, t1), (r0, t1)):
+                pts.append(bm.verts.new(B(on_wall(normal, a + rr * math.cos(t), spr + rr * math.sin(t), d))))
+        b, f = pts[:4], pts[4:]
+        bm.faces.new(b)
+        bm.faces.new(f)
+        for k in range(4):
+            j = (k + 1) % 4
+            bm.faces.new((b[k], b[j], f[j], f[k]))
+
+
+def arch_side(normal, a, w, crown, tag):
+    """The Chronicle Museum's round-arch-keystone door (doors.js), as the wing's history gallery has it: marble jambs to the springing line, a marble
+    arch ring, an outer dark marble order and a keystone; the leaves stop at the springing line under a fixed wooden tympanum."""
+    cw, r = 0.22, w / 2
+    spr = crown - r
+
+    def jambs(bm):                                                               # below head height: 4.5 cm proud at most (the layout check's rule)
+        wall_box(bm, normal, a - r - cw, a - r, 0.0, spr - 0.12, 0.0, 0.045)
+        wall_box(bm, normal, a + r, a + r + cw, 0.0, spr - 0.12, 0.0, 0.045)
+    part(f"Door_{tag}_Jambs", "Marble_White", jambs)
+
+    def arch(bm):                                                                # the imposts and the ring: overhead (from 1.98 m)
+        wall_box(bm, normal, a - r - cw - 0.04, a - r + 0.02, spr - 0.12, spr, 0.0, 0.07)
+        wall_box(bm, normal, a + r - 0.02, a + r + cw + 0.04, spr - 0.12, spr, 0.0, 0.07)
+        arch_ring(bm, normal, a, spr, r, r + cw, 0.0, 0.06)
+    part(f"Door_{tag}_Arch", "Marble_White", arch)
+
+    def outer(bm):
+        arch_ring(bm, normal, a, spr, r + cw, r + cw + 0.14, 0.0, 0.035)
+        wall_box(bm, normal, a - 0.17, a + 0.17, crown + cw - 0.32, crown + cw + 0.18, 0.0, 0.11)
+    part(f"Door_{tag}_Order", "Marble_Dark", outer)
+
+    def tympanum(bm):
+        seg = 16
+        c = bm.verts.new(B(on_wall(normal, a, spr, 0.03)))
+        rim = [bm.verts.new(B(on_wall(normal, a + r * math.cos(math.pi * i / seg), spr + r * math.sin(math.pi * i / seg), 0.03))) for i in range(seg + 1)]
+        for i in range(seg):
+            f = bm.faces.new((c, rim[i], rim[i + 1]))
+            f.normal_update()
+            if f.normal.dot(B(NVEC[normal])) < 0:
+                f.normal_flip()
+    part(f"Door_{tag}_Tympanum", "Door_Wood", tympanum, recalc=False)
+    return crown + cw + 0.46                                                     # the plaque's height, over the keystone
+
+
+def build_side_doors():
+    """The wing's two doorways: the surround, two closed leaves, the reveal linings of the opening (its jambs and head, 3 cm thick, so nothing stands
+    where the wall pieces are not), a plaque naming the gallery, two sconces, and the Link_/Arrive_ empties. The openings themselves are the gaps
+    between the wall pieces of HALL_COLLIDERS."""
+    rows = len(SIDE_DOORS)
+    atlas = np.zeros((96 * rows, 1024, 3), np.float32)
+    for i, d in enumerate(SIDE_DOORS):
+        atlas[i * 96:(i + 1) * 96] = text_pixels(d[4], 1024, 96, (0.10, 0.07, 0.05), (0.92, 0.80, 0.52), border=4)
+    textured("Plaque_Wing", mk_image("Plaque_Wing", atlas))
+    for i, (normal, style, door, top, label) in enumerate(SIDE_DOORS):
+        wn = "W" if normal == "+x" else "E"
+        tag = f"Wing_{wn}"
+        a = SIDE_Z
+        if style == "doric":
+            py = doric_side(normal, a, SIDE_W, top, tag)
+        else:
+            py = arch_side(normal, a, SIDE_W, top + SIDE_W / 2, tag)
+        door_leaf(normal, a - SIDE_W / 2, a - 0.004, top, 0, f"DoorLeaf_{door}_A")
+        door_leaf(normal, a + 0.004, a + SIDE_W / 2, top, 1, f"DoorLeaf_{door}_B")
+
+
+        def reveal(bm):
+            e, t = 0.03, 0.2                                                     # into the wall: d from -t to 0
+            wall_box(bm, normal, a - SIDE_W / 2, a - SIDE_W / 2 + e, 0.0, top, -t, 0.0)
+            wall_box(bm, normal, a + SIDE_W / 2 - e, a + SIDE_W / 2, 0.0, top, -t, 0.0)
+            wall_box(bm, normal, a - SIDE_W / 2, a + SIDE_W / 2, top - e, top, -t, 0.0)
+        part(f"Door_{tag}_Reveal", "Marble_White", reveal)
+        pw = 1.3 if style == "doric" else 1.5
+        ph = pw * 96 / 1024
+        d0 = 0.06 if style == "doric" else 0.0                                   # the Doric frieze is 6 cm proud
+        part(f"Door_{tag}_Plaque_Back", "Metal_Brass",
+             lambda bm: wall_box(bm, normal, a - pw / 2 - 0.03, a + pw / 2 + 0.03, py - ph / 2 - 0.03, py + ph / 2 + 0.03, d0, d0 + 0.012))
+        v0 = 1 - (i + 1) / rows
+        panel_uv(f"Door_{tag}_Plaque", "Plaque_Wing", on_wall(normal, a, py, d0 + 0.0125), normal, pw, ph, v0, v0 + 1 / rows)
+        sx = SIDE_GAP + 0.45
+        new = [on_wall(normal, a + k * sx, 2.62, 0.30) for k in (-1, 1)]
+        SCONCES.extend(new)
+
+        def brass(bm):
+            for p in new:
+                aa = p[2]
+                cyl(bm, on_wall(normal, aa, 2.52, 0.0), on_wall(normal, aa, 2.52, 0.02), 0.09, 0.09, 16)
+                cyl(bm, on_wall(normal, aa, 2.52, 0.02), on_wall(normal, aa, 2.52, 0.28), 0.018, 0.018, 10)
+                cyl(bm, (p[0], 2.50, p[2]), (p[0], 2.60, p[2]), 0.035, 0.06, 14)
+        part(f"Sconce_{tag}_Brass", "Metal_Brass", brass, smooth=True)
+        part(f"Sconce_{tag}_Bulbs", "Lamp_Emit", lambda bm: [sphere(bm, p, 0.05, 12) for p in new], smooth=True)
+        into = NVEC[normal]
+        layout_empty(f"Link_{door}", on_wall(normal, a, 0.0, 0.7))
+        layout_empty(f"Arrive_{door}", on_wall(normal, a, 0.0, 1.4), face=(into[0], into[2]))
+
+
+def text_pixels(text, w, h, bg, fg, border=None):
+    """Own pixel font (the wing's), gold on dark, centred; the scale is the largest that fits."""
+    cols = sum(len(PLAQUE_GLYPHS[ch][0]) + 1 for ch in text) - 1
+    s = max(1, min((w - 24) // cols, (h - 16) // 7))
+    img = np.zeros((h, w, 3), np.float32)
+    img[:] = bg
+    x = (w - cols * s) // 2
+    y0 = (h - 7 * s) // 2
+    for ch in text:
+        g = PLAQUE_GLYPHS[ch]
+        for r, row in enumerate(g):
+            for c, v in enumerate(row):
+                if v == "1":
+                    img[y0 + r * s:y0 + (r + 1) * s, x + c * s:x + (c + 1) * s] = fg
+        x += (len(g[0]) + 1) * s
+    if border:
+        b = border
+        img[b:2 * b, b:-b] = img[-2 * b:-b, b:-b] = fg
+        img[b:-b, b:2 * b] = img[b:-b, -2 * b:-b] = fg
+    return np.clip(blur(img, 1, 1), 0, 1).astype(np.float32)
+
+
+PLAQUE_GLYPHS = {"N": ["10001", "11001", "10101", "10011", "10001", "10001", "10001"], "A": ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
+                 "T": ["11111", "00100", "00100", "00100", "00100", "00100", "00100"], "U": ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+                 "R": ["11110", "10001", "10001", "11110", "10100", "10010", "10001"], "L": ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+                 "H": ["10001", "10001", "10001", "11111", "10001", "10001", "10001"], "I": ["111", "010", "010", "010", "010", "010", "111"],
+                 "S": ["01111", "10000", "10000", "01110", "00001", "00001", "11110"], "O": ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+                 "Y": ["10001", "10001", "01010", "00100", "00100", "00100", "00100"], "G": ["01111", "10000", "10000", "10011", "10001", "10001", "01111"],
+                 "E": ["11111", "10000", "10000", "11110", "10000", "10000", "11111"], " ": ["000"] * 7}
+
+
+def panel_uv(name, mat, centre, normal, w, h, v0, v1, coll=None):
+    """A flat quad like panel(), its UV the band v0..v1 of the image (one row of an atlas)."""
+    r = Vector(RIGHT[normal])
+    up = Vector((0, 1, 0))
+    c = Vector(centre)
+    pts = [c - r * w / 2 - up * h / 2, c + r * w / 2 - up * h / 2, c + r * w / 2 + up * h / 2, c - r * w / 2 + up * h / 2]
+    bm = bmesh.new()
+    quad(bm, *[tuple(p) for p in pts])
+    bm.faces.ensure_lookup_table()
+    uvl = bm.loops.layers.uv.new("UVMap")
+    for lp, uv in zip(bm.faces[0].loops, ((0, v0), (1, v0), (1, v1), (0, v1))):
+        lp[uvl].uv = uv
+    return finish(name, bm, mat, coll or ART, keep_uv=True)
 
 
 EXIT_Y = DOOR_H + 0.22 + 0.22                              # the EXIT sign's centre: on the door's frieze
@@ -589,6 +869,8 @@ def build_frames():
     FRAMES.clear()
     for n in ("+x", "-x"):
         for era, zb in zip(BAY_ERA, sorted(BAYS, reverse=True)):
+            if abs(zb - SIDE_Z) < 1e-6:                   # the wing's doorway has this bay
+                continue
             for da, yc, w, h, role in SALON:
                 st = era if role == "main" else SMALL[era]
                 FRAMES.append((n, zb + da, yc, w, h, st, role == "main" and yc < 2.5))
@@ -1027,7 +1309,7 @@ def stage_axes():
 
 
 def build_all():
-    global ART, STANDIN
+    global ART, STANDIN, DOORS_C, LAYOUT_C
     for c in list(bpy.data.collections):
         bpy.data.collections.remove(c)
     for o in list(bpy.data.objects):
@@ -1043,6 +1325,10 @@ def build_all():
     sc = bpy.context.scene
     sc.collection.children.link(ART)
     sc.collection.children.link(STANDIN)
+    DOORS_C = bpy.data.collections.new("Doors")                  # the wing doorways' leaves: their own nodes in the GLB
+    LAYOUT_C = bpy.data.collections.new("Layout")                # Link_/Arrive_ empties: never rendered or exported
+    sc.collection.children.link(DOORS_C)
+    sc.collection.children.link(LAYOUT_C)
     make_materials()
     textured("Sign_Exit", mk_image("Exit_Sign", exit_pixels()), emit=3.0)
     textured("Decal_Ghost", mk_image("Wall_Ghost", ghost_pixels()), alpha=True)
@@ -1055,6 +1341,7 @@ def build_all():
     build_tracks()
     build_exit_sign()
     build_sconces()
+    build_side_doors()
     build_chandeliers()
     build_benches()
     build_ghosts()
@@ -1062,21 +1349,83 @@ def build_all():
     add_lights()
     setup_world()
     ensure_marker()
+    split_at_doorways()
+
+
+SPLIT_HEAD = 1.8                        # check_layout.py's HEAD: art that starts above this hangs overhead and is not tested for standing
+
+
+def split_at_doorways():
+    """The layout check works one box per object, so a piece that runs past a wing doorway (a wall's wainscot panels, a surround's two jambs, the reveal
+    linings) has a box that spans the opening, where no collider stands. Each such Art piece is cut by faces into the part south of the doorway's centre
+    (keeping the name), the part north of it (_N) and the part wholly above head height (_Head, over the opening). Only Art is cut: the Export objects
+    are merged by material from Art, so the GLB holds the same triangles either way. Also run on its own (`--stage split`) on a saved .blend."""
+    art = bpy.data.collections["Art"]
+    z0, z1 = SIDE_Z - SIDE_W / 2 + 0.05, SIDE_Z + SIDE_W / 2 - 0.05          # the opening, less the check's 5 cm slack
+    done = []
+    for ob in list(art.objects):
+        if ob.type != "MESH" or ob.name.endswith(("_N", "_Head")):
+            continue
+        g = [ob.matrix_world @ Vector(c) for c in ob.bound_box]
+        gx0, gx1 = min(p.x for p in g), max(p.x for p in g)
+        gy0, gy1 = min(p.z for p in g), max(p.z for p in g)
+        gz0, gz1 = min(-p.y for p in g), max(-p.y for p in g)
+        if gy0 >= SPLIT_HEAD or gy1 - gy0 <= 0.2 or not (gz0 < z0 and gz1 > z1) or min(abs(gx0 + HX), abs(gx1 - HX)) > 0.5:
+            continue
+        mw = ob.matrix_world
+
+        def side(f):
+            vs = [mw @ v.co for v in f.verts]
+            if min(v.z for v in vs) >= SPLIT_HEAD - 1e-4:
+                return "_Head"
+            return "_N" if f.calc_center_median().y > -SIDE_Z else ""       # Blender y = -game z: north (game z < SIDE_Z) is Blender y > -SIDE_Z
+        pieces = {}
+        for suffix in ("", "_N", "_Head"):
+            bm = bmesh.new()
+            bm.from_mesh(ob.data)
+            bmesh.ops.delete(bm, geom=[f for f in bm.faces if side(f) != suffix], context="FACES")
+            pieces[suffix] = bm
+        if sum(1 for bm in pieces.values() if bm.faces) < 2:
+            for bm in pieces.values():
+                bm.free()
+            continue
+        for suffix, bm in pieces.items():
+            if not bm.faces:
+                bm.free()
+                continue
+            if suffix == "":
+                bm.to_mesh(ob.data)
+                bm.free()
+                continue
+            me = bpy.data.meshes.new(ob.name + suffix)
+            bm.to_mesh(me)
+            bm.free()
+            me.materials.append(ob.data.materials[0])
+            nob = bpy.data.objects.new(ob.name + suffix, me)
+            nob.matrix_world = mw.copy()
+            art.objects.link(nob)
+        done.append(ob.name)
+    print("SPLIT at the doorways:", done)
+    return done
 
 
 # ---------------------------------------------------------------- bake
 GROUPS = [["Floor_Parquet", "Floor_Marble", "Ceiling_Paint"],                                  # 0: the floor and the ceiling
           ["Wall_Paint", "Wainscot_Wood", "Trim_Paint", "Skirting_Marble", "Decal_Ghost"],       # 1: the walls, wainscot, skirting, rails, cornice, coffers
-          ["Marble_Dark", "Marble_White", "Frame_Gold", "Frame_Wood", "Frame_Black", "Door_Wood", "Bench_Paint"],   # 2: plinths, frames, the door, benches
+          ["Marble_Dark", "Marble_White", "Frame_Gold", "Frame_Wood", "Frame_Black", "Door_Wood", "Bench_Paint", "Plaque_Wing"],   # 2: plinths, frames,
+                                                #    the doors (and the wing doorways' leaves), benches, the wing plaques
           ["Metal_Dark", "Metal_Brass", "Chandelier_Gilt"]]   # 3: tracks, spot heads, picture lights, sconces, chandeliers: they sit next to the lights, so their
                                                 #    texels run far hotter than the rest and get their own map (and lightmap_intensity) instead of crushing the others
-PAGES = [896, 1536, 1024, 1152]        # each map's fixed page size (px), from a first run with None: the smallest page that gave >= 30 px/m. Fixed, because
+PAGES = [896, 1536, 1152, 1152]        # each map's fixed page size (px), from a first run with None: the smallest page that gave >= 30 px/m (map 2 went
+                                        # from 1024 to 1152 with the wing doorways, at 27 px/m on 1024). Fixed, because
                                         # Blender's island packer is not exactly repeatable
 WHITE_CAP = 12.0                        # a map's white point is its 99.5th percentile texel, but at most 12 x its 90th: on the fittings' map the few texels beside
                                         # the bulbs run some 40 x hotter than the rest and would push the rest into the bottom 8-bit levels; they clip instead
 KEEP_UV_LM = {"Chandelier_Gilt": 0.16}  # lightmapped through the model's own UVs, in a corner of its map this wide (its 64k triangles would make thousands of
                                         # smart-project islands); the three chandeliers share those texels, as they hang in the same light
 SHELL_PREFIX = ("Wall_", "Floor_", "Ceiling_")
+FLAT_UV = ("Plaque_",)                  # flat quads lightmapped through their own 0..1 UVs (smart project folds a lone quad into a sliver, which the
+                                        # island scaling then blows up until the packer shrinks the rest of the map to nothing)
 
 
 def trim_outside(bm, ceiling=False):
@@ -1206,11 +1555,12 @@ def lightmap_uv(objs, page=None):
     keep = [o for o in objs if o.name in KEEP_UV_LM]
     corner = max([KEEP_UV_LM[o.name] for o in keep], default=0.0)
     objs = [o for o in objs if o not in keep]
+    flat = [o for o in objs if o.name.startswith(FLAT_UV)]
     for o in objs + keep:
         uvs = o.data.uv_layers
         if "lightmap" in uvs:
             uvs.remove(uvs["lightmap"])
-        uvs.new(name="lightmap", do_init=o in keep)               # the kept ones start as a copy of UVMap
+        uvs.new(name="lightmap", do_init=o in keep or o in flat)  # the kept ones (and the plaques) start as a copy of UVMap
         uvs.active = uvs["lightmap"]
         uvs["lightmap"].active_render = True
     for o in keep:                                                 # the model's UVs, fitted into the corner square [1 - corner, 1] x [0, corner]
@@ -1220,10 +1570,15 @@ def lightmap_uv(objs, page=None):
         sc = (corner - 2 * MARGIN_PX / (page or 2048)) / max(hi - lo)
         us = (us - lo) * sc + np.array([1 - corner + MARGIN_PX / (page or 2048), MARGIN_PX / (page or 2048)])
         d.foreach_set("uv", us.ravel())
-    select_only(objs)
+    select_only([o for o in objs if o not in flat])
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=0.0, scale_to_bounds=False)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    select_only(objs)
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.uv.select_all(action="SELECT")
     bpy.ops.uv.average_islands_scale()
     chosen = None
     for S in ((page,) if page else (512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1792, 2048)):
@@ -1299,6 +1654,8 @@ def stage_bake():
     for n, mats in enumerate(GROUPS):
         t0 = time.time()
         objs = [exp[m] for m in mats if m in exp]
+        if "Door_Wood" in mats:                                   # the wing doorways' leaves (own objects) share the door wood's map
+            objs += sorted(bpy.data.collections["Doors"].objects, key=lambda o: o.name)
         print(f"lightmap {n}: {[o.name for o in objs]}")
         S, dens = lightmap_uv(objs, PAGES[n])
         img = bpy.data.images.new(f"LM_{n}", S, S, alpha=False, float_buffer=True)
@@ -1396,6 +1753,8 @@ def scrub_private():
                 for k in list(st.keys()):
                     if kind == "materials" and st is idb and k in KEEP_PROPS:
                         continue
+                    if kind == "objects" and st is idb and idb.name.startswith(("DoorLeaf_", "Link_", "Arrive_")):   # the doorways' layout (read by stage_export)
+                        continue
                     if st is not idb and k.startswith(SYS_KEEP):      # Cycles' and EEVEE's own settings (light, visibility, sampling) stay
                         continue
                     try:
@@ -1434,12 +1793,32 @@ def save_blend():
 
 
 # ---------------------------------------------------------------- export
+def write_world(leaves):
+    """world/galleries.json: the layout's collision file (as tools/make_street.mjs writes it from shared/museum.js) with the two doorways: the wall
+    pieces of HALL_COLLIDERS in place of Wall_W and Wall_E, and the four leaves in `doors` (export_scene.py's door entry). Nothing else changes."""
+    sys.path.insert(0, str(ROOT / "tools/blender"))
+    import export_scene
+    names = {o.name for o in leaves}
+    doc = dict(L["world"])
+    doc["colliders"] = HALL_COLLIDERS
+    doc["doors"] = [d for d in export_scene.collect(SCENE)["doors"] if d["name"] in names]
+    path = ROOT / f"world/{SCENE}.json"
+    path.write_text(json.dumps(doc, separators=(",", ":")))
+    print(f"WORLD {path.name}: {len(doc['colliders'])} colliders, {len(doc['doors'])} doors")
+
+
 def stage_export():
     exp = bpy.data.collections["Export"]
     exp.hide_viewport = exp.hide_render = False
     bpy.data.collections["Art"].hide_viewport = True
+    leaves = sorted(bpy.data.collections["Doors"].objects, key=lambda o: o.name)
+    write_world(leaves)
+    stash = {o.name: {k: o[k] for k in o.keys()} for o in leaves}    # the leaves' layout properties are in the JSON, not in the GLB's extras
+    for o in leaves:
+        for k in list(o.keys()):
+            del o[k]
     bpy.ops.object.select_all(action="DESELECT")
-    for o in exp.objects:
+    for o in list(exp.objects) + leaves:
         o.hide_set(False)
         o.select_set(True)
     bpy.context.view_layer.objects.active = next(iter(exp.objects))
@@ -1448,6 +1827,9 @@ def stage_export():
     bpy.ops.export_scene.gltf(filepath=str(raw), export_format="GLB", use_selection=True, export_extras=True, export_yup=True, export_apply=True,
                               export_texcoords=True, export_normals=True, export_materials="EXPORT", export_image_format="AUTO",
                               export_cameras=False, export_lights=False, export_draco_mesh_compression_enable=False, export_animations=False)
+    for o in leaves:
+        for k, v in stash[o.name].items():
+            o[k] = v
     print("EXPORTED", raw, raw.stat().st_size)
     bpy.data.collections["Art"].hide_viewport = False
     exp.hide_viewport = exp.hide_render = True
@@ -1551,6 +1933,9 @@ def stage_render():
 if __name__ == "__main__":
     if STAGE in ("art", "all"):
         build_all()
+        save_blend()
+    if STAGE == "split":                              # a saved .blend built before split_at_doorways: cut its Art pieces (Export, the bake and the GLB are untouched)
+        split_at_doorways()
         save_blend()
     if STAGE in ("bake", "all"):
         stage_bake()

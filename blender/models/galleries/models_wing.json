@@ -1,0 +1,29 @@
+{
+ "_doc": "The wing's additions (build_galleries_wing.py): CC0 models copied from the Chronicle Museum (Earth_Worldbuild/_Museum/assets/models), diffuse map only. models.json beside it lists the hall's.",
+ "models": {
+  "ph-bull-head": {
+   "title": "Bull head",
+   "artist": "Poly Haven (photoscan)",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/bull_head",
+   "target_h": 0.433,
+   "file": "bull_head_1k.gltf",
+   "units": "m"
+  },
+  "ph-horse-head": {
+   "title": "Horse head",
+   "artist": "Poly Haven (photoscan)",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/horse_head",
+   "target_h": 0.419,
+   "file": "horse_head_1k.gltf",
+   "units": "m"
+  }
+ }
+}
