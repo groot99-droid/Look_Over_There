@@ -69,7 +69,7 @@ What the page shows (area-weighted samples over each material's triangles, max c
 | `Plastic_White` (equipment) | 0.97 | 1.21 | 7.4 % | **0.57** | 0.70 | 0 |
 | `Trunking_PVC` | 0.76 | 0.85 | 0.01 % | **0.45** | 0.50 | 0 |
 
-No baked material reaches 1.0 now; only the unbaked emissive parts (`Lamp_Emit` at strength 8, the exit sign, the displays, the red LEDs) do, as they should. The three review stills above are from the first bake (Blender renders through AgX at the first lights) and were not re-rendered.
+No baked material reaches 1.0 now; only the unbaked emissive parts (`Lamp_Emit` at strength 8, the exit sign, the displays, the red LEDs) do, as they should. The three review stills above were re-rendered after the relight, at the new light levels (Cycles with OptiX on a rented GPU, 128 samples), and `check_layout.py` was run again on the relit `.blend`: PASS, 15 of 15.
 
 The three.js check (`glb_check`, run with node on the exported file):
 
