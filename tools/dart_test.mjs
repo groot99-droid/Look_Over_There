@@ -16,12 +16,13 @@ const settled = id => page.waitForFunction(i => window.__game.S.id === i && !win
 const frames = n => page.evaluate(n => { for (let i = 0; i < n; i++) window.__game.sim(0.05, i); }, n);
 const st = () => page.evaluate(() => { const g = window.__game, m = g.monsters[0]; return {owned: g.owned(), held: g.HELD.item, darts: g.DART.st.darts, cool: g.DART.st.cool, flights: g.DART.flights.length, mons: g.monsters.length, hp: m ? m.hp : null, jellyT: m ? m.jellyT : null, dps: m ? m.jellyDps : null, mul: m ? m.slowMul() : null, kills: g.GB.wave && g.GB.wave.kills, stash: g.GB.load && g.GB.load.stash}; });
 // stand somewhere open facing a clear line; monster 0 is `dist` m ahead (frozen: stunned for ever), the others at the metres in `others` ahead, or parked far away
+// a clear line at the eye and along the dart's own path, 0.1 m lower (fireDart), so a cabinet top between the two cannot stop the dart
 const stage = (dist, others = []) => page.evaluate(([dist, others]) => {
   const g = window.__game, cells = g.mainRegion().map(g.cellXZ);
   for (let t = 0; t < 8000; t++) {
     const [x, z] = cells[Math.floor(Math.random() * cells.length)], a = Math.random() * 6.28, fx = -Math.sin(a), fz = -Math.cos(a), far = Math.max(dist, ...others, 2) + 0.5;
     const o = [x, g.S.floor + g.P.eye, z], d = [fx, 0, fz];
-    if (!g.rayClear(o, d, far) || g.collide({x: x + fx * dist, y: g.S.floor + 0.02, z: z + fz * dist}) || g.collide({x, y: g.S.floor + 0.02, z})) continue;
+    if (!g.rayClear(o, d, far) || !g.rayClear([x, g.S.floor + g.P.eye - 0.1, z], d, far) || g.collide({x: x + fx * dist, y: g.S.floor + 0.02, z: z + fz * dist}) || g.collide({x, y: g.S.floor + 0.02, z})) continue;
     g.P.p.set(x, g.S.floor + 0.02, z); g.P.v.set(0, 0, 0); g.P.yaw = a; g.P.pitch = 0; g.P.imm = 1e9;
     g.monsters.forEach((m, i) => { const k = i === 0 ? dist : others[i - 1]; m.state = "patrol"; m.stunT = 1e9; m.jellyT = 0; m.slowT = 0; m.hp = m.cfg.hp; if (k === undefined) m.pos.set(x + 900, m.fy, z + 900); else m.pos.set(x + fx * k, m.fy, z + fz * k); });
     return true;
