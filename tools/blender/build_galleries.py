@@ -30,6 +30,12 @@ gallery. They are cut into the walls here: Wall_W and Wall_E of the collision fi
 (arched, under a fixed tympanum) opening, and the two pairs of closed leaves (DoorLeaf_wing_w_A/B, DoorLeaf_wing_e_A/B, their own nodes in the
 GLB, origin at the hinge) are written to the file's `doors`. `--stage export` writes world/galleries.json: the layout's file with exactly those two
 changes. Link_/Arrive_ empties (the `Layout` collection) mark where the page's links should start and arrive; they are not in the file.
+
+Version 3 (2026-11-26, the owner: warriors and the T. rex in the hall, pictures in the frames): every frame holds a picture of another scene of the game
+(build_canvases: one atlas made by make_galleries_paintings.py, the hang shared through galleries_frames.py); the T. rex skeleton on a platform at the
+north end and two warriors by the door are fixed exhibits in the GLB, each with COL_ boxes (`Colliders`) that --stage export appends to
+world/galleries.json; the bake's statue stand-ins are the six warriors that will be the moving statues. The models are static copies made by
+prep_galleries_exhibits.py (blender/models/galleries/exhibits/).
 """
 import json
 import math
@@ -43,6 +49,8 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools/blender"))
+import galleries_frames as gf  # noqa: E402   the picture hang, shared with make_galleries_paintings.py
 SCENE = "galleries"
 LAYOUT = ROOT / f"blender/layout/{SCENE}.json"
 TEX = ROOT / f"blender/textures/{SCENE}"
@@ -199,7 +207,7 @@ def make_materials():
     material("Skirting_Marble", diff="marble_01_diff_1k.jpg", tint=(0.11, 0.095, 0.09), rough=0.3, tile=1.0)
     material("Marble_Dark", diff="marble_01_diff_1k.jpg", tint=(0.12, 0.10, 0.095), rough=0.3, tile=1.0)
     material("Marble_White", diff="marble_01_diff_1k.jpg", tint=(0.95, 0.93, 0.89), rough=0.3, tile=1.0)
-    material("Frame_Gold", color=(0.87, 0.56, 0.14), rough=0.32, metal=0.9)
+    material("Frame_Gold", color=(0.56, 0.36, 0.09), rough=0.32, metal=0.9)        # darker than v2 (0.87, 0.56, 0.14): under the picture lights it showed above 1 in the page
     material("Frame_Wood", diff="dark_wood_diff_1k.jpg", tint=(0.75, 0.62, 0.55), rough=0.45, tile=0.6)
     material("Frame_Black", color=(0.014, 0.013, 0.013), rough=0.25)
     material("Metal_Dark", color=(0.03, 0.03, 0.035), rough=0.4, metal=0.8)
@@ -208,7 +216,6 @@ def make_materials():
     material("Bench_Paint", diff=BENCH.rsplit("/", 1)[0] + "/textures/painted_wooden_bench_diff_1k.jpg", rough=0.6)
     material("Lamp_Emit", color=(1.0, 0.85, 0.62), rough=0.4, emit=((1.0, 0.80, 0.55), 14.0))
     material("Skylight_Glass", color=(0.05, 0.07, 0.10), rough=0.2, emit=((0.10, 0.14, 0.26), 0.6), alpha=0.6)
-    material("Standin_Stone", color=(0.48, 0.46, 0.42), rough=0.8)
 
 
 # ---------------------------------------------------------------- geometry helpers (all built in world space, identity object transforms)
@@ -829,11 +836,7 @@ FRAME_STYLES = {
     "black-lacquer": ("Frame_Black", [(0, 0), (0, 0.034), (0.006, 0.04), (0.05, 0.04), (0.05, 0)]),
     "thin-metal": ("Metal_Dark", [(0, 0), (0, 0.028), (0.022, 0.028), (0.022, 0)]),
 }
-SMALL = {"gilt-ornate": "gilt-simple", "gilt-simple": "dark-wood", "dark-wood": "dark-wood", "black-lacquer": "thin-metal"}     # build_layout.ROOM_STYLE frame_small
-BAY_ERA = ["gilt-simple", "gilt-ornate", "dark-wood", "black-lacquer"]   # the bays from the door north: Renaissance, Baroque, 19th century, modern (the Chronicle's order)
-SALON = [(0.0, 1.75, 1.6, 1.2, "main"), (-1.45, 1.6, 0.7, 0.9, "small"), (1.45, 1.6, 0.7, 0.9, "small"),        # (along, centre y, w, h, role): the eye row ...
-         (-1.2, 2.75 + 0.275, 0.75, 0.55, "small"), (0.0, 2.75 + 0.35, 0.95, 0.7, "main"), (1.2, 2.75 + 0.275, 0.75, 0.55, "small")]   # ... and the row above it,
-#                                                                                                             bottom-aligned on 2.75 m (build_layout._vertical)
+# the hang itself (bays, salon grid, eras, the north and door walls) is in galleries_frames.py, which the pictures atlas reads too
 
 
 def frame_sweep(bm, normal, a, yc, w, h, profile):
@@ -861,25 +864,14 @@ FRAMES = []          # (normal, along, centre y, w, h, style, lit): filled by bu
 
 
 def build_frames():
-    """The frames, empty (docs/BLENDER.md: "picture rails and empty frames"; the paintings were taken down, and their pale ghosts are on the walls). They hang as the
-    Chronicle Museum hangs its works: a salon grid in each bay of the long walls (halfway between the plinths), a large work centred at eye height, smaller ones
+    """The frames (each with a picture of another scene of the game since 2026-11-26, build_canvases). They hang as the Chronicle Museum hangs its works: a salon grid in each bay of the long walls (halfway between the plinths), a large work centred at eye height, smaller ones
     either side and a row above bottom-aligned on a shared line; the frame style follows the era, bay by bay from the door north, as the Chronicle's rooms do
     (gilt simple, gilt ornate, dark wood, black lacquer; the small works in the era's lighter frame). A grand gilt frame and two smaller ones on the north wall, two
     beside the door. The main frames have brass picture lights; the row above hangs on brass wires from the picture rail."""
     FRAMES.clear()
-    for n in ("+x", "-x"):
-        for era, zb in zip(BAY_ERA, sorted(BAYS, reverse=True)):
-            if abs(zb - SIDE_Z) < 1e-6:                   # the wing's doorway has this bay
-                continue
-            for da, yc, w, h, role in SALON:
-                st = era if role == "main" else SMALL[era]
-                FRAMES.append((n, zb + da, yc, w, h, st, role == "main" and yc < 2.5))
-    dx = DOOR[0]
-    for k in (-1, 1):
-        FRAMES.append(("-z", dx + k * 4.0, 2.15, 1.25, 0.95, "gilt-simple", True))
-    FRAMES.append(("+z", 0.0, 2.7, 3.3, 2.4, "gilt-ornate", True))
-    for k in (-1, 1):
-        FRAMES.append(("+z", k * 3.4, 2.3, 1.0, 1.3, "gilt-simple", True))
+    FRAMES.extend(f[:7] for f in gf.frames(K))
+    for f in FRAMES:
+        assert gf.FRAME_DEPTH[f[5]] == FRAME_STYLES[f[5]][1][-1][0], f[5]      # the opening the canvases fill is each profile's inner edge
 
     for i, (n, a, yc, w, h, st, lit) in enumerate(FRAMES):
         mat, prof = FRAME_STYLES[st]
@@ -916,6 +908,36 @@ def build_frames():
     part("Picture_Light_Tubes", "Lamp_Emit", bulbs, smooth=True)
 
 
+PAINTINGS = "blender/textures/galleries/paintings_atlas"      # .jpg and .json: tools/blender/make_galleries_paintings.py
+CANVAS_D = 0.005                 # a canvas lies 5 mm off the wall, under every frame profile's inner lip (the lowest lip is 1.1 cm)
+CANVAS_TUCK = 0.012              # and runs 1.2 cm under the frame on every side, so no wall shows at the opening's edge
+
+
+def build_canvases():
+    """The owner (2026-11-26): the frames get pictures of the game's other scenes. One canvas per frame: a flat quad just inside the frame's opening, its
+    UVMap the frame's rectangle of the pictures atlas (paintings_atlas.json, by frame index; the atlas maker reads the same hang, galleries_frames.py).
+    One material for all (Canvas_Paintings, matte); in the bake each canvas is its own lightmap island (FLAT_UV)."""
+    atlas = json.loads((ROOT / (PAINTINGS + ".json")).read_text())
+    by_frame = {e["frame"]: e for e in atlas["frames"]}
+    assert len(by_frame) == len(FRAMES), f"the atlas has {len(by_frame)} pictures for {len(FRAMES)} frames: run make_galleries_paintings.py"
+    for i, (n, a, yc, w, h, st, lit) in enumerate(FRAMES):
+        d = gf.FRAME_DEPTH[st] - CANVAS_TUCK
+        u0, v0, u1, v1 = by_frame[i]["uv"]
+        r = Vector(RIGHT[n])
+        up = Vector((0, 1, 0))
+        c = Vector(on_wall(n, a, yc, CANVAS_D))
+        cw, ch = w / 2 - d, h / 2 - d
+        bm = bmesh.new()
+        quad(bm, *[tuple(c + r * sx * cw + up * sy * ch) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))])
+        bm.faces.ensure_lookup_table()
+        uvl = bm.loops.layers.uv.new("UVMap")
+        # the picture's rectangle, less the part under the frame: the atlas holds the opening, the quad reaches CANVAS_TUCK past it
+        du, dv = (u1 - u0) * CANVAS_TUCK / (w - 2 * gf.FRAME_DEPTH[st]), (v1 - v0) * CANVAS_TUCK / (h - 2 * gf.FRAME_DEPTH[st])
+        for lp, uv in zip(bm.faces[0].loops, ((u0 - du, v0 - dv), (u1 + du, v0 - dv), (u1 + du, v1 + dv), (u0 - du, v1 + dv))):
+            lp[uvl].uv = uv
+        finish(f"Canvas_{i}", bm, "Canvas_Paintings", ART, keep_uv=True)
+
+
 SPOTS = []           # (name, pivot (game), aim point (game), power W, cone deg): filled by build_tracks
 
 
@@ -930,6 +952,12 @@ def build_tracks():
         SPOTS.append((f"Spot_Plinth_{i}", (k * TRACK_X, yt - 0.22, z), (x, PLINTH_H + 0.85, z), SPOT_W, 34.0))
     for k in (-1, 1):
         SPOTS.append((f"Spot_North_{'E' if k > 0 else 'W'}", (k * TRACK_X, yt - 0.22, Z0 + 1.4), (k * 0.9, 2.7, Z0), SPOT_W * 0.8, 30.0))
+    x0, x1, z0, z1, top = TREX_PLAT
+    for k in (-1, 1):                                                                                       # the T. rex: one from each track, from the south
+        SPOTS.append((f"Spot_TRex_{'E' if k > 0 else 'W'}", (k * TRACK_X, yt - 0.22, z1 + 1.6), (k * 1.5, top + 1.0, (z0 + z1) / 2), SPOT_W, 44.0))
+    for mid, tag, (x, z) in DOOR_WARRIORS:                                                                  # the two warriors by the door
+        k = 1 if x > 0 else -1
+        SPOTS.append((f"Spot_{tag}", (k * TRACK_X, yt - 0.22, z - 1.7), (x, PLINTH_H + 1.0, z), SPOT_W * 0.6, 34.0))
 
     def heads(bm):
         for _, piv, aim, _, _ in SPOTS:
@@ -1086,22 +1114,6 @@ def exit_pixels():
     return np.clip(blur(img, 1, 1), 0, 1).astype(np.float32)
 
 
-def ghost_pixels():
-    """Where a painting hung: a cleaner, paler rectangle of the wall with a dusty rim (an alpha decal)."""
-    S = 256
-    rng = np.random.default_rng(7)
-    yy, xx = np.mgrid[0:S, 0:S] / (S - 1)
-    m = 0.08
-    inside = ((xx > m) & (xx < 1 - m) & (yy > m) & (yy < 1 - m)).astype(np.float32)
-    soft = blur(inside, 3, 2)
-    rim = np.clip(soft * (1 - soft) * 4, 0, 1)
-    noise = blur(rng.random((S, S)).astype(np.float32), 4, 2)
-    rgba = np.zeros((S, S, 4), np.float32)
-    rgba[..., :3] = np.array([0.95, 0.80, 0.74]) * (soft[..., None]) + np.array([0.20, 0.16, 0.12]) * (rim[..., None])
-    rgba[..., 3] = np.clip(soft * 0.16 + rim * 0.22 + (noise - 0.5) * 0.05, 0, 0.4)
-    return rgba
-
-
 def mk_image(name, arr, srgb=True):
     """A packed image from a float array (rows top to bottom): written as a PNG first, because a generated image forgets its pixels when the file is saved."""
     h, w = arr.shape[:2]
@@ -1178,27 +1190,109 @@ def panel(name, mat, centre, normal, w, h, coll=None):
     return finish(name, bm, mat, coll or ART, keep_uv=True)
 
 
-def build_ghosts():
-    """Paler rectangles over the plinths where paintings were taken down (decals 3 mm off the wall, above head height)."""
-    rng = np.random.default_rng(13)
-    for i, (x, z) in enumerate(HOMES):
-        n = "+x" if x < 0 else "-x"
-        w, h = rng.uniform(1.0, 1.5), rng.uniform(0.8, 1.1)
-        panel(f"Decal_Ghost_{i}", "Decal_Ghost", on_wall(n, z + rng.uniform(-0.15, 0.15), 3.15, 0.003), n, w, h)
+# ---------------------------------------------------------------- the exhibits and the statues' stand-ins: the owner's character models
+# The owner (2026-11-26): "Those warriors and the T. rex should be in the main museum hall instead of those faceless people". The models are static copies
+# (rest pose, no armature, 1K texture) made by tools/blender/prep_galleries_exhibits.py from the characters job's models/characters/<id>.glb. Each copy
+# stands on the ground centred over its origin, facing (a warrior) or heading (the T. rex) along Blender -Y, which is game +z.
+EXHIBITS = "blender/models/galleries/exhibits/"
+TREX_LEN = 6.5                                   # the skeleton's length in the hall (the model is the real 12 m)
+TREX_YAW = 15.0                                  # degrees: its head turned from east toward the south, toward the visitors
+TREX_PLAT = (-3.7, 3.7, -19.6, -15.6, 0.3)        # the platform: x0, x1, z0, z1, top (across the north end, clear of the aisle and the statues' paths)
+WARRIOR_H = 1.75                                 # the warriors are 0.43 to 0.54 m miniatures; in the hall they stand life-size, as the statues they replace
+DOOR_WARRIORS = [("warrior_british_redcoat", "Redcoat", (-2.75, 4.9)), ("warrior_mongol_archer", "Mongol", (2.75, 4.9))]   # either side of the door, facing the hall
+STATUE_WARRIORS = ["warrior_egyptian_pharaoh", "warrior_viking_raider", "warrior_qin_terracotta", "warrior_medieval_knight", "warrior_japanese_samurai",
+                   "warrior_roman_legionary"]        # the six moving statues, in MUSEUM.names order (homes 0 to 5): only stand-ins here
+EXHIBIT_COL = []                                 # (name, game min, game max): the exhibits' COL_ boxes, filled by build_exhibits
+EXHIBIT_SCALE = {}                               # model id -> the scale it is shown at (the page's moving statues should use the same)
 
 
-# ---------------------------------------------------------------- the statues, as stand-ins (the page draws them: index.html museumProps)
-STATUE = [(0.42, 0.75, 0.26, 0, 0.95), (0.15, 0.58, 0.15, -0.11, 0.29), (0.15, 0.58, 0.15, 0.11, 0.29), (0.11, 0.6, 0.11, -0.28, 0.98), (0.11, 0.6, 0.11, 0.28, 0.98), (0.24, 0.28, 0.24, 0, 1.5)]
+def yaw_to(face):
+    """The turn about Blender Z that brings a model's front (Blender -Y, game +z) to the game direction `face` (x, z)."""
+    return math.atan2(face[0], face[1])
+
+
+def exhibit(mid, name, pos, face, length=None, height=None, coll=None):
+    """One of the static copies, turned to `face`, scaled to `length` (along its heading) or `height`, standing at the game point `pos`; its own
+    material (Exhibit_<id>: the model's 1K texture). Returns the object and its game box."""
+    mname = f"Exhibit_{mid}"
+    if mname not in MATS:
+        material(mname, diff=EXHIBITS + f"{mid}_1k.jpg", rough=0.7)
+    tpl = load_model(EXHIBITS + f"{mid}.glb")
+    assert len(tpl) == 1, (mid, list(tpl))
+    key = next(iter(tpl))
+    vs = [v.co for t in tpl[key] for v in t.verts]
+    scale = length / (max(v.y for v in vs) - min(v.y for v in vs)) if length else height / (max(v.z for v in vs) - min(v.z for v in vs))
+    EXHIBIT_SCALE[mid] = round(scale, 4)
+    M = Matrix.Translation(B(pos)) @ Matrix.Rotation(yaw_to(face), 4, "Z") @ Matrix.Diagonal((scale, scale, scale, 1.0))
+    ob = place(tpl, {key: (mname, name)}, [M], coll)[0]
+    for ts in tpl.values():
+        for t in ts:
+            t.free()
+    vs = [v.co for v in ob.data.vertices]
+    gmin = [min(v.x for v in vs), min(v.z for v in vs), min(-v.y for v in vs)]
+    gmax = [max(v.x for v in vs), max(v.z for v in vs), max(-v.y for v in vs)]
+    return ob, gmin, gmax
+
+
+def pedestal(tag, x0, x1, z0, z1, top):
+    """A block pedestal in the hall plinths' style (build_plinths): white marble base, dark marble die, white marble cap, 2 cm proud of its collider."""
+    b = min(0.11, top * 0.3)
+    c = top - 0.1 if top > 0.4 else top - 0.05
+
+    def base(bm):
+        cube(bm, (x0 - 0.02, 0.0, z0 - 0.02), (x1 + 0.02, b * 0.45, z1 + 0.02))
+        cube(bm, (x0 - 0.005, b * 0.45, z0 - 0.005), (x1 + 0.005, b, z1 + 0.005))
+
+    def cap(bm):
+        cube(bm, (x0 - 0.005, c, z0 - 0.005), (x1 + 0.005, c + 0.035, z1 + 0.005))
+        cube(bm, (x0 - 0.02, c + 0.035, z0 - 0.02), (x1 + 0.02, top, z1 + 0.02))
+    part(f"{tag}_Base", "Marble_White", base)
+    part(f"{tag}_Die", "Marble_Dark", lambda bm: cube(bm, (x0 + 0.025, b, z0 + 0.025), (x1 - 0.025, c, z1 - 0.025)))
+    part(f"{tag}_Cap", "Marble_White", cap)
+
+
+def col_box(name, gmin, gmax):
+    """A COL_ box (a collider of world/galleries.json): its own object in `Colliders`, never rendered or exported as art."""
+    me = bpy.data.meshes.new("COL_" + name)
+    bm = bmesh.new()
+    cube(bm, gmin, gmax)
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new("COL_" + name, me)
+    bpy.data.collections["Colliders"].objects.link(ob)
+    ob.display_type = "WIRE"
+    EXHIBIT_COL.append((name, [round(v, 3) for v in gmin], [round(v, 3) for v in gmax]))
+    return ob
+
+
+def build_exhibits():
+    """The fixed exhibits, part of the hall's GLB: the T. rex skeleton on a low platform across the north end, and the redcoat and the Mongol archer on
+    plinths either side of the south door, facing the hall. Each gets two COL_ boxes: its pedestal, and the figure's own box above it."""
+    EXHIBIT_COL.clear()
+    x0, x1, z0, z1, top = TREX_PLAT
+    pedestal("TRex_Platform", x0, x1, z0, z1, top)
+    col_box("TRex_Platform", (x0, 0.0, z0), (x1, top, z1))
+    yaw = math.radians(TREX_YAW)
+    ob, gmin, gmax = exhibit("trex", "Exhibit_TRex", ((x0 + x1) / 2, top, (z0 + z1) / 2), (math.cos(yaw), math.sin(yaw)), length=TREX_LEN)
+    assert x0 <= gmin[0] and gmax[0] <= x1 and z0 <= gmin[2] and gmax[2] <= z1, ("the T. rex overhangs its platform", gmin, gmax)
+    col_box("TRex_Skeleton", (gmin[0], top, gmin[2]), gmax)
+    print(f"EXHIBIT T. rex: game box {[round(v, 2) for v in gmin]} .. {[round(v, 2) for v in gmax]}")
+    for mid, tag, (x, z) in DOOR_WARRIORS:
+        ob, gmin, gmax = exhibit(mid, f"Exhibit_{tag}", (x, PLINTH_H, z), (0, -1), height=WARRIOR_H)
+        half = max(P, math.ceil((max(gmax[0] - x, x - gmin[0], gmax[2] - z, z - gmin[2]) - 0.03) * 20) / 20)   # the figure within 3 cm of its plinth
+        pedestal(f"Exhibit_{tag}_Plinth", x - half, x + half, z - half, z + half, PLINTH_H)
+        col_box(f"Exhibit_{tag}_Plinth", (x - half, 0.0, z - half), (x + half, PLINTH_H, z + half))
+        col_box(f"Exhibit_{tag}", (gmin[0], PLINTH_H, gmin[2]), gmax)
+        print(f"EXHIBIT {tag}: plinth half-width {half}, figure {[round(v, 2) for v in gmin]} .. {[round(v, 2) for v in gmax]}")
 
 
 def build_standins():
-    """The blockout's statue (six boxes, as museumProps builds it) on each plinth, turned to face the hall: in the bake they throw the spots' shadows on the plinths.
-    Hidden from the export; seen in the review stills so the plinths read as they will in the game."""
-    def statues(bm):
-        for x, z in HOMES:
-            for w, h, d, ox, oy in STATUE:                    # turned a quarter: the box's width runs along z
-                cube(bm, (x - d / 2, PLINTH_H + oy - h / 2, z + ox - w / 2), (x + d / 2, PLINTH_H + oy + h / 2, z + ox + w / 2))
-    part("standin_statues", "Standin_Stone", statues, coll=STANDIN)
+    """The six statues the page moves (index.html museumProps), as stand-ins: the static copies of the six warriors that will be the statues, on the six
+    plinths in MUSEUM.names order, turned to face the hall as placeStatues turns them. In the bake they throw the spots' shadows on the plinths; they
+    show in the review stills; they are never exported."""
+    for i, ((x, z), mid) in enumerate(zip(HOMES, STATUE_WARRIORS)):
+        exhibit(mid, f"standin_warrior_{i}", (x, PLINTH_H, z), (-1 if x > 0 else 1, 0), height=WARRIOR_H, coll=STANDIN)
+    print("EXHIBIT scales", json.dumps(EXHIBIT_SCALE))
 
 
 # ---------------------------------------------------------------- lights, world
@@ -1327,11 +1421,14 @@ def build_all():
     sc.collection.children.link(STANDIN)
     DOORS_C = bpy.data.collections.new("Doors")                  # the wing doorways' leaves: their own nodes in the GLB
     LAYOUT_C = bpy.data.collections.new("Layout")                # Link_/Arrive_ empties: never rendered or exported
+    cols = bpy.data.collections.new("Colliders")                 # the exhibits' COL_ boxes: never rendered or exported (written to world/galleries.json)
     sc.collection.children.link(DOORS_C)
     sc.collection.children.link(LAYOUT_C)
+    sc.collection.children.link(cols)
+    cols.hide_render = True
     make_materials()
     textured("Sign_Exit", mk_image("Exit_Sign", exit_pixels()), emit=3.0)
-    textured("Decal_Ghost", mk_image("Wall_Ghost", ghost_pixels()), alpha=True)
+    textured("Canvas_Paintings", image(PAINTINGS + ".jpg"), rough=0.95)       # matte: the page shows it unlit anyway
     build_shell()
     build_skylights()
     build_mouldings()
@@ -1344,7 +1441,8 @@ def build_all():
     build_side_doors()
     build_chandeliers()
     build_benches()
-    build_ghosts()
+    build_canvases()
+    build_exhibits()
     build_standins()
     add_lights()
     setup_world()
@@ -1411,20 +1509,22 @@ def split_at_doorways():
 
 # ---------------------------------------------------------------- bake
 GROUPS = [["Floor_Parquet", "Floor_Marble", "Ceiling_Paint"],                                  # 0: the floor and the ceiling
-          ["Wall_Paint", "Wainscot_Wood", "Trim_Paint", "Skirting_Marble", "Decal_Ghost"],       # 1: the walls, wainscot, skirting, rails, cornice, coffers
-          ["Marble_Dark", "Marble_White", "Frame_Gold", "Frame_Wood", "Frame_Black", "Door_Wood", "Bench_Paint", "Plaque_Wing"],   # 2: plinths, frames,
-                                                #    the doors (and the wing doorways' leaves), benches, the wing plaques
+          ["Wall_Paint", "Wainscot_Wood", "Trim_Paint", "Skirting_Marble", "Canvas_Paintings"],  # 1: the walls, wainscot, skirting, rails, cornice, coffers, the pictures
+          ["Marble_Dark", "Marble_White", "Frame_Gold", "Frame_Wood", "Frame_Black", "Door_Wood", "Bench_Paint", "Plaque_Wing",   # 2: plinths, frames,
+           "Exhibit_trex", "Exhibit_warrior_british_redcoat", "Exhibit_warrior_mongol_archer"],   # the doors (and the wing leaves), benches, plaques, the exhibits
           ["Metal_Dark", "Metal_Brass", "Chandelier_Gilt"]]   # 3: tracks, spot heads, picture lights, sconces, chandeliers: they sit next to the lights, so their
                                                 #    texels run far hotter than the rest and get their own map (and lightmap_intensity) instead of crushing the others
-PAGES = [896, 1536, 1152, 1152]        # each map's fixed page size (px), from a first run with None: the smallest page that gave >= 30 px/m (map 2 went
-                                        # from 1024 to 1152 with the wing doorways, at 27 px/m on 1024). Fixed, because
+PAGES = [896, 1536, 1792, 1152]        # each map's fixed page size (px), from a first run with None: the smallest page that gave >= 30 px/m (map 2 went
+                                        # from 1024 to 1152 with the wing doorways, at 27 px/m on 1024, and to 1792 with the exhibits' strip; map 1
+                                        # stayed at 1536 with the pictures). Fixed, because
                                         # Blender's island packer is not exactly repeatable
 WHITE_CAP = 12.0                        # a map's white point is its 99.5th percentile texel, but at most 12 x its 90th: on the fittings' map the few texels beside
                                         # the bulbs run some 40 x hotter than the rest and would push the rest into the bottom 8-bit levels; they clip instead
-KEEP_UV_LM = {"Chandelier_Gilt": 0.16}  # lightmapped through the model's own UVs, in a corner of its map this wide (its 64k triangles would make thousands of
+KEEP_UV_LM = {"Chandelier_Gilt": 0.16,  # lightmapped through the model's own UVs, in a square of its map this wide (its 64k triangles would make thousands of
                                         # smart-project islands); the three chandeliers share those texels, as they hang in the same light
+              "Exhibit_trex": 0.30, "Exhibit_warrior_british_redcoat": 0.15, "Exhibit_warrior_mongol_archer": 0.15}   # the exhibits likewise (Meshy UVs)
 SHELL_PREFIX = ("Wall_", "Floor_", "Ceiling_")
-FLAT_UV = ("Plaque_",)                  # flat quads lightmapped through their own 0..1 UVs (smart project folds a lone quad into a sliver, which the
+FLAT_UV = ("Plaque_", "Canvas_")                # flat quads lightmapped through their own 0..1 UVs (smart project folds a lone quad into a sliver, which the
                                         # island scaling then blows up until the packer shrinks the rest of the map to nothing)
 
 
@@ -1552,8 +1652,16 @@ def uv_area(ob, layer):
 def lightmap_uv(objs, page=None):
     """One shared atlas for `objs`: smart-project islands, equal texel density, packed with MARGIN_PX; on `page` px, or else the smallest square
     page that gives >= 30 px/m."""
-    keep = [o for o in objs if o.name in KEEP_UV_LM]
-    corner = max([KEEP_UV_LM[o.name] for o in keep], default=0.0)
+    keep = sorted([o for o in objs if o.name in KEEP_UV_LM], key=lambda o: -KEEP_UV_LM[o.name])
+    corner = max([KEEP_UV_LM[o.name] for o in keep], default=0.0)     # the kept squares fill a strip this wide at the map's right edge, from the bottom up
+    slots, sx, sy, row = {}, 1 - corner, 0.0, 0.0
+    for o in keep:
+        q = KEEP_UV_LM[o.name]
+        if sx + q > 1 + 1e-9:
+            sx, sy, row = 1 - corner, sy + row, 0.0
+        slots[o.name] = (sx, sy, q)
+        sx, row = sx + q, max(row, q)
+    assert sy + row <= 1 + 1e-9, "the kept squares do not fit their strip"
     objs = [o for o in objs if o not in keep]
     flat = [o for o in objs if o.name.startswith(FLAT_UV)]
     for o in objs + keep:
@@ -1563,12 +1671,13 @@ def lightmap_uv(objs, page=None):
         uvs.new(name="lightmap", do_init=o in keep or o in flat)  # the kept ones (and the plaques) start as a copy of UVMap
         uvs.active = uvs["lightmap"]
         uvs["lightmap"].active_render = True
-    for o in keep:                                                 # the model's UVs, fitted into the corner square [1 - corner, 1] x [0, corner]
+    for o in keep:                                                 # the model's UVs, fitted into its square of the strip
         d = o.data.uv_layers["lightmap"].data
         us = np.array([x.uv for x in d])
         lo, hi = us.min(axis=0), us.max(axis=0)
-        sc = (corner - 2 * MARGIN_PX / (page or 2048)) / max(hi - lo)
-        us = (us - lo) * sc + np.array([1 - corner + MARGIN_PX / (page or 2048), MARGIN_PX / (page or 2048)])
+        x0, y0, q = slots[o.name]
+        sc = (q - 2 * MARGIN_PX / (page or 2048)) / max(hi - lo)
+        us = (us - lo) * sc + np.array([x0 + MARGIN_PX / (page or 2048), y0 + MARGIN_PX / (page or 2048)])
         d.foreach_set("uv", us.ravel())
     select_only([o for o in objs if o not in flat])
     bpy.ops.object.mode_set(mode="EDIT")
@@ -1800,8 +1909,9 @@ def write_world(leaves):
     import export_scene
     names = {o.name for o in leaves}
     doc = dict(L["world"])
-    doc["colliders"] = HALL_COLLIDERS
-    doc["doors"] = [d for d in export_scene.collect(SCENE)["doors"] if d["name"] in names]
+    found = export_scene.collect(SCENE)
+    doc["colliders"] = HALL_COLLIDERS + found["colliders"]        # the exhibits' COL_ boxes (T. rex platform and skeleton, the two door warriors) last
+    doc["doors"] = [d for d in found["doors"] if d["name"] in names]
     path = ROOT / f"world/{SCENE}.json"
     path.write_text(json.dumps(doc, separators=(",", ":")))
     print(f"WORLD {path.name}: {len(doc['colliders'])} colliders, {len(doc['doors'])} doors")
@@ -1897,13 +2007,19 @@ def stage_render():
     hx = HOMES[3][0]
     shots = {
         "1_arrival": look_cam("arrival", (arrive[0], 1.6, arrive[2]), (arrive[0] + face[0] * 3, 1.6, arrive[2] + face[1] * 3), 75.0),
-        "2_wide": look_cam("wide", (HX - 0.9, H - 0.75, Z1 - 0.6), (-1.6, 0.6, CZ - 6.0), 72.0),
+        "2_wide": look_cam("wide", (HX - 0.9, H - 0.75, Z0 + 0.6), (-1.2, 0.4, CZ + 5.0), 72.0),          # from high in the north-east corner, over the T. rex
         "3_detail": look_cam("detail", (hx - 2.6, 1.55, HOMES[3][1] + 2.9), (hx + 0.2, 1.25, HOMES[3][1] - 0.6), 55.0),
+    }
+    zt = (TREX_PLAT[2] + TREX_PLAT[3]) / 2
+    extra = {                                                                         # the owner's sheet only (work folder)
+        "5_trex": look_cam("trex", (2.4, 1.7, TREX_PLAT[3] + 2.6), (-0.3, 1.2, zt), 60.0),
+        "6_wall": look_cam("wall", (1.2, 2.2, -4.0), (-HX, 2.2, -4.0), 48.0),
+        "7_door": look_cam("door", (0.0, 1.7, -3.0), (0.0, 1.6, Z1), 62.0),
     }
     plan = look_cam("plan", (0, H + 8, CZ), None, ortho=(Z1 - Z0) + 1.2, roll=-math.pi / 2)
     arts = list(bpy.data.collections["Art"].objects) + list(bpy.data.collections["Standins"].objects)
     cut_plan = [o for o in arts if o.name.startswith(("Ceiling_", "Skylight_", "Track_", "Spot_", "Cornice", "Laylight_", "Chandelier_"))]
-    todo = [(k, v, (1920, 1080)) for k, v in shots.items()] + [("4_plan", plan, (1800, 900))]
+    todo = [(k, v, (1920, 1080)) for k, v in shots.items()] + [("4_plan", plan, (1800, 900))] + [(k, v, (1600, 900)) for k, v in extra.items()]
     for key, cam, (w, h) in todo:
         if which not in ("all", key):
             continue
@@ -1916,11 +2032,11 @@ def stage_render():
         sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = w, h, arg("--scale", 100, int)
         sc.render.image_settings.file_format = "JPEG"
         sc.render.image_settings.quality = 90
-        path = STILLS / f"{key}.jpg" if key != "4_plan" else stage_work() / "plan.jpg"
+        path = STILLS / f"{key}.jpg" if key in shots else stage_work() / f"{key}.jpg"
         sc.render.filepath = str(path)
         bpy.ops.render.render(write_still=True)
         q = 90
-        while path.stat().st_size > 400_000 and q > 40 and key != "4_plan":
+        while path.stat().st_size > 400_000 and q > 40 and key in shots:
             q -= 5
             sc.render.image_settings.quality = q
             bpy.data.images["Render Result"].save_render(str(path), scene=sc)
