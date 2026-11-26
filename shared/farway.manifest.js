@@ -95,7 +95,7 @@ export const FARWAY = {
     {
       // slice 14 (session 9): the museum night guard's shift, behind 108 Hallam Row. One gallery hall, blockout; you are only in it during your shift.
       id: "museum", name: "Museum (108 Hallam Row)", status: "built", tone: "liminal",
-      scenes: [{id: "galleries", floorY: 0, files: ["world/galleries.json"]}],
+      scenes: [{id: "galleries", floorY: 0, files: ["world/galleries.glb", "world/galleries.json"]}],
     },
     {
       // slice 16 (session 9): the factory floor worker's shift, behind 330 Hallam Row. One hall with a conveyor belt, blockout; you are only in it during your shift.
