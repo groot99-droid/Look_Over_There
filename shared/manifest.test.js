@@ -23,7 +23,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
     gbi_L4_4: {glbs: ["world/L4.glb", "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
-    street: {glbs: [], floor: 0}, apartment: {glbs: ["world/apartment.glb"], floor: 0}, main_floor: {glbs: ["world/main_floor.glb"], floor: 0}, entrance: {glbs: [], floor: 0}, galleries: {glbs: ["world/galleries.glb"], floor: 0}, factory_floor: {glbs: ["world/factory_floor.glb"], floor: 0}, laboratory: {glbs: ["world/laboratory.glb"], floor: 0}, forest: {glbs: [], floor: 0}, meadow: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
+    street: {glbs: ["world/street.glb"], floor: 0}, apartment: {glbs: ["world/apartment.glb"], floor: 0}, main_floor: {glbs: ["world/main_floor.glb"], floor: 0}, entrance: {glbs: [], floor: 0}, galleries: {glbs: ["world/galleries.glb"], floor: 0}, factory_floor: {glbs: ["world/factory_floor.glb"], floor: 0}, laboratory: {glbs: ["world/laboratory.glb"], floor: 0}, forest: {glbs: [], floor: 0}, meadow: {glbs: [], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
   });
   assert.deepEqual(REGISTRY.scenesWith("fuses"), ["B1"]);
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
@@ -198,7 +198,7 @@ test("a bad chamber is caught", () => {
 });
 test("the City's street is on the page, never a floor the server runs, and the bus links join it to the lot", () => {
   assert.equal(REGISTRY.floors.street, undefined);
-  assert.deepEqual(REGISTRY.pageScenes.street, {glbs: [], floor: 0});
+  assert.deepEqual(REGISTRY.pageScenes.street, {glbs: ["world/street.glb"], floor: 0});
   const there = REGISTRY.linkFrom("parking_lot", "bus_stop"), back = REGISTRY.linkFrom("street", "bus_stop");
   assert.ok(there && there.status === "built" && !there.soloOnly && !back.soloOnly && there.to.scene === "street" && back && back.to.scene === "parking_lot");
   assert.deepEqual(there.to.arrive, BUS_STREET.arrive, "the arrival is the street's spawn point"); assert.deepEqual(there.to.face, BUS_STREET.face);

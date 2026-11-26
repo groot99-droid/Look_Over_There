@@ -79,7 +79,7 @@ export const FARWAY = {
       // v0 (session 9): Hallam Row as a blockout street, reached by the bus. Its layout and the day clock are in shared/city.js; world/street.json is made from it by tools/make_street.mjs.
       id: "city", name: "City", status: "built", tone: "liminal",
       // presence (session 17): a room's players see each other on the street and in the apartment. Nothing else is shared: each player's clock, needs, money, jobs and night are their own.
-      scenes: [{id: "street", floorY: 0, files: ["world/street.json"], presence: true}, {id: "apartment", floorY: 0, files: ["world/apartment.glb", "world/apartment.json"], presence: true}, {id: "bus_stop"}],
+      scenes: [{id: "street", floorY: 0, files: ["world/street.glb", "world/street.json"], presence: true}, {id: "apartment", floorY: 0, files: ["world/apartment.glb", "world/apartment.json"], presence: true}, {id: "bus_stop"}],
     },
     stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
     {
