@@ -1,0 +1,31 @@
+{
+  "_doc": "CC0 models copied from the Chronicle Museum (Earth_Worldbuild/_Museum/assets/models). target_h is the height each is shown at; voyager_rotation is the Smithsonian Voyager scene's upright rotation (a glTF-space quaternion x, y, z, w) that the GLB itself does not carry. Poly Haven glTFs keep only their diffuse map.",
+  "models": {
+    "ph-chandelier-02": {
+      "title": "Chandelier",
+      "artist": "Poly Haven",
+      "date": "",
+      "museum": "Poly Haven",
+      "source": "polyhaven",
+      "license": "CC0",
+      "url": "https://polyhaven.com/a/Chandelier_02",
+      "target_h": 0.848,
+      "file": "Chandelier_02_1k.gltf",
+      "units": "m",
+      "asset": "Chandelier_02"
+    },
+    "ph-bench": {
+      "title": "Painted wooden bench",
+      "artist": "Poly Haven",
+      "date": "",
+      "museum": "Poly Haven",
+      "source": "polyhaven",
+      "license": "CC0",
+      "url": "https://polyhaven.com/a/painted_wooden_bench",
+      "target_h": 0.889,
+      "file": "painted_wooden_bench_1k.gltf",
+      "units": "m",
+      "asset": "painted_wooden_bench"
+    }
+  }
+}
