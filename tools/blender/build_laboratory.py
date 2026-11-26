@@ -1100,8 +1100,12 @@ LIGHT_X = 7.5                      # each row runs x -7.5 .. 7.5
 LIGHT_Y = 3.40                     # the diffuser's underside, hung 0.6 m under the 4 m ceiling
 LIGHT_MODULES = 10                 # 1.5 m modules a row
 VENTS = ((-4.5, -4.5), (4.5, -4.5), (-4.5, 1.5), (4.5, 1.5))     # ceiling diffusers, on the 0.6 m tile grid's centres
-DOWN_W = arg("--down", 210.0, float)   # watts per row, down
-UP_W = arg("--up", 45.0, float)        # watts per row, up toward the ceiling (a direct/indirect fitting)
+# How bright: the page draws a baked material unlit (three's MeshBasicMaterial: texture x lightmap x lightmap_intensity / pi, no tone mapping),
+# so a surface over 1.0 clips to white. At the first bake's 210 W down and 45 W up the floor's and the ceiling's 90th percentile showed at 1.03 and
+# 1.13 (13 % and 15 % of them flat white). Down x0.6 and up x0.5 (the ceiling was the hottest) keep the main surfaces' 90th percentile under 1.0
+# (docs/renders/laboratory/README.md, "How bright"). The bake stage sets the lights to these, so a relight needs no art stage.
+DOWN_W = arg("--down", 126.0, float)   # watts per row, down
+UP_W = arg("--up", 22.5, float)        # watts per row, up toward the ceiling (a direct/indirect fitting)
 
 
 def add_lights():
@@ -1442,7 +1446,17 @@ def stage_bake():
     import time
     t0 = time.time()
     stage_work()
-    exp = make_export_objects()
+    for ob in bpy.data.collections["Lights"].objects:   # the strip lights at this file's strengths (DOWN_W, UP_W), whatever the .blend was saved with
+        if ob.type == "LIGHT" and ob.name.startswith("Strip"):
+            ob.data.energy = DOWN_W if ob.name.endswith("_Down") else UP_W
+            print(f"  light {ob.name}: {ob.data.energy} W")
+    keep_uv = "--keep-uv" in args                     # a relight: bake the saved Export objects on their own lightmap UVs and pages (the GLB's geometry stays as it is)
+    exp = {o.data.materials[0].name: o for o in bpy.data.collections["Export"].objects} if keep_uv else make_export_objects()
+    if keep_uv:                                       # a saved bake leaves Export hidden: it must be visible and selectable to bake
+        bpy.data.collections["Export"].hide_viewport = bpy.data.collections["Export"].hide_render = False
+        for o in exp.values():
+            o.hide_set(False)
+            o.hide_render = False
     bpy.data.collections["Art"].hide_render = True
     bpy.data.collections["Art"].hide_viewport = True
     setup_cycles(SAMPLES, bake=True)
@@ -1454,7 +1468,13 @@ def stage_bake():
     for n, mats in enumerate(GROUPS):                # every group unwrapped first, then the bakes
         objs = [exp[m] for m in mats if m in exp]
         print(f"lightmap {n}: {[o.name for o in objs]}")
-        pages.append(lightmap_uv(objs))
+        if keep_uv:
+            old = bpy.data.images.load(str(ROOT / LM_URL.format(n)))   # the shipped map gives the page size
+            S = old.size[0]
+            bpy.data.images.remove(old)
+            pages.append((S, S * math.sqrt(sum(uv_area(o, "lightmap") for o in objs) / sum(area3d(o) for o in objs))))
+        else:
+            pages.append(lightmap_uv(objs))
     for n, mats in enumerate(GROUPS):
         objs = [exp[m] for m in mats if m in exp]
         S, dens = pages[n]
