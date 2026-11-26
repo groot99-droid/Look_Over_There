@@ -145,7 +145,13 @@ The street is code-first (part 1), so these are kits, not layouts.
 
 Five floors of four chambers, top down: L4, L3, L2, L1, B1. A chamber is as big as an original floor, and the existing floor is one of each four, so 15 are new.
 
-- **Ids:** `gbi_<floor>_<n>`, with n from 1 to 4. `gbi_L4_4` and `gbi_L3_1` exist already, made from L4 and L3. The coordinator will say which number the existing floor takes on L2, L1 and B1.
+- **Ids:** `gbi_<floor>_<n>`, with n from 1 to 4. `gbi_L4_4` and `gbi_L3_1` exist already, made from L4 and L3. 
+- **Which chamber the existing floor is** [DEFAULT]:
+  - On L4 it is the 4th, because it has the real stairs down.
+  - On L3, L2, L1 and B1 it is the 1st: you come down the stairs into the floor you know, then go deeper.
+  - So the 15 new chambers are `gbi_L4_1` to `gbi_L4_3`, and chambers 2 to 4 of L3, L2, L1 and B1.
+  - The 4th chamber of L3, L2 and L1 is new, so it needs a stair door from the kit. Its stairs arrive in the next floor's real stairwell.
+  - `gbi_B1_4` is wave 20, the run's end, and has no stairs down.
 - **Shell:** each chamber fits the store's footprint (x −26.3 to 26.3, z −22.35 to 27.35) at its floor's height: B1 −3, L1 0, L2 3.2, L3 6.4, L4 9.6.
 - **Look:** three new layouts per floor in that floor's own materials, taken from the store's Blender file: pools for B1, offices for L1, L2's look, white plaster for L3, showroom for L4.
 - **Each chamber has:**
@@ -205,6 +211,11 @@ About 12 scenes and the boss. A shooter that reuses and reskins Look Over There'
 
 As in part 1, with these differences:
 - **The layout file comes from Blender**, so each PR includes `world/<scene>.json`, the top-down plan and the exporter's summary: how many colliders, doors, links, zones and spots.
+- **Check the exported file before the PR:** `node tools/worlddoc.mjs check world/<scene>.json`. It must print OK.
+  - It checks the file's shape.
+  - It checks that every link, spot and spawn is somewhere a walker can stand.
+  - It checks the file's doors against the manifest's links.
+  - Warnings about a new scene or a new link are expected; include its output in the PR.
 - **The layout check runs the other way:** it reads the Blender file and fails on a visible solid with no `COL_` box, a `COL_` box with nothing visible, a `Link_` without its `Arrive_`, or an arrival point inside a collider.
 - **The Blender session still leaves `index.html`, `shared/`, the manifest and the tests alone.** The coordinator adds the scene and its links to the manifest, walks it in the browser, writes its test and merges.
 
@@ -221,11 +232,11 @@ Part 1's list comes first. Then one area at a time, greybox PR first:
 7. Right Door, Wrong Exit;
 8. Secret Operations.
 
-## What the owner still has to supply (none of it blocks greyboxing)
+## What the owner chose on 2026-11-24: the defaults
 
-- **The reference photos** named above (IMG_2903, 2909, 2910, 2984 to 2991, 2999, 3008, 3010, 3012, 3014, 3015, 3027, 3036, and the PNG redesign). They are not in the repo. Until they arrive, the scene is built from its description.
-- **The four Overworld skies.**
-- **The room list for Right Door, Wrong Exit,** or a pick from the proposed one.
-- **Which chamber number the existing floor takes** on L2, L1 and B1.
+- **The reference photos** named above (IMG_2903, 2909, 2910, 2984 to 2991, 2999, 3008, 3010, 3012, 3014, 3015, 3027, 3036, and the PNG redesign) are not in the repo. Build each scene from its description; if the photos arrive later, they correct the look, not the layout.
+- **The four Overworld skies** are the defaults: clear day, sunset, night and painted, as R3 backdrops. The owner can replace any of them.
+- **Right Door, Wrong Exit:** propose the room list, one line and one greybox per room. The owner picks the rooms to dress from the greyboxes.
+- **The apartment's window** stays as built: the glass takes the hour's tint, and the street behind it stays a fixed dusk.
 
 Two things the plan builds for that the game cannot do yet: crawling (vents) and swimming (the pool routes). The art is built; the routes stay shut until the game has them.

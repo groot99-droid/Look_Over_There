@@ -175,7 +175,7 @@
 <div id="hud"></div>
 <div id="camhud"></div><div id="buzz"></div><div id="cloak"><b>CLOAK · V</b><i></i></div><div id="cloakfx"></div><div id="beacons"></div><div id="hp"><b>HP</b><i></i></div><div id="hurt"></div><div id="stam"><i></i></div><div id="alarm"></div><div id="redpulse"></div>
 <div id="results"><div class="card"><h1>OUT</h1><div id="r-welcome" hidden></div><table id="r-rows"></table><div id="r-best"></div><button id="r-walk" type="button" hidden>Walk out to the parking lot</button><button id="r-again" type="button">Play again</button></div></div>
-<div id="station"><div class="card"><h2>LOCKER</h2><p>Your loadout. Click a piece (or press its number) to carry it or leave it here: two weapons at most besides the ray and the cloak. E swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
+<div id="station"><div class="card"><h2>LOST AND FOUND</h2><p>Your loadout. Click a piece (or press its number) to carry it or leave it here: two weapons at most besides the ray and the cloak. E swaps the E slot between the land mine and the tripwire.</p><div id="st-rows" style="display:flex;flex-direction:column;gap:8px"></div><small>After a death the gear comes back from here for free. Ammo, rays, bolts and consumables do not.</small><button id="st-close" type="button" style="justify-content:center">Close (Esc)</button></div></div>
 <div id="qz"><div class="card"><div id="qz-title"></div><p id="qz-prompt"></p><div id="qz-tray"></div><div id="qz-bins"></div><div id="qz-foot"><button id="qz-next" type="button"></button><button id="qz-cancel" type="button">Close (Esc)</button></div></div></div>
 <div id="shift"><div class="card"><h2 id="sh-title"></h2><p id="sh-text"></p><button id="sh-work" type="button">Work the shift</button><button id="sh-close" type="button">Not now (Esc)</button></div></div>
 <div id="pc"><div class="card"><div id="pc-tabs"></div><h2 id="pc-title"></h2><pre id="pc-body"></pre><div id="pc-actions"></div><button id="pc-close" type="button">Close (Esc or F)</button></div></div>
@@ -323,28 +323,39 @@ function updateDoors(dt) {
 function disposeTree(root) {
   root.traverse(o => {
     if (o.geometry) o.geometry.dispose();
-    for (const m of [].concat(o.material || [])) { for (const k in m) if (m[k] && m[k].isTexture) m[k].dispose(); m.dispose(); }
+    for (const m of [].concat(o.material || [])) { for (const k in m) if (m[k] && m[k].isTexture) m[k].dispose(); if (m.userData && m.userData.sets) for (const st of Object.values(m.userData.sets)) if (st) st[0].dispose(); m.dispose(); }
+    if (o.userData && o.userData.maps) for (const t of Object.values(o.userData.maps)) t.dispose();
   });
 }
 async function loadGlb(url) { return new Promise((res, rej) => loader.load(url, res, undefined, rej)); }
-// Baked light (docs/BLENDER.md, R1): a scene built in Blender names its lightmaps in each material's glTF extras (`lightmap`: the image's path, `lightmap_intensity`: its factor), on the
-// second UV set. Such a material is swapped for an unlit one that shows its texture times the baked light, so the page's own lights (the hemisphere light that the players, the
-// monsters and the things drawn in code need) do not light the room a second time. Materials without a lightmap (lamps, glass, a backdrop) are left as they are.
-// Returns how many materials were baked; a lightmap that cannot be loaded leaves its material as the file had it.
-const texLoader = new THREE.TextureLoader();
+// A scene built in Blender (docs/BLENDER.md): the manifest lists its model, and the page then draws only what moves and what the rules name (see each scene's ...Props).
+// ART_TEST lets a test point a scene at another model or backdrop for one load (tools/art_test.mjs); the game never fills it.
+const ART_TEST = {}, sceneCfg = id => ART_TEST[id] ? {...SCENES[id], ...ART_TEST[id]} : SCENES[id], hasArt = id => sceneCfg(id).glbs.length > 0;
+// Baked light (docs/BLENDER.md, R1): each material names its bake in its glTF extras, on the second UV set.
+//   lightmap, lightmap_intensity              the baked light. The material is swapped for an unlit one that shows its texture times the light, so the page's own lights (the
+//                                             hemisphere light that the players, the monsters and the things drawn in code need) do not light the room a second time.
+//   lightmap_night, lightmap_night_intensity  a second set of the same room (the mall's emergency lights): setLightSet("night" | "day") swaps them.
+//   aomap, aomap_intensity                    an AO bake only (the street, the forest, the meadow, where the sun moves): the material stays lit and takes it as its aoMap.
+// Materials named in ART_TOGGLES are switched by the clock (artToggle): each keeps the emissive strength it was exported with. A bake that cannot be loaded leaves its material as
+// the file had it. Returns {n: how many materials carry baked light, baked: those materials, toggles: {name: Set of materials}}.
+const texLoader = new THREE.TextureLoader(), ART_TOGGLES = ["Lamp_Emit", "Window_Lit", "Emergency_Emit"];
 async function applyLightmaps(gltfs) {
-  const maps = new Map(), done = new Map(); let n = 0;
-  const lightmap = url => maps.get(url) || maps.set(url, new Promise(res => texLoader.load(url, t => { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.channel = 1; res(t); }, undefined, () => res(null)))).get(url);
+  const maps = new Map(), done = new Map(), ao = new Set(), out = {n: 0, baked: [], toggles: {}};
+  const image = (url, srgb) => maps.get(url) || maps.set(url, new Promise(res => texLoader.load(url, t => { t.flipY = false; t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace; t.channel = 1; res(t); }, undefined, () => res(null)))).get(url);
   const jobs = [];
   for (const g of gltfs) g.scene.traverse(o => {
-    if (!o.isMesh || Array.isArray(o.material) || !o.material.userData || !o.material.userData.lightmap || !o.geometry.attributes.uv1) return;
-    jobs.push((async () => {
-      const src = o.material, tex = await lightmap(src.userData.lightmap); if (!tex) return;
+    if (!o.isMesh || Array.isArray(o.material)) return;
+    const src = o.material, u = src.userData || {};
+    if (ART_TOGGLES.includes(src.name)) { (out.toggles[src.name] ||= new Set()).add(src); src.userData.emit0 ??= src.emissiveIntensity; }
+    if (!o.geometry.attributes.uv1) return;
+    if (u.aomap) jobs.push((async () => { const tex = await image(u.aomap, false); if (!tex || ao.has(src)) return; ao.add(src); src.userData.ao = true; src.aoMap = tex; src.aoMapIntensity = u.aomap_intensity ?? 1; src.needsUpdate = true; })());
+    else if (u.lightmap) jobs.push((async () => {
+      const tex = await image(u.lightmap, true), night = u.lightmap_night ? await image(u.lightmap_night, true) : null; if (!tex) return;
       let m = done.get(src);
       if (!m) {
         m = new THREE.MeshBasicMaterial({name: src.name, color: src.color, map: src.map, transparent: src.transparent, opacity: src.opacity, alphaTest: src.alphaTest, side: src.side, depthWrite: src.depthWrite,
-          vertexColors: src.vertexColors, lightMap: tex, lightMapIntensity: src.userData.lightmap_intensity || 1});
-        m.userData = {...src.userData, baked: true}; done.set(src, m); n++;
+          vertexColors: src.vertexColors, lightMap: tex, lightMapIntensity: u.lightmap_intensity || 1});
+        m.userData = {...u, baked: true, sets: {day: [tex, u.lightmap_intensity || 1], night: night ? [night, u.lightmap_night_intensity || 1] : null}}; done.set(src, m); out.n++; out.baked.push(m);
         for (const k of ["normalMap", "roughnessMap", "metalnessMap", "aoMap", "emissiveMap"]) if (src[k] && src[k] !== src.map) src[k].dispose();
         src.dispose();
       }
@@ -352,8 +363,27 @@ async function applyLightmaps(gltfs) {
     })());
   });
   await Promise.all(jobs);
-  return n;
+  return out;
 }
+// which baked set the scene shows ("day" or "night"; a material without a night set keeps its day one), and a toggled material on (its exported strength) or off
+function setLightSet(name) { for (const m of (S.bake ? S.bake.baked : [])) { const [tex, k] = m.userData.sets[name] || m.userData.sets.day; if (m.lightMap !== tex) { m.lightMap = tex; m.lightMapIntensity = k; } } S.lightSet = name; }
+function artToggle(name, on) { for (const m of ((S.bake && S.bake.toggles[name]) || [])) m.emissiveIntensity = on ? m.userData.emit0 : 0; }
+// The edge of the world (docs/BLENDER.md, R3): a scene's manifest entry may name equirect pictures of what lies past it (`backdrop: {day, night?}`). They are drawn on a sphere
+// round the camera, behind everything; the picture's middle faces north (-z) and its right-hand side east (+x). setBackdrop swaps the picture by the hour.
+const BACKDROP_GEO = new THREE.SphereGeometry(50, 48, 24); BACKDROP_GEO.scale(-1, 1, 1);
+function addBackdrop(cfg, root) {
+  S.backdrop = null; if (!cfg.backdrop) return;
+  const b = new THREE.Mesh(BACKDROP_GEO.clone(), new THREE.MeshBasicMaterial({fog: false, depthWrite: false, depthTest: false}));
+  b.name = "Backdrop"; b.rotation.y = -Math.PI / 2; b.renderOrder = -1000; b.frustumCulled = false; b.userData = {pictures: cfg.backdrop, maps: {}, now: null};
+  root.add(b); S.backdrop = b; setBackdrop("day");
+}
+function setBackdrop(name) {
+  const b = S.backdrop; if (!b) return;
+  const url = b.userData.pictures[name] || b.userData.pictures.day; if (b.userData.now === url) return;
+  const t = b.userData.maps[url] ||= texLoader.load(url); t.colorSpace = THREE.SRGBColorSpace;
+  b.userData.now = url; b.userData.set = b.userData.pictures[name] ? name : "day"; b.material.map = t; b.material.needsUpdate = true;
+}
+const backdropTick = () => { if (S.backdrop) camera.getWorldPosition(S.backdrop.position); };
 // ---------------------------------------------------------------- transition passages: every door pair is joined by a short walkable corridor (built here, no model)
 const PASSAGE_TINT = {B1: 0x7aa7a0, L1: 0xd9c36a, L2: 0xc9b27a, L3: 0xe8e4d8, L4: 0xcfd8dc, rdwe: 0x4a7a3e, intern: 0x4a4a52};
 const PASSAGE_LEN = 10, PASSAGE_W = 2.4, PASSAGE_H = 2.7;
@@ -455,16 +485,16 @@ async function loadScene(id, arrival) {
   clearPortals();
   monsters.forEach(m => m.dispose()); monsters.length = 0; MAPSEEN.clear(); clearBeacons();
   const passage = arrival && arrival.passage ? buildPassage(arrival.passage) : null;
-  const cfg = passage ? {glbs: [], floor: 0} : SCENES[id], doc = passage ? {colliders: passage.cols, doors: passage.doors, cameras: [], markers: []} : await (await fetch(`world/${id}.json`)).json();
+  const cfg = passage ? {glbs: [], floor: 0} : sceneCfg(id), doc = passage ? {colliders: passage.cols, doors: passage.doors, cameras: [], markers: []} : await (await fetch(`world/${id}.json`)).json();
   const root = passage ? passage.root : new THREE.Group();
   const gl = await Promise.all(cfg.glbs.map(loadGlb));
-  const baked = await applyLightmaps(gl);
+  const bake = await applyLightmaps(gl);
   if (passage) id = "T";
   for (const g of gl) { g.scene.traverse(o => { if (o.isMesh) { o.matrixAutoUpdate = false; o.updateMatrix(); } }); root.add(g.scene); }
   scene.add(root);
   const chamber = passage ? null : REGISTRY.chamber(id);
-  Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, baked, grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
-  applySky(id, root);
+  Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, baked: bake.n, bake, lightSet: "day", grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
+  applySky(id, root); addBackdrop(cfg, root);
   boxes.length = 0; doors.length = 0;
   for (const c of doc.colliders) boxes.push({n: c.min, x: c.max});
   for (const d of doc.doors || []) {
@@ -873,6 +903,7 @@ function useDoor() {
 //   Y: tap to take out what you carry (tap again to rotate), hold for the wheel · RT / left click: use what you hold (fire / cloak on-off / roll a beacon)
 //   LT / right click: the gun aims; with the cloak or a beacon in hand it is the secondary ability · LB / RB (Q / E): the flash-vial, and the land mine or tripwire (Going back in only; empty in the Original) · 4: the hunting crossbow, 5: the pneumatic bolt driver (Going back in only)
 //   D-pad up / View / Tab / M: the handheld map (the camera feeds have no controls for now)
+const HELD_MODELS = {};                                                     // item id -> its weapon's model loader, run the first time it is held (see heldModel)
 const HELD = {mouseAlt: false, padAlt: false, mouseFire: false, padFire: false, item: null, yAt: 0, yDown: false, wheel: false, sel: 0, aimBtn: false, padAim: false};
 const AIM = {on: false, fov: 75, fovAim: 42};
 let crouchLatch = false;
@@ -881,6 +912,7 @@ const ITEM_HINT = {gun: "RT / click: fire · LT / right click: aim", cloak: "RT 
 const owned = () => [LT.gun && "gun", CL.have && "cloak", BC.have > 0 && "beacon", GB.load && carries(GB.load, "crossbow") && "crossbow", GB.load && carries(GB.load, "driver") && "driver", GB.load && carries(GB.load, "baton") && "baton", GB.load && carries(GB.load, "dart") && "dart", GB.load && carries(GB.load, "flame") && "flame", GB.load && carries(GB.load, "horn") && "horn", GB.load && carries(GB.load, "rocket") && "rocket", GB.load && carries(GB.load, "laser") && "laser", GB.load && carries(GB.load, "shear") && "shear"].filter(Boolean);
 function setHeld(it) {
   HELD.item = it || null; AIM.on = false; HELD.mouseFire = false; HELD.mouseAlt = false;
+  if (HELD.item && HELD_MODELS[HELD.item]) HELD_MODELS[HELD.item]();                 // the first time a weapon is in hand, its model is fetched
   toast(HELD.item ? `Holding: ${ITEM_NAMES[it]}   ${ITEM_HINT[it]}` : "Hands empty", 2600);
 }
 function rotateHeld() {
@@ -944,7 +976,7 @@ addEventListener("keydown", e => {
   if (e.code === "KeyE") useConsumable(1);
   if (/^Digit[1-5]$/.test(e.code) && (e.code !== "Digit5" || GB.load)) {
     const k = +e.code.slice(5), it = k <= 3 ? ["gun", "cloak", "beacon"][k - 1] : GB.load ? arsenalCarried(GB.load)[k - 4] : "crossbow";           // keys 4 and 5: the first and the second arsenal weapon you carry (docs/ITEMS.md 1.3)
-    if (it && owned().includes(it)) setHeld(it); else toast(it ? `You do not have the ${ITEM_NAMES[it].toLowerCase()}` : `Weapon slot ${k - 3} is empty (the locker holds the rest: two weapons at most)`);
+    if (it && owned().includes(it)) setHeld(it); else toast(it ? `You do not have the ${ITEM_NAMES[it].toLowerCase()}` : `Weapon slot ${k - 3} is empty (the Lost and Found holds the rest: two weapons at most)`);
   }
   if (e.code === "KeyH") document.getElementById("help").classList.toggle("on");
   if (e.code === "KeyN") toast(AUD.toggleMute() ? "Sound off" : "Sound on");
@@ -1530,7 +1562,7 @@ function updatePrompt() {
     }
   }
   if (!pz && !dead && !loading && !reviveTarget() && nearPower()) msg = "Press E to switch on the power";
-  if (!msg && !dead && !loading && !reviveTarget() && nearStation()) msg = "Press E to open the locker";
+  if (!msg && !dead && !loading && !reviveTarget() && nearStation()) msg = "Press E to open the Lost and Found";
   if (!msg && !dead && !loading && !reviveTarget()) msg = cityPrompt();
   if (!msg && !dead && !loading && !reviveTarget()) { const n = nearLoot(); if (n) msg = n.k === "locker" ? (LT.gun ? "You already carry a gun" : "Press E to open the locker") : n.k === "beacon" ? (BC.have >= MAX_BEACONS ? "You cannot carry more beacons" : "Press E to take the AFK Beacon") : (LT.rounds >= MAX_ROUNDS ? "You cannot carry more ammo" : "Press E to take the ammo pack (+3)"); }
   el.textContent = msg; el.style.display = msg ? "block" : "none";
@@ -1707,7 +1739,7 @@ function gbMe(m) {
   if (m.kit) GB.kit = {n: {...m.kit.n}, e: m.kit.e};
   if (HELD.item && !owned().includes(HELD.item)) setHeld(null);
   if (STN.open) renderStation();
-  if (m.respawn) toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
+  if (m.respawn) toast("Your gear is in the Lost and Found. The ammo and consumables are gone.", 4200);
 }
 // the server killed a monster of the wave (somebody's bolt or trap): it is gone here too, and the count is the server's
 function gbKill(m) {
@@ -1751,8 +1783,12 @@ function fireBow() {
 // a held weapon's Meshy model (models/items/<id>.glb), laid along the view: `front` is the end of the file's X axis the weapon points along (-1 or +1), `len` its length in metres.
 // Fronts, read from side renders: the bolt driver, dart and flamethrower point along -X (like the crossbow and the ray gun); the stun baton's prongs are at +X.
 // The code-made shape is kept in W.art and hidden once the model is in; if the file cannot load it stays. The kick and bob move W.pivot, so they apply to the model.
-function heldModel(W, id, len, front) {
-  loadModel(id).then(g => {
+// The model is fetched the first time the weapon is held (setHeld), not when the page starts: these weapons are Going back in's, and nobody in the Original should download them.
+function heldModel(W, id, len, front, item) {
+  let asked = false;
+  HELD_MODELS[item] = () => { if (asked) return; asked = true; load(); };
+  queueMicrotask(() => { if (HELD.item === item) HELD_MODELS[item](); });   // already in hand when the weapon was built
+  const load = () => loadModel(id).then(g => {
     if (!g) return;
     const m = SkeletonUtils.clone(g.scene), bb = new THREE.Box3().setFromObject(m, true), c = bb.getCenter(new THREE.Vector3());
     m.position.set(-c.x, -c.y, -c.z); m.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.material.side = THREE.DoubleSide; } });
@@ -1764,7 +1800,7 @@ const DRV = {st: newDriver(0), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .8}), body = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.1, 0.42), mat(0x8a5a2a));
   const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.2, 10), mat(0x6e7a6a)); tank.rotation.x = Math.PI / 2; tank.position.set(0, -0.09, 0.05);
   const gauge = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.02, 12), mat(0xd8d8c8)); gauge.rotation.z = Math.PI / 2; gauge.position.set(0.045, 0.02, 0.1);
-  DRV.art = new THREE.Group(); DRV.art.add(body, tank, gauge); DRV.pivot.add(DRV.art); heldModel(DRV, "items/pneumatic_bolt_driver", 0.4, -1); DRV.pivot.position.set(0.22, -0.3, -0.5); DRV.pivot.visible = false; camera.add(DRV.pivot); }
+  DRV.art = new THREE.Group(); DRV.art.add(body, tank, gauge); DRV.pivot.add(DRV.art); heldModel(DRV, "items/pneumatic_bolt_driver", 0.4, -1, "driver"); DRV.pivot.position.set(0.22, -0.3, -0.5); DRV.pivot.visible = false; camera.add(DRV.pivot); }
 function fireDriver() {
   if (!GB.load || !carries(GB.load, "driver") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
@@ -1782,7 +1818,7 @@ const BAT = {st: newBaton(), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), rod = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.62, 8), mat(0x3a3a38)); rod.rotation.x = Math.PI / 2;
   const bank = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.16), mat(0x8a6a3a)); bank.position.set(0, 0.0, 0.2);
   const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.3, 5), mat(0xc84a3a)); wire.rotation.x = Math.PI / 2; wire.position.set(0.04, 0.03, 0.05);
-  BAT.art = new THREE.Group(); BAT.art.add(rod, bank, wire); BAT.pivot.add(BAT.art); heldModel(BAT, "items/stun_baton_capacitor", 0.5, 1); BAT.pivot.position.set(0.24, -0.28, -0.5); BAT.pivot.visible = false; camera.add(BAT.pivot); }
+  BAT.art = new THREE.Group(); BAT.art.add(rod, bank, wire); BAT.pivot.add(BAT.art); heldModel(BAT, "items/stun_baton_capacitor", 0.5, 1, "baton"); BAT.pivot.position.set(0.24, -0.28, -0.5); BAT.pivot.visible = false; camera.add(BAT.pivot); }
 function swingBaton() {
   if (!GB.load || !carries(GB.load, "baton") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
@@ -1812,7 +1848,7 @@ function dischargeBaton() {
 const DART = {st: newDart(0), kick: 0, pivot: new THREE.Group(), flights: []};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), body = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.5), mat(0x6a5a40));
   const syringe = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.24, 10), new THREE.MeshStandardMaterial({color: 0xe8a020, roughness: .3, emissive: 0x6a3a00})); syringe.rotation.x = Math.PI / 2; syringe.position.set(0, 0.075, -0.05);
-  DART.art = new THREE.Group(); DART.art.add(body, syringe); DART.pivot.add(DART.art); heldModel(DART, "items/moth_jelly_dart", 0.5, -1); DART.pivot.position.set(0.22, -0.3, -0.5); DART.pivot.visible = false; camera.add(DART.pivot); }
+  DART.art = new THREE.Group(); DART.art.add(body, syringe); DART.pivot.add(DART.art); heldModel(DART, "items/moth_jelly_dart", 0.5, -1, "dart"); DART.pivot.position.set(0.22, -0.3, -0.5); DART.pivot.visible = false; camera.add(DART.pivot); }
 function clearFlights() { for (const f of DART.flights) if (f.mesh) S.root.remove(f.mesh); DART.flights.length = 0; }
 function fireDart() {
   if (!GB.load || !carries(GB.load, "dart") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1840,7 +1876,7 @@ const FLAME = {st: newFlame(), on: false, pivot: new THREE.Group(), fx: [], hitT
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), frame = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.07, 0.5), mat(0x4a4a46));
   const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.26, 12), mat(0x2f6fd0)); tank.rotation.x = Math.PI / 2; tank.position.set(0, -0.09, 0.08);
   const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.025, 0.12, 8), mat(0x1c1c1a)); nozzle.rotation.x = Math.PI / 2; nozzle.position.set(0, 0.01, -0.3);
-  FLAME.art = new THREE.Group(); FLAME.art.add(frame, tank, nozzle); FLAME.pivot.add(FLAME.art); heldModel(FLAME, "items/propane_flamethrower", 0.55, -1); FLAME.pivot.position.set(0.22, -0.3, -0.5); FLAME.pivot.visible = false; camera.add(FLAME.pivot); }
+  FLAME.art = new THREE.Group(); FLAME.art.add(frame, tank, nozzle); FLAME.pivot.add(FLAME.art); heldModel(FLAME, "items/propane_flamethrower", 0.55, -1, "flame"); FLAME.pivot.position.set(0.22, -0.3, -0.5); FLAME.pivot.visible = false; camera.add(FLAME.pivot); }
 function clearFlames() { for (const f of FLAME.fx) S.root.remove(f.o); FLAME.fx.length = 0; }
 function swapCanister() {
   if (!GB.load || !carries(GB.load, "flame") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1877,7 +1913,7 @@ const HORN = {st: newHorn(), kick: 0, pivot: new THREE.Group()};
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .55, metalness: .3}), bell = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.025, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({color: 0xb0a070, roughness: .5, metalness: .5, side: THREE.DoubleSide}));
   bell.rotation.x = -Math.PI / 2; bell.position.set(0, 0.02, -0.18);
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.16), mat(0x34383c)); box.position.set(0, -0.08, 0.08);
-  HORN.pivot.add(bell, box); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
+  HORN.art = new THREE.Group(); HORN.art.add(bell, box); HORN.pivot.add(HORN.art); heldModel(HORN, "items/frequency_horn", 0.38, -1, "horn"); HORN.pivot.position.set(0.22, -0.3, -0.5); HORN.pivot.visible = false; camera.add(HORN.pivot); }
 function hornRings(x, z, dx, dz, reach) {                                    // rings spreading along the cone, or one ring round you for the call
   for (let k = 1; k <= 5; k++) {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xd8f0ff, depthWrite: false, transparent: true, opacity: 0.9})); sp.scale.set(2, 2, 1);
@@ -1888,7 +1924,7 @@ function blowHorn() {
   if (!GB.load || !carries(GB.load, "horn") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
   if (myCarry() >= 0) { toast("Your hands are full: put the fuse down first"); return false; }
   const r = hornBlast(HORN.st);
-  if (!r.ok) { if (r.why === "empty") { toast("The battery is flat: a locker recharges it for free", 2200); AUD.play("gun_dry"); } else if (r.why === "swapping") toast("Swapping batteries…", 1400); return false; }
+  if (!r.ok) { if (r.why === "empty") { toast("The battery is flat: the Lost and Found recharges it for free", 2200); AUD.play("gun_dry"); } else if (r.why === "swapping") toast("Swapping batteries…", 1400); return false; }
   HORN.st = r.horn; HORN.kick = 1;
   const o = [P.p.x, P.p.y + P.eye, P.p.z], f = [-Math.sin(P.yaw), -Math.cos(P.yaw)], hit = blastTargets(S, monsters, o, f);
   for (const m of hit) { const [x, z] = knockEnd(S, m, [P.p.x, P.p.z], knockDist(m.cfg)); m.shove(x, z); m.stun(HORN_STUN_S); }
@@ -1909,9 +1945,9 @@ function callHorn() {
 }
 // ---- the rocket launcher (shared/rocket.js): a rocket bursts on the first thing it meets; the blast hurts, a mist slows, the bang is heard far off, and it hurts you too inside 5 m. Under 5 m of flight it is a dud.
 const ROCKET = {st: newRocket(0), kick: 0, pivot: new THREE.Group(), flights: [], mists: []};
-{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), tube = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 12), mat(0x5a6a50)); tube.rotation.x = Math.PI / 2;
-  for (const [x, y] of [[0.075, 0.07], [-0.075, 0.07], [0, -0.09]]) { const can = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), mat(0xd8c070)); can.rotation.x = Math.PI / 2; can.position.set(x, y, 0.05); ROCKET.pivot.add(can); }
-  ROCKET.pivot.add(tube); ROCKET.pivot.position.set(0.2, -0.26, -0.5); ROCKET.pivot.visible = false; camera.add(ROCKET.pivot); }
+{ const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .6}), tube = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 12), mat(0x5a6a50)); tube.rotation.x = Math.PI / 2; ROCKET.art = new THREE.Group();
+  for (const [x, y] of [[0.075, 0.07], [-0.075, 0.07], [0, -0.09]]) { const can = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), mat(0xd8c070)); can.rotation.x = Math.PI / 2; can.position.set(x, y, 0.05); ROCKET.art.add(can); }
+  ROCKET.art.add(tube); ROCKET.pivot.add(ROCKET.art); heldModel(ROCKET, "items/almond_water_rocket_launcher", 0.7, -1, "rocket"); ROCKET.pivot.position.set(0.2, -0.26, -0.5); ROCKET.pivot.visible = false; camera.add(ROCKET.pivot); }
 function clearRockets() { for (const f of ROCKET.flights) if (f.mesh) S.root.remove(f.mesh); ROCKET.flights.length = 0; for (const m of ROCKET.mists) S.root.remove(m.o); ROCKET.mists.length = 0; }
 function fireRocket() {
   if (!GB.load || !carries(GB.load, "rocket") || dead || loading || KPUI.open || FIN.out || devOn.v) return false;
@@ -1954,7 +1990,7 @@ const LASER = {st: newLaser(), on: false, dotOn: false, pivot: new THREE.Group()
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .5, metalness: .4}), drum = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.14, 14), mat(0x50545a)); drum.rotation.z = Math.PI / 2; drum.position.set(0, 0, 0.08);
   const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.3, 12), mat(0x24262a)); lens.rotation.x = Math.PI / 2; lens.position.set(0, 0.01, -0.15);
   const pack = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.12), mat(0xb03a2a)); pack.position.set(0, -0.08, 0.1);
-  LASER.pivot.add(drum, lens, pack); LASER.pivot.position.set(0.22, -0.3, -0.5); LASER.pivot.visible = false; camera.add(LASER.pivot);
+  LASER.art = new THREE.Group(); LASER.art.add(drum, lens, pack); LASER.pivot.add(LASER.art); heldModel(LASER, "items/laser_pointer_dissector", 0.3, -1, "laser"); LASER.pivot.position.set(0.22, -0.3, -0.5); LASER.pivot.visible = false; camera.add(LASER.pivot);
   LASER.line = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 6), new THREE.MeshBasicMaterial({color: 0xff2a2a, transparent: true, opacity: 0.85, depthWrite: false})); LASER.line.visible = false; scene.add(LASER.line);
   LASER.spot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), new THREE.MeshBasicMaterial({color: 0xff3030})); LASER.spot.visible = false; scene.add(LASER.spot); }
 function laserReach(o, d) { let lo = 0, hi = d[1] < -1e-3 ? Math.min(LASER_RANGE, (o[1] - S.floor - 0.03) / -d[1]) : LASER_RANGE;          // the floor is not a collider box: the beam and the dot stop on it
@@ -1988,7 +2024,8 @@ const SHEAR = {st: newShear(), was: false, pivot: new THREE.Group(), kick: 0, ms
 { const mat = c => new THREE.MeshStandardMaterial({color: c, roughness: .7}), body = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.11, 0.34), mat(0xb8411e));
   const jawA = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.05, 0.16), mat(0x3a3a3a)), jawB = jawA.clone(); jawA.position.set(-0.03, 0, -0.24); jawB.position.set(0.03, 0, -0.24);
   const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.1, 10), mat(0x2a2a2a)); motor.rotation.z = Math.PI / 2; motor.position.set(0, 0.07, 0.06);
-  SHEAR.jaws = [jawA, jawB]; SHEAR.pivot.add(body, jawA, jawB, motor); SHEAR.pivot.position.set(0.22, -0.3, -0.5); SHEAR.pivot.visible = false; camera.add(SHEAR.pivot); }
+  SHEAR.jaws = [jawA, jawB]; SHEAR.art = new THREE.Group(); SHEAR.art.add(body, jawA, jawB, motor); SHEAR.pivot.add(SHEAR.art); heldModel(SHEAR, "items/hydraulic_rebar_shear", 0.55, -1, "shear");   // the model is one piece: the code-made jaws still open and close, unseen, and the cut shows in the pivot's kick and buzz
+  SHEAR.pivot.position.set(0.22, -0.3, -0.5); SHEAR.pivot.visible = false; camera.add(SHEAR.pivot); }
 function shearTick(dt) {
   SHEAR.msgT = Math.max(0, SHEAR.msgT - dt); SHEAR.kick = Math.max(0, SHEAR.kick - dt * 4);
   SHEAR.st = shearTickState(SHEAR.st, dt);
@@ -2121,7 +2158,7 @@ function trapTick(dt) {
   }
   for (let i = TRAPS.flashes.length - 1; i >= 0; i--) { const f = TRAPS.flashes[i]; f.t += dt; f.o.material.opacity = Math.max(0, 1 - f.t / 0.6); f.o.scale.setScalar(2 + f.t * 8); if (f.t > 0.6) { S.root.remove(f.o); TRAPS.flashes.splice(i, 1); } }
 }
-// ---- the loadout locker (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is. (Name still open: docs/WORLD.md.)
+// ---- the loadout locker, called the Lost and Found in the game (docs/ROUND.md, decision of 2026-11-24) (shared/loadout.js): one per chamber, shows your gear and lets you carry it or leave it. After a death it is where the gear is.
 const STN = {open: false, spot: null, mesh: null, sel: 0};
 const gearList = () => net.on ? GEAR : SOLO_GEAR;                  // the locker rows: a room runs the first three; the bolt driver is solo only so far (the server does not own its nails)
 const STN_NAMES = {gun: "Ray gun", cloak: "Cloak", crossbow: "Hunting crossbow", driver: "Pneumatic bolt driver", baton: "Stun baton", dart: "Moth jelly dart", flame: "Propane flamethrower", horn: "Frequency horn", rocket: "Almond water rocket launcher", laser: "Laser pointer dissector", shear: "Hydraulic rebar shear"};
@@ -2136,7 +2173,7 @@ function tryStation() { if (!nearStation()) return false; openStation(); return 
 function openStation() { HORN.st = hornRecharge(HORN.st); STN.open = true; STN.sel = 0; document.exitPointerLock?.(); renderStation(); $("station").style.display = "flex"; }
 function closeStation() { STN.open = false; $("station").style.display = "none"; }
 function renderStation() {
-  const rows = $("st-rows"); rows.innerHTML = gearList().map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i < 9 ? i + 1 : i === 9 ? 0 : "·"}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "IN LOCKER"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>E  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
+  const rows = $("st-rows"); rows.innerHTML = gearList().map((g, i) => `<button type="button" data-gear="${g}" class="${GB.load && carries(GB.load, g) ? "in" : ""}${i === STN.sel ? " sel" : ""}"><span>${i < 9 ? i + 1 : i === 9 ? 0 : "·"}  ${STN_NAMES[g]}</span><span>${GB.load && carries(GB.load, g) ? "CARRIED" : "LEFT HERE"}</span></button>`).join("") + (GB.kit ? `<button type="button" data-slot="e" class="${STN.sel === GEAR.length ? "sel" : ""}"><span>E  E slot</span><span>${KIT_NAMES[GB.kit.e].toUpperCase()} ×${GB.kit.n[GB.kit.e]}</span></button>` : "");
   rows.querySelectorAll("button").forEach(b => { b.onclick = () => stationToggle(b.dataset.slot ? gearList().length : gearList().indexOf(b.dataset.gear)); });
   $("st-close").onclick = closeStation;
 }
@@ -2145,7 +2182,7 @@ function stationToggle(i) {
   if (i === gearList().length && GB.kit) { GB.kit = setE(GB.kit, GB.kit.e === "mine" ? "wire" : "mine"); renderStation(); return; }          // the E slot: land mine or tripwire
   const g = gearList()[i]; if (!g || !GB.load) return;
   if (net.on) { net.send({t: "gear", a: carries(GB.load, g) ? "leave" : "take", g}); return; }          // in a room the loadout is the server's: its answer (`me`) redraws this
-  if (!carries(GB.load, g) && !canTake(GB.load, g) && ARSENAL.includes(g)) { toast("Two weapons at most: leave one in the locker first", 2600); return; }
+  if (!carries(GB.load, g) && !canTake(GB.load, g) && ARSENAL.includes(g)) { toast("Two weapons at most: leave one in the Lost and Found first", 2600); return; }
   GB.load = carries(GB.load, g) ? lockerLeave(GB.load, g) : lockerTake(GB.load, g); syncGear(); renderStation();
 }
 // the loadout decides what you hold: the page's own flags follow it (ammo is not part of it)
@@ -2158,7 +2195,7 @@ function syncGear() {
 function gbDeath() {
   if (!GB.load) return;
   GB.load = lockerDied(GB.load); if (GB.kit) GB.kit = kitLost(GB.kit); LT.rounds = 0; BOW.st = newBow(0); DRV.st = drvLost(); DART.st = dartLost(); FLAME.st = flameLost(); HORN.st = hornLost(); ROCKET.st = rocketLost(); LASER.st = laserLost(); SHEAR.st = shearLost(); BC.have = 0; syncGear();
-  toast("Your gear is in the locker. The ammo and consumables are gone.", 4200);
+  toast("Your gear is in the Lost and Found. The ammo and consumables are gone.", 4200);
 }
 
 // ---------------------------------------------------------------- the Overworld, v0: the parking lot after the Original (session 6)
@@ -2311,18 +2348,21 @@ function forestRoadLotProps(root) {
 }
 function forestProps(root) {
   const g = new THREE.Group(), y = S.floor, [hx, hz] = FOREST.half, z0 = FOREST.cz - hz, z1 = FOREST.cz + hz, rnd = seeded(FOREST.seed + 1);
+  if (!hasArt(FOREST_SCENE)) {                                               // a Blender build brings its own ground, path and trees; the page keeps the gap's glow and the signpost
   g.add(boxMesh([-hx - 30, y - 0.2, z0 - 30], [hx + 30, y - 0.01, z1 + 30], 0xbfe8c0));                     // the grass, past the edge too, so the haze has something to sit on
   pathRibbon(g, y, z1, -96, z => pathX(z), 2.6, 0xf0d8b8);                                                          // the path: the road's end, then up through the trees
   treeInstances(g, forestTrees(), y, rnd);
   const ring = []; for (let x = -hx - 8; x <= hx + 8; x += 3.4) { ring.push([x, z0 - 3 - rnd() * 3, 0.3], [x, z1 + 3 + rnd() * 3, 0.3]); } for (let z = z0; z <= z1; z += 3.4) ring.push([-hx - 3 - rnd() * 3, z, 0.3], [hx + 3 + rnd() * 3, z, 0.3]);
   treeInstances(g, ring.filter(([x, z]) => !(z < z0 && Math.abs(x) < 6)), y, rnd);                         // a wall of trees round the edge, open only behind the gap
+  }
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTexture(), color: 0xffffff, transparent: true, opacity: 0.95, depthWrite: false, fog: false})); glow.scale.set(14, 9, 1); glow.position.set(0, y + 3, FOREST.gap.z - 6); g.add(glow);   // the bright gap
   const [bx, bz] = FOREST.back.at; signpost(g, bx, bz, y, "< PARKING LOT", Math.PI / 2);
-  dreamSky(g, y);
+  if (!sceneCfg(FOREST_SCENE).backdrop) dreamSky(g, y);                        // a backdrop picture has its own sky
   root.add(g);
 }
 function meadowProps(root) {
   const g = new THREE.Group(), y = S.floor, [hx, hz] = MEADOW.half, z0 = MEADOW.cz - hz, z1 = MEADOW.cz + hz, rnd = seeded(MEADOW.seed + 1);
+  if (!hasArt(MEADOW_SCENE)) {                                               // a Blender build brings its own ground, path, trees and flowers; the page keeps the shed, the house and the porch light
   g.add(boxMesh([-hx - 30, y - 0.2, z0 - 30], [hx + 30, y - 0.01, z1 + 30], 0xc8f0b8));
   pathRibbon(g, y, z1, MEADOW.house.door.at[1] - 0.5, () => 0, 2.4, 0xf0d8b8);                                       // the path from the trees to the house's door
   pathRibbon(g, y, MEADOW.shed.at[1] + 1.2, MEADOW.shed.at[1] - 1.2, () => (MEADOW.shed.door.at[0] - 0.2) / 2, Math.abs(MEADOW.shed.door.at[0]) - 1, 0xf0d8b8);   // a short spur to the shed's door
@@ -2331,11 +2371,12 @@ function meadowProps(root) {
   const m = new THREE.Matrix4(), col = new THREE.Color();
   fl.forEach(([x, z, c], i) => { heads.setMatrixAt(i, m.makeTranslation(x, y + 0.16 + (i % 3) * 0.05, z)); heads.setColorAt(i, col.set(FLOWER_COLORS[c])); });
   heads.instanceMatrix.needsUpdate = true; heads.instanceColor.needsUpdate = true; heads.frustumCulled = false; g.add(heads);
+  }
   FST.shed = null; FST.house = null;
   placeBuilding(g, "world/shed", MEADOW.shed, y, w => { FST.shed = w; });
   placeBuilding(g, "world/cottage", MEADOW.house, y, w => { FST.house = w; });
   const lamp = new THREE.PointLight(0xffd8a0, 8, 10, 1.6); lamp.position.set(MEADOW.house.door.at[0], y + 2.6, MEADOW.house.door.at[1] + 0.6); g.add(lamp);   // the porch light
-  dreamSky(g, y);
+  if (!sceneCfg(MEADOW_SCENE).backdrop) dreamSky(g, y);
   root.add(g);
 }
 // walking through a gap takes you on (the arrival on the other side is outside that side's gap, so it does not bounce you back)
@@ -2373,7 +2414,9 @@ function roomCityNote() {
 function cityProps(root) {
   roomCityNote();
   const g = new THREE.Group(), y = CITY_Y, z0 = ROAD.z0, z1 = ROAD.z1;
-  CITY.doors = []; CITY.mats = {win: new THREE.MeshLambertMaterial({color: 0x20262c, emissive: 0xffd890, emissiveIntensity: 0}), lamp: new THREE.MeshLambertMaterial({color: 0x333333, emissive: 0xffe0a0, emissiveIntensity: 0})};
+  const art = hasArt(CITY_SCENE);                                            // a Blender build is there: the ground, the buildings, their windows, the lamp posts, the door leaves and the shelter are its; the page keeps the door signs, lamps and shutters, and the anomalies
+  CITY.doors = []; CITY.mats = art ? {} : {win: new THREE.MeshLambertMaterial({color: 0x20262c, emissive: 0xffd890, emissiveIntensity: 0}), lamp: new THREE.MeshLambertMaterial({color: 0x333333, emissive: 0xffe0a0, emissiveIntensity: 0})};
+  if (!art) {
   g.add(boxMesh([-60, y - 0.2, z0 - 10], [60, y - 0.02, z1 + 10], 0x3a4a34));                                                  // grass past the buildings
   g.add(boxMesh([ROAD.x0, y - 0.1, z0], [ROAD.x1, y - 0.01, z1], 0x2c2c30));                                                  // road
   for (let z = z1 - 4; z > z0; z -= 8) g.add(boxMesh([-0.12, y - 0.009, z - 1.8], [0.12, y - 0.005, z + 1.8], 0xd8d0a0));                  // centre dashes
@@ -2384,16 +2427,17 @@ function cityProps(root) {
       const w = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.3), CITY.mats.win); w.position.set(s.x, y + s.y, s.z); w.rotation.y = b.side === "w" ? Math.PI / 2 : -Math.PI / 2; g.add(w);
     }
   }
+  }
   for (const d of DOORS) {
     const dir = d.side === "w" ? 1 : -1, x = d.x + dir * 0.03, tint = d.kind === "tower" ? 0x3a5a80 : 0x6a4a2a, ry = d.side === "w" ? Math.PI / 2 : -Math.PI / 2;
-    g.add(boxMesh([x - 0.02, y, d.z - DOOR_W / 2], [x + 0.02, y + DOOR_H, d.z + DOOR_W / 2], tint));
+    if (!art) g.add(boxMesh([x - 0.02, y, d.z - DOOR_W / 2], [x + 0.02, y + DOOR_H, d.z + DOOR_W / 2], tint));
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 0.52), new THREE.MeshBasicMaterial({map: signTexture(d.label)})); sign.position.set(x + dir * 0.03, y + DOOR_H + 0.55, d.z); sign.rotation.y = ry; g.add(sign);
     const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.2, 0.2), new THREE.MeshBasicMaterial({color: 0x40e060})); lamp.position.set(x + dir * 0.04, y + 1.5, d.z + DOOR_W / 2 + 0.3); g.add(lamp);   // green: open, red: closed
     const shutter = boxMesh([x + dir * 0.02, y, d.z - DOOR_W / 2 - 0.25], [x + dir * 0.02 + dir * 0.1, y + DOOR_H + 0.1, d.z + DOOR_W / 2 + 0.25], 0x55575c);   // the roller shutter: down when the store is closed
     shutter.visible = false; g.add(shutter); CITY.doors.push({d, shutter, lamp});
   }
-  for (const z of LAMP_ZS) for (const s of [-1, 1]) { g.add(boxMesh([s * 5.5 - 0.07, y, z - 0.07], [s * 5.5 + 0.07, y + 4.2, z + 0.07], 0x3c3c40)); const l = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.5), CITY.mats.lamp); l.position.set(s * 5.5, y + 4.25, z); g.add(l); }
-  anomalyProps(g, y); shelter(g, BUS_STREET.shelter, y); root.add(g);
+  if (!art) for (const z of LAMP_ZS) for (const s of [-1, 1]) { g.add(boxMesh([s * 5.5 - 0.07, y, z - 0.07], [s * 5.5 + 0.07, y + 4.2, z + 0.07], 0x3c3c40)); const l = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.5), CITY.mats.lamp); l.position.set(s * 5.5, y + 4.25, z); g.add(l); }
+  anomalyProps(g, y); if (!art) shelter(g, BUS_STREET.shelter, y); root.add(g);
 }
 // the City's anomalies (rules: shared/anomalies.js, slice 8): a sign that changes a letter each time you pass it, pedestrians who all face up the street, and a lit window
 // with no building round it. Drawn only: nothing here collides, and nothing is saved (a reload puts the sign back). CITY.signPasses lasts for the page's life.
@@ -2462,11 +2506,12 @@ function cityLook(force) {
   if (S.id === LAB_SCENE) { scene.background.set(0x050606); HEMI.intensity = 1.4; HEMI.color.set(0xe8fff8); return; }   // slice 17: the lab's cold light
   if (S.id === FACTORY_SCENE) { scene.background.set(0x060606); HEMI.intensity = 1.3; HEMI.color.set(0xf0f4ff); return; }   // slice 16: the factory's work lights
   if (S.id === MUSEUM_SCENE) { scene.background.set(0x030305); HEMI.intensity = 0.5; HEMI.color.set(0x9aa8d0); return; }   // slice 14: the museum after hours
-  if (S.id === MALL_SCENE) { const lk = mallLocked(st.hour); scene.background.set(0x050505); HEMI.intensity = lk ? 0.32 : 1.25; HEMI.color.set(lk ? 0x8090c0 : 0xfff4e4); if (CITY.mats.mallLamp) CITY.mats.mallLamp.intensity = lk ? 0.6 : 6; return; }   // slice 13: by night only the emergency lights
+  if (S.id === MALL_SCENE) { const lk = mallLocked(st.hour); scene.background.set(0x050505); HEMI.intensity = lk ? 0.32 : 1.25; HEMI.color.set(lk ? 0x8090c0 : 0xfff4e4); if (CITY.mats.mallLamp) CITY.mats.mallLamp.intensity = lk ? 0.6 : 6; setLightSet(lk ? "night" : "day"); artToggle("Emergency_Emit", lk); artToggle("Lamp_Emit", !lk); return; }   // slice 13: by night only the emergency lights
   if (S.id === GROCERY_SCENE) { scene.background.set(0x050505); HEMI.intensity = 1.35; HEMI.color.set(0xf4f8ff); return; }                         // the grocery's strip lights
   if (S.id === APT_SCENE) { scene.background.set(0x050505); HEMI.intensity = 1.05; HEMI.color.set(0xffe8c8); if (CITY.mats.window) CITY.mats.window.color.set(sky.bg); if (CITY.mats.screen) CITY.mats.screen.emissiveIntensity = 0.9; return; }       // indoors the light is the room's own; the window shows the sky
   scene.background.set(sky.bg); HEMI.intensity = sky.light; HEMI.color.set(sky.lightColor);
   if (CITY.mats.win) { CITY.mats.win.emissiveIntensity = sky.night ? 0.9 : 0; CITY.mats.lamp.emissiveIntensity = sky.light < 0.8 ? 1.2 : 0; }
+  artToggle("Window_Lit", sky.night); artToggle("Lamp_Emit", sky.light < 0.8); setBackdrop(sky.night ? "night" : "day");   // a Blender build's lit windows, lamp heads and horizon follow the same clock
   for (const c of CITY.doors) { const open = c.d.kind === "tower" || st.open; c.shutter.visible = !open; c.lamp.material.color.set(open ? 0x40e060 : 0xe04040); }
   anomalyLook(st.hour);
 }
@@ -2692,7 +2737,7 @@ function apartmentProps(root) {
   const g = new THREE.Group(), [hx, hz] = APARTMENT.half, h = APARTMENT.h, wall = 0xd8cfc0, M = (c, o = {}) => new THREE.MeshLambertMaterial({color: c, ...o});
   CITY.doors = []; CITY.mats = {window: new THREE.MeshBasicMaterial({color: 0x9ec8ee}), screen: new THREE.MeshLambertMaterial({color: 0x102030, emissive: 0x4a9ad8, emissiveIntensity: 0.9})};
   const slab = (min, max, mat) => { const m = boxMesh(min, max, 0); m.material = mat; g.add(m); return m; };
-  if (SCENES[APT_SCENE].glbs.length) {                                       // the room is the Blender build (world/apartment.glb, docs/BLENDER.md): its light is baked, so no lamp is added here.
+  if (hasArt(APT_SCENE)) {                                       // the room is the Blender build (world/apartment.glb, docs/BLENDER.md): its light is baked, so no lamp is added here.
     slab([1.5, 0.88, -2.166], [2.1, 1.3, -2.1595], CITY.mats.screen);       // the page keeps the computer's screen, in the monitor's opening
     root.traverse(o => { if (o.isMesh && o.material.name === "Window_Glass") CITY.mats.window = o.material; });   // the pane takes the hour's sky, as the blockout's window did
     root.add(g); return;
@@ -2715,31 +2760,33 @@ const FOOD_COLOR = {apple: 0xd84a3a, bread: 0xd8b070, soup: 0xc8c8c8, meal: 0x4a
 function groceryProps(root) {
   const g = new THREE.Group(), [hx, hz] = GROCERY.half, h = GROCERY.h, M = c => new THREE.MeshLambertMaterial({color: c});
   CITY.doors = []; CITY.mats = {};
-  const slab = (min, max, c) => { const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
+  const art = hasArt(GROCERY_SCENE);                                                 // a Blender build is there: only `keep` slabs, the signs and what moves are drawn, and no lamp (the light is baked)
+  const slab = (min, max, c, keep) => { if (art && !keep) return null; const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
   slab([-hx, -0.05, -hz], [hx, 0, hz], 0xd8d8d0); slab([-hx, h, -hz], [hx, h + 0.05, hz], 0xe8e8e4);
   for (const [a, b] of [[[-hx, 0, -hz - 0.05], [hx, h, -hz]], [[-hx, 0, hz], [hx, h, hz + 0.05]], [[-hx - 0.05, 0, -hz], [-hx, h, hz]], [[hx, 0, -hz], [hx + 0.05, h, hz]]]) slab(a, b, 0xe4e0d4);
   const strip = new THREE.MeshBasicMaterial({color: 0xf8fbff}); for (let x = -9; x <= 9; x += 6) slab([x - 0.15, h - 0.04, -hz + 1], [x + 0.15, h - 0.01, hz - 1], strip);    // strip lights
   slab([-1, 0, hz - 0.06], [1, 2.4, hz - 0.01], 0x8ab8c8);                                                                            // the glass doors
   for (const sh of GROCERY.shelves) {
     slab(sh.min, [sh.max[0], 0.1, sh.max[2]], 0x6a6a70); slab([sh.min[0] + 0.5, 0.1, sh.min[2]], [sh.max[0] - 0.5, sh.max[1], sh.max[2]], 0x8a8a90);
-    for (const y of [0.35, 0.95, 1.55]) { slab([sh.min[0], y - 0.04, sh.min[2]], [sh.max[0], y, sh.max[2]], 0x9a9aa0); for (let z = sh.min[2] + 0.3; z < sh.max[2] - 0.2; z += 0.55) for (const side of [-1, 1]) slab([side < 0 ? sh.min[0] + 0.05 : sh.max[0] - 0.4, y, z], [side < 0 ? sh.min[0] + 0.4 : sh.max[0] - 0.05, y + 0.3, z + 0.35], FOOD_COLOR[sh.food]); }
+    for (const y of [0.35, 0.95, 1.55]) { slab([sh.min[0], y - 0.04, sh.min[2]], [sh.max[0], y, sh.max[2]], 0x9a9aa0); for (let z = sh.min[2] + 0.3; z < sh.max[2] - 0.2; z += 0.55) for (const side of [-1, 1]) slab([side < 0 ? sh.min[0] + 0.05 : sh.max[0] - 0.4, y, z], [side < 0 ? sh.min[0] + 0.4 : sh.max[0] - 0.05, y + 0.3, z + 0.35], FOOD_COLOR[sh.food], true); }
     const f = FOODS.find(f => f.id === sh.food), sign = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.42), new THREE.MeshBasicMaterial({map: signTexture(`${f.label.toUpperCase()} $${f.price}`)}));
     sign.position.set((sh.min[0] + sh.max[0]) / 2, 2.5, sh.max[2] + 0.02); g.add(sign);
   }
   const co = GROCERY.checkout; slab(co.min, co.max, 0x5a6a5a); slab([co.max[0] - 0.9, co.max[1], co.min[2] + 0.1], [co.max[0] - 0.3, co.max[1] + 0.35, co.min[2] + 0.6], 0x2a2a2e);   // counter and till
-  const ca = GROCERY.cart; for (let i = 0; i < 3; i++) { const z0 = ca.min[2] + 0.05 + i * 0.05, x0 = ca.min[0] + i * 0.12; slab([x0, 0.35, z0], [x0 + 0.9, 0.85, z0 + 0.55], 0xc83a32); slab([x0 + 0.85, 0.85, z0], [x0 + 0.9, 1.05, z0 + 0.55], 0x8a8a8a); }   // red carts in the corral
+  const ca = GROCERY.cart; for (let i = 0; i < 3; i++) { const z0 = ca.min[2] + 0.05 + i * 0.05, x0 = ca.min[0] + i * 0.12; slab([x0, 0.35, z0], [x0 + 0.9, 0.85, z0 + 0.55], 0xc83a32, true); slab([x0 + 0.85, 0.85, z0], [x0 + 0.9, 1.05, z0 + 0.55], 0x8a8a8a, true); }   // red carts in the corral
   const cam = new THREE.Group(); cam.position.set(...CAMERA.at);                                        // slice 19: the security camera; its body points along +z, and it swings with camYaw
   { const body = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.2, 0.5), M(0xd8d8d8)); body.position.z = 0.15; cam.add(body); const led = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.02), new THREE.MeshBasicMaterial({color: 0xff2020})); led.position.set(0.07, 0.06, 0.41); cam.add(led);
-    const mount = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.06), M(0x808080)); mount.position.set(0, 0.25, 0); cam.add(mount); }
+    if (!art) { const mount = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.4, 0.06), M(0x808080)); mount.position.set(0, 0.25, 0); cam.add(mount); } }
   g.add(cam); CITY.mats.cam = cam;
-  const lamp = new THREE.PointLight(0xf4f8ff, 5, 20, 1.4); lamp.position.set(0, h - 0.5, 0); g.add(lamp);
+  if (!art) { const lamp = new THREE.PointLight(0xf4f8ff, 5, 20, 1.4); lamp.position.set(0, h - 0.5, 0); g.add(lamp); }
   root.add(g);
 }
 // ---- the laboratory (slice 17; rules in shared/lab.js): five stations round a white room, procedure cards to follow, and a sealed door marked B2.
 function labProps(root) {
   const g = new THREE.Group(), [hx, hz] = LAB.half, h = LAB.h, M = c => new THREE.MeshLambertMaterial({color: c});
   CITY.doors = []; CITY.mats = {};
-  const slab = (min, max, c) => { const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
+  const art = hasArt(LAB_SCENE);                                                 // a Blender build is there: only `keep` slabs, the signs and what moves are drawn, and no lamp (the light is baked)
+  const slab = (min, max, c, keep) => { if (art && !keep) return null; const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
   slab([-hx, -0.05, -hz], [hx, 0, hz], 0xd8dcd8); slab([-hx, h, -hz], [hx, h + 0.05, hz], 0xf0f2f0);
   for (const [a, b] of [[[-hx, 0, -hz - 0.05], [hx, h, -hz]], [[-hx, 0, hz], [hx, h, hz + 0.05]], [[-hx - 0.05, 0, -hz], [-hx, h, hz]], [[hx, 0, -hz], [hx + 0.05, h, hz]]]) slab(a, b, 0xe8ece8);
   slab([-1.2, 0, hz - 0.06], [1.2, 2.5, hz - 0.01], 0x8a9a96);                                                                    // the way out
@@ -2751,7 +2798,7 @@ function labProps(root) {
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.34), new THREE.MeshBasicMaterial({map: signTexture(s.label)})); sign.position.set(s.x, 2.3, s.z);
     sign.rotation.y = Math.atan2(-s.x, -s.z); g.add(sign);                                                                         // each sign faces the middle of the room
   }
-  const l = new THREE.PointLight(0xe8fff8, 4, 22, 1.3); l.position.set(0, h - 0.3, 0); g.add(l);
+  if (!art) { const l = new THREE.PointLight(0xe8fff8, 4, 22, 1.3); l.position.set(0, h - 0.3, 0); g.add(l); }
   root.add(g);
 }
 function startLab() {
@@ -2774,18 +2821,19 @@ function endLab(how) {
 function factoryProps(root) {
   const g = new THREE.Group(), [hx, hz] = FACTORY.half, h = FACTORY.h, B = FACTORY.belt, M = c => new THREE.MeshLambertMaterial({color: c});
   CITY.doors = []; CITY.mats = {};
-  const slab = (min, max, c) => { const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
+  const art = hasArt(FACTORY_SCENE);                                                 // a Blender build is there: only `keep` slabs, the signs and what moves are drawn, and no lamp (the light is baked)
+  const slab = (min, max, c, keep) => { if (art && !keep) return null; const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
   slab([-hx, -0.05, -hz], [hx, 0, hz], 0x5a5a58); slab([-hx, h, -hz], [hx, h + 0.05, hz], 0x3a3a3c);
   for (const [a, b] of [[[-hx, 0, -hz - 0.05], [hx, h, -hz]], [[-hx, 0, hz], [hx, h, hz + 0.05]], [[-hx - 0.05, 0, -hz], [-hx, h, hz]], [[hx, 0, -hz], [hx + 0.05, h, hz]]]) slab(a, b, 0x7a7a70);
   slab([-1.2, 0, hz - 0.06], [1.2, 2.6, hz - 0.01], 0x4a4a50);                                                                   // the door
-  slab([B.x0 - 0.5, 0, B.z - B.w / 2], [B.x1 + 0.5, B.top - 0.06, B.z + B.w / 2], 0x3a3a40); slab([B.x0 - 0.5, B.top - 0.06, B.z - B.w / 2 + 0.05], [B.x1 + 0.5, B.top, B.z + B.w / 2 - 0.05], 0x1e1e22);   // the belt
+  slab([B.x0 - 0.5, 0, B.z - B.w / 2], [B.x1 + 0.5, B.top - 0.06, B.z + B.w / 2], 0x3a3a40); slab([B.x0 - 0.5, B.top - 0.06, B.z - B.w / 2 + 0.05], [B.x1 + 0.5, B.top, B.z + B.w / 2 - 0.05], 0x1e1e22, true);   // the belt
   slab([B.x1 + 0.5, 0, B.z - 0.8], [B.x1 + 1.6, 0.5, B.z + 0.8], 0x6a2a2a);                                                    // the reject chute
   for (const b of FACTORY.bins) {
     slab([b.x - b.half, 0, b.z - b.half], [b.x + b.half, 1.0, b.z + b.half], KINDS[b.kind].color);
     const s = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.36), new THREE.MeshBasicMaterial({map: signTexture(KINDS[b.kind].label)})); s.position.set(b.x, 1.5, b.z); g.add(s);
   }
   CITY.fa.parts = new THREE.Group(); g.add(CITY.fa.parts);
-  for (let x = -6; x <= 6; x += 6) { const l = new THREE.PointLight(0xf0f4ff, 3, 16, 1.4); l.position.set(x, h - 0.4, 0); g.add(l); }
+  if (!art) for (let x = -6; x <= 6; x += 6) { const l = new THREE.PointLight(0xf0f4ff, 3, 16, 1.4); l.position.set(x, h - 0.4, 0); g.add(l); }
   root.add(g); drawParts();
 }
 // the parts on the belt, and the one in your hands (held in front of you)
@@ -2818,7 +2866,8 @@ function endFactory(how) {
 function museumProps(root) {
   const g = new THREE.Group(), [hx, hz] = MUSEUM.half, cz = MUSEUM.cz, h = MUSEUM.h, M = c => new THREE.MeshLambertMaterial({color: c});
   CITY.doors = []; CITY.mats = {};
-  const slab = (min, max, c) => { const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
+  const art = hasArt(MUSEUM_SCENE);                                                 // a Blender build is there: only `keep` slabs, the signs and what moves are drawn, and no lamp (the light is baked)
+  const slab = (min, max, c, keep) => { if (art && !keep) return null; const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
   slab([-hx, -0.05, cz - hz], [hx, 0, cz + hz], 0x4a3a30); slab([-hx, h, cz - hz], [hx, h + 0.05, cz + hz], 0x2a2a30);
   for (const [a, b] of [[[-hx, 0, cz - hz - 0.05], [hx, h, cz - hz]], [[-hx, 0, cz + hz], [hx, h, cz + hz + 0.05]], [[-hx - 0.05, 0, cz - hz], [-hx, h, cz + hz]], [[hx, 0, cz - hz], [hx + 0.05, h, cz + hz]]]) slab(a, b, 0x6a2e2e);
   slab([-1.2, 0, cz + hz - 0.06], [1.2, 2.6, cz + hz - 0.01], 0x3a2a20);                                                          // the door
@@ -2830,7 +2879,7 @@ function museumProps(root) {
     part(0.42, 0.75, 0.26, 0, 0.95, 0); part(0.15, 0.58, 0.15, -0.11, 0.29, 0); part(0.15, 0.58, 0.15, 0.11, 0.29, 0); part(0.11, 0.6, 0.11, -0.28, 0.98, 0); part(0.11, 0.6, 0.11, 0.28, 0.98, 0); part(0.24, 0.28, 0.24, 0, 1.5, 0);
     g.add(f); CITY.mu.figs.push(f);
   });
-  for (let z = cz - hz + 3; z < cz + hz - 2; z += 6) { const l = new THREE.PointLight(0x9aa8d0, 1.6, 9, 1.6); l.position.set(0, h - 0.4, z); g.add(l); }   // the night lights
+  if (!art) for (let z = cz - hz + 3; z < cz + hz - 2; z += 6) { const l = new THREE.PointLight(0x9aa8d0, 1.6, 9, 1.6); l.position.set(0, h - 0.4, z); g.add(l); }   // the night lights
   root.add(g); placeStatues();
 }
 // each statue where the rules put it: on its plinth facing the hall, or stepped off it and turned to face you
@@ -2864,13 +2913,14 @@ function endMuseum(how) {
 function mallProps(root) {
   const g = new THREE.Group(), [hx, hz] = MALL.half, h = MALL.h, M = c => new THREE.MeshLambertMaterial({color: c});
   CITY.doors = []; CITY.mats = {}; CITY.mallLocked = mallLocked(hourAt(CITY.t));
-  const slab = (min, max, c) => { const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
+  const art = hasArt(MALL_SCENE);                                                 // a Blender build is there: only `keep` slabs, the signs and what moves are drawn, and no lamp (the light is baked)
+  const slab = (min, max, c, keep) => { if (art && !keep) return null; const m = boxMesh(min, max, 0); m.material = typeof c === "number" ? M(c) : c; g.add(m); return m; };
   slab([-hx, -0.05, -hz], [hx, 0, hz], 0xcfc8b8); slab([-hx, h, -hz], [hx, h + 0.05, hz], 0xe0dcd4);
   for (const [a, b] of [[[-hx, 0, -hz - 0.05], [hx, h, -hz]], [[-hx, 0, hz], [hx, h, hz + 0.05]], [[-hx - 0.05, 0, -hz], [-hx, h, hz]], [[hx, 0, -hz], [hx + 0.05, h, hz]]]) slab(a, b, 0xd8d0c4);
   slab([-1.6, 0, hz - 0.06], [1.6, 2.8, hz - 0.01], 0x8ab8c8);                                                                     // the glass doors
   const f = MALL.fountain; slab(f.min, f.max, 0xa8a49c); slab([f.min[0] + 0.3, f.max[1] - 0.05, f.min[2] + 0.3], [f.max[0] - 0.3, f.max[1], f.max[2] - 0.3], 0x6a6860);   // a dry fountain
   for (const b of MALL.benches) { slab(b.min, b.max, 0x6a5440); slab([b.min[0], 0.5, b.min[2] - 0.12], [b.max[0], 1.0, b.min[2]], 0x6a5440); }
-  const front = (label, x, z, ry) => {                                                                // a shuttered shopfront: shutter, frame and sign on a wall
+  const front = (label, x, z, ry) => { if (art) return;                                                                // a shuttered shopfront: shutter, frame and sign on a wall
     const p = new THREE.Group(); p.position.set(x, 0, z); p.rotation.y = ry; g.add(p);
     const sh = boxMesh([-2.4, 0, 0], [2.4, 3.2, 0.08], 0x5a5c62); p.add(sh);
     for (let y = 0.3; y < 3.2; y += 0.35) p.add(boxMesh([-2.4, y, 0.08], [2.4, y + 0.04, 0.1], 0x4a4c52));
@@ -2879,7 +2929,7 @@ function mallProps(root) {
   const L = MALL.shops;
   [-11, -4, 4, 11].forEach((x, i) => front(L[i], x, -hz + 0.02, 0));                                       // north wall
   [-6, 4].forEach((z, i) => { front(L[4 + i], -hx + 0.02, z, Math.PI / 2); front(L[6 + i], hx - 0.02, z, -Math.PI / 2); });
-  const lamp = new THREE.PointLight(0xfff4e4, 6, 34, 1.2); lamp.position.set(0, h - 0.6, 0); g.add(lamp); CITY.mats.mallLamp = lamp;
+  if (!art) { const lamp = new THREE.PointLight(0xfff4e4, 6, 34, 1.2); lamp.position.set(0, h - 0.6, 0); g.add(lamp); CITY.mats.mallLamp = lamp; }
   root.add(g);
 }
 function mallTick() {
@@ -3486,7 +3536,7 @@ function audioTick(dt) {
     return {id: p.id, x: p.x, y: p.y, z: p.z, moving: p.moving, run: p.run, crouch: p.crouch, blocked: !!p.audBlocked}; }), levelMix(S.id).step);
 }
 function sim(dt, t) {
-  update(dt); hpHud(dt); audioTick(dt); exitCheck(); overworldTick(); forestTick(); cityTick(dt); if ((seenT -= dt) <= 0) { seenT = 0.2; updateSeen(ctime()); } updatePeers(dt); drawAlert(); animateAlarm(dt); animateFuses(t); animateLoot(); camHud(); animateGun(dt); animateCloak(dt); animateBeacons(dt); animatePower(dt); updatePrompt(); renderKp(); netTick(dt);
+  update(dt); hpHud(dt); audioTick(dt); exitCheck(); overworldTick(); forestTick(); backdropTick(); cityTick(dt); if ((seenT -= dt) <= 0) { seenT = 0.2; updateSeen(ctime()); } updatePeers(dt); drawAlert(); animateAlarm(dt); animateFuses(t); animateLoot(); camHud(); animateGun(dt); animateCloak(dt); animateBeacons(dt); animatePower(dt); updatePrompt(); renderKp(); netTick(dt);
 }
 const BOT = new URLSearchParams(location.search).has("bot");
 function step(dtOverride) {
@@ -3519,7 +3569,7 @@ FIN.t0 = performance.now();
 await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {FST, FOREST_SCENES, tryForest, forestPrompt, SHEAR, shearTick, shearCut, BAR, buildBarricades, cutBarricade, tryBarricade, gotPack, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {ART_TEST, setLightSet, camera, FST, FOREST_SCENES, tryForest, forestPrompt, SHEAR, shearTick, shearCut, BAR, buildBarricades, cutBarricade, tryBarricade, gotPack, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
