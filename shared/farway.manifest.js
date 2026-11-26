@@ -105,7 +105,7 @@ export const FARWAY = {
     {
       // slice 17 (session 9): the laboratory worker's shift, behind 214 Hallam Row. One room of stations, blockout, with a sealed door marked B2 (Secret Operations is planned).
       id: "lab", name: "Laboratory (214 Hallam Row)", status: "built", tone: "liminal",
-      scenes: [{id: "laboratory", floorY: 0, files: ["world/laboratory.json"]}],
+      scenes: [{id: "laboratory", floorY: 0, files: ["world/laboratory.glb", "world/laboratory.json"]}],
     },
     stub("jobs", "Hallam Row (street of jobs)", "planned", ["street_of_jobs"]),
     stub("secret_ops", "Secret Operations (Project Never Land)", "planned", ["service_entry", "hidden_entry"]),
