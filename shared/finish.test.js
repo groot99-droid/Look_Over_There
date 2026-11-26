@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {newRun, exitPlayer, done, finish, results, fmtTime, SCORE, score, runRecord} from "./finish.js";
+import {newRun, exitPlayer, done, finish, results, fmtTime, SCORE, score, runRecord, rankBoard} from "./finish.js";
 
 test("places go in the order players leave, with their time", () => {
   let run = newRun(1000);
@@ -30,7 +30,7 @@ test("input is never mutated and times format as m:ss", () => {
   assert.equal(fmtTime(0), "0:00"); assert.equal(fmtTime(65400), "1:05"); assert.equal(fmtTime(3725000), "62:05");
 });
 
-test("score: 1000, +150 per revive, -100 per death, -1 per 5 s, never below 0 (RND-27 placeholder)", () => {
+test("score: 1000, +150 per revive, -100 per death, -1 per 5 s, never below 0 (RND-27, confirmed)", () => {
   assert.deepEqual(SCORE, {base: 1000, perRevive: 150, perDeath: 100, perStepMs: 5000, perStep: 1});
   assert.equal(score({}), 1000);
   assert.equal(score({deaths: 2, revives: 3, ms: 600000}), 1000 + 450 - 200 - 120, "10 minutes is 120 steps of 5 s");
@@ -51,4 +51,10 @@ test("run record: missing or bad numbers become 0 and the input is not changed",
   const input = {roomCode: "X", mode: "original", startedAt: 0, endedAt: 5, players: [{char: 2, place: 1, ms: -5, downs: "x"}]}, frozen = JSON.stringify(input);
   const rec = runRecord(input); assert.deepEqual(rec.players[0], {char: 2, place: 1, ms: 0, downs: 0, deaths: 0, revives: 0, shots: 0, score: 1000}); assert.deepEqual(rec.floors, []);
   assert.equal(JSON.stringify(input), frozen);
+});
+test("a board ranks by score, then by the faster time; ties keep their order; the input is untouched", () => {
+  const rows = [{id: "a", score: 900, ms: 300000}, {id: "b", score: 1100, ms: 500000}, {id: "c", score: 900, ms: 200000}, {id: "d", score: 900, ms: 200000}];
+  const copy = JSON.parse(JSON.stringify(rows));
+  assert.deepEqual(rankBoard(rows).map(r => r.id), ["b", "c", "d", "a"]);
+  assert.deepEqual(rows, copy); assert.deepEqual(rankBoard([]), []);
 });
