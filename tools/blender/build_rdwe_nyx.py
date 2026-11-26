@@ -564,7 +564,7 @@ def floor_pixels():
     n1 = (n1 - n1.min()) / (n1.max() - n1.min())
     n2 = (n2 - n2.min()) / (n2.max() - n2.min())
     img = np.zeros((S, S, 3), np.float32)
-    img[:] = np.array([0.055, 0.050, 0.060])
+    img[:] = np.array([0.13, 0.12, 0.14])                     # black marble, but not so black that the unlit page shows nothing
     img *= (0.75 + 0.5 * n1)[..., None]
     # veins: thin bands where a warped field crosses levels
     f = n1 * 9.0 + n2 * 1.6
@@ -612,8 +612,8 @@ def damask_pixels():
     inner = r < 0.10
     stem = (ux < 0.05) & (np.abs(cy - 0.5) < 0.42)
     motif = (lattice | petals | stem) & ~inner
-    base = np.array([0.30, 0.025, 0.04])
-    sheen = np.array([0.52, 0.06, 0.08])
+    base = np.array([0.42, 0.04, 0.06])
+    sheen = np.array([0.64, 0.10, 0.12])
     img = np.where(motif[..., None], sheen, base).astype(np.float32)
     rng = np.random.default_rng(7)
     weave = wrap_blur(rng.random((S, S)).astype(np.float32), 1, 1)
@@ -628,7 +628,7 @@ def upper_pixels():
     n = wrap_blur(rng.random((S, S)).astype(np.float32), 12, 2)
     n = (n - n.min()) / (n.max() - n.min())
     img = np.zeros((S, S, 3), np.float32)
-    img[:] = np.array([0.045, 0.055, 0.13])
+    img[:] = np.array([0.08, 0.10, 0.22])
     img *= (0.85 + 0.3 * n)[..., None]
     dust = rng.random((S, S)) > 0.9985
     img[dust] = (0.7, 0.55, 0.28)
@@ -711,7 +711,7 @@ def make_materials(gen):
     material("Floor_Marble", img=gen["floor"], rough=0.25)
     material("Wall_Damask", img=gen["damask"], rough=0.6)
     material("Wall_Upper", img=gen["upper"], rough=0.85)
-    material("Dome_Night", color=(0.0033, 0.0052, 0.0296), rough=0.9)          # #0b1030 (PLAN)
+    material("Dome_Night", color=(0.0070, 0.0110, 0.0610), rough=0.9)          # #151d45: the plan's #0b1030 lifted, for the unlit page
     material("Gold_Trim", color=(0.40, 0.27, 0.09), rough=0.35, metal=0.9)          # antique gilt: the page draws it unlit, so not too light
     material("Trim_Black", color=(0.012, 0.010, 0.012), rough=0.4)
     material("Velvet_Curtain", color=(0.20, 0.012, 0.02), rough=0.9)
@@ -719,6 +719,7 @@ def make_materials(gen):
     material("Placard", img=gen["placard"], rough=0.5)
     material("Star_Emit", color=(1.0, 0.8, 0.45), emit=((1.0, 0.78, 0.40), 6.0))
     material("Star_Wire", color=(0.30, 0.22, 0.10), rough=0.4, emit=((0.9, 0.7, 0.4), 0.25))     # the fine wires the stars hang on
+    material("Picture_Light_Emit", color=(1.0, 0.9, 0.7), emit=((1.0, 0.85, 0.6), 4.0))    # the placard light's strip: seen, but it lights nothing in the bake
     material("Sconce_Gilt", color=(0.62, 0.42, 0.14), rough=0.35, metal=0.9)                     # not baked: inches from its own bulb
     material("Star_Door", color=(0.02, 0.02, 0.04), emit=((1.0, 0.82, 0.48), 3.0))
     material("Lamp_Emit", color=(1.0, 0.85, 0.6), emit=((1.0, 0.62, 0.30), 8.0))
@@ -976,6 +977,18 @@ def build_placard():
     add_box(bm, c + Vector((0, -0.004, 0)), (w + 0.03, 0.008, h + 0.03))
     box_uv(bm, 1.0)
     mesh_obj("Placard_Frame", bm, "Gold_Trim")
+    # a small brass picture light over it (its bulb strip is Lamp_Emit; the light itself is PLACARD_W in add_lights)
+    bm = bmesh.new()
+    top = c + Vector((0, 0, h / 2 + 0.06))
+    add_cyl(bm, top + Vector((0, -0.004, 0)), top + Vector((0, 0.16, 0.05)), 0.008, seg=8)              # the arm, out from the wall
+    head = top + Vector((0, 0.16, 0.05))
+    add_cyl(bm, head - Vector((0.17, 0, 0)), head + Vector((0.17, 0, 0)), 0.022, seg=10)                 # the hood
+    box_uv(bm, 1.0)
+    mesh_obj("Placard_Light", bm, "Sconce_Gilt", smooth=True)
+    bm = bmesh.new()
+    add_box(bm, head + Vector((0, -0.004, -0.023)), (0.30, 0.012, 0.004))
+    box_uv(bm, 1.0)
+    mesh_obj("Placard_Light_Glow", bm, "Picture_Light_Emit")
 
 
 SCONCES = [("N", -2.3), ("N", 2.3), ("W", -1.7), ("E", -2.6), ("SW", 0.0), ("SE", 0.0)]
@@ -1057,6 +1070,9 @@ def eye():
     return Vector((SPOT.x, SPOT.y, EYE))
 
 
+SILL = 0.10                                   # the outline's lowest stars: their centres this high, so the largest (r <= 0.06) clear the floor
+
+
 def door_outline(step=0.13):
     """Points round the star door (on the east wall's face): its two jambs, a round-arched head, and the knob."""
     pts = []
@@ -1065,7 +1081,7 @@ def door_outline(step=0.13):
     x = APO - 0.005
     n = max(2, int(spring / step))
     for i in range(n + 1):
-        z = spring * i / n
+        z = SILL + (spring - SILL) * i / n            # from the sill up: no star of the outline sits below the floor line
         pts += [Vector((x, y0, z)), Vector((x, y1, z))]
     m = max(4, int(math.pi * DOOR_W / 2 / step))
     for i in range(1, m):
@@ -1373,9 +1389,10 @@ def build_layout(placed):
 
 
 # ---------------------------------------------------------------- lights (for the bake and the stills; never exported)
-SCONCE_W = 14.0          # each sconce's bulb (W)
-LAMP_W = 18.0            # the bedside lamp
-STARLIGHT_W = 120.0      # the dome's cool glow, an area light under the apex pointing down
+SCONCE_W = 9.0           # each sconce's bulb (W)
+PLACARD_W = 0.09         # the placard's picture light (an area light under its hood, aimed at the plate)
+LAMP_W = 10.0            # the bedside lamp
+STARLIGHT_W = 160.0      # the dome's cool glow, an area light under the apex pointing down: the even part of the light
 CANOPY_W = 0.0
 
 
@@ -1408,6 +1425,10 @@ def add_lights():
         bmesh.ops.create_uvsphere(bm, u_segments=10, v_segments=6, radius=0.022, matrix=Matrix.Translation((c.x, c.y, bottom - 0.025)))
         box_uv(bm, 1.0)
         mesh_obj("Lamp_Glow", bm, "Lamp_Emit", smooth=True)
+    pc = Vector((1.05, -APO + 0.012 + 0.16, 1.0 + 0.14 + 0.06 + 0.05 - 0.03))
+    ob, d = light("Placard_Light", "AREA", pc, PLACARD_W, (1.0, 0.85, 0.65), 0.0)
+    d.shape, d.size, d.size_y = "RECTANGLE", 0.28, 0.02
+    ob.rotation_euler = (Vector((1.05, -APO, 1.0)) - pc).to_track_quat("-Z", "Y").to_euler()
     ob, d = light("Starlight", "AREA", (0, 0, DOME_TOP - 0.6), STARLIGHT_W, (0.45, 0.55, 1.0), 0.0)
     d.shape, d.size = "DISK", 4.0
 
@@ -1448,7 +1469,7 @@ def build_all():
     setup_world()
     sc.unit_settings.system = "METRIC"
     for o in ART.objects:
-        if o.type == "MESH" and o.data.materials and o.data.materials[0].name in ("Lamp_Emit", "Star_Emit", "Star_Door", "Sconce_Gilt"):
+        if o.type == "MESH" and o.data.materials and o.data.materials[0].name in ("Lamp_Emit", "Star_Emit", "Star_Door", "Sconce_Gilt", "Picture_Light_Emit"):
             o.visible_shadow = False                  # the lamps' bulbs hold their point lights; the stars and the wires cast nothing
 
 
@@ -1475,11 +1496,13 @@ MIN_DENSITY = [30, 24, 60, 60]          # px per metre wanted on each map (the s
 PAGES = [1024, 512, 768, 1280]          # the pages the first full bake chose (Blender's packer is not exactly repeatable); --pages a,b,c,d or auto
 if arg("--pages"):
     PAGES = [None if v == "auto" else int(v) for v in arg("--pages").split(",")]
-NOLM = ("Star_Emit", "Star_Door", "Lamp_Emit", "Star_Wire", "Sconce_Gilt")
+NOLM = ("Star_Emit", "Star_Door", "Lamp_Emit", "Star_Wire", "Sconce_Gilt", "Picture_Light_Emit")
 KEEP_NODES = ("DoorLeaf_", "decor_star_")     # exported as their own nodes (the scene code moves or hides them), not merged by material
 MAIN = ("Floor_Marble", "Wall_Damask", "Wall_Upper", "Dome_Night", "Velvet_Curtain", "Nyx_")   # the surfaces held to a displayed p90 <= TARGET
 NOT_MAIN = ("Nyx_NX-00_lamp",)          # the lamp's own body, inches from its bulb: reported, not held (it may glow white where the bulb is)
-TARGET_P90 = arg("--target", 0.45, float)     # the brightest main surface's displayed p90; a night room, so well under the 1.0 that clips
+TARGET_P90 = arg("--target", 0.90, float)
+CLIP_CAP = arg("--clip-cap", 0.98, float)     # and no main surface's p99 above this (0 turns the cap off): the furniture's gilt and marble
+                                              # run about twice their p90, so this cap, not the target, can be the one that binds     # the brightest main surface's displayed p90; a night room, so well under the 1.0 that clips
 
 
 def group_of(mname):
@@ -1532,6 +1555,8 @@ def make_export_objects():
     for ob in out.values():
         if ob.data.materials[0].name in NOLM:
             ob.visible_shadow = False
+        if ob.data.materials[0].name == "Picture_Light_Emit":
+            ob.visible_diffuse = ob.visible_glossy = False     # the area light under the hood is the placard's light; the strip only shows
     return out
 
 
@@ -1772,7 +1797,16 @@ def displayed_stats(ob, lm, scale, n_pts=200000):
     return {"p50": p(0.5), "p90": p(0.9), "p99": p(0.99), "area_m2": float(area.sum())}
 
 
+def reset_lights():
+    """The lights at the constants' energies (the saved .blend holds them times the last bake's exposure), so a bake is the same from any start."""
+    for ob in bpy.data.collections["Lights"].objects:
+        for prefix, w in (("Sconce_", SCONCE_W), ("Lamp_Bulb", LAMP_W), ("Starlight", STARLIGHT_W), ("Placard_Light", PLACARD_W)):
+            if ob.name.startswith(prefix):
+                ob.data.energy = w
+
+
 def stage_bake():
+    reset_lights()
     exp = make_export_objects()
     bpy.data.collections["Art"].hide_render = True
     exp["DoorLeaf_Nyx_Star_x"].hide_render = True          # not there until the trick
@@ -1821,8 +1855,13 @@ def stage_bake():
         disp[mname].update({"area_m2": tot, "map": lst[0][1]})
     main = [m for m in disp if m.startswith(MAIN) and m not in NOT_MAIN]
     worst = max(disp[m]["p90"] for m in main)
+    worst99 = max(disp[m]["p99"] for m in main)
     k = TARGET_P90 / worst
-    print(f"EXPOSURE k = {k:.4f} (the brightest main surface's p90 {worst:.4f} -> {TARGET_P90})")
+    capped = bool(CLIP_CAP) and k * worst99 > CLIP_CAP
+    if capped:
+        k = CLIP_CAP / worst99
+    print(f"EXPOSURE k = {k:.4f} (the brightest main surface's p90 {worst:.4f} -> {TARGET_P90}; p99 {worst99:.4f}; "
+          f"{'held by the clip cap ' + str(CLIP_CAP) if capped else 'the target binds'})")
     for n, (rgb, scale, S) in raw.items():
         out = np.ones((S, S, 4), np.float32)
         out[..., :3] = srgb_encode(rgb / scale)
@@ -1845,7 +1884,7 @@ def stage_bake():
         disp[m]["area_m2"] = round(disp[m]["area_m2"], 2)
     for ob in bpy.data.collections["Lights"].objects:      # the lights as the page shows them, so the stills hold the lightmaps' light
         ob.data.energy *= k
-    (work() / "lightmaps.json").write_text(json.dumps({"maps": report, "exposure_k": round(k, 5), "target_p90": TARGET_P90, "displayed": disp}, indent=1))
+    (work() / "lightmaps.json").write_text(json.dumps({"maps": report, "exposure_k": round(k, 5), "target_p90": TARGET_P90, "clip_cap_p99": CLIP_CAP, "cap_binds": capped, "displayed": disp}, indent=1))
     for m, d in sorted(disp.items()):
         print(f"DISPLAYED {m:30s} map {d['map']}  p50 {d['p50']:.3f}  p90 {d['p90']:.3f}  p99 {d['p99']:.3f}  {'main' if d['main'] else ''}")
     bpy.data.collections["Art"].hide_render = False
