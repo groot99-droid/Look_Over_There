@@ -90,7 +90,7 @@ export const FARWAY = {
     {
       // slice 4 (session 9): the grocery's main floor, a blockout behind the street's grocery door; open by day like the other stores. The back of house stays planned.
       id: "grocery", name: "Grocery", status: "built", tone: "liminal",
-      scenes: [{id: "main_floor", floorY: 0, files: ["world/main_floor.json"]}, {id: "back_of_house"}],
+      scenes: [{id: "main_floor", floorY: 0, files: ["world/main_floor.glb", "world/main_floor.json"]}, {id: "back_of_house"}],
     },
     {
       // slice 14 (session 9): the museum night guard's shift, behind 108 Hallam Row. One gallery hall, blockout; you are only in it during your shift.
