@@ -21,7 +21,7 @@
   ],
   "samples": 768,
   "device": "GPU",
-  "seconds": 190,
+  "seconds": 89,
   "materials": [
    "Acoustic",
    "Store_Wall",
@@ -32,25 +32,25 @@
   "set": "day",
   "size": 2048,
   "px_per_m": 33.8,
-  "scale": 6.014,
-  "knee": 3.0746,
+  "scale": 6.0147,
+  "knee": 3.072,
   "raw_p50_p90_p99_p995_max": [
-   1.813,
-   3.724,
-   10.873,
-   11.18,
-   14.828
+   1.819,
+   3.736,
+   10.863,
+   11.215,
+   14.875
   ],
   "p50_p90_p99_p995_max": [
-   1.813,
-   3.644,
-   5.973,
-   6.014,
-   6.387
+   1.819,
+   3.652,
+   5.967,
+   6.015,
+   6.386
   ],
   "samples": 768,
   "device": "GPU",
-  "seconds": 239,
+  "seconds": 109,
   "materials": [
    "Alu",
    "Brass",
@@ -99,7 +99,7 @@
   ],
   "samples": 768,
   "device": "GPU",
-  "seconds": 58,
+  "seconds": 28,
   "materials": [
    "Gondola",
    "Gondola_Back",
