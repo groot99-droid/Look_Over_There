@@ -14,7 +14,7 @@
   ],
   "samples": 384,
   "device": "GPU",
-  "seconds": 85,
+  "seconds": 49,
   "materials": [
    "Ceil_White",
    "Floor_Concrete",
@@ -30,15 +30,15 @@
   "C": 1.12,
   "px_per_m": 141.9,
   "p50_p90_p99_p995_max": [
-   0.2375,
-   0.455,
-   1.0949,
-   1.6047,
-   54.3246
+   0.2369,
+   0.4539,
+   1.0967,
+   1.601,
+   46.7893
   ],
   "samples": 384,
   "device": "GPU",
-  "seconds": 102,
+  "seconds": 58,
   "materials": [
    "Brass",
    "Chrome",

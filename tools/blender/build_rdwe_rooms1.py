@@ -3842,7 +3842,9 @@ def stage_render():
             if o.type != "MESH":
                 continue
             lowest = min((o.matrix_world @ v.co).z for v in o.data.vertices) if o.data.vertices else 0
-            if o.name in ceil or (lowest > 2.6 and not o.name.startswith(("Step", "Fill", "Landing", "Ledge", "Chair_", "decor_Trick_Painted"))):
+            over = (o.name.startswith(("decor_Ceiling", "decor_Roof", "decor_Trick_Upside", "decor_Terrace_Trim", "decor_Pendant", "decor_Chandelier"))
+                    or any(sl.material and sl.material.name in ceil | {"Ceil_Prop"} for sl in o.material_slots))
+            if o.name in ceil or over or (lowest > 2.6 and not o.name.startswith(("Step", "Fill", "Landing", "Ledge", "Chair_", "decor_Trick_Painted"))):
                 if not o.hide_render:
                     o.hide_render = True
                     hidden.append(o)
@@ -3889,6 +3891,10 @@ def main():
         try:
             if STAGE == "encode":
                 stage_encode_blender()
+                continue
+            if STAGE == "plan":                                # the plan alone, again, from the saved scene (the .blend is not saved)
+                load_scene_file()
+                stage_render()
                 continue
             if STAGE in ("art", "all", "preview"):
                 build_all()
