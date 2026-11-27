@@ -1,0 +1,1456 @@
+{
+ "scene": "gbi_L1_3",
+ "colliders": [
+  {
+   "s": "Car_Ceiling_from_L1_2",
+   "min": [
+    -11.05,
+    2.4,
+    25.05
+   ],
+   "max": [
+    -8.95,
+    2.48,
+    27.15
+   ]
+  },
+  {
+   "s": "Car_Floor_from_L1_2",
+   "min": [
+    -11.05,
+    -0.12,
+    25.05
+   ],
+   "max": [
+    -8.95,
+    0.0,
+    27.15
+   ]
+  },
+  {
+   "s": "Car_Front_E_from_L1_2",
+   "min": [
+    -11.0,
+    0.0,
+    25.05
+   ],
+   "max": [
+    -10.6,
+    2.4,
+    25.1
+   ]
+  },
+  {
+   "s": "Car_Front_W_from_L1_2",
+   "min": [
+    -9.4,
+    0.0,
+    25.05
+   ],
+   "max": [
+    -9.0,
+    2.4,
+    25.1
+   ]
+  },
+  {
+   "s": "Car_Head_from_L1_2",
+   "min": [
+    -10.6,
+    2.2,
+    25.05
+   ],
+   "max": [
+    -9.4,
+    2.4,
+    25.1
+   ]
+  },
+  {
+   "s": "Car_Wall_Back_from_L1_2",
+   "min": [
+    -11.0,
+    0.0,
+    27.1
+   ],
+   "max": [
+    -9.0,
+    2.4,
+    27.15
+   ]
+  },
+  {
+   "s": "Car_Wall_E_from_L1_2",
+   "min": [
+    -11.05,
+    0.0,
+    25.05
+   ],
+   "max": [
+    -11.0,
+    2.4,
+    27.15
+   ]
+  },
+  {
+   "s": "Car_Wall_W_from_L1_2",
+   "min": [
+    -9.0,
+    0.0,
+    25.05
+   ],
+   "max": [
+    -8.95,
+    2.4,
+    27.15
+   ]
+  },
+  {
+   "s": "Ceiling",
+   "min": [
+    -26.3,
+    2.8,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    3.0,
+    27.35
+   ]
+  },
+  {
+   "s": "Desk_1",
+   "min": [
+    -24.0,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    -20.0,
+    0.75,
+    -6.0
+   ]
+  },
+  {
+   "s": "Desk_2",
+   "min": [
+    -16.0,
+    0.0,
+    -12.0
+   ],
+   "max": [
+    -12.0,
+    0.75,
+    -10.0
+   ]
+  },
+  {
+   "s": "Desk_3",
+   "min": [
+    -8.0,
+    0.0,
+    -16.0
+   ],
+   "max": [
+    -4.0,
+    0.75,
+    -14.0
+   ]
+  },
+  {
+   "s": "Desk_4",
+   "min": [
+    4.0,
+    0.0,
+    14.0
+   ],
+   "max": [
+    8.0,
+    0.75,
+    16.0
+   ]
+  },
+  {
+   "s": "Desk_5",
+   "min": [
+    12.0,
+    0.0,
+    20.0
+   ],
+   "max": [
+    16.0,
+    0.75,
+    22.0
+   ]
+  },
+  {
+   "s": "Desk_6",
+   "min": [
+    20.0,
+    0.0,
+    8.0
+   ],
+   "max": [
+    24.0,
+    0.75,
+    10.0
+   ]
+  },
+  {
+   "s": "Desk_7",
+   "min": [
+    6.0,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    10.0,
+    0.75,
+    -6.0
+   ]
+  },
+  {
+   "s": "Desk_8",
+   "min": [
+    20.0,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    24.0,
+    0.75,
+    -8.0
+   ]
+  },
+  {
+   "s": "Floor",
+   "min": [
+    -26.3,
+    -0.2,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    0.0,
+    27.35
+   ]
+  },
+  {
+   "s": "Landing_Floor_from_L1_2",
+   "min": [
+    -10.9,
+    -0.05,
+    23.53
+   ],
+   "max": [
+    -9.1,
+    0.006,
+    24.73
+   ]
+  },
+  {
+   "s": "Landing_Head_from_L1_2",
+   "min": [
+    -10.6,
+    2.2,
+    24.74
+   ],
+   "max": [
+    -9.4,
+    2.28,
+    24.82
+   ]
+  },
+  {
+   "s": "Landing_Jamb_E_from_L1_2",
+   "min": [
+    -10.68,
+    0.0,
+    24.74
+   ],
+   "max": [
+    -10.6,
+    2.28,
+    24.82
+   ]
+  },
+  {
+   "s": "Landing_Jamb_W_from_L1_2",
+   "min": [
+    -9.4,
+    0.0,
+    24.74
+   ],
+   "max": [
+    -9.32,
+    2.28,
+    24.82
+   ]
+  },
+  {
+   "s": "Office_NW_1_1",
+   "min": [
+    -18.1,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    -17.9,
+    2.8,
+    -0.2
+   ]
+  },
+  {
+   "s": "Office_NW_2_1",
+   "min": [
+    -10.1,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    -9.9,
+    2.8,
+    -0.2
+   ]
+  },
+  {
+   "s": "Office_SE_1_1",
+   "min": [
+    9.9,
+    0.0,
+    3.2
+   ],
+   "max": [
+    10.1,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Office_SE_2_1",
+   "min": [
+    17.9,
+    0.0,
+    3.2
+   ],
+   "max": [
+    18.1,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Shaft_E_from_L1_2",
+   "min": [
+    -11.25,
+    0.0,
+    24.74
+   ],
+   "max": [
+    -11.05,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Shaft_Fill_E_from_L1_2",
+   "min": [
+    -11.05,
+    0.0,
+    24.74
+   ],
+   "max": [
+    -10.68,
+    2.8,
+    25.05
+   ]
+  },
+  {
+   "s": "Shaft_Fill_W_from_L1_2",
+   "min": [
+    -9.32,
+    0.0,
+    24.74
+   ],
+   "max": [
+    -8.95,
+    2.8,
+    25.05
+   ]
+  },
+  {
+   "s": "Shaft_Head_Front_from_L1_2",
+   "min": [
+    -10.68,
+    2.4,
+    24.74
+   ],
+   "max": [
+    -9.32,
+    2.8,
+    25.05
+   ]
+  },
+  {
+   "s": "Shaft_Head_from_L1_2",
+   "min": [
+    -11.05,
+    2.48,
+    25.05
+   ],
+   "max": [
+    -8.95,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Shaft_W_from_L1_2",
+   "min": [
+    -8.95,
+    0.0,
+    24.74
+   ],
+   "max": [
+    -8.75,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Sky_Ceiling_to_L1_4",
+   "min": [
+    16.6,
+    3.0,
+    -22.15
+   ],
+   "max": [
+    19.4,
+    3.25,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_0_to_L1_4",
+   "min": [
+    16.8,
+    0.0,
+    -11.95
+   ],
+   "max": [
+    17.45,
+    3.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_1_to_L1_4",
+   "min": [
+    18.55,
+    0.0,
+    -11.95
+   ],
+   "max": [
+    19.2,
+    3.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_2_to_L1_4",
+   "min": [
+    17.45,
+    2.16,
+    -11.95
+   ],
+   "max": [
+    18.55,
+    3.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_3_to_L1_4",
+   "min": [
+    16.8,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    17.45,
+    3.0,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_End_4_to_L1_4",
+   "min": [
+    18.55,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    19.2,
+    3.0,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_End_5_to_L1_4",
+   "min": [
+    17.45,
+    2.16,
+    -22.15
+   ],
+   "max": [
+    18.55,
+    3.0,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_Floor_to_L1_4",
+   "min": [
+    16.8,
+    -0.3,
+    -21.95
+   ],
+   "max": [
+    19.2,
+    0.0,
+    -11.95
+   ]
+  },
+  {
+   "s": "Sky_Wall_E_to_L1_4",
+   "min": [
+    19.2,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    19.4,
+    3.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_Wall_W_to_L1_4",
+   "min": [
+    16.6,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    16.8,
+    3.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Spine_E_N_1",
+   "min": [
+    1.5,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    1.7,
+    2.8,
+    -0.2
+   ]
+  },
+  {
+   "s": "Spine_E_S_1",
+   "min": [
+    1.5,
+    0.0,
+    3.2
+   ],
+   "max": [
+    1.7,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Spine_N_E_1",
+   "min": [
+    1.7,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    9.0,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_E_2",
+   "min": [
+    11.0,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    26.1,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_W_1",
+   "min": [
+    -26.1,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    -22.5,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_W_2",
+   "min": [
+    -22.5,
+    2.2,
+    -0.2
+   ],
+   "max": [
+    -21.5,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_W_3",
+   "min": [
+    -21.5,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    -14.5,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_W_4",
+   "min": [
+    -14.5,
+    2.2,
+    -0.2
+   ],
+   "max": [
+    -13.5,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_W_5",
+   "min": [
+    -13.5,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    -6.5,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_W_6",
+   "min": [
+    -6.5,
+    2.2,
+    -0.2
+   ],
+   "max": [
+    -5.5,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_N_W_7",
+   "min": [
+    -5.5,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    -1.7,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Spine_S_E_1",
+   "min": [
+    1.7,
+    0.0,
+    3.0
+   ],
+   "max": [
+    5.5,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_E_2",
+   "min": [
+    5.5,
+    2.2,
+    3.0
+   ],
+   "max": [
+    6.5,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_E_3",
+   "min": [
+    6.5,
+    0.0,
+    3.0
+   ],
+   "max": [
+    13.5,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_E_4",
+   "min": [
+    13.5,
+    2.2,
+    3.0
+   ],
+   "max": [
+    14.5,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_E_5",
+   "min": [
+    14.5,
+    0.0,
+    3.0
+   ],
+   "max": [
+    21.5,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_E_6",
+   "min": [
+    21.5,
+    2.2,
+    3.0
+   ],
+   "max": [
+    22.5,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_E_7",
+   "min": [
+    22.5,
+    0.0,
+    3.0
+   ],
+   "max": [
+    26.1,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_W_1",
+   "min": [
+    -26.1,
+    0.0,
+    3.0
+   ],
+   "max": [
+    -11.0,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_S_W_2",
+   "min": [
+    -9.0,
+    0.0,
+    3.0
+   ],
+   "max": [
+    -1.7,
+    2.8,
+    3.2
+   ]
+  },
+  {
+   "s": "Spine_W_N_1",
+   "min": [
+    -1.7,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    -1.5,
+    2.8,
+    -0.2
+   ]
+  },
+  {
+   "s": "Spine_W_S_1",
+   "min": [
+    -1.7,
+    0.0,
+    3.2
+   ],
+   "max": [
+    -1.5,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Vent_1",
+   "min": [
+    4.0,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    9.0,
+    1.0,
+    -21.15
+   ]
+  },
+  {
+   "s": "Wall_E_1",
+   "min": [
+    26.1,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    26.3,
+    2.8,
+    27.15
+   ]
+  },
+  {
+   "s": "Wall_N_1",
+   "min": [
+    -26.3,
+    0.0,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    2.8,
+    -22.15
+   ]
+  },
+  {
+   "s": "Wall_S_1",
+   "min": [
+    -26.3,
+    0.0,
+    27.15
+   ],
+   "max": [
+    26.3,
+    2.8,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_W_1",
+   "min": [
+    -26.3,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    -26.1,
+    2.8,
+    27.15
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_Spine_N_W_m14",
+   "level": "gbi_L1_3",
+   "hinge": [
+    -14.47,
+    0.0,
+    0.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Spine_N_W_m22",
+   "level": "gbi_L1_3",
+   "hinge": [
+    -22.47,
+    0.0,
+    0.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Spine_N_W_m6",
+   "level": "gbi_L1_3",
+   "hinge": [
+    -6.47,
+    0.0,
+    0.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Spine_S_E_14",
+   "level": "gbi_L1_3",
+   "hinge": [
+    13.53,
+    0.0,
+    3.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Spine_S_E_22",
+   "level": "gbi_L1_3",
+   "hinge": [
+    21.53,
+    0.0,
+    3.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Spine_S_E_6",
+   "level": "gbi_L1_3",
+   "hinge": [
+    5.53,
+    0.0,
+    3.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_entry_to_L1_4",
+   "level": "gbi_L1_3",
+   "hinge": [
+    17.48,
+    0.0,
+    -11.85
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "hall door"
+  },
+  {
+   "name": "DoorLeaf_exit_to_L1_4",
+   "level": "gbi_L1_3",
+   "hinge": [
+    18.52,
+    0.0,
+    -22.05
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": -180.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "EXIT door"
+  },
+  {
+   "name": "DoorLeaf_lift_from_L1_2",
+   "level": "gbi_L1_3",
+   "hinge": [
+    -10.6,
+    0.0,
+    24.8
+   ],
+   "width": 1.2,
+   "height": 2.2,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "elevator",
+   "leaves": "LiftLeaf_L,LiftLeaf_R",
+   "slide_m": 0.6,
+   "car": "elevator_car"
+  },
+  {
+   "name": "DoorLeaf_vent_1",
+   "level": "gbi_L1_3",
+   "hinge": [
+    4.0,
+    0.1,
+    -22.05
+   ],
+   "width": 0.8,
+   "height": 0.8,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "vent",
+   "locked": "crawling is not in the game yet"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Arrival",
+   "room": "gbi_L1_3",
+   "level": "gbi_L1_3",
+   "kind": "Entrance",
+   "position": [
+    -10.0,
+    0.0,
+    23.8
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "exit_to_L1_4",
+   "at": [
+    18.0,
+    0.0,
+    -21.45
+   ],
+   "arrive": [
+    18.0,
+    0.0,
+    -21.05
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "lift_from_L1_2",
+   "at": [
+    -10.0,
+    0.0,
+    24.2
+   ],
+   "arrive": [
+    -10.0,
+    0.0,
+    23.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_crush_1",
+   "min": [
+    -1.5,
+    0.0,
+    -14.0
+   ],
+   "max": [
+    1.5,
+    2.8,
+    -10.0
+   ]
+  },
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_crush_2",
+   "min": [
+    -1.5,
+    0.0,
+    -14.0
+   ],
+   "max": [
+    1.5,
+    2.8,
+    -10.0
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "call",
+   "name": "Spot_call_1_from_L1_2",
+   "position": [
+    -10.88,
+    0.0,
+    24.35
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the call button"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_1_a",
+   "position": [
+    -1.1,
+    0.0,
+    -12.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_1",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 6.0,
+   "what": "the north leg's walls close",
+   "pair": "Hazard_crush_2",
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_1_b",
+   "position": [
+    0.2,
+    0.0,
+    -12.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_1",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 6.0,
+   "what": "the north leg's walls close",
+   "pair": "Hazard_crush_2",
+   "end": "b"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_2_a",
+   "position": [
+    1.1,
+    0.0,
+    -12.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_2",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 6.0,
+   "what": "the north leg's walls close",
+   "pair": "Hazard_crush_1",
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_2_b",
+   "position": [
+    -0.2,
+    0.0,
+    -12.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_2",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 6.0,
+   "what": "the north leg's walls close",
+   "pair": "Hazard_crush_1",
+   "end": "b"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1",
+   "position": [
+    -14.5,
+    0.0,
+    25.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the Lost and Found: your loadout, and your gear back after you die"
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    -22.0,
+    0.0,
+    -10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_2",
+   "position": [
+    0.0,
+    0.0,
+    -20.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_3",
+   "position": [
+    14.0,
+    0.0,
+    15.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_1",
+   "position": [
+    10.0,
+    0.0,
+    -16.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "15"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_2",
+   "position": [
+    -14.0,
+    0.0,
+    -14.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "15"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_3",
+   "position": [
+    14.0,
+    0.0,
+    10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "15"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_1",
+   "position": [
+    -6.0,
+    0.0,
+    -10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_2",
+   "position": [
+    22.0,
+    0.0,
+    20.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_3",
+   "position": [
+    -20.0,
+    0.0,
+    10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "panel",
+   "name": "Spot_panel_1_from_L1_2",
+   "position": [
+    -10.55,
+    0.0,
+    25.47
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "what": "the car's floor buttons (inside the car)"
+  },
+  {
+   "kind": "puzzle",
+   "name": "Spot_puzzle_1",
+   "position": [
+    24.0,
+    0.0,
+    -2.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a pair of loud switches"
+  },
+  {
+   "kind": "vent",
+   "name": "Spot_vent_1",
+   "position": [
+    3.1,
+    0.0,
+    -21.65
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "to": "gbi_L1_4 (shut: crawling is not in the game yet)",
+   "state": "shut"
+  }
+ ]
+}

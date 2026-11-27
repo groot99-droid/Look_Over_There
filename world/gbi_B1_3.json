@@ -1,0 +1,1031 @@
+{
+ "scene": "gbi_B1_3",
+ "colliders": [
+  {
+   "s": "Bath_N_E_1",
+   "min": [
+    12.9,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    13.1,
+    0.0,
+    3.8
+   ]
+  },
+  {
+   "s": "Bath_N_W_1",
+   "min": [
+    -13.1,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    -12.9,
+    0.0,
+    3.8
+   ]
+  },
+  {
+   "s": "Bath_S_E_1",
+   "min": [
+    7.9,
+    -3.0,
+    8.2
+   ],
+   "max": [
+    8.1,
+    0.0,
+    27.15
+   ]
+  },
+  {
+   "s": "Bath_S_W_1",
+   "min": [
+    -8.1,
+    -3.0,
+    8.2
+   ],
+   "max": [
+    -7.9,
+    0.0,
+    27.15
+   ]
+  },
+  {
+   "s": "Ceiling",
+   "min": [
+    -26.3,
+    0.0,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    0.2,
+    27.35
+   ]
+  },
+  {
+   "s": "Corridor_N_1",
+   "min": [
+    -26.1,
+    -3.0,
+    3.8
+   ],
+   "max": [
+    -20.5,
+    0.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Corridor_N_2",
+   "min": [
+    -20.5,
+    -0.8,
+    3.8
+   ],
+   "max": [
+    -19.5,
+    0.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Corridor_N_3",
+   "min": [
+    -19.5,
+    -3.0,
+    3.8
+   ],
+   "max": [
+    -1.2,
+    0.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Corridor_N_4",
+   "min": [
+    1.2,
+    -3.0,
+    3.8
+   ],
+   "max": [
+    19.5,
+    0.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Corridor_N_5",
+   "min": [
+    19.5,
+    -0.8,
+    3.8
+   ],
+   "max": [
+    20.5,
+    0.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Corridor_N_6",
+   "min": [
+    20.5,
+    -3.0,
+    3.8
+   ],
+   "max": [
+    26.1,
+    0.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Corridor_S_1",
+   "min": [
+    -26.1,
+    -3.0,
+    8.0
+   ],
+   "max": [
+    -17.2,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Corridor_S_2",
+   "min": [
+    -14.8,
+    -3.0,
+    8.0
+   ],
+   "max": [
+    -0.5,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Corridor_S_3",
+   "min": [
+    -0.5,
+    -0.8,
+    8.0
+   ],
+   "max": [
+    0.5,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Corridor_S_4",
+   "min": [
+    0.5,
+    -3.0,
+    8.0
+   ],
+   "max": [
+    15.5,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Corridor_S_5",
+   "min": [
+    15.5,
+    -0.8,
+    8.0
+   ],
+   "max": [
+    16.5,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Corridor_S_6",
+   "min": [
+    16.5,
+    -3.0,
+    8.0
+   ],
+   "max": [
+    26.1,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Floor",
+   "min": [
+    -26.3,
+    -3.2,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    -3.0,
+    27.35
+   ]
+  },
+  {
+   "s": "Sky_Ceiling_to_B1_4",
+   "min": [
+    -1.4,
+    0.0,
+    -22.15
+   ],
+   "max": [
+    1.4,
+    0.25,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_0_to_B1_4",
+   "min": [
+    -1.2,
+    -3.0,
+    -11.95
+   ],
+   "max": [
+    -0.55,
+    0.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_1_to_B1_4",
+   "min": [
+    0.55,
+    -3.0,
+    -11.95
+   ],
+   "max": [
+    1.2,
+    0.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_2_to_B1_4",
+   "min": [
+    -0.55,
+    -0.84,
+    -11.95
+   ],
+   "max": [
+    0.55,
+    0.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_3_to_B1_4",
+   "min": [
+    -1.2,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    -0.55,
+    0.0,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_End_4_to_B1_4",
+   "min": [
+    0.55,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    1.2,
+    0.0,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_End_5_to_B1_4",
+   "min": [
+    -0.55,
+    -0.84,
+    -22.15
+   ],
+   "max": [
+    0.55,
+    0.0,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_Floor_to_B1_4",
+   "min": [
+    -1.2,
+    -3.3,
+    -21.95
+   ],
+   "max": [
+    1.2,
+    -3.0,
+    -11.95
+   ]
+  },
+  {
+   "s": "Sky_Wall_E_to_B1_4",
+   "min": [
+    1.2,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    1.4,
+    0.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_Wall_W_to_B1_4",
+   "min": [
+    -1.4,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    -1.2,
+    0.0,
+    -11.75
+   ]
+  },
+  {
+   "s": "Vent_1",
+   "min": [
+    -26.1,
+    -3.0,
+    -10.0
+   ],
+   "max": [
+    -25.1,
+    -2.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Wall_E_1",
+   "min": [
+    26.1,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    26.3,
+    0.0,
+    27.15
+   ]
+  },
+  {
+   "s": "Wall_N_1",
+   "min": [
+    -26.3,
+    -3.0,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    0.0,
+    -22.15
+   ]
+  },
+  {
+   "s": "Wall_S_1",
+   "min": [
+    -26.3,
+    -3.0,
+    27.15
+   ],
+   "max": [
+    -16.5,
+    0.0,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_S_2",
+   "min": [
+    -16.5,
+    -0.8,
+    27.15
+   ],
+   "max": [
+    -15.5,
+    0.0,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_S_3",
+   "min": [
+    -15.5,
+    -3.0,
+    27.15
+   ],
+   "max": [
+    26.3,
+    0.0,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_W_1",
+   "min": [
+    -26.3,
+    -3.0,
+    -22.15
+   ],
+   "max": [
+    -26.1,
+    0.0,
+    27.15
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_Corridor_N_20",
+   "level": "gbi_B1_3",
+   "hinge": [
+    19.53,
+    -3.0,
+    4.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Corridor_N_m20",
+   "level": "gbi_B1_3",
+   "hinge": [
+    -20.47,
+    -3.0,
+    4.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Corridor_S_0",
+   "level": "gbi_B1_3",
+   "hinge": [
+    -0.47,
+    -3.0,
+    8.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Corridor_S_16",
+   "level": "gbi_B1_3",
+   "hinge": [
+    15.53,
+    -3.0,
+    8.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_entry_to_B1_4",
+   "level": "gbi_B1_3",
+   "hinge": [
+    -0.52,
+    -3.0,
+    -11.85
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "hall door"
+  },
+  {
+   "name": "DoorLeaf_exit_to_B1_4",
+   "level": "gbi_B1_3",
+   "hinge": [
+    0.52,
+    -3.0,
+    -22.05
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": -180.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "EXIT door"
+  },
+  {
+   "name": "DoorLeaf_from_B1_2",
+   "level": "gbi_B1_3",
+   "hinge": [
+    -15.53,
+    -3.0,
+    27.15
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "door"
+  },
+  {
+   "name": "DoorLeaf_vent_1",
+   "level": "gbi_B1_3",
+   "hinge": [
+    -26.0,
+    -2.9,
+    -10.0
+   ],
+   "width": 0.8,
+   "height": 0.8,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "vent",
+   "locked": "crawling is not in the game yet"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Arrival",
+   "room": "gbi_B1_3",
+   "level": "gbi_B1_3",
+   "kind": "Entrance",
+   "position": [
+    -16.0,
+    -3.0,
+    25.95
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "exit_to_B1_4",
+   "at": [
+    0.0,
+    -3.0,
+    -21.45
+   ],
+   "arrive": [
+    0.0,
+    -3.0,
+    -21.05
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "from_B1_2",
+   "at": [
+    -16.0,
+    -3.0,
+    26.55
+   ],
+   "arrive": [
+    -16.0,
+    -3.0,
+    25.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_gas_1",
+   "min": [
+    -26.1,
+    -3.0,
+    4.0
+   ],
+   "max": [
+    26.1,
+    0.0,
+    8.0
+   ]
+  },
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_tide_1",
+   "min": [
+    -24.0,
+    -3.0,
+    -20.0
+   ],
+   "max": [
+    -15.0,
+    -1.4,
+    -2.0
+   ]
+  },
+  {
+   "kind": "water",
+   "name": "Zone_water_bath_E",
+   "min": [
+    15.0,
+    -3.0,
+    -20.0
+   ],
+   "max": [
+    24.0,
+    -2.7,
+    -2.0
+   ]
+  },
+  {
+   "kind": "water",
+   "name": "Zone_water_bath_M_E",
+   "min": [
+    4.0,
+    -3.0,
+    -6.0
+   ],
+   "max": [
+    11.0,
+    -2.7,
+    1.5
+   ]
+  },
+  {
+   "kind": "water",
+   "name": "Zone_water_bath_M_W",
+   "min": [
+    -11.0,
+    -3.0,
+    -6.0
+   ],
+   "max": [
+    -4.0,
+    -2.7,
+    1.5
+   ]
+  },
+  {
+   "kind": "water",
+   "name": "Zone_water_bath_SE",
+   "min": [
+    10.0,
+    -3.0,
+    12.0
+   ],
+   "max": [
+    24.0,
+    -2.7,
+    24.0
+   ]
+  },
+  {
+   "kind": "water",
+   "name": "Zone_water_bath_SM",
+   "min": [
+    -6.0,
+    -3.0,
+    12.0
+   ],
+   "max": [
+    6.0,
+    -2.7,
+    24.0
+   ]
+  },
+  {
+   "kind": "water",
+   "name": "Zone_water_bath_W",
+   "min": [
+    -24.0,
+    -3.0,
+    -20.0
+   ],
+   "max": [
+    -15.0,
+    -2.7,
+    -2.0
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_gas_1_a",
+   "position": [
+    24.0,
+    -3.0,
+    6.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_gas_1",
+   "kind_of": "toxic gas",
+   "motion": "drift",
+   "period_s": 30.0,
+   "what": "gas drifts west down the tiled corridor",
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_gas_1_b",
+   "position": [
+    -24.0,
+    -3.0,
+    6.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_gas_1",
+   "kind_of": "toxic gas",
+   "motion": "drift",
+   "period_s": 30.0,
+   "what": "gas drifts west down the tiled corridor",
+   "end": "b"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_tide_1_a",
+   "position": [
+    -19.5,
+    -3.0,
+    -11.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_tide_1",
+   "kind_of": "high tides",
+   "motion": "rise",
+   "period_s": 40.0,
+   "what": "the west bath floods to the ceiling's lip and drains",
+   "y_from": -2.7,
+   "y_to": -1.6,
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_tide_1_b",
+   "position": [
+    -19.5,
+    -3.0,
+    -11.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_tide_1",
+   "kind_of": "high tides",
+   "motion": "rise",
+   "period_s": 40.0,
+   "what": "the west bath floods to the ceiling's lip and drains",
+   "y_from": -2.7,
+   "y_to": -1.6,
+   "end": "b"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1",
+   "position": [
+    -12.0,
+    -3.0,
+    25.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the Lost and Found: your loadout, and your gear back after you die"
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    20.0,
+    -3.0,
+    -10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_2",
+   "position": [
+    0.0,
+    -3.0,
+    20.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_3",
+   "position": [
+    16.0,
+    -3.0,
+    20.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_1",
+   "position": [
+    6.0,
+    -3.0,
+    -16.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "19"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_2",
+   "position": [
+    20.0,
+    -3.0,
+    -18.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "19"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_3",
+   "position": [
+    -8.0,
+    -3.0,
+    -10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "19"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_1",
+   "position": [
+    -20.0,
+    -3.0,
+    -16.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_2",
+   "position": [
+    8.0,
+    -3.0,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_3",
+   "position": [
+    20.0,
+    -3.0,
+    12.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "puzzle",
+   "name": "Spot_puzzle_1",
+   "position": [
+    -22.0,
+    -3.0,
+    14.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "what": "a fuse to carry to the fuse box"
+  },
+  {
+   "kind": "vent",
+   "name": "Spot_vent_1",
+   "position": [
+    -25.6,
+    -3.0,
+    -10.9
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "to": "gbi_B1_4 (shut: crawling is not in the game yet)",
+   "state": "shut"
+  }
+ ]
+}
