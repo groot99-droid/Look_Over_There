@@ -1721,7 +1721,7 @@ ATLAS_CROSS = Atlas([("wayout", 512, 128, sign("WAY OUT", (0.05, 0.35, 0.12), (0
 
 CROSSROADS = dict(
     pages=(2048, 1024),
-    grade={"target": 0.95, "shoulder": 1.15},
+    grade={"target": 2.2, "shoulder": 1.15, "caps": {"Trim_White": 0.815}},
     mats={"Terrazzo": dict(diff="terrazzo_tiles_diff_1k.jpg", tint=(0.95, 0.95, 0.92), rough=0.3, tile=2.0, group="struct"),
           "Paint_Acid": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.62, 0.90, 0.20), rough=0.35, tile=2.5, group="struct"),
           "Tile_Green": dict(gen="tile", rough=0.25, tile=0.6, group="struct"),
@@ -1943,9 +1943,9 @@ def dress_laundromat():
             p0 = on_wall("N", dc[0] + ux * (R - 0.2), dc[1] + uy * (R - 0.2), -0.04)
             p1 = on_wall("N", dc[0] + ux * (R - 0.04), dc[1] + uy * (R - 0.04), -0.32)
             cube(bm, [min(p0[i], p1[i]) - (0.03 if i != 2 else 0) for i in range(3)], [max(p0[i], p1[i]) + (0.03 if i != 2 else 0) for i in range(3)])
-    moving_part("Drum", "Drum_Steel", drum, pivot)
+    moving_part("decor_Drum", "Drum_Steel", drum, pivot)
     moving_part("decor_Drum_Clothes", "Clothes_Move", lambda bm: sphere(bm, on_wall("N", dc[0] + 0.1, dc[1] - 0.4, -0.2), 0.32, 14, 0.5), pivot, smooth=True)
-    K.spec["moving"] = {"Drum": "turns about its axis (the round door's centre); a turn each time you look away",
+    K.spec["moving"] = {"decor_Drum": "turns about its axis (the round door's centre); a turn each time you look away",
                         "decor_Drum_Clothes": "the washing in the drum: turns with it"}
     finish("decor_Door_Rings", rl, "Chrome")
     finish("decor_Door_Glass", gl, "Glass_Dark", recalc=False)
@@ -2037,7 +2037,7 @@ def dress_motel_room():
     for z0 in (0.1, 0.85):
         P.add("cream", sphere, (bb["min"][0] + 0.35, 0.62, z0 + 0.33), 0.32, 12, 0.3, sx=0.6)
     P.done("decor_Pillows")
-    part("Bed_Headboard", "Wood_Dark", lambda bm: box(bm, bb["min"][0], bb["min"][0] + 0.06, 0.0, 1.15, bb["min"][2] - 0.1, bb["max"][2] + 0.1))
+    part("Bed_Headboard", "Wood_Dark", lambda bm: box(bm, bb["min"][0], bb["min"][0] + 0.06, 0.0, 1.15, bb["min"][2], bb["max"][2]))
     frame_picture("Seascape", "W", 0.8, 1.75, 1.2, 0.6, "Paintings", uv=painting_uv(2), frame_mat="Frame_Gilt")
     for n in ("Nightstand_N", "Nightstand_S"):
         b = K.BOX[n]
@@ -2236,7 +2236,7 @@ def g_monitor():
 
 OFFICE_NIGHT = dict(
     pages=(2048, 2048),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 1.5, "shoulder": 1.15, "caps": {"Trim_White": 0.822}},
     mats={"Carpet_Tiles": dict(gen="carpet", rough=1.0, tile=2.0, group="struct"),
           "Paint_Office": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.72, 0.74, 0.72), rough=0.8, tile=2.5, group="struct"),
           "Ceiling_Tiles": dict(gen="ceiltile", rough=0.9, tile=1.2, group="struct"),
@@ -2353,7 +2353,7 @@ ATLAS_LIFT = Atlas([("dial", 512, 256, lambda h, w: (lambda yy, xx: np.where((((
 
 ELEVATOR_LOBBY = dict(
     pages=(2048, 1024),
-    grade={"target": 0.95, "shoulder": 1.15},
+    grade={"target": 1.6, "shoulder": 1.15, "caps": {}},
     mats={"Marble_Floor": dict(diff="Marble012_color_1k.jpg", tint=(0.92, 0.9, 0.86), rough=0.2, tile=2.0, group="struct"),
           "Steel_Wall": dict(diff="Metal048A_color_512.jpg", tint=(0.82, 0.83, 0.85), rough=0.4, metal=0.5, tile=1.2, group="struct"),
           "Marble_Wall": dict(diff="marble_01_diff_1k.jpg", tint=(0.9, 0.86, 0.8), rough=0.3, tile=1.6, group="struct"),
@@ -2460,7 +2460,7 @@ def g_pinboard():
 
 MAP_ROOM = dict(
     pages=(2048, 1024),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 1.2, "shoulder": 1.15, "caps": {}},
     mats={"Floor_Oak": dict(diff="old_wood_floor_diff_1k.jpg", tint=(0.95, 0.85, 0.72), rough=0.5, tile=1.4, group="struct"),
           "Paper_Map": dict(gen="mappaper", rough=0.9, tile=1.2, group="struct"),
           "Panel_Dark": dict(diff="dark_wood_diff_1k.jpg", tint=(0.75, 0.65, 0.55), rough=0.5, tile=1.2, group="struct"),
@@ -2614,7 +2614,7 @@ def dress_melting_library():
 
             def case(bm, k=k, x=x, j=j, b=b, y0=y0, y1=y1):
                 zs = np.linspace(-4.0, 4.0, 33)
-                for yb in np.arange(y0, y1 - 0.05, 0.45 if j == 0 else 0.46):     # the boards: a strip along z, slumped and leaning
+                for yb in np.arange(y0 + (0.0 if j == 0 else 0.26), y1 - 0.05, 0.45 if j == 0 else 0.46):   # the boards (slumped, never below the box)
                     for z0, z1 in zip(zs, zs[1:]):
                         ya, yb2 = yb - sag_y(z0, j + yb / 2), yb - sag_y(z1, j + yb / 2)
                         xa, xb = x + lean_x(ya, k), x + lean_x(yb2, k)
@@ -2642,7 +2642,7 @@ def dress_melting_library():
         P = Painter()
         for j in range(3):
             b = K.BOX[f"Shelf_{k}_{j + 1}"]
-            for yb in np.arange(b["min"][1], b["max"][1] - 0.05, 0.45 if j == 0 else 0.46):
+            for yb in np.arange(b["min"][1] + (0.0 if j == 0 else 0.26), b["max"][1] - 0.05, 0.45 if j == 0 else 0.46):
                 z = -3.95
                 while z < 3.9:
                     t = rng.uniform(0.03, 0.06)
@@ -2762,6 +2762,7 @@ def build_scene(sid, stages, samples, rsamples):
     KT.reset(sid, spec)
     spec["dress"]()
     KT.fill_missing()
+    KT.ensure_cover()
     KT.build_leaves()
     if spec.get("post"):
         spec["post"]()

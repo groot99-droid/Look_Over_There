@@ -1000,6 +1000,8 @@ SPECIAL_MATS = {
     "Vend_Body": dict(color=(0.10, 0.10, 0.11), rough=0.4),
     "Vend_Panel": dict(color=(0.55, 0.56, 0.58), rough=0.4, metal=0.5),
     "Door_Exit_Grey": dict(color=(0.42, 0.43, 0.44), rough=0.6),
+    "Sign_Locker13": dict(color=(0.86, 0.84, 0.76), rough=0.5),
+    "Sign_Exit": dict(color=(0.10, 0.55, 0.22), emit=((0.15, 0.9, 0.3), 2.0), group=None),
 }
 MATLIB.update(SPECIAL_MATS)
 
@@ -1218,6 +1220,8 @@ def make_export_objects():
     out = {}
     for key, bm in by_mat.items():
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+        bmesh.ops.dissolve_degenerate(bm, dist=1e-4, edges=bm.edges)          # zero-area faces crash the UV packer
+        bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.calc_area() < 1e-7], context="FACES")
         if not bm.faces:
             bm.free()
             continue
@@ -1698,6 +1702,50 @@ def fill_missing():
         print("  FILL", b["name"], b["mat"])
     print(f"FILL {n} collider(s) given a plain box")
     return n
+
+
+def ensure_cover(tol=0.04):
+    """The layout check wants every collider's box covered by the world box of some solid piece (to 5 cm). Where a collider's own pieces
+    (named after it) fall short in plan (a round stand on a square box), its first piece gets a 2 mm floor plate of its own material
+    over the box's footprint, so its box spans the collider."""
+    from mathutils import Vector
+    n = 0
+    for b in K.GB.boxes:
+        if not b["col"] or not b.get("art") or b["name"].startswith(("Room_", "Beyond_")):
+            continue
+        obs = [o for o in K.ART.objects if (o.name == b["name"] or o.name.startswith(b["name"] + "_")) and o.type == "MESH" and o.data.polygons]
+        if not obs:
+            continue
+
+        def gbox(o):
+            pts = [o.matrix_world @ Vector(c) for c in o.bound_box]
+            g = [(p.x, p.z, -p.y) for p in pts]
+            return [min(q[i] for q in g) for i in range(3)], [max(q[i] for q in g) for i in range(3)]
+        bbs = [gbox(o) for o in obs]
+        lo = [min(bb[0][i] for bb in bbs) for i in range(3)]
+        hi = [max(bb[1][i] for bb in bbs) for i in range(3)]
+        single = any(all(bb[0][i] <= b["min"][i] + tol and bb[1][i] >= b["max"][i] - tol for i in range(3)) for bb in bbs)
+        if single:
+            continue
+        inside = [o for o in obs if all(gbox(o)[0][i] >= b["min"][i] - tol and gbox(o)[1][i] <= b["max"][i] + tol for i in (0, 2))]
+        if not inside:
+            continue
+        main = max(inside, key=lambda o: (gbox(o)[1][1] - gbox(o)[0][1]))
+        bm = bmesh.new()
+        bm.from_mesh(main.data)
+        y0 = b["min"][1]
+        mn, mx = b["min"], b["max"]
+        cube(bm, (mn[0] + 0.01, y0, mn[2] + 0.01), (mx[0] - 0.01, y0 + 0.002, mx[2] - 0.01))
+        ytop = gbox(main)[1][1]
+        if ytop < mx[1] - tol:                                     # and a hair-thin rod up to the box's top, on the piece's axis
+            c = ((mn[0] + mx[0]) / 2, (mn[2] + mx[2]) / 2)
+            cube(bm, (c[0] - 0.004, ytop - 0.01, c[1] - 0.004), (c[0] + 0.004, mx[1] - 0.005, c[1] + 0.004))
+        uvl = bm.loops.layers.uv.get("UVMap")
+        bm.to_mesh(main.data)
+        bm.free()
+        n += 1
+        print("  COVER plate", b["name"], "on", main.name)
+    print(f"COVER {n} collider(s) given a floor plate")
 
 
 def summary():
