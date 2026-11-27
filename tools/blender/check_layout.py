@@ -52,6 +52,23 @@ def _stands(p):
     return (p["max"][1] - max(p["min"][1], 0.0)) > STAND_H and p["min"][1] < HEAD
 
 
+def _walk_up(world, x, z, reach):
+    """A spot with a `reach` is an F prompt that works from up to `reach` away (the forest's signpost back to the lot). When a standing collider (the
+    thing itself, which the page may draw) covers the spot, the walker stands beside it: the nearest point within reach, in eight directions, that is
+    clear of standing colliders by the walker's radius. The CLEAR rule then checks that point against the colliders and the art."""
+    stand = [c for c in world.get("colliders", []) if _standing(c)]
+    if not any(_in_plan(c, x, z, CLEAR_R) for c in stand):
+        return x, z
+    d = CLEAR_R
+    while d <= reach + 1e-9:
+        for k in range(8):
+            px, pz = round(x + d * math.cos(k * math.pi / 4), 3), round(z + d * math.sin(k * math.pi / 4), 3)
+            if not any(_in_plan(c, px, pz, CLEAR_R) for c in stand):
+                return px, pz
+        d += 0.05
+    return x, z
+
+
 def points_of(world, constants):
     """(label, x, z) of every arrival point, door spot and marker the scene names."""
     pts = [(f"marker {m['name']}", m["position"][0], m["position"][2]) for m in world.get("markers", []) if "position" in m]
@@ -62,7 +79,9 @@ def points_of(world, constants):
                 if k == "arrive" and isinstance(v, list) and len(v) == 3:
                     pts.append((f"{'.'.join(path) or 'constants'}.arrive", v[0], v[2]))
                 elif k == "at" and isinstance(v, list) and len(v) == 2:
-                    pts.append((f"{'.'.join(path) or 'constants'}.at", v[0], v[1]))
+                    x, z = _walk_up(world, v[0], v[1], o["reach"]) if "reach" in o else (v[0], v[1])
+                    label = f"{'.'.join(path) or 'constants'}.at"
+                    pts.append((label if (x, z) == (v[0], v[1]) else f"{label} ({v[0]:.2f}, {v[1]:.2f}), reach {o['reach']}: its walk-up spot", x, z))
                 else:
                     walk(v, path + [k])
     walk(constants or {}, [])
