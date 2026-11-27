@@ -592,7 +592,7 @@ def dress_lights_out():
 LIGHTS_OUT = dict(
     sets=["switch_1", "switch_2", "switch_3"],
     pages=(2048,),
-    grade={"target": 0.9, "shoulder": 1.15, "mode": "each", "set_gain": {"switch_3": 0.8}},
+    grade={"target": 0.9, "shoulder": 1.15, "mode": "each", "set_gain": {"switch_3": 0.8}, "caps": {"Shade_Silk": 0.876, "Trim_White": 0.89}},
     mats={"Carpet_Stars": dict(gen="carpet", rough=1.0, tile=1.6, group="struct"),
           "Paper_Violet": dict(gen="paper", rough=0.9, tile=0.9, group="struct"),
           "Panel_Dark": dict(diff="dark_wood_diff_1k.jpg", tint=(0.6, 0.5, 0.55), rough=0.5, tile=1.2, group="struct"),
@@ -917,7 +917,7 @@ def dress_ames_room():
 
 AMES = dict(
     pages=(2048, 1024),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 1.2, "shoulder": 1.15, "caps": {}},
     mats={"Ames_Floor": dict(gen="checker", rough=0.35, tile=1.0, group="struct"),
           "Ames_Paper": dict(gen="ames", rough=0.9, tile=1.0, group="struct") if False else dict(gen="paper", rough=0.9, tile=0.9, group="struct"),
           "Ames_Proj": dict(gen="ames", rough=0.9, group="struct"),
@@ -2085,7 +2085,7 @@ def dress_motel_room():
 
 MOTEL_ROOM = dict(
     pages=(2048, 1024),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 1.4, "shoulder": 1.15, "caps": {"Ceramic_Orange": 0.883}},
     mats={"Carpet_Shag": dict(gen="shag", rough=1.0, tile=1.2, group="struct"),
           "Plaster_Peach": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.98, 0.72, 0.56), rough=0.9, tile=2.5, group="struct"),
           "Panel_Wood": dict(diff="dark_wood_diff_1k.jpg", tint=(1.0, 0.78, 0.55), rough=0.5, tile=1.2, group="struct"),
@@ -2592,6 +2592,27 @@ VENDING_ROOM = dict(
 
 
 # ================================================================ 34. rdwe_melting_library
+def g_spines(seed):
+    """A run of book spines, 0.6 m a repeat: random widths and colours, a band or two of gilt."""
+    def f():
+        rng = np.random.default_rng(seed)
+        W, Hh = 512, 256
+        img = np.zeros((Hh, W, 3), np.float32)
+        cols = [(0.45, 0.08, 0.07), (0.10, 0.25, 0.14), (0.10, 0.15, 0.33), (0.66, 0.55, 0.38), (0.07, 0.07, 0.07), (0.62, 0.42, 0.10),
+                (0.86, 0.82, 0.70), (0.30, 0.10, 0.22)]
+        x = 0
+        while x < W:
+            w = int(rng.integers(14, 36))
+            top = int(rng.integers(0, 60))
+            c = np.array(cols[int(rng.integers(len(cols)))])
+            img[top:, x:x + w - 2] = c
+            for yb in (top + 20, Hh - 30):
+                img[yb:yb + 4, x:x + w - 2] = (0.75, 0.6, 0.25)
+            x += w
+        return img * (0.85 + 0.2 * vnoise(Hh, W, rng, 4, 6)[..., None])
+    return f
+
+
 def sag_y(z, j):
     """How far a shelf at level j has slumped at z (metres, down): most in the middle of the run, more higher up."""
     return (0.06 + 0.07 * j) * (1 - (z / 4.0) ** 2)
@@ -2639,29 +2660,27 @@ def dress_melting_library():
                 back = b["min"][0] if k == 1 else b["max"][0]                    # the back panel, on the outside of the row
                 box(bm, back - 0.01, back + 0.01, y0, y1, -4.0, 4.0) if j == 0 else None
             part(f"Shelf_{k}_{j + 1}", "Shelf_Wood", case, recalc=False, smooth=True, sharp_deg=60)
-        # the books on every board: following the slump, tilted, some sliding off the edge
+        # the books on every board: a run of spines per segment, following the slump; some books sliding off the edge
         P = Painter()
-        for j in range(3):
-            b = K.BOX[f"Shelf_{k}_{j + 1}"]
-            for yb in np.arange(b["min"][1] + (0.0 if j == 0 else 0.26), b["max"][1] - 0.05, 0.45 if j == 0 else 0.46):
-                z = -3.95
-                while z < 3.9:
-                    t = rng.uniform(0.03, 0.06)
-                    hh = rng.uniform(0.2, 0.32)
-                    ya = yb + 0.03 - sag_y(z, j + yb / 2)
-                    xc = x + lean_x(ya, k)
-                    tilt = (sag_y(z + 0.1, j + yb / 2) - sag_y(z - 0.1, j + yb / 2)) * 3
-                    key = ["book_red", "book_green", "book_blue", "book_tan", "book_black", "book_ochre", "book_cream", "book_plum"][int(rng.integers(8))]
-                    slide = rng.random() < 0.06
-                    if slide:
-                        P.add(key, quad, (xc + 0.35 * (1 if k == 1 else -1), ya, z), (xc + 0.6 * (1 if k == 1 else -1), ya - 0.25, z),
-                              (xc + 0.6 * (1 if k == 1 else -1), ya - 0.25, z + t), (xc + 0.35 * (1 if k == 1 else -1), ya, z + t))
-                    else:
-                        bmp = (xc - 0.3, xc + 0.3)
-                        P.add(key, lambda bm, xa=bmp[0], xb=bmp[1], ya=ya, z=z, t=t, hh=hh, tilt=tilt: poly(bm, [(xa, ya, z), (xa, ya, z + t), (xa, ya + hh, z + t + tilt * hh),
-                                                                                                                (xa, ya + hh, z + tilt * hh)])
-                              if False else box(bm, xa, xb, ya, ya + hh, z, z + t))
-                    z += t + rng.uniform(0.0, 0.01)
+
+        def spines(bm, k=k, x=x):
+            for j in range(3):
+                b = K.BOX[f"Shelf_{k}_{j + 1}"]
+                for yb in np.arange(b["min"][1] + (0.0 if j == 0 else 0.26), b["max"][1] - 0.05, 0.45 if j == 0 else 0.46):
+                    zs = np.linspace(-3.95, 3.95, 17)
+                    for z0, z1 in zip(zs, zs[1:]):
+                        zm = (z0 + z1) / 2
+                        ya = yb + 0.03 - sag_y(zm, j + yb / 2)
+                        xc = x + lean_x(ya, k)
+                        box(bm, xc - 0.28, xc + 0.28, ya, ya + 0.27, z0 + 0.004, z1 - 0.004)
+                    for _ in range(3):
+                        z = rng.uniform(-3.5, 3.5)
+                        ya = yb + 0.03 - sag_y(z, j + yb / 2)
+                        xc = x + lean_x(ya, k)
+                        sg = 1 if k == 1 else -1
+                        P.add(["book_red", "book_green", "book_blue", "book_ochre"][int(rng.integers(4))], quad, (xc + 0.3 * sg, ya, z),
+                              (xc + 0.55 * sg, ya - 0.25, z), (xc + 0.55 * sg, ya - 0.25, z + 0.05), (xc + 0.3 * sg, ya, z + 0.05))
+        part(f"decor_Spines_{k}", "Book_Spines", spines, tile=0.6)
         P.done(f"decor_Books_{k}")
         # wax drips from the boards' slumped middles
         part(f"decor_Drips_{k}", "Wax", lambda bm, k=k, x=x: [cyl(bm, (x + lean_x(y, k) + rng.uniform(-0.3, 0.3), y - sag_y(z, 1), z),
@@ -2674,10 +2693,8 @@ def dress_melting_library():
                                                box(bm, b["min"][0], b["max"][0], b["max"][1] - 0.05, b["max"][1], b["min"][2], b["max"][2]),
                                                [box(bm, b["min"][0], b["max"][0], y, y + 0.025, b["min"][2], b["max"][2]) for y in (0.45, 0.9, 1.35, 1.8, 2.25, 2.7)],
                                                [box(bm, b["min"][0], b["max"][0], 0.0, b["max"][1], z - 0.015, z + 0.015) for z in np.linspace(b["min"][2], b["max"][2], 6)]))
-        P = Painter()
-        for y in (0.06, 0.475, 0.925, 1.375, 1.825, 2.275, 2.725):
-            books_row(P, b["min"][2] + 0.02, b["max"][2] - 0.02, y, b["min"][0] + 0.02, b["max"][0] - 0.02, rng, along="z", hmax=0.34)
-        P.done(f"decor_{n}_Books")
+        part(f"decor_{n}_Books", "Book_Spines", lambda bm, b=b: [box(bm, b["min"][0] + 0.03, b["max"][0] - 0.02, y, y + 0.3, b["min"][2] + 0.03, b["max"][2] - 0.03)
+                                                               for y in (0.06, 0.475, 0.925, 1.375, 1.825, 2.275, 2.725)], tile=0.6)
     table("Reading_Table", K.BOX["Reading_Table"], "Shelf_Wood", "Shelf_Wood", t=0.05, inset=0.08)
     rt = K.BOX["Reading_Table"]
     for k, x in enumerate((-0.7, 0.7), 1):
@@ -2730,7 +2747,7 @@ def dress_melting_library():
 
 MELTING_LIBRARY = dict(
     pages=(2048, 2048),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 1.5, "shoulder": 1.15, "caps": {}},
     mats={"Floor_Parquet": dict(diff="herringbone_parquet_diff_1k.jpg", tint=(0.85, 0.72, 0.6), rough=0.4, tile=1.6, group="struct"),
           "Paper_Oxblood": dict(gen="paper", rough=0.9, tile=0.9, group="struct"),
           "Ceiling_Dark": dict(diff="dark_wood_diff_1k.jpg", tint=(0.7, 0.6, 0.55), rough=0.6, tile=1.6, group="struct"),
@@ -2740,8 +2757,9 @@ MELTING_LIBRARY = dict(
           "Shade_Green": dict(color=(0.05, 0.35, 0.18), rough=0.3, two_sided=True),
           "Globe_Map": dict(color=(0.20, 0.38, 0.55), rough=0.5),
           "Rug_Red": dict(diff="rough_linen_diff_512.jpg", tint=(0.42, 0.08, 0.08), rough=1.0, tile=0.6),
-          "Stone": dict(diff="concrete_floor_02_diff_1k.jpg", tint=(0.92, 0.88, 0.80), rough=0.8, tile=1.0)},
-    gen={"paper": g_damask((0.32, 0.03, 0.05), (0.45, 0.08, 0.08), seed=151)},
+          "Stone": dict(diff="concrete_floor_02_diff_1k.jpg", tint=(0.92, 0.88, 0.80), rough=0.8, tile=1.0),
+          "Book_Spines": dict(gen="spines", rough=0.7, tile=0.6)},
+    gen={"paper": g_damask((0.32, 0.03, 0.05), (0.45, 0.08, 0.08), seed=151), "spines": g_spines(152)},
     dress=dress_melting_library,
     shots={"1_arrival": ((-3.0, 1.55, 5.6), (1.0, 2.0, -6.0), 74.0),
            "2_wide": ((6.0, 2.6, 6.2), (-1.0, 1.6, -4.0), 80.0),
