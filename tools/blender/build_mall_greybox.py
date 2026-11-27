@@ -728,8 +728,8 @@ def construction():
     for x in (-9.75, -5.5, -1.05):
         S.solid("Deck_Post", (x - 0.05, 0.0, -5.3), (x + 0.05, 2.9, -5.2), "scaffold")
     flight(S, "deck", -11.0, -9.8, -1.6, -1, "z", 0.0, 3.0, 12, 0.3)
-    S.solid("Stair_Rail", (-9.8, 0.0, -5.2), (-9.75, 1.0, -1.6), "scaffold")
-    S.solid("Stair_Rail", (-11.05, 0.0, -5.2), (-11.0, 4.0, -1.6), "scaffold")   # the west side, over the 1 m gap to the wall: full height, so it guards the top too
+    S.solid("Stair_Rail", (-9.8, 0.0, -5.2), (-9.75, 4.0, -1.6), "scaffold")     # the east side: floor to the top of the flight, so it guards the whole flight
+    S.solid("Stair_Rail", (-11.05, 0.0, -5.2), (-11.0, 4.0, -1.6), "scaffold")   # the west side, over the 1 m gap to the wall: the same
     kit_door(S, "sky_hall_04", "N", -5.0, z0, y=3.0)
     door_link(S, "sky_hall_04", "N", -5.0, z0, "sky_hall_04 (an unfinished doorway onto a painted sky)", y=3.0)
     S.label("scaffold deck (y 3)", -6.0, -7.0, 3.0)
