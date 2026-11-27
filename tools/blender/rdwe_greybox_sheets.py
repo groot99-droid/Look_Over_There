@@ -544,7 +544,7 @@ def owner_rooms(path, out, renders):
     for i, sid in enumerate(G.PHASE_C, 1):
         S = G.build(sid)
         im = Image.open(renders / f"{sid}_still.png").convert("RGB").resize((300, 169), Image.LANCZOS)
-        lines = textwrap.wrap(S.line, 40)[:4]
+        lines = textwrap.wrap(S.line, 40)
         blocks.append(("row", im, f"{i}. {short(sid)}", lines))
     para("Reserved, built elsewhere: the six god rooms (Nyx, Selene, Hypnos, Morpheus, Oneiros, Thanatos).", f_b, GREY)
     _sheet(blocks, path)

@@ -1,0 +1,265 @@
+{
+ "scene": "rdwe_painted_door",
+ "colliders": [
+  {
+   "s": "Beyond_doors",
+   "min": [
+    -0.7,
+    -0.05,
+    12.35
+   ],
+   "max": [
+    0.7,
+    2.39,
+    12.55
+   ]
+  },
+  {
+   "s": "Beyond_painted",
+   "min": [
+    -0.78,
+    -0.05,
+    -12.55
+   ],
+   "max": [
+    0.78,
+    2.45,
+    -12.35
+   ]
+  },
+  {
+   "s": "Pillar",
+   "min": [
+    1.0,
+    0.0,
+    -2.0
+   ],
+   "max": [
+    1.6,
+    3.4,
+    -1.4
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -3.2,
+    3.4,
+    -12.2
+   ],
+   "max": [
+    3.2,
+    3.6,
+    12.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -3.2,
+    -0.3,
+    -12.2
+   ],
+   "max": [
+    3.2,
+    0.0,
+    12.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    3.0,
+    0.0,
+    -12.0
+   ],
+   "max": [
+    3.2,
+    3.4,
+    12.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -3.2,
+    0.0,
+    -12.2
+   ],
+   "max": [
+    -0.55,
+    3.4,
+    -12.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    -0.55,
+    2.34,
+    -12.2
+   ],
+   "max": [
+    0.55,
+    3.4,
+    -12.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    0.55,
+    0.0,
+    -12.2
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -12.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -3.2,
+    0.0,
+    12.0
+   ],
+   "max": [
+    -0.47,
+    3.4,
+    12.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    -0.47,
+    2.28,
+    12.0
+   ],
+   "max": [
+    0.47,
+    3.4,
+    12.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    0.47,
+    0.0,
+    12.0
+   ],
+   "max": [
+    3.2,
+    3.4,
+    12.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -3.2,
+    0.0,
+    -12.0
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    12.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_doors",
+   "level": "rdwe_painted_door",
+   "hinge": [
+    0.45,
+    0.0,
+    12.0
+   ],
+   "width": 0.9,
+   "height": 2.24,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "doors",
+   "look": "half-glazed bottle green door, no handle"
+  },
+  {
+   "name": "DoorLeaf_painted",
+   "level": "rdwe_painted_door",
+   "hinge": [
+    -0.53,
+    0.0,
+    -12.0
+   ],
+   "width": 1.06,
+   "height": 2.3,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "painted",
+   "look": "a door painted on the end wall, real from the mark"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "doors",
+   "at": [
+    0.0,
+    0.0,
+    11.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    10.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "painted",
+   "at": [
+    0.0,
+    0.0,
+    -11.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -10.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "view",
+   "name": "Spot_view_1",
+   "position": [
+    0.0,
+    0.0,
+    6.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the floor mark: from here the painting is a door"
+  }
+ ]
+}

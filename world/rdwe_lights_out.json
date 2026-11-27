@@ -1,0 +1,323 @@
+{
+ "scene": "rdwe_lights_out",
+ "colliders": [
+  {
+   "s": "Beyond_three",
+   "min": [
+    2.19,
+    -0.05,
+    6.35
+   ],
+   "max": [
+    3.81,
+    2.25,
+    6.55
+   ]
+  },
+  {
+   "s": "Beyond_void",
+   "min": [
+    -6.55,
+    -0.05,
+    -3.81
+   ],
+   "max": [
+    -6.35,
+    2.39,
+    -2.19
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -6.2,
+    3.2,
+    -6.2
+   ],
+   "max": [
+    6.2,
+    3.4,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -6.2,
+    -0.3,
+    -6.2
+   ],
+   "max": [
+    6.2,
+    0.0,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    6.0,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    6.2,
+    3.2,
+    6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -6.2,
+    0.0,
+    -6.2
+   ],
+   "max": [
+    6.2,
+    3.2,
+    -6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -6.2,
+    0.0,
+    6.0
+   ],
+   "max": [
+    2.42,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    2.42,
+    2.14,
+    6.0
+   ],
+   "max": [
+    3.58,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    3.58,
+    0.0,
+    6.0
+   ],
+   "max": [
+    6.2,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -6.2,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    -6.0,
+    3.2,
+    -3.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -6.2,
+    2.28,
+    -3.58
+   ],
+   "max": [
+    -6.0,
+    3.2,
+    -2.42
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -6.2,
+    0.0,
+    -2.42
+   ],
+   "max": [
+    -6.0,
+    3.2,
+    6.0
+   ]
+  },
+  {
+   "s": "Switch_Post_1",
+   "min": [
+    -3.15,
+    0.0,
+    1.85
+   ],
+   "max": [
+    -2.85,
+    1.2,
+    2.15
+   ]
+  },
+  {
+   "s": "Switch_Post_2",
+   "min": [
+    -0.15,
+    0.0,
+    -2.15
+   ],
+   "max": [
+    0.15,
+    1.2,
+    -1.85
+   ]
+  },
+  {
+   "s": "Switch_Post_3",
+   "min": [
+    2.85,
+    0.0,
+    1.85
+   ],
+   "max": [
+    3.15,
+    1.2,
+    2.15
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_three",
+   "level": "rdwe_lights_out",
+   "hinge": [
+    3.56,
+    0.0,
+    6.0
+   ],
+   "width": 1.12,
+   "height": 2.1,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "three",
+   "look": "mirror-faced bottle green door, ring pull"
+  },
+  {
+   "name": "DoorLeaf_void",
+   "level": "rdwe_lights_out",
+   "hinge": [
+    -6.0,
+    0.0,
+    -2.44
+   ],
+   "width": 1.12,
+   "height": 2.24,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "void",
+   "look": "quilted brushed steel door, chrome lever"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "three",
+   "at": [
+    3.0,
+    0.0,
+    5.25
+   ],
+   "arrive": [
+    3.0,
+    0.0,
+    4.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "void",
+   "at": [
+    -5.25,
+    0.0,
+    -3.0
+   ],
+   "arrive": [
+    -4.1,
+    0.0,
+    -3.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "switch",
+   "name": "Spot_switch_1",
+   "position": [
+    -3.0,
+    0.0,
+    2.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "a light switch: it shows one door and hides another"
+  },
+  {
+   "kind": "switch",
+   "name": "Spot_switch_2",
+   "position": [
+    0.0,
+    0.0,
+    -1.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "a light switch: it shows one door and hides another"
+  },
+  {
+   "kind": "switch",
+   "name": "Spot_switch_3",
+   "position": [
+    3.0,
+    0.0,
+    2.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "a light switch: it shows one door and hides another"
+  }
+ ]
+}

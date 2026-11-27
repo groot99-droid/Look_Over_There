@@ -1,0 +1,279 @@
+{
+ "scene": "rdwe_anamorphic_room",
+ "colliders": [
+  {
+   "s": "Beyond_painted",
+   "min": [
+    -7.55,
+    -0.05,
+    -0.72
+   ],
+   "max": [
+    -7.35,
+    2.45,
+    0.72
+   ]
+  },
+  {
+   "s": "Beyond_word",
+   "min": [
+    2.34,
+    -0.05,
+    -7.55
+   ],
+   "max": [
+    3.66,
+    2.55,
+    -7.35
+   ]
+  },
+  {
+   "s": "Crate_1",
+   "min": [
+    -5.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -3.8,
+    1.2,
+    -3.8
+   ]
+  },
+  {
+   "s": "Crate_2",
+   "min": [
+    4.0,
+    0.0,
+    3.6
+   ],
+   "max": [
+    5.2,
+    0.8,
+    4.8
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -7.2,
+    4.0,
+    -7.2
+   ],
+   "max": [
+    7.2,
+    4.2,
+    7.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -7.2,
+    -0.3,
+    -7.2
+   ],
+   "max": [
+    7.2,
+    0.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    7.0,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    7.2,
+    4.0,
+    7.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -7.2,
+    0.0,
+    -7.2
+   ],
+   "max": [
+    2.57,
+    4.0,
+    -7.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    2.57,
+    2.44,
+    -7.2
+   ],
+   "max": [
+    3.43,
+    4.0,
+    -7.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    3.43,
+    0.0,
+    -7.2
+   ],
+   "max": [
+    7.2,
+    4.0,
+    -7.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -7.2,
+    0.0,
+    7.0
+   ],
+   "max": [
+    7.2,
+    4.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -7.2,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -7.0,
+    4.0,
+    -0.49
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -7.2,
+    2.34,
+    -0.49
+   ],
+   "max": [
+    -7.0,
+    4.0,
+    0.49
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -7.2,
+    0.0,
+    0.49
+   ],
+   "max": [
+    -7.0,
+    4.0,
+    7.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_painted",
+   "level": "rdwe_anamorphic_room",
+   "hinge": [
+    -7.0,
+    0.0,
+    0.47
+   ],
+   "width": 0.94,
+   "height": 2.3,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "painted",
+   "look": "ledged and braced birch door, brass knob"
+  },
+  {
+   "name": "DoorLeaf_word",
+   "level": "rdwe_anamorphic_room",
+   "hinge": [
+    2.59,
+    0.0,
+    -7.0
+   ],
+   "width": 0.82,
+   "height": 2.4,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "word",
+   "shows": "from Spot_view_1 only",
+   "look": "round-topped mustard door, push plate"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "painted",
+   "at": [
+    -6.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -5.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "word",
+   "at": [
+    3.0,
+    0.0,
+    -6.25
+   ],
+   "arrive": [
+    3.0,
+    0.0,
+    -5.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "view",
+   "name": "Spot_view_1",
+   "position": [
+    -4.0,
+    0.0,
+    4.0
+   ],
+   "face": [
+    0.6,
+    -0.8
+   ],
+   "yaw_deg": 143.1,
+   "scale": 1.0,
+   "what": "from here the shards make a doorway"
+  }
+ ]
+}

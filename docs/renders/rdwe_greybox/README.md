@@ -37,20 +37,88 @@ Plain boxes, to scale, for the Right Door, Wrong Exit rooms: the seven that exis
 | `rdwe_grocery` | A | 50 m by 50 m, 5 m high (was 38 by 46 by 4): a maze of shelving, 10 by 10 aisles of 5 m | `entrance`: rdwe_finale (the locked entrance doors open once every room is done); `exit`: rdwe_dining (the loop: you are back at the start); `gods`: arrival only (reserved): the last god room comes out here; `stockroom`: rdwe_vending_room; `glow`: arrival only: from rdwe_trampoline's red glow (the locked doors behind you) | 189 colliders, 4 doors; spots: cart x1, tin x3 |
 | `rdwe_repeating_room` | B | 12 m by 12 m, 3.2 m high; a recess 2 m deep behind a baffle on the east wall | `lift`: rdwe_elevator_lobby (lift 3); `library`: rdwe_melting_library; `again`: this room again: you come back in by the south door (it repeats); `secret_ops`: secret_ops.hidden_entry (rdwe.repeating_room>secret_ops: the one entrance with no clearance) | 31 colliders, 5 doors; spots: change x3, view x1 |
 | `rdwe_finale` | B | 48 m by 44 m, 4.5 m high: a hall and four wings (offices, the house, the server room, the aisles) | `grocery`: arrival only: through the grocery's entrance doors, once the map is complete; `win`: grocery.main_floor (rdwe.finale>grocery: the one ending; opens when every camera is off) | 67 colliders, 2 doors, 10 cameras; spots: agent x6, computer x4, hide x12, seeker x1 |
+| `rdwe_long_table` | C | 8 m by 34 m, 3.2 m high | `dining`: rdwe_dining; `kitchen`: rdwe_tiny_kitchen; `party`: rdwe_birthday_party | 24 colliders, 3 doors; spots: trick x1 |
+| `rdwe_tiny_kitchen` | C | 10 m by 8 m, 3 m high | `table`: rdwe_long_table; `back`: rdwe_giant_chair | 14 colliders, 2 doors; spots: trick x1 |
+| `rdwe_birthday_party` | C | 14 m by 10 m, 3.2 m high | `table`: rdwe_long_table; `attic`: rdwe_attic | 13 colliders, 2 doors; spots: cake x1 |
+| `rdwe_attic` | C | 12 m by 8 m, 2.6 m high | `party`: rdwe_birthday_party; `hatch`: rdwe_kids_bedroom (down through the hatch) | 13 colliders, 1 doors; spots: photo x1 |
+| `rdwe_kids_bedroom` | C | 8 m by 8 m, 2.8 m high | `closet`: rdwe_hallway (a side door); `hatch`: arrival from rdwe_attic's hatch (and back up it) | 11 colliders, 1 doors; spots: notes x1 |
+| `rdwe_giant_chair` | C | 16 m by 14 m, 8 m high | `kitchen`: rdwe_tiny_kitchen; `high`: rdwe_upside_room | 28 colliders, 2 doors; spots: trick x1 |
+| `rdwe_upside_room` | C | 10 m by 10 m, 3.4 m high | `chair`: rdwe_giant_chair; `hall`: rdwe_hallway (a side door) | 13 colliders, 2 doors; spots: trick x1 |
+| `rdwe_door_hall` | C | 6 m by 44 m, 3.4 m high | `hallway`: rdwe_hallway (a side door); `d3`: rdwe_stretching_hall; `d9`: rdwe_painted_door; `d6`: rdwe_three_doors | 46 colliders, 13 doors; spots: trick x1 |
+| `rdwe_stretching_hall` | C | 4 m by 46 m, 3 m high | `doors`: rdwe_door_hall; `far`: rdwe_bending_hall | 24 colliders, 2 doors; spots: trick x1 |
+| `rdwe_bending_hall` | C | 20 m by 20 m, 3 m high | `start`: rdwe_stretching_hall; `lap`: rdwe_stair_loop | 13 colliders, 2 doors; spots: lap x1 |
+| `rdwe_stair_loop` | C | 8 m by 14 m, 6.4 m high; one flight to a landing at y 3 | `hall`: rdwe_bending_hall; `top`: this room again: you arrive at the foot of the stairs; `landing`: rdwe_tilted_hall | 31 colliders, 3 doors; spots: trick x1 |
+| `rdwe_tilted_hall` | C | 6 m by 30 m, 4 m high | `stairs`: rdwe_stair_loop; `end`: rdwe_crossroads | 19 colliders, 2 doors; spots: trick x1 |
+| `rdwe_three_doors` | C | 12 m by 10 m, 3.4 m high | `back`: rdwe_door_hall; `left`: rdwe_mirror_room; `middle`: rdwe_waiting_room; `right`: rdwe_lights_out | 19 colliders, 4 doors; spots: note x1 |
+| `rdwe_painted_door` | C | 6 m by 24 m, 3.4 m high | `doors`: rdwe_door_hall; `painted`: rdwe_anamorphic_room | 13 colliders, 2 doors; spots: view x1 |
+| `rdwe_anamorphic_room` | C | 14 m by 14 m, 4 m high | `painted`: rdwe_painted_door; `word`: rdwe_ames_room | 14 colliders, 2 doors; spots: view x1 |
+| `rdwe_void_room` | C | 10 m by 10 m, 4 m high | `teal`: rdwe_teal (back through the black); `lit`: rdwe_lights_out | 13 colliders, 2 doors; spots: dark x1 |
+| `rdwe_lights_out` | C | 12 m by 12 m, 3.2 m high | `void`: rdwe_void_room; `three`: rdwe_three_doors | 15 colliders, 2 doors; spots: switch x3 |
+| `rdwe_green_grid` | C | 6 m by 30 m, 4 m high | `teal2`: rdwe_teal2; `seam`: rdwe_ames_room | 28 colliders, 2 doors; spots: grid x1 |
+| `rdwe_ames_room` | C | 14 m by 10 m, 4.5 m high | `word`: rdwe_anamorphic_room; `grid`: rdwe_green_grid; `small`: rdwe_shrink_hall | 21 colliders, 3 doors; spots: view x1 |
+| `rdwe_shrink_hall` | C | 6 m by 24 m, 3.6 m high | `ames`: rdwe_ames_room; `small`: rdwe_moon_window | 18 colliders, 2 doors; spots: trick x1 |
+| `rdwe_moon_window` | C | 10 m by 12 m, 3.6 m high | `hall`: rdwe_shrink_hall; `sill`: rdwe_mirror_room | 13 colliders, 2 doors; spots: moon x1, switch x1 |
+| `rdwe_mirror_room` | C | 16 m by 10 m, 3.4 m high | `three`: rdwe_three_doors; `moon`: rdwe_moon_window; `reflection`: rdwe_dont_look | 19 colliders, 3 doors; spots: trick x1 |
+| `rdwe_dont_look` | C | 14 m by 10 m, 4 m high | `mirror`: rdwe_mirror_room; `statue`: rdwe_wrong_clock | 15 colliders, 2 doors; spots: statue x1 |
+| `rdwe_waiting_room` | C | 14 m by 10 m, 3 m high | `three`: rdwe_three_doors; `number`: rdwe_wrong_clock | 16 colliders, 2 doors; spots: ticket x1 |
+| `rdwe_wrong_clock` | C | 12 m by 12 m, 4.5 m high | `gallery`: rdwe_dont_look; `waiting`: rdwe_waiting_room; `hands`: rdwe_crossroads | 19 colliders, 3 doors; spots: clock x1 |
+| `rdwe_crossroads` | C | 32 m by 32 m, 4 m high | `west`: rdwe_tilted_hall; `north`: rdwe_wrong_clock; `south`: rdwe_trampoline (the padded vent); `east`: rdwe_elevator_lobby | 23 colliders, 4 doors; spots: trick x1 |
+| `rdwe_changing_rooms` | C | 14 m by 10 m, 3 m high | `flooded`: rdwe_flooded (the frame door); `locker`: rdwe_laundromat | 14 colliders, 2 doors; spots: locker x1 |
+| `rdwe_laundromat` | C | 16 m by 8 m, 3.2 m high | `lockers`: rdwe_changing_rooms; `drum`: rdwe_motel_room | 19 colliders, 2 doors; spots: trick x1 |
+| `rdwe_motel_room` | C | 6 m by 10 m, 2.8 m high | `drum`: rdwe_laundromat; `bathroom`: rdwe_office_night | 14 colliders, 2 doors; spots: tv x1 |
+| `rdwe_office_night` | C | 24 m by 20 m, 3 m high | `stairs`: rdwe_motel_room; `lift`: rdwe_elevator_lobby | 18 colliders, 2 doors; spots: monitor x1 |
+| `rdwe_elevator_lobby` | C | 18 m by 10 m, 3.6 m high | `crossroads`: rdwe_crossroads; `lift_1`: rdwe_office_night; `lift_2`: rdwe_map_room; `lift_3`: rdwe_repeating_room; `lift_4`: rdwe_vending_room | 22 colliders, 5 doors; spots: buttons x1 |
+| `rdwe_map_room` | C | 12 m by 12 m, 3.4 m high | `lift`: rdwe_elevator_lobby; `door`: rdwe_melting_library | 13 colliders, 2 doors; spots: map x1 |
+| `rdwe_vending_room` | C | 8 m by 8 m, 3 m high | `lift`: rdwe_elevator_lobby; `machine`: rdwe_grocery (the stockroom) | 18 colliders, 3 doors; spots: trick x1 |
+| `rdwe_melting_library` | C | 14 m by 14 m, 5 m high | `map`: rdwe_map_room; `arch`: rdwe_repeating_room | 18 colliders, 2 doors; spots: book x1 |
 
 ## How the rooms connect
 
 Each line is a room and its exits (`door > where it goes`). Pressing F at one side's `Link_<door>` puts you at the other side's `Arrive_<door>`, facing its -Y axis. A one-way link's far side is an arrival door that does not open back.
 
-- **dining**: stairs > hallway; loop < grocery (arrival); house > the way in
-- **hallway**: dining > dining; well > teal
-- **teal**: well > hallway; sleep > teal2 (one way)
-- **teal2**: sleep < teal (arrival); arch > flooded (one way)
-- **flooded**: arch < teal2 (arrival); grate > trampoline (one way)
-- **trampoline**: vent < flooded (arrival); glow > grocery (one way); gods > rdwe_nyx, the first god room; the god rooms' own doors decide their order
-- **grocery**: glow < trampoline (arrival); exit > dining (one way); entrance > finale (one way); gods > rdwe_thanatos, the last god room, comes out here
-- **repeating_room**: again > itself; secret_ops > secret_ops.hidden_entry
+- **dining**: stairs > hallway; loop < grocery (arrival); pantry > long_table; house > the way in
+- **hallway**: dining > dining; well > teal; door_a > kids_bedroom; door_b > upside_room; door_c > door_hall
+- **teal**: well > hallway; sleep > teal2 (one way); void > void_room
+- **teal2**: sleep < teal (arrival); arch > flooded (one way); grid > green_grid
+- **flooded**: arch < teal2 (arrival); grate > trampoline (one way); frame > changing_rooms
+- **trampoline**: vent < flooded (arrival); glow > grocery (one way); bounce > crossroads; gods > rdwe_nyx, the first god room; the god rooms' own doors decide their order
+- **grocery**: glow < trampoline (arrival); exit > dining (one way); entrance > finale (one way); stockroom > vending_room; gods > rdwe_thanatos, the last god room, comes out here
+- **repeating_room**: lift > elevator_lobby; library > melting_library; again > itself; secret_ops > secret_ops.hidden_entry
 - **finale**: grocery < grocery (arrival); win > grocery.main_floor
+- **long_table**: dining > dining; kitchen > tiny_kitchen; party > birthday_party
+- **tiny_kitchen**: table > long_table; back > giant_chair
+- **birthday_party**: table > long_table; attic > attic
+- **attic**: party > birthday_party; hatch > kids_bedroom
+- **kids_bedroom**: hatch > attic; closet > hallway
+- **giant_chair**: kitchen > tiny_kitchen; high > upside_room
+- **upside_room**: chair > giant_chair; hall > hallway
+- **door_hall**: hallway > hallway; d3 > stretching_hall; d6 > three_doors; d9 > painted_door
+- **stretching_hall**: doors > door_hall; far > bending_hall
+- **bending_hall**: start > stretching_hall; lap > stair_loop
+- **stair_loop**: hall > bending_hall; landing > tilted_hall; top > itself
+- **tilted_hall**: stairs > stair_loop; end > crossroads
+- **three_doors**: back > door_hall; left > mirror_room; middle > waiting_room; right > lights_out
+- **painted_door**: doors > door_hall; painted > anamorphic_room
+- **anamorphic_room**: painted > painted_door; word > ames_room
+- **void_room**: teal > teal; lit > lights_out
+- **lights_out**: three > three_doors; void > void_room
+- **green_grid**: teal2 > teal2; seam > ames_room
+- **ames_room**: word > anamorphic_room; grid > green_grid; small > shrink_hall
+- **shrink_hall**: ames > ames_room; small > moon_window
+- **moon_window**: hall > shrink_hall; sill > mirror_room
+- **mirror_room**: three > three_doors; moon > moon_window; reflection > dont_look
+- **dont_look**: mirror > mirror_room; statue > wrong_clock
+- **waiting_room**: three > three_doors; number > wrong_clock
+- **wrong_clock**: gallery > dont_look; waiting > waiting_room; hands > crossroads
+- **crossroads**: west > tilted_hall; north > wrong_clock; south > trampoline; east > elevator_lobby
+- **changing_rooms**: flooded > flooded; locker > laundromat
+- **laundromat**: lockers > changing_rooms; drum > motel_room
+- **motel_room**: drum > laundromat; bathroom > office_night
+- **office_night**: stairs > motel_room; lift > elevator_lobby
+- **elevator_lobby**: crossroads > crossroads; lift_1 > office_night; lift_2 > map_room; lift_3 > repeating_room; lift_4 > vending_room
+- **map_room**: lift > elevator_lobby; door > melting_library
+- **vending_room**: lift > elevator_lobby; machine > grocery
+- **melting_library**: map > map_room; arch > repeating_room
 
 ### Every link
 
@@ -64,9 +132,56 @@ Each line is a room and its exits (`door > where it goes`). Pressing F at one si
 | `rdwe_trampoline.glow` | `rdwe_grocery.glow` | one_way | walk to the red glow: the anomaly |
 | `rdwe_grocery.exit` | `rdwe_dining.loop` | one_way | the EXIT closes the loop: you are back in the dining room |
 | `rdwe_grocery.entrance` | `rdwe_finale.grocery` | one_way | the locked entrance opens once the map is complete: the finale |
+| `rdwe_dining.pantry` | `rdwe_long_table.dining` | doors |  |
+| `rdwe_long_table.kitchen` | `rdwe_tiny_kitchen.table` | doors |  |
+| `rdwe_long_table.party` | `rdwe_birthday_party.table` | doors |  |
+| `rdwe_birthday_party.attic` | `rdwe_attic.party` | stairs | a door to the attic stairs |
+| `rdwe_attic.hatch` | `rdwe_kids_bedroom.hatch` | hatch | down through the floor hatch (and back up) |
+| `rdwe_kids_bedroom.closet` | `rdwe_hallway.door_a` | doors | the closet opens on the hallway |
+| `rdwe_tiny_kitchen.back` | `rdwe_giant_chair.kitchen` | doors |  |
+| `rdwe_giant_chair.high` | `rdwe_upside_room.chair` | doors | the door 3 m up the wall |
+| `rdwe_upside_room.hall` | `rdwe_hallway.door_b` | doors |  |
+| `rdwe_hallway.door_c` | `rdwe_door_hall.hallway` | doors |  |
+| `rdwe_door_hall.d3` | `rdwe_stretching_hall.doors` | doors |  |
+| `rdwe_door_hall.d6` | `rdwe_three_doors.back` | doors |  |
+| `rdwe_door_hall.d9` | `rdwe_painted_door.doors` | doors |  |
+| `rdwe_stretching_hall.far` | `rdwe_bending_hall.start` | doors |  |
+| `rdwe_bending_hall.lap` | `rdwe_stair_loop.hall` | doors | the door that is there on the third lap |
+| `rdwe_stair_loop.landing` | `rdwe_tilted_hall.stairs` | doors |  |
+| `rdwe_tilted_hall.end` | `rdwe_crossroads.west` | doors |  |
+| `rdwe_three_doors.left` | `rdwe_mirror_room.three` | doors |  |
+| `rdwe_three_doors.middle` | `rdwe_waiting_room.three` | doors |  |
+| `rdwe_three_doors.right` | `rdwe_lights_out.three` | doors |  |
+| `rdwe_painted_door.painted` | `rdwe_anamorphic_room.painted` | doors | the painted door, from its mark |
+| `rdwe_anamorphic_room.word` | `rdwe_ames_room.word` | doors | the door the shards draw |
+| `rdwe_teal.void` | `rdwe_void_room.teal` | doors | into the black square doorway |
+| `rdwe_void_room.lit` | `rdwe_lights_out.void` | doors |  |
+| `rdwe_teal2.grid` | `rdwe_green_grid.teal2` | doors | behind the peeled wallpaper |
+| `rdwe_green_grid.seam` | `rdwe_ames_room.grid` | doors |  |
+| `rdwe_ames_room.small` | `rdwe_shrink_hall.ames` | doors |  |
+| `rdwe_shrink_hall.small` | `rdwe_moon_window.hall` | doors |  |
+| `rdwe_moon_window.sill` | `rdwe_mirror_room.moon` | doors |  |
+| `rdwe_mirror_room.reflection` | `rdwe_dont_look.mirror` | doors | the door in the reflection |
+| `rdwe_dont_look.statue` | `rdwe_wrong_clock.gallery` | doors |  |
+| `rdwe_waiting_room.number` | `rdwe_wrong_clock.waiting` | doors |  |
+| `rdwe_wrong_clock.hands` | `rdwe_crossroads.north` | doors |  |
+| `rdwe_flooded.frame` | `rdwe_changing_rooms.flooded` | doors | the frame door |
+| `rdwe_changing_rooms.locker` | `rdwe_laundromat.lockers` | doors |  |
+| `rdwe_laundromat.drum` | `rdwe_motel_room.drum` | doors | through the drum |
+| `rdwe_motel_room.bathroom` | `rdwe_office_night.stairs` | doors |  |
+| `rdwe_trampoline.bounce` | `rdwe_crossroads.south` | doors | the padded vent |
+| `rdwe_crossroads.east` | `rdwe_elevator_lobby.crossroads` | doors |  |
+| `rdwe_elevator_lobby.lift_1` | `rdwe_office_night.lift` | lift |  |
+| `rdwe_elevator_lobby.lift_2` | `rdwe_map_room.lift` | lift |  |
+| `rdwe_elevator_lobby.lift_3` | `rdwe_repeating_room.lift` | lift |  |
+| `rdwe_elevator_lobby.lift_4` | `rdwe_vending_room.lift` | lift |  |
+| `rdwe_vending_room.machine` | `rdwe_grocery.stockroom` | doors | the vending machine swings open on the stockroom |
+| `rdwe_map_room.door` | `rdwe_melting_library.map` | doors |  |
+| `rdwe_melting_library.arch` | `rdwe_repeating_room.library` | doors |  |
 
 Links inside one room, and links that leave the set:
 
+- `rdwe_stair_loop.top` (loop): the top door arrives at the foot of the same stairs (a Penrose loop)
 - `rdwe_repeating_room.again` (loop): the north door arrives through the south door: the same room, changed
 - `rdwe_dining.house` (doors): the way in: the dreamcore house's door in the meadow, and the gate on L4; they arrive here, facing the stairs. Manifest: built: forest.house>rdwe and the Overworld gate DoorLeaf_Gate_RDW (both arrive in room dining)
 - `rdwe_finale.win` (doors): grocery.main_floor: the one ending, once every camera is off. Manifest: planned: rdwe.finale>grocery (its `from` names room grocery; the coordinator may move it to rdwe_finale)
