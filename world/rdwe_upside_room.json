@@ -30,14 +30,14 @@
   {
    "s": "Chandelier_Up",
    "min": [
-    -0.25,
+    -0.3,
     0.0,
-    -0.25
+    -0.3
    ],
    "max": [
-    0.25,
-    1.6,
-    0.25
+    0.3,
+    1.7,
+    0.3
    ]
   },
   {
@@ -245,6 +245,22 @@
  ],
  "zones": [],
  "spots": [
+  {
+   "kind": "chandelier",
+   "name": "Spot_chandelier_1",
+   "position": [
+    0.0,
+    0.0,
+    -1.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the chandelier stands on the floor, lit, pointing up"
+  },
   {
    "kind": "trick",
    "name": "Spot_trick_1",

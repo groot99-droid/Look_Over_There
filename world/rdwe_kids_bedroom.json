@@ -4,13 +4,13 @@
   {
    "s": "Bed",
    "min": [
-    -3.6,
+    -3.8,
     0.0,
-    -3.6
+    -4.0
    ],
    "max": [
-    -1.6,
-    0.5,
+    -1.8,
+    0.6,
     -1.0
    ]
   },
@@ -25,6 +25,58 @@
     4.55,
     2.19,
     -1.19
+   ]
+  },
+  {
+   "s": "Bookshelf",
+   "min": [
+    -4.0,
+    0.0,
+    0.8
+   ],
+   "max": [
+    -3.65,
+    1.6,
+    2.4
+   ]
+  },
+  {
+   "s": "Desk",
+   "min": [
+    1.4,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    3.0,
+    0.75,
+    -3.4
+   ]
+  },
+  {
+   "s": "Desk_Chair",
+   "min": [
+    2.0,
+    0.0,
+    -3.2
+   ],
+   "max": [
+    2.5,
+    0.85,
+    -2.7
+   ]
+  },
+  {
+   "s": "Nightstand",
+   "min": [
+    -1.7,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -1.2,
+    0.55,
+    -3.5
    ]
   },
   {
@@ -218,6 +270,22 @@
    "yaw_deg": 180.0,
    "scale": 1.0,
    "what": "the notes under the bed: someone counted the days here"
+  },
+  {
+   "kind": "stars",
+   "name": "Spot_stars_1",
+   "position": [
+    0.8,
+    0.0,
+    -1.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the glow stars: they make the same shape as the hallway's doors"
   }
  ]
 }
