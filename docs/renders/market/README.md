@@ -67,7 +67,7 @@ Nothing over 0.85 at p99 (the signs' 0.06 % at 1 are a few texels of the atlas s
 
 ## Checks
 
-- Layout check (`check_layout.py` on `Art`, the CLEAR points the link's `at` and `arrive`): **PASS, 75 of 75** (70 COVER, 1 STRAY: 67 tall solid meshes each over a collider, 100 decor_ meshes exempt, 2 CLEAR, and the rest).
+- Layout check (`check_layout.py` on `Art`, the CLEAR points the link's `at` and `arrive`): **PASS, 75 of 75** (72 COVER, 1 STRAY: 67 tall solid meshes each over a collider, 100 decor_ meshes exempt, 2 CLEAR).
 - `python tools/blender/build_overworld_greybox.py --check . --glb world`: **GATES PASS**.
 - `node tools/worlddoc.mjs check world/market.json`: **OK**, 76 colliders, 1 link, 12 spots, 0 errors, 3 warnings (66 m along x; the scene and its link are new to the manifest; as for the greybox).
 - `glb_inspect.py world/market.glb --budget tris=300000,mb=8`: **pass**, 74,474 triangles, 3.82 MB (4.01 MB on disk), 33 draw calls (primitives).
