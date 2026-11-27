@@ -2,9 +2,9 @@
 
 Run it on a saved scene, from the repo root:
 
-    blender -b blender/scenes/<scene>.blend --python tools/blender/check_layout.py -- --scene <scene> [--collection Art]
+    blender -b blender/scenes/<scene>.blend --python tools/blender/check_layout.py -- --scene <scene> [--collection Art] [--floor <y>]
 
-It compares each visible mesh's world box, in GAME coordinates (metres, y up; Blender (x, y, z) is game (x, z, -y)), with the scene's collision
+With --floor <y> every height is read from that floor (a scene built at its storey's height, as the Going back in chambers are). It compares each visible mesh's world box, in GAME coordinates (metres, y up; Blender (x, y, z) is game (x, z, -y)), with the scene's collision
 file world/<scene>.json and prints one PASS or FAIL line per rule. The exit code is 1 when anything fails.
 
 Rules (a collider is a box {s, min, max}; "solid art" is every visible mesh whose name does not start with decor_):
@@ -160,7 +160,14 @@ def main(argv):
         parts = json.loads(Path(arg("--boxes")).read_text())
     else:
         parts = blender_parts(arg("--collection", "Art"))
-    print(f"layout check: scene {scene}, {len(parts)} visible meshes, {len(world['colliders'])} colliders")
+    floor = float(arg("--floor", 0.0))
+    if floor:                                   # a scene whose floor is not at y 0 (the Going back in chambers): heights are read from its floor
+        def down(b):
+            return dict(b, min=[b["min"][0], b["min"][1] - floor, b["min"][2]], max=[b["max"][0], b["max"][1] - floor, b["max"][2]])
+        parts = [down(p) for p in parts]
+        world = dict(world, colliders=[dict(c, **down(c)) for c in world["colliders"]],
+                     markers=[dict(m, position=[m["position"][0], m["position"][1] - floor, m["position"][2]]) for m in world.get("markers", [])])
+    print(f"layout check: scene {scene}, {len(parts)} visible meshes, {len(world['colliders'])} colliders" + (f", floor at y {floor:g}" if floor else ""))
     return 1 if report(check(parts, world, constants)) else 0
 
 
