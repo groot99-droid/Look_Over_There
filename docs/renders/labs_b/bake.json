@@ -1,0 +1,93 @@
+{
+ "scene": "labs_b",
+ "samples": 512,
+ "map_0": {
+  "set": "normal",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 37.7,
+  "gain": 0.23544,
+  "C": 1.2,
+  "wall_median_L": 2.01503,
+  "raw_p50_p90_p99": [
+   1.7932,
+   3.2412,
+   3.4998
+  ]
+ },
+ "map_1": {
+  "set": "normal",
+  "page": 1,
+  "size": 2048,
+  "px_per_m": 60.1,
+  "gain": 0.23544,
+  "C": 1.2,
+  "wall_median_L": 2.01503,
+  "raw_p50_p90_p99": [
+   1.4958,
+   2.7377,
+   6.1925
+  ]
+ },
+ "map_2": {
+  "set": "alarm",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 37.7,
+  "gain": 4.45318,
+  "C": 1.2,
+  "wall_median_L": 0.07453,
+  "raw_p50_p90_p99": [
+   0.0608,
+   0.2288,
+   1.0337
+  ]
+ },
+ "map_3": {
+  "set": "alarm",
+  "page": 1,
+  "size": 2048,
+  "px_per_m": 60.1,
+  "gain": 4.45318,
+  "C": 1.2,
+  "wall_median_L": 0.07453,
+  "raw_p50_p90_p99": [
+   0.0363,
+   0.1537,
+   1.0869
+  ]
+ },
+ "page_0_materials": [
+  "Ceiling_Tile",
+  "Floor_Lab",
+  "Wall_Lab"
+ ],
+ "page_1_materials": [
+  "Bench_Top",
+  "Cam_Body",
+  "Cardboard",
+  "Clock_Face",
+  "Door_Frame",
+  "Door_Keycard",
+  "Door_Steel",
+  "Hazard",
+  "Lamp_Housing",
+  "Liquid",
+  "Notice",
+  "Paint_Dark",
+  "Paint_Grey",
+  "Pillar_Paint",
+  "Plastic_Black",
+  "Plastic_Grey",
+  "Plastic_White",
+  "Sign_Plate",
+  "Skirting",
+  "Specimen",
+  "Steel",
+  "Steel_Dark",
+  "Stripe_Red",
+  "Stripe_Teal"
+ ],
+ "seconds": 172,
+ "device": "GPU"
+}

@@ -165,7 +165,7 @@ def skin(M, max_len=6.0):
                         for v in (mn[va], mx[va]):
                             if lo[1] < v < hi[1]:
                                 bv.add(v)
-                bu, bv = sorted(bu), sorted(bv)
+                bu, bv = sorted({round(v, 5) for v in bu}), sorted({round(v, 5) for v in bv})   # no slivers from float noise
                 cells = {}
                 for i in range(len(bu) - 1):
                     for j in range(len(bv) - 1):
@@ -179,6 +179,8 @@ def skin(M, max_len=6.0):
                         cells[(i, j)] = face_key(M, B, a, side, where)
                 for i0, i1, j0, j1, key in GB.grid_rects(cells):
                     u0, u1, v0, v1 = bu[i0], bu[i1], bv[j0], bv[j1]
+                    if u1 - u0 < 1e-3 or v1 - v0 < 1e-3:
+                        continue
                     nu, nv = max(1, math.ceil((u1 - u0) / max_len - 1e-9)), max(1, math.ceil((v1 - v0) / max_len - 1e-9))
                     for m in range(nu):
                         for n in range(nv):
