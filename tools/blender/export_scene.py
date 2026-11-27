@@ -11,7 +11,7 @@ The format is the page's (world/L1.json): `scene`, `colliders`, `doors`, `camera
 | `DoorLeaf_<name>` (origin = hinge) | `doors`: {name, level, hinge, width, height, closed_yaw_deg, swing_deg, state, + its other custom properties} |
 | `Marker_<name>` empty, `kind`      | `markers`: {name, room, level, kind, position}                                                       |
 | `Link_<id>` + `Arrive_<id>`        | `links`: {door: <id>, at, arrive, face} (face: the Arrive empty's -Y axis, as game (x, z))          |
-| `SecCam_<nn>`                      | `cameras` (none of the scenes built so far has one)                                                  |
+| `SecCam_<nn>` empty                | `cameras`: world/L1.json's shape, from the empty's place and its -Y axis (see camera_doc)            |
 | `Zone_<kind>_<name>` mesh          | `zones`: {kind, name, min, max}                                                                      |
 | `Spot_<kind>[_<n>]` empty          | `spots`: {kind, name, position, face, yaw_deg, scale, + the empty's other custom properties}         |
 
@@ -38,6 +38,29 @@ def _box(ob):
     from mathutils import Vector
     pts = [_g(ob.matrix_world @ Vector(c)) for c in ob.bound_box]
     return [min(p[i] for p in pts) for i in range(3)], [max(p[i] for p in pts) for i in range(3)]
+
+
+CAM_DEFAULTS = {"style": "security_camera_01", "mount_height_above_floor": 2.8, "pan": {"amplitude_deg": 45.0, "cycles": 1, "phase": 0.0},
+                "tilt": {"base_deg": -18.0, "wobble_deg": 4.0, "cycles": 2, "phase": 0.5},
+                "zoom": {"lens_wide_mm": 22, "lens_tele_mm": 70, "cycles": 2, "phase": 0.2}, "loop_seconds": 20, "aspect": "16:9",
+                "view_range_m": [0.03, 40]}
+
+
+def camera_doc(scene, name, position, face, props=None):
+    """One SecCam_<nn> as the page reads cameras (world/L1.json's shape: id, level, position, facing_deg, pan, tilt, zoom, loop_seconds).
+    face: the way it looks, game (x, z); facing_deg is three's rotation.y of it. Each camera's sweep starts at its own phase. The empty's
+    custom properties are added as they are (a nested pan/tilt/zoom is not read from them). Pure Python: build scripts use it for --preview."""
+    c = {"id": name, "level": scene, "position": [round(v, 3) + 0.0 for v in position],
+         "facing_deg": round(math.degrees(math.atan2(face[0], face[1])), 1) + 0.0}
+    c.update(json.loads(json.dumps(CAM_DEFAULTS)))
+    digits = "".join(ch for ch in name if ch.isdigit())
+    k = int(digits) if digits else 0
+    c["pan"]["phase"] = round((k * 0.137) % 1.0, 3)
+    c["tilt"]["phase"] = round((k * 0.291) % 1.0, 3)
+    for kk, v in (props or {}).items():
+        if kk not in c and isinstance(v, (int, float, str)):
+            c[kk] = v
+    return c
 
 
 def collect(scene):
@@ -78,6 +101,8 @@ def collect(scene):
             kind = n.split("_")[1]
             mn, mx = _box(ob)
             out["zones"].append({"kind": kind, "name": n, "min": mn, "max": mx})
+        elif n.startswith("SecCam_") and ob.type == "EMPTY":
+            out["cameras"].append(camera_doc(scene, n, _g(ob.matrix_world.translation), facing(ob), {k: ob[k] for k in ob.keys()}))
         elif n.startswith("Spot_") and ob.type == "EMPTY":
             f = facing(ob)
             sp = {"kind": n.split("_")[1], "name": n, "position": _g(ob.matrix_world.translation), "face": f,
@@ -94,7 +119,7 @@ def write(scene, path=None):
     d = collect(scene)
     path.write_text(json.dumps(d, indent=1) + "\n")
     print(f"EXPORT_SCENE {path.name}: {len(d['colliders'])} colliders, {len(d['doors'])} doors, {len(d['markers'])} markers, {len(d['links'])} links, "
-          f"{len(d['zones'])} zones, {len(d['spots'])} spots")
+          f"{len(d['zones'])} zones, {len(d['spots'])} spots, {len(d['cameras'])} cameras")
     return d
 
 
