@@ -11,7 +11,7 @@ The format is the page's (world/L1.json): `scene`, `colliders`, `doors`, `camera
 | `DoorLeaf_<name>` (origin = hinge) | `doors`: {name, level, hinge, width, height, closed_yaw_deg, swing_deg, state, + its other custom properties} |
 | `Marker_<name>` empty, `kind`      | `markers`: {name, room, level, kind, position}                                                       |
 | `Link_<id>` + `Arrive_<id>`        | `links`: {door: <id>, at, arrive, face} (face: the Arrive empty's -Y axis, as game (x, z))          |
-| `SecCam_<nn>`                      | `cameras` (none of the scenes built so far has one)                                                  |
+| `SecCam_<nn>` empty                | `cameras`: {id, style, level, position, facing_deg, mount_height_above_floor, pan, tilt, zoom, ...} (L1's shape; see camera()) |
 | `Zone_<kind>_<name>` mesh          | `zones`: {kind, name, min, max}                                                                      |
 | `Spot_<kind>[_<n>]` empty          | `spots`: {kind, name, position, face, yaw_deg, scale, + the empty's other custom properties}         |
 
@@ -38,6 +38,25 @@ def _box(ob):
     from mathutils import Vector
     pts = [_g(ob.matrix_world @ Vector(c)) for c in ob.bound_box]
     return [min(p[i] for p in pts) for i in range(3)], [max(p[i] for p in pts) for i in range(3)]
+
+
+CAM_ZOOM = "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+
+
+def camera(scene, name, position, face, props):
+    """A SecCam_<nn> empty as world/L1.json writes a camera: at the empty, facing its -Y axis (facing_deg as a spot's yaw_deg), sweeping as its
+    custom properties say (pan_amplitude_deg, pan_cycles, pan_phase, tilt_base_deg, tilt_wobble_deg, tilt_cycles, tilt_phase, zoom_cycles,
+    zoom_phase, lens_wide_mm, lens_tele_mm, loop_seconds, mount_height_above_floor, style), with L1's values where it has none."""
+    g = lambda k, d: float(props.get(k, d))
+    fov = lambda mm: round(2 * math.degrees(math.atan(20.25 / 2 / mm)), 2)
+    wide, tele = g("lens_wide_mm", 22.0), g("lens_tele_mm", 70.0)
+    return {"id": name, "style": str(props.get("style", "security_camera_01")), "level": scene, "position": position,
+            "facing_deg": round(math.degrees(math.atan2(face[0], face[1])), 1) + 0.0, "mount_height_above_floor": g("mount_height_above_floor", 2.8),
+            "pan": {"amplitude_deg": g("pan_amplitude_deg", 45.0), "cycles": int(g("pan_cycles", 1)), "phase": g("pan_phase", 0.0)},
+            "tilt": {"base_deg": g("tilt_base_deg", -15.0), "wobble_deg": g("tilt_wobble_deg", 4.0), "cycles": int(g("tilt_cycles", 2)), "phase": g("tilt_phase", 0.0)},
+            "zoom": {"lens_wide_mm": wide, "lens_tele_mm": tele, "cycles": int(g("zoom_cycles", 2)), "phase": g("zoom_phase", 0.0),
+                     "fov_v_wide_deg": fov(wide), "fov_v_tele_deg": fov(tele), "formula": CAM_ZOOM},
+            "loop_seconds": g("loop_seconds", 20.0), "aspect": "16:9", "view_range_m": [0.03, 80]}
 
 
 def collect(scene):
@@ -74,6 +93,8 @@ def collect(scene):
             assert key in arrive, f"{n} has no Arrive_{key}"
             a = arrive[key]
             out["links"].append({"door": key, "at": _g(ob.matrix_world.translation), "arrive": _g(a.matrix_world.translation), "face": facing(a)})
+        elif n.startswith("SecCam_") and ob.type == "EMPTY":
+            out["cameras"].append(camera(scene, n, _g(ob.matrix_world.translation), facing(ob), ob))
         elif n.startswith("Zone_") and ob.type == "MESH":
             kind = n.split("_")[1]
             mn, mx = _box(ob)
@@ -93,8 +114,8 @@ def write(scene, path=None):
     path = Path(path) if path else ROOT / f"world/{scene}.json"
     d = collect(scene)
     path.write_text(json.dumps(d, indent=1) + "\n")
-    print(f"EXPORT_SCENE {path.name}: {len(d['colliders'])} colliders, {len(d['doors'])} doors, {len(d['markers'])} markers, {len(d['links'])} links, "
-          f"{len(d['zones'])} zones, {len(d['spots'])} spots")
+    print(f"EXPORT_SCENE {path.name}: {len(d['colliders'])} colliders, {len(d['doors'])} doors, {len(d['cameras'])} cameras, {len(d['markers'])} markers, "
+          f"{len(d['links'])} links, {len(d['zones'])} zones, {len(d['spots'])} spots")
     return d
 
 
