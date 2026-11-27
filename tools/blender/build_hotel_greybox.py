@@ -440,6 +440,44 @@ def lobby():
     return S
 
 
+# ---------------------------------------------------------------- a connector-kit piece's layout, placed (as tools/blender/kit_place.py does)
+def atrium_kit_point(at, yaw_deg, p):
+    """A kit point (x, y, z) in the scene, for the piece placed at `at`, turned by `yaw_deg` (three.js rotation.y)."""
+    a = math.radians(yaw_deg)
+    c, s = math.cos(a), math.sin(a)
+    return (at[0] + p[0] * c + p[2] * s, at[1] + p[1], at[2] - p[0] * s + p[2] * c)
+
+
+def atrium_kit_face(yaw_deg, f):
+    a = math.radians(yaw_deg)
+    c, s = math.cos(a), math.sin(a)
+    return (f[0] * c + f[1] * s, -f[0] * s + f[1] * c)
+
+
+def atrium_kit_elevator(S, suffix, at, yaw_deg, car=True, props=None):
+    """The kit elevator's layout (world/kit/elevator.json) at one stop: the landing's colliders, the lift door record and the call button's spot;
+    with car=True also the car's colliders and its panel spot (one car, parked at this stop). The kit's own Link_/Arrive_ and Marker_Landing are
+    left out: the scene keeps its own link (the greybox's, 1.3 m out from the wall) and its own markers."""
+    kit = json.loads((ROOT / "world/kit/elevator.json").read_text())
+    for c in kit["colliders"]:
+        if c["s"].startswith("Car_") and not car:
+            continue
+        p, q = atrium_kit_point(at, yaw_deg, c["min"]), atrium_kit_point(at, yaw_deg, c["max"])
+        S.solid(f"{c['s']}_{suffix}", [min(p[i], q[i]) for i in range(3)], [max(p[i], q[i]) for i in range(3)], "lift")
+    for d in kit["doors"]:
+        yaw = (d["closed_yaw_deg"] + yaw_deg + 180.0) % 360.0 - 180.0
+        pr = {"width": d["width"], "height": d["height"], "closed_yaw_deg": round(yaw, 1), "swing_deg": d["swing_deg"], "state": d["state"]}
+        pr.update({k: v for k, v in d.items() if k not in pr and k not in ("name", "level", "hinge")})
+        pr.update(props or {})
+        S.doors.append({"name": S.uniq(f"{d['name']}_{suffix}"), "hinge": [float(v) for v in atrium_kit_point(at, yaw_deg, d["hinge"])],
+                        "yaw": math.radians(yaw), "props": pr})
+    for sp in kit["spots"]:
+        if sp["kind"] == "panel" and not car:
+            continue
+        extra = {k: v for k, v in sp.items() if k not in ("kind", "name", "position", "face", "yaw_deg", "scale")}
+        S.empty(f"{sp['name']}_{suffix}", atrium_kit_point(at, yaw_deg, sp["position"]), face=atrium_kit_face(yaw_deg, sp["face"]), props=extra)
+
+
 # ---------------------------------------------------------------- the atrium
 ATR = 18.0
 GAL = 4.0
@@ -506,16 +544,17 @@ def atrium():
         for sz in (-1, 1):
             cx0, cz0 = (g - 0.6, g - 0.6)
             S.solid("Column", (min(sx * g, sx * cx0), 0.0, min(sz * g, sz * cz0)), (max(sx * g, sx * cx0), ATR_H, max(sz * g, sz * cz0)), "column")
-    # the elevator shaft through all four galleries, its doors on the north side at every level; a placeholder car at the bottom
+    # the elevator shaft through all four galleries, its doors on the north side at every level. The car and the four landings are the connector
+    # kit's (blender/kit/README.md): atrium_kit_elevator() adds the kit's colliders, door records and spots, as tools/blender/kit_place.py places them
+    # in the dressed scene (tools/blender/build_atrium.py); the car is parked at the ground stop, as the bake has it, and the page moves it.
     sz0, sz1 = -g, -g + 2.6
     wall(S, "Shaft_N", "x", sz0, sz0 + 0.2, -1.3, 1.3, 0.0, ATR_H, [(-0.6, 0.6, y, y + 2.2) for y in LEVELS], "lift")
     S.solid("Shaft_W", (-1.3, 0.0, sz0 + 0.2), (-1.1, ATR_H, sz1), "lift")
     S.solid("Shaft_E", (1.1, 0.0, sz0 + 0.2), (1.3, ATR_H, sz1), "lift")
     S.solid("Shaft_S", (-1.1, 0.0, sz1 - 0.2), (1.1, ATR_H, sz1), "lift")
-    S.solid("Lift_Car", (-1.05, 0.0, sz0 + 0.25), (1.05, 2.4, sz1 - 0.25), "lift")
     for y in LEVELS:
         L = f"L{int(y)}"
-        S.door(f"lift_{L}", (-0.6, y, sz0), (1, 0), (0, -1), width=1.2, height=2.2, props={"kind": "elevator", "stop": LEVEL_NAME[y]})
+        atrium_kit_elevator(S, L, (0.0, y, sz0), 180.0, car=not y, props={"stop": LEVEL_NAME[y]})
         S.link(f"lift_{L}", (0.0, y, sz0 - 0.6), (0.0, y, sz0 - 1.3), (0, -1),
                {0.0: "the elevator's ground stop", 4.0: "floor_1_lower", 8.0: "floor_2_lower", 12.0: "floor_3"}[y])
         S.label(f"{LEVEL_NAME[y]} gallery (y {int(y)})", -a + 6.5 if not y else -a + 2.0, 8.0 if not y else -2.0, y, kind="room" if y else "note")
@@ -531,7 +570,14 @@ def atrium():
     S.corridor("narrow_hall", hx0, hx1, -0.8, 0.8)
     S.label("narrow hall", 23.0, -1.6, kind="note")
     S.marker("Spawn", (26.6, 0.0, 0.0))
-    box(S, "Planter", -2.0, 2.0, -2.0, 2.0, 0, 0.6, "safe")
+    box(S, "Planter", -2.0, 2.0, -2.0, 2.0, 0, 0.6, "safe")       # the quiet fountain's basin (build_atrium.py)
+    # added with the dressed atrium (tools/blender/build_atrium.py): the solid furniture on the floor of the void, each with its collider
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            box(S, "Palm_Planter", sx * 7.0 - 0.7, sx * 7.0 + 0.7, sz * 7.0 - 0.7, sz * 7.0 + 0.7, 0, 0.75, "safe")   # four palms in square planters
+    for k, (cx, cz, along_x) in enumerate(((0.0, -5.2, True), (0.0, 5.2, True), (-5.2, 0.0, False), (5.2, 0.0, False)), 1):
+        hx, hz = (0.9, 0.25) if along_x else (0.25, 0.9)                      # four benches round the fountain, facing it
+        box(S, f"Bench_{k}", cx - hx, cx + hx, cz - hz, cz + hz, 0, 0.45, "furniture")
     S.label("ATRIUM floor (sub floor)", 0.0, 4.0)
     S.still = ((15.0, 0.0, 12.0), (-0.75, -0.66), 16)
     for x in (-10, 0, 10):
