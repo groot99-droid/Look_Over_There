@@ -459,6 +459,7 @@ def back_of_house():
             box(S, "Break_Chair", x - 0.22, x + 0.22, z - 0.22, z + 0.22, 0.0, 0.9)
     box(S, "Break_Counter", BX0, 13.0, 8.4, 14.6, 0.0, 0.9, "counter")
     box(S, "Vending", 18.6, 19.8, 14.2, 15.0, 0.0, 1.9, "lift")
+    box(S, "Break_Fridge", BX0, 12.95, 7.4, 8.3, 0.0, 1.85, "lift")       # the dressing's fridge, at the counter's north end
     S.spot("hide", 1, (18.9, 0.0, 9.4), face=(0, 1), props={"where": "behind the break room door"})
     S.label("BREAK ROOM", 16.1, 13.6)
     # lockers
@@ -471,7 +472,7 @@ def back_of_house():
     # the manager's office: a desk facing a bank of camera monitors (the page shows the SecCam_ feeds on it)
     box(S, "Office_Desk", 26.6, 29.4, 11.0, 11.8, 0.0, 0.75)
     S.solid("Monitor_Bank", (25.4, 0.8, 13.2), (31.8, 2.4, 13.6), "monitor")
-    box(S, "Monitor_Shelf", 25.4, 31.8, 13.6, BZ1, 0.0, 0.8, "counter")
+    box(S, "Monitor_Shelf", 25.4, 31.8, 13.2, BZ1, 0.0, 0.8, "counter")    # the console runs under the bank (the dressing stands the CRTs on it)
     box(S, "Office_Cabinet", 30.6, 31.8, 7.4, 8.4, 0.0, 1.3)
     S.spot("monitor", 1, (28.6, 0.0, 12.6), face=(0, 1), props={"what": "the camera monitors: the SecCam_ feeds (code)"})
     S.spot("hide", 2, (31.2, 0.0, 9.6), face=(-1, 0), props={"where": "behind the office cabinet"})
@@ -575,6 +576,7 @@ def basement():
     box(S, "Chiller", 37.0, 41.6, -4.6, -1.6, 0.0, 2.0, "plant")
     box(S, "Electrical_Panels", x1 - 0.5, x1, 0.0, 2.6, 0.0, 2.2, "monitor")
     S.decor("Pipes", (28.2, 3.0, -1.2), (x1, 3.3, -0.9), "plant")
+    box(S, "Pump_Set", 32.6, 35.4, 0.8, 1.8, 0.0, 1.1, "plant")           # the dressing's pump set on its plinth
     S.spot("breaker", 1, (41.2, 0.0, 1.3), face=(1, 0), props={"what": "the store's breakers: the lights, by night the emergency lights (code)"})
     S.label("PLANT ROOM", 35.0, 0.6)
     # pallets in the south-west, stacked at different heights
