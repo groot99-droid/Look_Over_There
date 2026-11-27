@@ -6,7 +6,7 @@ GATES PASS
 
 node tools/worlddoc.mjs check <the 31 scene files> world/rooms/*.json
   warning: link street: the manifest has no link from this door yet: a new link to add
-OK world/lobby.json: 44 colliders, 3 doors, 1 markers, 2 links, 0 zones, 12 spots, 0 errors, 1 warnings
+OK world/lobby.json: 62 colliders, 3 doors, 1 markers, 2 links, 0 zones, 12 spots, 0 errors, 1 warnings
   warning: link escalators_L0: the manifest has no link from this door yet: a new link to add
   warning: link escalators_L12: the manifest has no link from this door yet: a new link to add
   warning: link escalators_L4: the manifest has no link from this door yet: a new link to add

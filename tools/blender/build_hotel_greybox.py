@@ -427,6 +427,21 @@ def lobby():
     box(S, "Planter", -16.0, -14.0, -20.0, -18.0, 0, 0.8, "safe")
     box(S, "Sofa", -12.0, -10.0, -16.0, -15.2, 0, 0.8)
     box(S, "Sofa", -12.0, -10.0, -22.8, -22.0, 0, 0.8)
+    # added with the dressed lobby (tools/blender/build_lobby.py): the solid furniture it brings, each with its collider
+    box(S, "Coffee_Table", -11.6, -10.4, -17.0, -16.4, 0, 0.45)                 # in front of each sofa, across the aisle from the doors
+    box(S, "Coffee_Table", -11.6, -10.4, -21.6, -21.0, 0, 0.45)
+    for k, (px, pz) in enumerate(((-8.9, -21.4), (-8.9, -16.6), (-8.9, -29.1), (-19.7, -25.7), (-14.3, -25.7)), 1):
+        box(S, f"Plant_{k}", px - 0.3, px + 0.3, pz - 0.3, pz + 0.3, 0, 0.55, "safe")   # potted plants: by the doors, the north-east corner, the desk
+    S.solid("Deli_Shelf", (x0, 0.0, -20.5), (-27.45, 2.4, -14.0), "furniture")         # the deli's back shelves, on the west wall
+    for zc in (-19.0, -16.0):                                                      # two bistro chairs at each deli table, north and south of it
+        for dz in (-0.73, 0.73):
+            box(S, "Deli_Chair", -23.22, -22.78, zc + dz - 0.22, zc + dz + 0.22, 0, 0.9)
+    S.solid("Shop_Shelf", (-16.8, 0.0, -8.55), (-13.3, 2.2, z1), "furniture")         # each shop's back shelves, on the south wall
+    S.solid("Shop_Shelf", (-12.7, 0.0, -8.55), (-8.6, 2.2, z1), "furniture")
+    for z_a in (-18.2, -14.4):                                                     # the loft's sitting corner: two armchairs and a table by the west wall
+        box(S, "Loft_Armchair", -27.6, -26.8, z_a - 0.4, z_a + 0.4, 3.0, 3.9)
+    box(S, "Loft_Table", -27.5, -26.9, -16.6, -16.0, 3.0, 3.55)
+    box(S, "Plant_6", -22.0, -21.4, -9.1, -8.5, 3.0, 3.55, "safe")                # a potted plant in the loft's south-east corner
     S.spot("puzzle", 1, (-15.0, 0.0, -17.2), face=(0, -1))
     S.spot("puzzle", 2, (-9.4, 0.0, -27.0), face=(-1, 0))
     S.spot("dealer", 1, (-20.0, 0.0, -23.5), face=(1, 0))
