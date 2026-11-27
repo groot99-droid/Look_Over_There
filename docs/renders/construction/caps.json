@@ -50,13 +50,13 @@
    "Steel_Galv": 12.2368,
    "Tile_Glazed": 7.76,
    "Block_Bare": 13.4605,
-   "Column_Concrete": 13.4605,
+   "Column_Concrete": 13.28,
    "Hoarding_Ply": 13.4605,
    "Pit_Concrete": 13.4605,
    "Slab_Concrete": 13.4605,
    "Soffit_Concrete": 13.4605
   },
-  "note": "the shell x1.1 after the second bake, so the blockwork reads (p50 0.15)"
+  "note": "the shell x1.1 after the second bake, so the blockwork reads (p50 0.15); Column_Concrete x0.987 after the west rail's re-bake (p99 0.983 -> under 0.98)"
  },
  "night": {
   "gain": 70.0,

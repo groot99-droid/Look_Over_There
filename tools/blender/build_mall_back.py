@@ -1306,7 +1306,7 @@ def festoon(pts, tag, every=1.5, sag=0.22, power=30.0):
 
 def scaffold_deck():
     """The tube-and-clip scaffold along the north wall: standards front (on the greybox's Deck_Post boxes) and back (against the wall), ledgers,
-    transoms, braces, couplers, a timber board deck at 3 m (the Deck box), guard rails and toe boards (Deck_Rail, Deck_Rail_2)."""
+    transoms, braces, couplers, a timber board deck at 3 m (the Deck box), guard rails and toe boards (Deck_Rail, Deck_Rail_2, Deck_Rail_3)."""
     FZ, BZ, LY, TY = -5.25, -8.976, 2.889, 2.937
     front, back = (-9.75, -5.5, -1.05), (-9.75, -6.0, -1.05)
     for i, x in enumerate(front):
@@ -1370,6 +1370,15 @@ def scaffold_deck():
     multi_part("Scaffold_GuardRail_E", [("Scaffold_Tube", lambda bm: (cyl(bm, (-1.05, 3.976, -9.0), (-1.05, 3.976, FZ), TUBE, seg=8),
                                                                       cyl(bm, (-1.05, 3.5, -9.0), (-1.05, 3.5, FZ), TUBE, seg=8))),
                                         ("Scaffold_Board", lambda bm: cube(bm, (-1.096, 3.0, -9.0), (-1.058, 3.15, -5.3)))])
+    # the west end (Deck_Rail_3, over the 1 m gap to the wall): the same two rails and toe board, on a post clipped to the end transom at the
+    # stair's head; everything inside the box x -11 to -10.9
+    WX, PZ = -10.95, -5.235
+    multi_part("Scaffold_GuardRail_W", [("Scaffold_Tube", lambda bm: (cyl(bm, (WX, 3.976, -9.0), (WX, 3.976, -5.2), TUBE, seg=8),
+                                                                      cyl(bm, (WX, 3.5, -9.0), (WX, 3.5, -5.2), TUBE, seg=8),
+                                                                      cyl(bm, (WX, TY - 0.03, PZ), (WX, 4.05, PZ), TUBE, seg=10))),
+                                        ("Scaffold_Board", lambda bm: cube(bm, (-10.942, 3.0, -9.0), (-10.904, 3.15, -5.26))),
+                                        ("Coupler", lambda bm: [cube(bm, (WX - 0.04, y - 0.035, PZ - 0.035), (WX + 0.04, y + 0.035, PZ + 0.035))
+                                                                for y in (TY, 3.5, 3.976)])])
 
 
 def site_stair():

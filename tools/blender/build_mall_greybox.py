@@ -724,6 +724,7 @@ def construction():
     S.solid("Deck", (-11.0, 2.9, z0), (-1.0, 3.0, -5.2), "plank")
     S.solid("Deck_Rail", (-9.8, 3.0, -5.3), (-1.0, 4.0, -5.2), "scaffold")
     S.solid("Deck_Rail", (-1.1, 3.0, z0), (-1.0, 4.0, -5.3), "scaffold")
+    S.solid("Deck_Rail", (-11.0, 3.0, z0), (-10.9, 4.0, -5.2), "scaffold")      # the west end, over the 1 m gap to the wall
     for x in (-9.75, -5.5, -1.05):
         S.solid("Deck_Post", (x - 0.05, 0.0, -5.3), (x + 0.05, 2.9, -5.2), "scaffold")
     flight(S, "deck", -11.0, -9.8, -1.6, -1, "z", 0.0, 3.0, 12, 0.3)

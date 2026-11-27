@@ -6,12 +6,12 @@ This README covers all seven scenes. Each dressed scene's folder (`docs/renders/
 
 | File | What it is |
 |---|---|
-| `world/construction.glb` | 4.55 MB on disk (4.34 MiB), 26 502 triangles, 49 draw calls |
+| `world/construction.glb` | 4.56 MB on disk (4.35 MiB), 26 628 triangles, 49 draw calls |
 | `world/service_corridor.glb` | 2.79 MB (2.66 MiB), 16 302 triangles, 47 draw calls |
 | `world/mirror_bathroom.glb` | 1.64 MB (1.56 MiB), 4 850 triangles, 34 draw calls |
 | `world/lightmaps/<scene>_0.webp`, `_1.webp` | the day set (second UV set): `_0` the shell, `_1` everything in it |
 | `world/lightmaps/<scene>_2.webp`, `_3.webp` | the emergency set on the same UVs: `_2` the shell, `_3` everything in it |
-| `world/<scene>.json` (all seven) | the layouts, written by `export_scene.py` from the `.blend`: the same as the greybox's files (no change) |
+| `world/<scene>.json` (all seven) | the layouts, written by `export_scene.py` from the `.blend`: the same as the greybox's files (construction's has the greybox's new `Deck_Rail_3`, the deck's west rail) |
 | `blender/scenes/<scene>.blend` (all seven) | the saved scenes (Git LFS). The dressed ones: `Art` (`Props`, and `Arch`: grey twins of the shell's colliders for the layout check and the plan), `Skin` (the shell as seen), `Doors`, `Layout`, `Lights` (`Lights_Day`, `Lights_Night`), `Standins`, `Export`. The sky halls: `Layout` (the kit's, placed) and the kit's `Art` collection linked from `blender/kit/sky_hall.blend` |
 | `tools/blender/build_mall_back.py` | the re-runnable build of all seven |
 | `tools/blender/kit_place.py` | the fix from `claude/blender-hotel-floor3-roof` (32ac313): appended objects start from `matrix_basis` |
@@ -22,7 +22,7 @@ This README covers all seven scenes. Each dressed scene's folder (`docs/renders/
 
 A unit mid-fit-out behind the books wing's hoarding.
 
-- **Scaffold:** tube-and-clip, galvanised tubes with dark couplers: standards on the greybox's three deck posts and three more against the north wall, ledgers, transoms, knee braces and facade braces, a timber board deck at 3 m (scaffold boards with staggered joints and steel end bands), double guard rails with toe boards along the front and the east end.
+- **Scaffold:** tube-and-clip, galvanised tubes with dark couplers: standards on the greybox's three deck posts and three more against the north wall, ledgers, transoms, knee braces and facade braces, a timber board deck at 3 m (scaffold boards with staggered joints and steel end bands), double guard rails with toe boards along the front, the east end and the west end (`Deck_Rail_3`, over the 1 m gap to the west wall, on a post clipped to the end transom at the stair's head).
 - **The site stair:** twelve galvanised treads with yellow nosings on the greybox's steps, stringers, a tube handrail on the `Stair_Rail` box.
 - **Hoarding:** plywood over the south wall to 3 m, the site door (ledged and braced ply, a hasp and padlock, KEEP SHUT), a blue PPE board, UNIT 14 FIT-OUT and NO UNAUTHORISED ACCESS painted on it, an EXIT sign over the door.
 - **Walls:** bare grey blockwork. The east wall and the north wall's east end are half tiled in white 150 mm tiles, row by row to a ragged top, combed adhesive past them, loose tiles and boxes of tiles on the floor. A half-built stud partition (the greybox's studs and plates) with one plasterboard sheet.
@@ -61,11 +61,11 @@ A tiled public restroom.
 
 ## How it is built
 
-- **The layout comes from the greybox model.** The build imports `build_mall_greybox.py` and makes every `COL_` box, `Zone_` box, `DoorLeaf_`, `Link_`/`Arrive_`, `Marker_` and `Spot_` from it, with the same names and numbers; `export_scene.py` writes the layout files again, and they hold exactly what the greybox's files hold. No collider was added or moved.
+- **The layout comes from the greybox model.** The build imports `build_mall_greybox.py` and makes every `COL_` box, `Zone_` box, `DoorLeaf_`, `Link_`/`Arrive_`, `Marker_` and `Spot_` from it, with the same names and numbers; `export_scene.py` writes the layout files again, and they hold exactly what the greybox's files hold. No collider was added or moved here; the one later fix (the deck's west rail, `Deck_Rail_3`) was made in the greybox and the scene re-dressed and re-baked from it.
 - **The shell is only what can be seen** (the mazes' and floor 1's method): every face of the room's boxes (walls, floors, ceilings, the columns, the hoarding, the pit's floor) that looks into the air, cut where other boxes meet it, packed by hand on the shell's lightmap page. Every other collider (the scaffold's deck, posts and rails, the steps, the studs, the pallets, the mixer, the scissor lift, the pit's barriers, the bins, the stall partitions and pilasters, the vanity, the fire exit) gets its own art over its box, one object per box, so the layout check's cover rule tests the real art. The steps are art 0.2 m deep each, so the check reads them as steps.
 - **The props** are merged by material for export; faces pressed against the shell are dropped. The door leaves are reused meshes, one per kind and size, each leaf its own node with its origin at the hinge; one leaf per mesh is baked and the others show its lightmap. Thin free-standing pieces (leaves, partitions) keep both faces in the lightmap.
 - **Two light sets.** `Lights_Day` (the working lights: tripods and festoons; battens; ceiling panels) with `Lamp_Emit` on, and `Lights_Night` (the emergency fittings alone) with `Emergency_Emit` on. Each lightmap page is baked twice on the same UVs; the day maps are `lightmap`, the night maps `lightmap_night`. The EXIT signs' faces (`Sign_Exit`) and the reader's light (`Reader_Glow`) are always lit and are not switched names. The GLB carries `Lamp_Emit` at 3.0 and `Emergency_Emit` at 5.0, the strengths the page switches on.
-- **Bake:** Cycles on the rented GPU (OptiX), diffuse direct and indirect, the day set at 512 samples and the night set at 768, OIDN denoise, a soft shoulder, 8-bit PNG then WebP q90 (`--pack`), fixed 2048 pages. Texel density: construction 44 / 43 px/m (shell / props), service_corridor 70 / 44, mirror_bathroom 107 / 120. The twelve bakes took 9 to 126 s each.
+- **Bake:** Cycles on the rented GPU (OptiX), diffuse direct and indirect, the day set at 512 samples and the night set at 768, OIDN denoise, a soft shoulder, 8-bit PNG then WebP q90 (`--pack`), fixed 2048 pages. Texel density: construction 44 / 43 px/m (shell / props), service_corridor 70 / 44, mirror_bathroom 107 / 120. The twelve bakes took 9 to 127 s each (construction's four, re-baked for the west rail: 40, 105, 58 and 127 s).
 - **Brightness** (`caps.json`, read at export): each set's intensity is scaled so the big shell surfaces reach the targets, then any material still over p99 0.98 or p90 0.9 is capped by itself. The night set is scaled so the shell's brightest emergency pools reach about p99 0.35: dark, the walls p50 0.03 to 0.09, readable near the fittings.
 - **Stills:** Cycles 128 samples, AgX, 1920 x 1080, the day set with Blender's real lights; the construction stills at +1.6 EV (the bake is scaled; the real lights are dim). `2_wide` of the corridor and the bathroom is a cutaway (ceiling off). Plans are orthographic, north up.
 
@@ -77,14 +77,15 @@ Run on the box (from a slim copy of the worktree):
 
 ## Brightness (lab_display.py: shown = texture x base colour x lightmap x intensity / pi)
 
-The main surfaces; every material of all three scenes, both sets, is at or under p90 0.9 and p99 0.98.
+The main surfaces; every material of all three scenes, both sets, is at or under p90 0.9 and p99 0.98 (construction measured again after the west rail's re-bake: day at most p99 0.972 and p90 0.778, night at most p99 0.785 and p90 0.694; `Column_Concrete`'s day factor lowered from 13.46 to 13.28 in `caps.json` to bring it from p99 0.983 to 0.970).
 
 | Scene | Set | Material | m2 | p50 | p90 | p99 |
 |---|---|---|---|---|---|---|
-| construction | day | Block_Bare (walls) | 474.5 | 0.155 | 0.436 | 0.888 |
-| construction | day | Slab_Concrete | 419.7 | 0.097 | 0.315 | 0.679 |
+| construction | day | Block_Bare (walls) | 474.5 | 0.155 | 0.436 | 0.887 |
+| construction | day | Slab_Concrete | 419.7 | 0.107 | 0.346 | 0.747 |
 | construction | day | Soffit_Concrete | 430.5 | 0.092 | 0.261 | 0.554 |
-| construction | night | Block_Bare | 474.5 | 0.033 | 0.114 | 0.273 |
+| construction | day | Column_Concrete | 78.0 | 0.167 | 0.497 | 0.970 |
+| construction | night | Block_Bare | 474.5 | 0.033 | 0.112 | 0.270 |
 | service_corridor | day | Block_Paint (walls) | 212.6 | 0.325 | 0.763 | 0.931 |
 | service_corridor | day | Block_Dado (the dark band) | 139.0 | 0.098 | 0.180 | 0.270 |
 | service_corridor | day | Floor_Epoxy | 120.6 | 0.044 | 0.082 | 0.141 |
@@ -98,11 +99,11 @@ The sky hall is the kit's (its brightness is in `blender/kit/README.md`: wainsco
 
 ## Checks
 
-- `check_layout.py`: construction 62 of 62, service_corridor 38 of 38, mirror_bathroom 24 of 24 pass (on `Art`: the props and the shell's grey twins).
+- `check_layout.py`: construction 63 of 63 (with `Deck_Rail_3`), service_corridor 38 of 38, mirror_bathroom 24 of 24 pass (on `Art`: the props and the shell's grey twins).
 - The sky halls: COVER passes for all ten colliders on the kit's linked art; STRAY and CLEAR fail on it because the kit's art is merged by material (one mesh's box spans the whole hall) and its door leaves stand in their openings. This is the kit piece as published (`claude/blender-hotel-kit`), unchanged.
 - `build_mall_greybox.py --check . --glb world`: GATES PASS (links, navigable 18 of 18, steps, corridors, mirrors: 6 of 6 `Mirror_<n>` nodes in `world/mirror_bathroom.glb`, the portal Mirror_4).
-- `node tools/worlddoc.mjs check`: all seven OK, 0 errors (warnings: new links not yet in the manifest).
-- `glb_inspect.py --budget tris=300000,mb=8`: all three pass.
+- `node tools/worlddoc.mjs check`: all seven OK, 0 errors (warnings: new links not yet in the manifest); construction 61 colliders.
+- `glb_inspect.py --budget tris=300000,mb=8`: all three pass (construction 26 628 triangles, 4.35 MiB).
 - The axes check (a marker cube at the arrival point through the exporter): PASS in all three.
 - `node --test shared/*.test.js`: 297 pass.
 - Privacy: no user name, path, session id or e-mail in any file, the decompressed `.blend`s included; JPEG comments and APP1 stripped.
@@ -131,6 +132,6 @@ Own work, drawn by the build with numpy from fixed seeds: the blockwork joints, 
 
 - The sky halls have no GLB of their own: draw `world/kit/sky_hall.glb` at (0, 0, 0), yaw 0 in each, with its lightmap `kit_sky_hall_0`.
 - `Mirror_1` to `Mirror_6` are nodes in `world/mirror_bathroom.glb` with extras `mirror`, `portal`, `portal_to`; swap their material for the portal. `Spot_mirror_<n>` and `Spot_puzzle_1` are in the layout file as before.
-- The deck's west edge (x -11, beside the wall) has no rail and no collider in the greybox: a walker can step off it. Left as the greybox has it.
+- The deck's west edge (x -11, beside the wall) now has a guard rail and its collider, `Deck_Rail_3` (x -11 to -10.9, y 3 to 4, z -9 to -5.2), added in `build_mall_greybox.py` and dressed like the east end; nothing else in the layout moved. The site stair's own west side (x -11, the same 1 m gap) still has no rail or collider, as in the greybox.
 - The construction day set is scaled up a lot (the room has no daylight; tripods and festoons only), so its lightmaps carry most of their range in the darker half.
 - Door leaves' outer faces (toward the next scene) are dark: they are lit from this scene only.
