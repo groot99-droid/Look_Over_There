@@ -509,9 +509,18 @@ def strip_material(m):
     """Only the base colour reaches the page (baked materials are drawn unlit): drop the image nodes that feed anything else (normal,
     roughness, metalness, displacement), and set metalness to 0."""
     nt = m.node_tree
+    for n in nt.nodes:                           # nothing drives metalness, roughness or normals (a metallic surface bakes black)
+        if n.type == "BSDF_PRINCIPLED":
+            for k in ("Metallic", "Roughness", "Normal"):
+                for l in list(n.inputs[k].links):
+                    nt.links.remove(l)
     for n in list(nt.nodes):
         if n.type in ("NORMAL_MAP", "BUMP", "DISPLACEMENT"):
             nt.nodes.remove(n)
+    for _ in range(4):                           # then every node that no longer feeds anything
+        for n in list(nt.nodes):
+            if n.type not in ("OUTPUT_MATERIAL", "BSDF_PRINCIPLED") and not any(o.links for o in n.outputs):
+                nt.nodes.remove(n)
     for n in list(nt.nodes):
         if n.type == "TEX_IMAGE":
             to = [l.to_socket.name for o in n.outputs for l in o.links]
