@@ -61,6 +61,9 @@ def points_of(world, constants):
             for k, v in o.items():
                 if k == "arrive" and isinstance(v, list) and len(v) == 3:
                     pts.append((f"{'.'.join(path) or 'constants'}.arrive", v[0], v[2]))
+                elif k == "at" and isinstance(v, list) and len(v) == 2 and "half" in o:
+                    continue                                  # a placed building's middle (the meadow's shed and house: at, half, height), not a spot to
+                                                              # walk to: its collider stands on it (rule 1 covers it) and its door is checked
                 elif k == "at" and isinstance(v, list) and len(v) == 2:
                     pts.append((f"{'.'.join(path) or 'constants'}.at", v[0], v[1]))
                 else:
