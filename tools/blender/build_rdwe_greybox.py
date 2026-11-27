@@ -1360,7 +1360,7 @@ def c_laundromat():
         _spot(S, "trick", 2, (4.0, 0.0, -3.0), (0, -1), "the round door, 1.4 m across: the drum behind the glass is still turning")
     return croom("rdwe_laundromat", "The laundromat: the drum is a door", 16, 8, 3.2,
                  [("lockers", "W", 0.0, D(to="rdwe_changing_rooms", look="quilted pink laminate door, brass knob")),
-                  ("drum", "N", 4.0, D(to="rdwe_motel_room", width=1.4, height=1.6, look="a washing machine's round glass door, 1.4 m across"))],
+                  ("drum", "N", 4.0, D(to="rdwe_motel_room", width=1.4, height=1.8, look="a washing machine's round glass door, 1.4 m across"))],
                  keys, "Object distortion: a row of washers and one machine the size of a car; its round door is the way on, the drum still turning.",
                  "inst", fmat="vinyl", wmat="cyan",
                  trick=("trick", (4.0, 0.0, -1.6), (0, -1), "the big drum turns once every time you look away"))
