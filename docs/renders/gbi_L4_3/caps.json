@@ -1,0 +1,54 @@
+{
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "day": {
+  "gain": 0.6667,
+  "wall_p50_before": 0.75,
+  "target_wall_p50": 0.5
+ },
+ "factor": {
+  "M_D_door": 0.6667,
+  "M_X_steel": 0.6667,
+  "M_D_ceil_L4": 0.6667,
+  "M_D_floor_L4": 0.6667,
+  "M_D_trim": 0.6667,
+  "M_D_wall_L4": 0.6667,
+  "M_Fixture_Housing": 0.5189,
+  "M_GBI_card": 0.6667,
+  "M_GBI_furn_L4": 0.4101,
+  "M_GBI_kit": 0.6667,
+  "M_GBI_shutter": 0.6667,
+  "M_GBI_tape": 0.6395,
+  "M_GBI_wood": 0.6667,
+  "M_U_arrow": 0.5154,
+  "M_U_bluepaint": 0.6667,
+  "M_U_yellow": 0.6667,
+  "M_X_dark": 0.6667,
+  "M_X_white": 0.5215
+ },
+ "night": {
+  "gain": 3.3333,
+  "wall_p50_before": 0.045,
+  "target_wall_p50": 0.15
+ },
+ "factor_night": {
+  "M_D_door": 3.3333,
+  "M_X_steel": 3.3333,
+  "M_D_ceil_L4": 3.3333,
+  "M_D_floor_L4": 3.3333,
+  "M_D_trim": 3.3333,
+  "M_D_wall_L4": 3.3333,
+  "M_Fixture_Housing": 3.3333,
+  "M_GBI_card": 3.3333,
+  "M_GBI_furn_L4": 3.3333,
+  "M_GBI_kit": 3.3333,
+  "M_GBI_shutter": 3.3333,
+  "M_GBI_tape": 3.3333,
+  "M_GBI_wood": 3.3333,
+  "M_U_arrow": 3.3333,
+  "M_U_bluepaint": 3.3333,
+  "M_U_yellow": 3.3333,
+  "M_X_dark": 3.3333,
+  "M_X_white": 3.3333
+ }
+}
