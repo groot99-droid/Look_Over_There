@@ -52,25 +52,25 @@ Plain boxes, to scale, for the Right Door, Wrong Exit rooms: the seven that exis
 | `rdwe_three_doors` | C | 12 m by 10 m, 3.4 m high | `back`: rdwe_door_hall; `left`: rdwe_mirror_room; `middle`: rdwe_waiting_room; `right`: rdwe_lights_out | 19 colliders, 4 doors; spots: note x1 |
 | `rdwe_painted_door` | C | 6 m by 24 m, 3.4 m high | `doors`: rdwe_door_hall; `painted`: rdwe_anamorphic_room | 13 colliders, 2 doors; spots: view x1 |
 | `rdwe_anamorphic_room` | C | 14 m by 14 m, 4 m high | `painted`: rdwe_painted_door; `word`: rdwe_ames_room | 14 colliders, 2 doors; spots: view x1 |
-| `rdwe_void_room` | C | 10 m by 10 m, 4 m high | `teal`: rdwe_teal (back through the black); `lit`: rdwe_lights_out | 13 colliders, 2 doors; spots: dark x1 |
-| `rdwe_lights_out` | C | 12 m by 12 m, 3.2 m high | `void`: rdwe_void_room; `three`: rdwe_three_doors | 15 colliders, 2 doors; spots: switch x3 |
-| `rdwe_green_grid` | C | 6 m by 30 m, 4 m high | `teal2`: rdwe_teal2; `seam`: rdwe_ames_room | 28 colliders, 2 doors; spots: grid x1 |
-| `rdwe_ames_room` | C | 14 m by 10 m, 4.5 m high | `word`: rdwe_anamorphic_room; `grid`: rdwe_green_grid; `small`: rdwe_shrink_hall | 21 colliders, 3 doors; spots: view x1 |
-| `rdwe_shrink_hall` | C | 6 m by 24 m, 3.6 m high | `ames`: rdwe_ames_room; `small`: rdwe_moon_window | 18 colliders, 2 doors; spots: trick x1 |
-| `rdwe_moon_window` | C | 10 m by 12 m, 3.6 m high | `hall`: rdwe_shrink_hall; `sill`: rdwe_mirror_room | 13 colliders, 2 doors; spots: moon x1, switch x1 |
-| `rdwe_mirror_room` | C | 16 m by 10 m, 3.4 m high | `three`: rdwe_three_doors; `moon`: rdwe_moon_window; `reflection`: rdwe_dont_look | 19 colliders, 3 doors; spots: trick x1 |
-| `rdwe_dont_look` | C | 14 m by 10 m, 4 m high | `mirror`: rdwe_mirror_room; `statue`: rdwe_wrong_clock | 15 colliders, 2 doors; spots: statue x1 |
-| `rdwe_waiting_room` | C | 14 m by 10 m, 3 m high | `three`: rdwe_three_doors; `number`: rdwe_wrong_clock | 16 colliders, 2 doors; spots: ticket x1 |
-| `rdwe_wrong_clock` | C | 12 m by 12 m, 4.5 m high | `gallery`: rdwe_dont_look; `waiting`: rdwe_waiting_room; `hands`: rdwe_crossroads | 19 colliders, 3 doors; spots: clock x1 |
-| `rdwe_crossroads` | C | 32 m by 32 m, 4 m high | `west`: rdwe_tilted_hall; `north`: rdwe_wrong_clock; `south`: rdwe_trampoline (the padded vent); `east`: rdwe_elevator_lobby | 23 colliders, 4 doors; spots: trick x1 |
-| `rdwe_changing_rooms` | C | 14 m by 10 m, 3 m high | `flooded`: rdwe_flooded (the frame door); `locker`: rdwe_laundromat | 14 colliders, 2 doors; spots: locker x1 |
-| `rdwe_laundromat` | C | 16 m by 8 m, 3.2 m high | `lockers`: rdwe_changing_rooms; `drum`: rdwe_motel_room | 19 colliders, 2 doors; spots: trick x1 |
-| `rdwe_motel_room` | C | 6 m by 10 m, 2.8 m high | `drum`: rdwe_laundromat; `bathroom`: rdwe_office_night | 14 colliders, 2 doors; spots: tv x1 |
-| `rdwe_office_night` | C | 24 m by 20 m, 3 m high | `stairs`: rdwe_motel_room; `lift`: rdwe_elevator_lobby | 18 colliders, 2 doors; spots: monitor x1 |
-| `rdwe_elevator_lobby` | C | 18 m by 10 m, 3.6 m high | `crossroads`: rdwe_crossroads; `lift_1`: rdwe_office_night; `lift_2`: rdwe_map_room; `lift_3`: rdwe_repeating_room; `lift_4`: rdwe_vending_room | 22 colliders, 5 doors; spots: buttons x1 |
-| `rdwe_map_room` | C | 12 m by 12 m, 3.4 m high | `lift`: rdwe_elevator_lobby; `door`: rdwe_melting_library | 13 colliders, 2 doors; spots: map x1 |
-| `rdwe_vending_room` | C | 8 m by 8 m, 3 m high | `lift`: rdwe_elevator_lobby; `machine`: rdwe_grocery (the stockroom) | 18 colliders, 3 doors; spots: trick x1 |
-| `rdwe_melting_library` | C | 14 m by 14 m, 5 m high | `map`: rdwe_map_room; `arch`: rdwe_repeating_room | 18 colliders, 2 doors; spots: book x1 |
+| `rdwe_void_room` | C | 10 m by 10 m, 4 m high | `teal`: rdwe_teal (back through the black); `lit`: rdwe_lights_out | 15 colliders, 2 doors; spots: dark x3 |
+| `rdwe_lights_out` | C | 12 m by 12 m, 3.2 m high | `void`: rdwe_void_room; `three`: rdwe_three_doors | 18 colliders, 2 doors; spots: switch x3, trick x1 |
+| `rdwe_green_grid` | C | 6 m by 30 m, 4 m high | `teal2`: rdwe_teal2; `seam`: rdwe_ames_room | 31 colliders, 2 doors; spots: grid x3 |
+| `rdwe_ames_room` | C | 14 m by 10 m, 4.5 m high | `word`: rdwe_anamorphic_room; `grid`: rdwe_green_grid; `small`: rdwe_shrink_hall | 24 colliders, 3 doors; spots: view x3 |
+| `rdwe_shrink_hall` | C | 6 m by 24 m, 3.6 m high | `ames`: rdwe_ames_room; `small`: rdwe_moon_window | 22 colliders, 2 doors; spots: trick x2 |
+| `rdwe_moon_window` | C | 10 m by 12 m, 3.6 m high | `hall`: rdwe_shrink_hall; `sill`: rdwe_mirror_room | 19 colliders, 2 doors; spots: moon x2, switch x1 |
+| `rdwe_mirror_room` | C | 16 m by 10 m, 3.4 m high | `three`: rdwe_three_doors; `moon`: rdwe_moon_window; `reflection`: rdwe_dont_look | 27 colliders, 3 doors; spots: trick x3 |
+| `rdwe_dont_look` | C | 14 m by 10 m, 4 m high | `mirror`: rdwe_mirror_room; `statue`: rdwe_wrong_clock | 19 colliders, 2 doors; spots: statue x3 |
+| `rdwe_waiting_room` | C | 14 m by 10 m, 3 m high | `three`: rdwe_three_doors; `number`: rdwe_wrong_clock | 21 colliders, 2 doors; spots: ticket x3 |
+| `rdwe_wrong_clock` | C | 12 m by 12 m, 4.5 m high | `gallery`: rdwe_dont_look; `waiting`: rdwe_waiting_room; `hands`: rdwe_crossroads | 30 colliders, 3 doors; spots: clock x2 |
+| `rdwe_crossroads` | C | 32 m by 32 m, 4 m high | `west`: rdwe_tilted_hall; `north`: rdwe_wrong_clock; `south`: rdwe_trampoline (the padded vent); `east`: rdwe_elevator_lobby | 31 colliders, 4 doors; spots: trick x2 |
+| `rdwe_changing_rooms` | C | 14 m by 10 m, 3 m high | `flooded`: rdwe_flooded (the frame door); `locker`: rdwe_laundromat | 22 colliders, 2 doors; spots: locker x3 |
+| `rdwe_laundromat` | C | 16 m by 8 m, 3.2 m high | `lockers`: rdwe_changing_rooms; `drum`: rdwe_motel_room | 24 colliders, 2 doors; spots: trick x2 |
+| `rdwe_motel_room` | C | 6 m by 10 m, 2.8 m high | `drum`: rdwe_laundromat; `bathroom`: rdwe_office_night | 20 colliders, 2 doors; spots: tv x3 |
+| `rdwe_office_night` | C | 24 m by 20 m, 3 m high | `stairs`: rdwe_motel_room; `lift`: rdwe_elevator_lobby | 72 colliders, 2 doors; spots: monitor x2 |
+| `rdwe_elevator_lobby` | C | 18 m by 10 m, 3.6 m high | `crossroads`: rdwe_crossroads; `lift_1`: rdwe_office_night; `lift_2`: rdwe_map_room; `lift_3`: rdwe_repeating_room; `lift_4`: rdwe_vending_room | 29 colliders, 5 doors; spots: buttons x3 |
+| `rdwe_map_room` | C | 12 m by 12 m, 3.4 m high | `lift`: rdwe_elevator_lobby; `door`: rdwe_melting_library | 17 colliders, 2 doors; spots: map x3 |
+| `rdwe_vending_room` | C | 8 m by 8 m, 3 m high | `lift`: rdwe_elevator_lobby; `machine`: rdwe_grocery (the stockroom) | 22 colliders, 3 doors; spots: trick x3 |
+| `rdwe_melting_library` | C | 14 m by 14 m, 5 m high | `map`: rdwe_map_room; `arch`: rdwe_repeating_room | 22 colliders, 2 doors; spots: book x3 |
 
 ## How the rooms connect
 
