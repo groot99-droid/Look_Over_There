@@ -229,13 +229,22 @@ def stage_check():
         def spot(bear):
             c = int(round(sun_column(bear))) % W
             return float(lum[row - 2: row + 3, [(c + d) % W for d in range(-2, 3)]].mean())
-        here, flips = spot(bearing), [spot(360.0 - bearing), spot(bearing + 180.0), spot(180.0 - bearing)]
-        sun_ok = here >= 240 and max(f for f, bb in zip(flips, (360.0 - bearing, bearing + 180.0, 180.0 - bearing))
-                                       if abs((bb - bearing + 180) % 360 - 180) > 3) < 0.8 * here
+
+        def ring(bear, R=45):
+            """The mean brightness on a ring about 4 degrees round the spot: a disc stands out from it, a broad white cloud does not."""
+            c = sun_column(bear)
+            sq = max(0.2, math.cos(math.radians(el)))
+            return float(np.mean([lum[min(H - 1, max(0, int(row + R * math.sin(t)))), int(c + R * math.cos(t) / sq) % W]
+                                  for t in np.linspace(0, 2 * math.pi, 48, endpoint=False)]))
+        mirrors = [bb for bb in (360.0 - bearing, bearing + 180.0, 180.0 - bearing) if abs((bb - bearing + 180) % 360 - 180) > 3]
+        here, flips = spot(bearing), [spot(bb) for bb in (360.0 - bearing, bearing + 180.0, 180.0 - bearing)]
+        contrast = here - ring(bearing)
+        # at a mirrored bearing there must be no disc: either dimmer, or (a bright cloud in the painted sky) no brighter than its own ring
+        sun_ok = here >= 240 and contrast >= 20 and all(spot(bb) < 0.8 * here or spot(bb) - ring(bb) < 0.5 * contrast for bb in mirrors)
         ground = float(lum[H // 2 + 40: H // 2 + 400].mean())
         line = (f"{p.name}: {im.size[0]} x {im.size[1]} {'ok' if size_ok else 'WRONG'}; {len(b):,} bytes {'ok' if bytes_ok else 'OVER 1 MB'}; "
                 f"chunks {chunks} {'ok' if meta_ok else 'METADATA'}; {'moon' if k == 'night' else 'sun'} at bearing {bearing:.0f}, {el:.0f} up "
-                f"(column {sun_column(bearing):.0f}, row {row}): {here:.0f}, at the mirrored bearings {[round(f) for f in flips]} "
+                f"(column {sun_column(bearing):.0f}, row {row}): {here:.0f}, {contrast:.0f} over its ring; at the mirrored bearings {[round(f) for f in flips]} "
                 f"{'ok' if sun_ok else 'WRONG'}; mean ground below the horizon {ground:.0f}")
         print(line)
         ok &= size_ok and bytes_ok and meta_ok and sun_ok
@@ -276,40 +285,41 @@ NAMES = {"clear_day": "clear day", "sunset": "sunset (and sunrise)", "night": "n
 
 
 def stage_sheet():
-    from PIL import Image, ImageDraw
+    from PIL import Image, ImageDraw, ImageFont
     work = Path(arg("--work", "."))
     dst = Path(arg("--out", str(work / "owner_overworld_skies.png")))
     pw, ph = 2000, 1000
     vw, vh = 500, 282
-    pad, lab = 16, 30
+    pad, lab = 16, 64
+    font, small = ImageFont.load_default(size=40), ImageFont.load_default(size=30)     # big enough to read on a phone
     rows = []
     for k in SKIES:
         pano = load_pano(work, k)
         rows.append(("pano", k, pano.resize((pw, ph), Image.LANCZOS)))
         rows.append(("views", k, [Image.fromarray(equirect_view(pano, yaw, size=(vw, vh), pitch_deg=8.0)) for yaw in (0, 90, 180, 270)]))
-    hgt = pad + 40 + sum(lab + (ph if kind == "pano" else vh) + pad for kind, _, _ in rows)
+    hgt = pad + 120 + sum(lab + (ph if kind == "pano" else vh) + pad for kind, _, _ in rows)
     sheet = Image.new("RGB", (pw + 2 * pad, hgt), (24, 24, 28))
     dr = ImageDraw.Draw(sheet)
-    dr.text((pad, pad + 6), "Farway Overworld: the four default sky backdrops (R3). Each 4096 x 2048 equirect, middle north (-z), right east (+x). "
-            "Defaults the owner can replace.", fill=(255, 255, 255))
-    y = pad + 40
-    views = ("north (the store, far off)", "east", "south (the town)", "west")
+    dr.text((pad, pad + 6), "Farway Overworld: the four default sky backdrops", fill=(255, 255, 255), font=font)
+    dr.text((pad, pad + 60), "4096 x 2048 each; middle of the picture = north, right = east. Defaults the owner can replace.", fill=(220, 220, 220), font=small)
+    y = pad + 120
+    views = ("north (store)", "east", "south (town)", "west")
     for kind, k, im in rows:
         if kind == "pano":
             kb = (OUT / f"overworld_{k}.webp").stat().st_size / 1e3 if (OUT / f"overworld_{k}.webp").exists() else 0
-            dr.text((pad, y + 8), f"{NAMES[k]}: world/backdrops/overworld_{k}.webp, {kb:.0f} KB, shown at {pw} x {ph}", fill=(235, 235, 235))
+            dr.text((pad, y + 12), f"{NAMES[k]}  ({kb:.0f} KB)", fill=(255, 235, 160), font=font)
             y += lab
             sheet.paste(im, (pad, y))
             for frac, t in ((0.0, "S"), (0.25, "W"), (0.5, "N"), (0.75, "E")):
-                dr.text((pad + int(frac * pw) + 4, y + 4), t, fill=(255, 60, 60))
+                dr.text((pad + int(frac * pw) + 8, y + 6), t, fill=(255, 60, 60), font=font)
             y += ph + pad
         else:
-            dr.text((pad, y + 8), f"{NAMES[k]}: flat 90-degree views out of the panorama", fill=(200, 200, 200))
+            dr.text((pad, y + 16), "looking north, east, south, west", fill=(200, 200, 200), font=small)
             y += lab
             for i, v in enumerate(im):
                 x = pad + i * vw
                 sheet.paste(v, (x, y))
-                dr.text((x + 6, y + 6), views[i], fill=(255, 255, 255))
+                dr.text((x + 8, y + 6), views[i], fill=(255, 255, 255), font=small, stroke_width=2, stroke_fill=(0, 0, 0))
             y += vh + pad
     dst.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(dst, optimize=True)
