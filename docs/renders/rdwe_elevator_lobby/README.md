@@ -77,18 +77,18 @@ Steel_Wall           197.8 rdwe_elevator_lobby_0  3.6128  0.000  0.655  0.746   
 Marble_Floor         178.4 rdwe_elevator_lobby_0  3.6128  0.379  0.446  0.508   0.00%
 Marble_Wall          135.6 rdwe_elevator_lobby_0  3.6128  0.223  0.293  0.409   0.00%
 Door_Teal_Paint       15.4 rdwe_elevator_lobby_1  3.6128  0.000  0.215  0.321   0.00%
-Door_Birch            12.4 rdwe_elevator_lobby_1  3.6128  0.000  0.196  0.279   0.00%
-Door_Brushed_Steel     9.9 rdwe_elevator_lobby_1  3.6128  0.000  0.515  0.694   0.00%
-Steel                  9.7 rdwe_elevator_lobby_1  3.6128  0.646  0.828  0.902   0.26%
-Brass                  7.8 rdwe_elevator_lobby_1  3.6128  0.302  0.516  0.598   0.00%
-Trim_Dark              7.7 rdwe_elevator_lobby_0  3.6128  0.095  0.107  0.116   0.00%
+Door_Birch            12.4 rdwe_elevator_lobby_1  3.6128  0.000  0.195  0.276   0.00%
+Door_Brushed_Steel     9.9 rdwe_elevator_lobby_1  3.6128  0.000  0.512  0.694   0.00%
+Steel                  9.7 rdwe_elevator_lobby_1  3.6128  0.646  0.828  0.903   0.24%
+Brass                  7.8 rdwe_elevator_lobby_1  3.6128  0.302  0.516  0.592   0.00%
+Trim_Dark              7.7 rdwe_elevator_lobby_0  3.6128  0.095  0.107  0.117   0.00%
 Rug_Red                7.1 rdwe_elevator_lobby_1  3.6128  0.139  0.148  0.159   0.00%
-Door_Mustard           6.1 rdwe_elevator_lobby_1  3.6128  0.001  0.768  0.861   0.00%
-Wood_Dark              4.3 rdwe_elevator_lobby_1  3.6128  0.089  0.139  0.190   0.00%
-Door_Bottle_Green      3.6 rdwe_elevator_lobby_1  3.6128  0.028  0.174  0.186   0.00%
+Door_Mustard           6.1 rdwe_elevator_lobby_1  3.6128  0.001  0.776  0.853   0.00%
+Wood_Dark              4.3 rdwe_elevator_lobby_1  3.6128  0.090  0.139  0.191   0.00%
+Door_Bottle_Green      3.6 rdwe_elevator_lobby_1  3.6128  0.027  0.174  0.188   0.00%
 Dials                  2.4 rdwe_elevator_lobby_1  3.6128  0.004  0.005  0.005   0.00%
-Tile_Teal              2.0 rdwe_elevator_lobby_1  3.6128  0.077  0.371  0.546   0.00%
-Plant_Leaf             1.8 rdwe_elevator_lobby_1  3.6128  0.037  0.073  0.101   0.00%
+Tile_Teal              2.0 rdwe_elevator_lobby_1  3.6128  0.077  0.370  0.542   0.00%
+Plant_Leaf             1.8 rdwe_elevator_lobby_1  3.6128  0.036  0.073  0.101   0.00%
 Glass_Door             1.3 rdwe_elevator_lobby_1  3.6128  0.003  0.617  0.647   0.00%
 Pot_Clay               1.2 rdwe_elevator_lobby_1  3.6128  0.142  0.242  0.255   0.00%
 Chrome                 0.8 rdwe_elevator_lobby_1  3.6128  0.000  0.000  0.001   0.00%
@@ -190,7 +190,7 @@ world/lightmaps/rdwe_elevator_lobby_0.webp  0.12 MB
 world/lightmaps/rdwe_elevator_lobby_1.webp  0.11 MB
 docs/renders/rdwe_elevator_lobby/1_arrival.jpg  0.17 MB
 docs/renders/rdwe_elevator_lobby/2_wide.jpg  0.16 MB
-docs/renders/rdwe_elevator_lobby/3_detail.jpg  0.22 MB
+docs/renders/rdwe_elevator_lobby/3_detail.jpg  0.13 MB
 
 ## privacy grep (user names, absolute paths, session ids, e-mail; the .blend decompressed)
 privacy grep: 9 files, 0 with hits

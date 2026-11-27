@@ -609,7 +609,7 @@ LIGHTS_OUT = dict(
     gen={"carpet": g_carpet((0.05, 0.07, 0.24), (0.12, 0.16, 0.42), pattern=stars_pattern((0.75, 0.66, 0.30))),
          "paper": g_damask((0.36, 0.18, 0.55), (0.48, 0.28, 0.66))},
     dress=dress_lights_out,
-    shots={"1_arrival": ((-4.3, 1.55, -3.0), (3.0, 1.0, 2.5), 72.0),
+    shots={"1_arrival": ((2.6, 1.55, 3.6), (-5.3, 1.0, -4.6), 72.0),
            "2_wide": ((5.4, 2.4, 5.4), (-3.0, 0.8, -3.0), 78.0),
            "3_detail": ((1.2, 1.5, 0.6), (0.0, 1.0, -5.9), 60.0)},
     set_shots=("1_arrival", "2_wide", "3_detail"),
@@ -932,7 +932,7 @@ AMES = dict(
     gen={"checker": g_checker((0.88, 0.87, 0.84), (0.05, 0.05, 0.05), n=2, S=256), "ames": g_ames,
          "paper": g_damask((0.62, 0.05, 0.40), (0.78, 0.22, 0.55), S=256, seed=15, scale=1), "paintings": g_paintings(21)},
     dress=dress_ames_room,
-    shots={"1_arrival": (AMES_EYE, (0.0, 1.55, -5.0), 62.0),
+    shots={"1_arrival": (AMES_EYE, (0.0, 2.0, -5.0), 56.0),
            "2_wide": ((-6.2, 2.4, 4.3), (3.0, 1.0, -3.0), 78.0),
            "3_detail": ((4.2, 1.4, 2.0), (6.5, 1.0, -1.6), 62.0)},
 )
@@ -2373,7 +2373,7 @@ ELEVATOR_LOBBY = dict(
     dress=dress_elevator_lobby,
     shots={"1_arrival": ((0.0, 1.55, 3.4), (0.0, 1.6, -5.0), 76.0),
            "2_wide": ((8.0, 2.4, 4.4), (-5.0, 1.2, -4.0), 80.0),
-           "3_detail": ((-0.6, 1.5, 2.0), (0.0, 1.1, 0.8), 56.0)},
+           "3_detail": ((-3.6, 1.6, 0.6), (-6.0, 2.2, -5.0), 60.0)},
 )
 
 

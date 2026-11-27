@@ -60,23 +60,23 @@ Graded by `rdwe_rooms2_pack.py`: texel = G L / (C + G L), intensity = pi C (C = 
 brightness, set main (`lightmap`): lab_display.py (shown = texel x intensity / pi x base colour)
 material                m2           map       k    p50    p90    p99     >=1
 Ames_Paper           286.7 rdwe_ames_room_0  3.6128  0.000  0.218  0.354   0.00%
-Ames_Floor           122.6 rdwe_ames_room_0  3.6128  0.003  0.502  0.565   0.00%
-Ames_Ceiling         122.0 rdwe_ames_room_0  3.6128  0.140  0.172  0.194   0.00%
-Ames_Proj             76.5 rdwe_ames_room_0  3.6128  0.267  0.497  0.676   0.00%
+Ames_Floor           122.6 rdwe_ames_room_0  3.6128  0.003  0.502  0.569   0.00%
+Ames_Ceiling         122.0 rdwe_ames_room_0  3.6128  0.140  0.172  0.193   0.00%
+Ames_Proj             76.5 rdwe_ames_room_0  3.6128  0.267  0.497  0.675   0.00%
 Ames_Dado             31.4 rdwe_ames_room_0  3.6128  0.456  0.546  0.585   0.00%
 Rug_Red               18.4 rdwe_ames_room_1  3.6128  0.127  0.137  0.146   0.00%
 Door_Mustard          14.7 rdwe_ames_room_1  3.6128  0.000  0.447  0.474   0.00%
 Trim_White            12.8 rdwe_ames_room_0  3.6128  0.454  0.591  0.653   0.00%
 Door_Teal_Paint        9.4 rdwe_ames_room_1  3.6128  0.000  0.240  0.264   0.00%
-Velvet_Green           9.0 rdwe_ames_room_1  3.6128  0.054  0.098  0.114   0.00%
+Velvet_Green           9.0 rdwe_ames_room_1  3.6128  0.054  0.098  0.115   0.00%
 Door_Cream_Gloss       8.5 rdwe_ames_room_1  3.6128  0.000  0.552  0.597   0.00%
 Paintings              2.9 rdwe_ames_room_1  3.6128  0.163  0.408  0.479   0.00%
-Frame_Gilt             1.3 rdwe_ames_room_1  3.6128  0.359  0.443  0.484   0.00%
-Brass                  0.7 rdwe_ames_room_1  3.6128  0.268  0.407  0.474   0.00%
-Iron                   0.2 rdwe_ames_room_1  3.6128  0.038  0.069  0.089   0.00%
-Chrome                 0.1 rdwe_ames_room_1  3.6128  0.000  0.000  0.001   0.00%
+Frame_Gilt             1.3 rdwe_ames_room_1  3.6128  0.364  0.443  0.489   0.00%
+Brass                  0.7 rdwe_ames_room_1  3.6128  0.268  0.403  0.469   0.00%
+Iron                   0.2 rdwe_ames_room_1  3.6128  0.038  0.069  0.088   0.00%
+Chrome                 0.1 rdwe_ames_room_1  3.6128  0.000  0.000  0.000   0.00%
 Wood_Dark              0.1 rdwe_ames_room_1  3.6128  0.014  0.045  0.091   0.00%
-Glass_Door             0.0 rdwe_ames_room_1  3.6128  0.151  0.241  0.244   0.00%
+Glass_Door             0.0 rdwe_ames_room_1  3.6128  0.151  0.244  0.248   0.00%
 ```
 
 ## Gates

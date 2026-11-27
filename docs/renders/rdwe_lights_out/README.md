@@ -65,71 +65,71 @@ Graded by `rdwe_rooms2_pack.py`: texel = G L / (C + G L), intensity = pi C (C = 
 ```
 brightness, set switch_1 (`lightmap`): lab_display.py (shown = texel x intensity / pi x base colour)
 material                m2           map       k    p50    p90    p99     >=1
-Paper_Violet         151.3 rdwe_lights_out_0  3.6128  0.105  0.209  0.302   0.00%
-Ceiling_Plaster      144.0 rdwe_lights_out_0  3.6128  0.072  0.178  0.254   0.00%
-Carpet_Stars         142.8 rdwe_lights_out_0  3.6128  0.001  0.038  0.050   0.00%
-Rug_Plum              70.3 rdwe_lights_out_0  3.6128  0.122  0.135  0.145   0.00%
-Panel_Dark            41.5 rdwe_lights_out_0  3.6128  0.030  0.066  0.112   0.00%
+Paper_Violet         151.3 rdwe_lights_out_0  3.6128  0.104  0.209  0.302   0.00%
+Ceiling_Plaster      144.0 rdwe_lights_out_0  3.6128  0.071  0.178  0.254   0.00%
+Carpet_Stars         142.8 rdwe_lights_out_0  3.6128  0.000  0.038  0.050   0.00%
+Rug_Plum              70.3 rdwe_lights_out_0  3.6128  0.122  0.134  0.145   0.00%
+Panel_Dark            41.5 rdwe_lights_out_0  3.6128  0.030  0.067  0.112   0.00%
 Trim_Dark             26.4 rdwe_lights_out_0  3.6128  0.012  0.056  0.107   0.00%
-Door_Brushed_Steel    13.5 rdwe_lights_out_0  3.6128  0.000  0.731  0.945   0.00%
+Door_Brushed_Steel    13.5 rdwe_lights_out_0  3.6128  0.000  0.730  0.945   0.00%
 Mirror                 7.5 rdwe_lights_out_0  3.6128  0.000  0.451  0.478   0.00%
-Door_Bottle_Green      7.4 rdwe_lights_out_0  3.6128  0.000  0.015  0.102   0.00%
-Velvet_Plum            5.9 rdwe_lights_out_0  3.6128  0.018  0.093  0.123   0.00%
-Brass                  1.8 rdwe_lights_out_0  3.6128  0.394  0.713  0.713   0.00%
-Rubber                 1.2 rdwe_lights_out_0  3.6128  0.030  0.046  0.057   0.00%
-Wood_Dark              0.8 rdwe_lights_out_0  3.6128  0.023  0.050  0.084   0.00%
-Trim_White             0.6 rdwe_lights_out_0  3.2154  0.140  0.171  0.319   0.00%
-Shade_Silk             0.5 rdwe_lights_out_0  3.1648  0.815  0.862  0.878   0.00%
-Bakelite               0.1 rdwe_lights_out_0  3.6128  0.035  0.054  0.060   0.00%
+Door_Bottle_Green      7.4 rdwe_lights_out_0  3.6128  0.000  0.016  0.101   0.00%
+Velvet_Plum            5.9 rdwe_lights_out_0  3.6128  0.018  0.092  0.118   0.00%
+Brass                  1.8 rdwe_lights_out_0  3.6128  0.385  0.713  0.713   0.00%
+Rubber                 1.2 rdwe_lights_out_0  3.6128  0.033  0.046  0.057   0.00%
+Wood_Dark              0.8 rdwe_lights_out_0  3.6128  0.023  0.051  0.079   0.00%
+Trim_White             0.6 rdwe_lights_out_0  3.2154  0.138  0.180  0.216   0.00%
+Shade_Silk             0.5 rdwe_lights_out_0  3.1648  0.815  0.854  0.878   0.00%
+Bakelite               0.1 rdwe_lights_out_0  3.6128  0.036  0.054  0.054   0.00%
 Chrome                 0.1 rdwe_lights_out_0  3.6128  0.000  0.000  0.001   0.00%
 Iron                   0.0 rdwe_lights_out_0  3.6128  0.000  0.000  0.039   0.00%
-Glass_Door             0.0 rdwe_lights_out_0  3.6128  0.242  0.346  0.359   0.00%
+Glass_Door             0.0 rdwe_lights_out_0  3.6128  0.218  0.377  0.409   0.00%
 ```
 ```
 brightness, set switch_2 (`lightmap_switch_2`): lab_display.py (shown = texel x intensity / pi x base colour)
 material                m2           map       k    p50    p90    p99     >=1
-Paper_Violet         151.3 rdwe_lights_out_1  3.6128  0.105  0.256  0.376   0.00%
-Ceiling_Plaster      144.0 rdwe_lights_out_1  3.6128  0.073  0.163  0.210   0.00%
+Paper_Violet         151.3 rdwe_lights_out_1  3.6128  0.105  0.255  0.376   0.00%
+Ceiling_Plaster      144.0 rdwe_lights_out_1  3.6128  0.072  0.163  0.210   0.00%
 Carpet_Stars         142.8 rdwe_lights_out_1  3.6128  0.001  0.043  0.051   0.00%
 Rug_Plum              70.3 rdwe_lights_out_1  3.6128  0.116  0.146  0.157   0.00%
 Panel_Dark            41.5 rdwe_lights_out_1  3.6128  0.035  0.073  0.109   0.00%
 Trim_Dark             26.4 rdwe_lights_out_1  3.6128  0.014  0.056  0.097   0.00%
-Door_Brushed_Steel    13.5 rdwe_lights_out_1  3.6128  0.000  0.351  0.440   0.00%
+Door_Brushed_Steel    13.5 rdwe_lights_out_1  3.6128  0.000  0.349  0.440   0.00%
 Mirror                 7.5 rdwe_lights_out_1  3.6128  0.002  0.881  0.881   0.00%
 Door_Bottle_Green      7.4 rdwe_lights_out_1  3.6128  0.000  0.184  0.271   0.00%
-Velvet_Plum            5.9 rdwe_lights_out_1  3.6128  0.030  0.130  0.148   0.00%
-Brass                  1.8 rdwe_lights_out_1  3.6128  0.165  0.570  0.675   0.00%
-Rubber                 1.2 rdwe_lights_out_1  3.6128  0.029  0.052  0.057   0.00%
-Wood_Dark              0.8 rdwe_lights_out_1  3.6128  0.022  0.059  0.103   0.00%
+Velvet_Plum            5.9 rdwe_lights_out_1  3.6128  0.031  0.128  0.148   0.00%
+Brass                  1.8 rdwe_lights_out_1  3.6128  0.157  0.559  0.675   0.00%
+Rubber                 1.2 rdwe_lights_out_1  3.6128  0.030  0.052  0.057   0.00%
+Wood_Dark              0.8 rdwe_lights_out_1  3.6128  0.022  0.058  0.103   0.00%
 Trim_White             0.6 rdwe_lights_out_1  3.2154  0.802  0.862  0.862   0.00%
-Shade_Silk             0.5 rdwe_lights_out_1  3.1648  0.075  0.321  0.339   0.00%
-Bakelite               0.1 rdwe_lights_out_1  3.6128  0.026  0.064  0.066   0.00%
-Chrome                 0.1 rdwe_lights_out_1  3.6128  0.000  0.000  0.000   0.00%
+Shade_Silk             0.5 rdwe_lights_out_1  3.1648  0.075  0.312  0.335   0.00%
+Bakelite               0.1 rdwe_lights_out_1  3.6128  0.026  0.064  0.065   0.00%
+Chrome                 0.1 rdwe_lights_out_1  3.6128  0.000  0.000  0.001   0.00%
 Iron                   0.0 rdwe_lights_out_1  3.6128  0.000  0.001  0.095   0.00%
-Glass_Door             0.0 rdwe_lights_out_1  3.6128  0.228  0.443  0.474   0.00%
+Glass_Door             0.0 rdwe_lights_out_1  3.6128  0.208  0.438  0.474   0.00%
 ```
 ```
 brightness, set switch_3 (`lightmap_switch_3`): lab_display.py (shown = texel x intensity / pi x base colour)
 material                m2           map       k    p50    p90    p99     >=1
 Paper_Violet         151.3 rdwe_lights_out_2  3.6128  0.074  0.131  0.274   0.00%
-Ceiling_Plaster      144.0 rdwe_lights_out_2  3.6128  0.074  0.186  0.245   0.00%
+Ceiling_Plaster      144.0 rdwe_lights_out_2  3.6128  0.074  0.185  0.245   0.00%
 Carpet_Stars         142.8 rdwe_lights_out_2  3.6128  0.000  0.025  0.043   0.00%
-Rug_Plum              70.3 rdwe_lights_out_2  3.6128  0.082  0.105  0.120   0.00%
+Rug_Plum              70.3 rdwe_lights_out_2  3.6128  0.082  0.104  0.120   0.00%
 Panel_Dark            41.5 rdwe_lights_out_2  3.6128  0.030  0.058  0.094   0.00%
 Trim_Dark             26.4 rdwe_lights_out_2  3.6128  0.021  0.054  0.092   0.00%
-Door_Brushed_Steel    13.5 rdwe_lights_out_2  3.6128  0.000  0.624  0.666   0.00%
+Door_Brushed_Steel    13.5 rdwe_lights_out_2  3.6128  0.000  0.624  0.672   0.00%
 Mirror                 7.5 rdwe_lights_out_2  3.6128  0.000  0.363  0.372   0.00%
-Door_Bottle_Green      7.4 rdwe_lights_out_2  3.6128  0.000  0.005  0.062   0.00%
-Velvet_Plum            5.9 rdwe_lights_out_2  3.6128  0.014  0.081  0.114   0.00%
-Brass                  1.8 rdwe_lights_out_2  3.6128  0.234  0.469  0.621   0.00%
-Rubber                 1.2 rdwe_lights_out_2  3.6128  0.023  0.049  0.056   0.00%
-Wood_Dark              0.8 rdwe_lights_out_2  3.6128  0.032  0.091  0.132   0.00%
-Trim_White             0.6 rdwe_lights_out_2  3.2154  0.138  0.373  0.453   0.00%
-Shade_Silk             0.5 rdwe_lights_out_2  3.1648  0.202  0.623  0.663   0.00%
-Bakelite               0.1 rdwe_lights_out_2  3.6128  0.033  0.065  0.068   0.00%
+Door_Bottle_Green      7.4 rdwe_lights_out_2  3.6128  0.000  0.005  0.061   0.00%
+Velvet_Plum            5.9 rdwe_lights_out_2  3.6128  0.013  0.081  0.114   0.00%
+Brass                  1.8 rdwe_lights_out_2  3.6128  0.221  0.455  0.615   0.00%
+Rubber                 1.2 rdwe_lights_out_2  3.6128  0.026  0.050  0.057   0.00%
+Wood_Dark              0.8 rdwe_lights_out_2  3.6128  0.033  0.093  0.132   0.00%
+Trim_White             0.6 rdwe_lights_out_2  3.2154  0.136  0.368  0.443   0.00%
+Shade_Silk             0.5 rdwe_lights_out_2  3.1648  0.193  0.630  0.663   0.00%
+Bakelite               0.1 rdwe_lights_out_2  3.6128  0.035  0.067  0.068   0.00%
 Chrome                 0.1 rdwe_lights_out_2  3.6128  0.000  0.000  0.001   0.00%
-Iron                   0.0 rdwe_lights_out_2  3.6128  0.000  0.000  0.033   0.00%
-Glass_Door             0.0 rdwe_lights_out_2  3.6128  0.292  0.476  0.500   0.00%
+Iron                   0.0 rdwe_lights_out_2  3.6128  0.000  0.000  0.039   0.00%
+Glass_Door             0.0 rdwe_lights_out_2  3.6128  0.292  0.471  0.496   0.00%
 ```
 
 ## Gates
@@ -205,9 +205,9 @@ world/rdwe_lights_out.glb  0.90 MB
 world/rdwe_lights_out.json  0.00 MB
 blender/scenes/rdwe_lights_out.blend  0.61 MB
 world/lightmaps/rdwe_lights_out_0.webp  0.20 MB
-world/lightmaps/rdwe_lights_out_1.webp  0.15 MB
+world/lightmaps/rdwe_lights_out_1.webp  0.16 MB
 world/lightmaps/rdwe_lights_out_2.webp  0.22 MB
-docs/renders/rdwe_lights_out/1_arrival.jpg  0.04 MB
+docs/renders/rdwe_lights_out/1_arrival.jpg  0.06 MB
 docs/renders/rdwe_lights_out/2_wide.jpg  0.05 MB
 docs/renders/rdwe_lights_out/3_detail.jpg  0.08 MB
 
