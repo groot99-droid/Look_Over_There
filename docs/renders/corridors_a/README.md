@@ -23,12 +23,12 @@ Built by `tools/blender/build_secretops_dress.py` around the greybox's layout (`
 
 | Map | Set | Page | Size | px/m | Gain G | Shown gain (caps) |
 |---|---|---|---|---|---|---|
-| `corridors_a_0` | normal | shell | 2048 | 35.4 | 0.27477 | 0.852 |
-| `corridors_a_1` | normal | props | 2048 | 71.0 | 0.27477 | 0.852 |
+| `corridors_a_0` | normal | shell | 2048 | 35.4 | 0.27477 | 1.3453 |
+| `corridors_a_1` | normal | props | 2048 | 71.0 | 0.27477 | 1.3453 |
 | `corridors_a_2` | alarm | shell | 2048 | 35.4 | 1.84867 | 0.9118 |
 | `corridors_a_3` | alarm | props | 2048 | 71.0 | 1.84867 | 0.9118 |
 
-Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 237 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.19 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
+Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 237 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.3 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
 
 ## Brightness (`lab_display.py`, as the page shows it)
 
@@ -36,29 +36,29 @@ Normal set:
 
 ```
 material                m2           map       k    p50    p90    p99     >=1
-Wall_Corridor       1115.4 corridors_a_0  3.2120  0.190  0.257  0.319   0.00%
-Ceiling_Tile         558.7 corridors_a_0  3.2120  0.159  0.217  0.345   0.00%
-Floor_Corridor       546.6 corridors_a_0  3.2120  0.132  0.180  0.212   0.00%
-Lamp_Housing          61.2 corridors_a_1  3.2120  0.379  0.381  0.421   0.00%
-Wood_Crate            38.5 corridors_a_1  3.2120  0.044  0.092  0.136   0.00%
-Pillar_Paint          38.4 corridors_a_1  3.2120  0.195  0.249  0.273   0.00%
-Steel                 34.1 corridors_a_1  3.2120  0.023  0.114  0.160   0.00%
-Skirting              23.6 corridors_a_1  3.2120  0.009  0.013  0.015   0.00%
-Stripe_Blue           23.6 corridors_a_1  3.2120  0.095  0.128  0.143   0.00%
-Paint_Grey            19.4 corridors_a_1  3.2120  0.011  0.062  0.123   0.00%
-Cardboard             17.9 corridors_a_1  3.2120  0.016  0.079  0.105   0.00%
-Concrete_Prop          9.1 corridors_a_1  3.2120  0.044  0.105  0.190   0.00%
-Door_Frame             8.8 corridors_a_1  3.2120  0.060  0.084  0.094   0.00%
-Hazard                 5.8 corridors_a_1  3.2120  0.000  0.168  0.251   0.00%
-Notice                 5.1 corridors_a_1  3.2120  0.054  0.260  0.273   0.00%
-Door_Steel             4.4 corridors_a_1  3.2120  0.000  0.136  0.153   0.00%
-Plastic_Black          3.0 corridors_a_1  3.2120  0.000  0.001  0.001   0.00%
-Laminate               2.7 corridors_a_1  3.2120  0.079  0.196  0.204   0.00%
-Sign_Plate             1.8 corridors_a_1  3.2120  0.201  0.249  0.295   0.00%
-Stripe_Red             1.1 corridors_a_1  3.2120  0.107  0.146  0.154   0.00%
-Cam_Body               0.4 corridors_a_1  3.2120  0.215  0.344  0.385   0.00%
-Steel_Dark             0.4 corridors_a_1  3.2120  0.016  0.025  0.031   0.00%
-Clock_Face             0.2 corridors_a_1  3.2120  0.197  0.274  0.278   0.00%
+Wall_Corridor       1115.4 corridors_a_0  5.0716  0.301  0.406  0.504   0.00%
+Ceiling_Tile         558.7 corridors_a_0  5.0716  0.251  0.342  0.545   0.00%
+Floor_Corridor       546.6 corridors_a_0  5.0716  0.209  0.284  0.335   0.00%
+Lamp_Housing          61.2 corridors_a_1  5.0716  0.599  0.602  0.664   0.00%
+Wood_Crate            38.5 corridors_a_1  5.0716  0.070  0.146  0.214   0.00%
+Pillar_Paint          38.4 corridors_a_1  5.0716  0.308  0.393  0.431   0.00%
+Steel                 34.1 corridors_a_1  5.0716  0.036  0.180  0.252   0.00%
+Skirting              23.6 corridors_a_1  5.0716  0.014  0.020  0.024   0.00%
+Stripe_Blue           23.6 corridors_a_1  5.0716  0.150  0.202  0.225   0.00%
+Paint_Grey            19.4 corridors_a_1  5.0716  0.017  0.099  0.194   0.00%
+Cardboard             17.9 corridors_a_1  5.0716  0.024  0.125  0.166   0.00%
+Concrete_Prop          9.1 corridors_a_1  5.0716  0.069  0.166  0.299   0.00%
+Door_Frame             8.8 corridors_a_1  5.0716  0.095  0.133  0.148   0.00%
+Hazard                 5.8 corridors_a_1  5.0716  0.000  0.265  0.396   0.00%
+Notice                 5.1 corridors_a_1  5.0716  0.086  0.411  0.431   0.00%
+Door_Steel             4.4 corridors_a_1  5.0716  0.000  0.215  0.242   0.00%
+Plastic_Black          3.0 corridors_a_1  5.0716  0.001  0.001  0.002   0.00%
+Laminate               2.7 corridors_a_1  5.0716  0.125  0.310  0.322   0.00%
+Sign_Plate             1.8 corridors_a_1  5.0716  0.318  0.393  0.466   0.00%
+Stripe_Red             1.1 corridors_a_1  5.0716  0.170  0.230  0.244   0.00%
+Cam_Body               0.4 corridors_a_1  5.0716  0.339  0.544  0.608   0.00%
+Steel_Dark             0.4 corridors_a_1  5.0716  0.025  0.040  0.049   0.00%
+Clock_Face             0.2 corridors_a_1  5.0716  0.312  0.433  0.439   0.00%
 ```
 
 Alarm set (`lightmap_night`):
@@ -98,6 +98,6 @@ greybox --check: GATES PASS
 layout JSON: IDENTICAL: world/corridors_a.json is byte for byte the greybox's
 worlddoc: OK world/corridors_a.json: 100 colliders, 8 doors, 0 markers, 6 links, 1 zones, 11 spots, 0 errors, 7 warnings
 glb_inspect: pass       tris: 10138 triangles, budget 300000 / pass       mb: 1.96 MB, budget 8
-privacy: privacy grep: 14 files, 0 with hits
+privacy: privacy grep: 15 files, 0 with hits
 ```
 

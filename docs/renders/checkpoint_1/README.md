@@ -23,12 +23,12 @@ Built by `tools/blender/build_secretops_dress.py` around the greybox's layout (`
 
 | Map | Set | Page | Size | px/m | Gain G | Shown gain (caps) |
 |---|---|---|---|---|---|---|
-| `checkpoint_1_0` | normal | shell | 2048 | 44.2 | 0.26631 | 0.9406 |
-| `checkpoint_1_1` | normal | props | 1536 | 47.2 | 0.26631 | 0.9406 |
+| `checkpoint_1_0` | normal | shell | 2048 | 44.2 | 0.26631 | 1.4851 |
+| `checkpoint_1_1` | normal | props | 1536 | 47.2 | 0.26631 | 1.4851 |
 | `checkpoint_1_2` | alarm | shell | 2048 | 44.2 | 5.08423 | 1.2917 |
 | `checkpoint_1_3` | alarm | props | 1536 | 47.2 | 5.08423 | 1.2917 |
 
-Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 140 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.19 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
+Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 140 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.3 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
 
 ## Brightness (`lab_display.py`, as the page shows it)
 
@@ -36,31 +36,31 @@ Normal set:
 
 ```
 material                m2           map       k    p50    p90    p99     >=1
-Ceiling_Tile         518.9 checkpoint_1_0  3.5460  0.139  0.203  0.225   0.00%
-Wall_Checkpoint      511.0 checkpoint_1_0  3.5460  0.190  0.267  0.309   0.00%
-Floor_Checkpoint     502.9 checkpoint_1_0  3.5460  0.121  0.159  0.185   0.00%
-Lamp_Housing          57.9 checkpoint_1_1  3.5460  0.416  0.426  0.435   0.00%
-Concrete_Prop         44.8 checkpoint_1_1  3.5460  0.036  0.090  0.158   0.00%
-Wood_Crate            25.6 checkpoint_1_1  3.5460  0.063  0.105  0.153   0.00%
-Pillar_Paint          20.5 checkpoint_1_1  3.5460  0.194  0.249  0.275   0.00%
-Paint_Grey            16.1 checkpoint_1_1  3.5460  0.016  0.076  0.129   0.00%
-Skirting              13.1 checkpoint_1_1  3.5460  0.011  0.016  0.017   0.00%
-Stripe_Red            12.9 checkpoint_1_1  3.5460  0.131  0.185  0.193   0.00%
-Plastic_Grey          11.9 checkpoint_1_1  3.5460  0.064  0.082  0.095   0.00%
-Soil                   9.6 checkpoint_1_1  3.5460  0.000  0.003  0.003   0.00%
-Hazard                 9.3 checkpoint_1_1  3.5460  0.000  0.189  0.222   0.00%
-Plastic_Black          8.6 checkpoint_1_1  3.5460  0.001  0.001  0.001   0.00%
-Door_Frame             8.0 checkpoint_1_1  3.5460  0.065  0.105  0.113   0.00%
-Laminate               6.1 checkpoint_1_1  3.5460  0.055  0.155  0.162   0.00%
-Steel                  5.6 checkpoint_1_1  3.5460  0.000  0.132  0.162   0.00%
-Door_Steel             4.4 checkpoint_1_1  3.5460  0.000  0.157  0.167   0.00%
-Door_Keycard           4.4 checkpoint_1_1  3.5460  0.000  0.168  0.170   0.00%
-Plant                  4.0 checkpoint_1_1  3.5460  0.023  0.037  0.041   0.00%
-Clock_Face             0.9 checkpoint_1_1  3.5460  0.237  0.404  0.419   0.00%
-Sign_Plate             0.9 checkpoint_1_1  3.5460  0.226  0.304  0.309   0.00%
-Cam_Body               0.4 checkpoint_1_1  3.5460  0.114  0.169  0.241   0.00%
-Steel_Dark             0.2 checkpoint_1_1  3.5460  0.013  0.021  0.030   0.00%
-Plastic_White          0.0 checkpoint_1_1  3.5460  0.023  0.251  0.262   0.00%
+Ceiling_Tile         518.9 checkpoint_1_0  5.5987  0.219  0.321  0.355   0.00%
+Wall_Checkpoint      511.0 checkpoint_1_0  5.5987  0.301  0.422  0.487   0.00%
+Floor_Checkpoint     502.9 checkpoint_1_0  5.5987  0.192  0.251  0.292   0.00%
+Lamp_Housing          57.9 checkpoint_1_1  5.5987  0.657  0.672  0.687   0.00%
+Concrete_Prop         44.8 checkpoint_1_1  5.5987  0.057  0.142  0.249   0.00%
+Wood_Crate            25.6 checkpoint_1_1  5.5987  0.099  0.166  0.241   0.00%
+Pillar_Paint          20.5 checkpoint_1_1  5.5987  0.306  0.393  0.433   0.00%
+Paint_Grey            16.1 checkpoint_1_1  5.5987  0.025  0.119  0.204   0.00%
+Skirting              13.1 checkpoint_1_1  5.5987  0.018  0.025  0.027   0.00%
+Stripe_Red            12.9 checkpoint_1_1  5.5987  0.206  0.292  0.304   0.00%
+Plastic_Grey          11.9 checkpoint_1_1  5.5987  0.101  0.129  0.149   0.00%
+Soil                   9.6 checkpoint_1_1  5.5987  0.000  0.004  0.004   0.00%
+Hazard                 9.3 checkpoint_1_1  5.5987  0.000  0.298  0.350   0.00%
+Plastic_Black          8.6 checkpoint_1_1  5.5987  0.001  0.002  0.002   0.00%
+Door_Frame             8.0 checkpoint_1_1  5.5987  0.103  0.165  0.178   0.00%
+Laminate               6.1 checkpoint_1_1  5.5987  0.087  0.244  0.255   0.00%
+Steel                  5.6 checkpoint_1_1  5.5987  0.000  0.208  0.256   0.00%
+Door_Steel             4.4 checkpoint_1_1  5.5987  0.000  0.248  0.263   0.00%
+Door_Keycard           4.4 checkpoint_1_1  5.5987  0.000  0.265  0.269   0.00%
+Plant                  4.0 checkpoint_1_1  5.5987  0.036  0.059  0.064   0.00%
+Clock_Face             0.9 checkpoint_1_1  5.5987  0.374  0.638  0.662   0.00%
+Sign_Plate             0.9 checkpoint_1_1  5.5987  0.357  0.480  0.488   0.00%
+Cam_Body               0.4 checkpoint_1_1  5.5987  0.180  0.266  0.380   0.00%
+Steel_Dark             0.2 checkpoint_1_1  5.5987  0.020  0.034  0.047   0.00%
+Plastic_White          0.0 checkpoint_1_1  5.5987  0.037  0.396  0.414   0.00%
 ```
 
 Alarm set (`lightmap_night`):

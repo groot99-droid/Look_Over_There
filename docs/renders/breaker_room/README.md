@@ -23,12 +23,12 @@ Built by `tools/blender/build_secretops_dress.py` around the greybox's layout (`
 
 | Map | Set | Page | Size | px/m | Gain G | Shown gain (caps) |
 |---|---|---|---|---|---|---|
-| `breaker_room_0` | normal | shell | 1536 | 47.5 | 0.42316 | 1.4961 |
-| `breaker_room_1` | normal | props | 1536 | 55.9 | 0.42316 | 1.4961 |
+| `breaker_room_0` | normal | shell | 1536 | 47.5 | 0.42316 | 1.7323 |
+| `breaker_room_1` | normal | props | 1536 | 55.9 | 0.42316 | 1.7323 |
 | `breaker_room_2` | alarm | shell | 1536 | 47.5 | 7.83837 | 1.6667 |
 | `breaker_room_3` | alarm | props | 1536 | 55.9 | 7.83837 | 1.6667 |
 
-Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 67 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.19 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
+Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 67 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.22 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
 
 ## Brightness (`lab_display.py`, as the page shows it)
 
@@ -36,30 +36,30 @@ Normal set:
 
 ```
 material                m2           map       k    p50    p90    p99     >=1
-Ceiling_Concrete     237.6 breaker_room_0  5.6401  0.031  0.065  0.108   0.00%
-Wall_Service         234.0 breaker_room_0  5.6401  0.189  0.241  0.273   0.00%
-Floor_Concrete       224.0 breaker_room_0  5.6401  0.114  0.232  0.377   0.00%
-Trafo_Paint          101.2 breaker_room_1  5.6401  0.013  0.058  0.110   0.00%
-Breaker_Paint         38.5 breaker_room_1  5.6401  0.001  0.166  0.190   0.00%
-Steel                 27.1 breaker_room_1  5.6401  0.030  0.153  0.444   0.00%
-Steel_Dark            19.3 breaker_room_1  5.6401  0.011  0.100  0.104   0.00%
-Cable                 16.6 breaker_room_1  5.6401  0.000  0.002  0.003   0.00%
-Paint_Dark             8.1 breaker_room_1  5.6401  0.000  0.005  0.008   0.00%
-Concrete_Prop          5.7 breaker_room_1  5.6401  0.090  0.206  0.344   0.00%
-Skirting               5.2 breaker_room_1  5.6401  0.016  0.018  0.020   0.00%
-Door_Steel             4.4 breaker_room_1  5.6401  0.000  0.288  0.340   0.00%
-Door_Keycard           4.4 breaker_room_1  5.6401  0.000  0.159  0.169   0.00%
-Plastic_Black          1.7 breaker_room_1  5.6401  0.000  0.002  0.002   0.00%
-Hazard                 1.6 breaker_room_1  5.6401  0.003  0.400  0.447   0.00%
-Door_Frame             1.5 breaker_room_1  5.6401  0.093  0.157  0.201   0.00%
-Sign_Plate             1.3 breaker_room_1  5.6401  0.295  0.546  0.678   0.00%
-Notice                 1.0 breaker_room_1  5.6401  0.123  0.564  0.600   0.00%
-Paint_Yellow           1.0 breaker_room_1  5.6401  0.001  0.461  0.474   0.00%
-Stripe_Red             0.9 breaker_room_1  5.6401  0.174  0.249  0.264   0.00%
-Plastic_White          0.6 breaker_room_1  5.6401  0.406  0.568  0.753   0.00%
-Paint_Orange           0.5 breaker_room_1  5.6401  0.244  0.424  0.448   0.00%
-Cam_Body               0.4 breaker_room_1  5.6401  0.132  0.211  0.400   0.00%
-Clock_Face             0.2 breaker_room_1  5.6401  0.283  0.550  0.558   0.00%
+Ceiling_Concrete     237.6 breaker_room_0  6.5306  0.036  0.076  0.125   0.00%
+Wall_Service         234.0 breaker_room_0  6.5306  0.219  0.279  0.316   0.00%
+Floor_Concrete       224.0 breaker_room_0  6.5306  0.132  0.268  0.437   0.00%
+Trafo_Paint          101.2 breaker_room_1  6.5306  0.016  0.068  0.128   0.00%
+Breaker_Paint         38.5 breaker_room_1  6.5306  0.001  0.192  0.220   0.00%
+Steel                 27.1 breaker_room_1  6.5306  0.035  0.177  0.514   0.00%
+Steel_Dark            19.3 breaker_room_1  6.5306  0.012  0.116  0.120   0.00%
+Cable                 16.6 breaker_room_1  6.5306  0.000  0.002  0.003   0.00%
+Paint_Dark             8.1 breaker_room_1  6.5306  0.000  0.005  0.009   0.00%
+Concrete_Prop          5.7 breaker_room_1  6.5306  0.105  0.238  0.398   0.00%
+Skirting               5.2 breaker_room_1  6.5306  0.018  0.021  0.024   0.00%
+Door_Steel             4.4 breaker_room_1  6.5306  0.000  0.333  0.394   0.00%
+Door_Keycard           4.4 breaker_room_1  6.5306  0.000  0.184  0.196   0.00%
+Plastic_Black          1.7 breaker_room_1  6.5306  0.000  0.002  0.002   0.00%
+Hazard                 1.6 breaker_room_1  6.5306  0.004  0.464  0.517   0.00%
+Door_Frame             1.5 breaker_room_1  6.5306  0.108  0.182  0.232   0.00%
+Sign_Plate             1.3 breaker_room_1  6.5306  0.342  0.633  0.785   0.00%
+Notice                 1.0 breaker_room_1  6.5306  0.142  0.654  0.694   0.00%
+Paint_Yellow           1.0 breaker_room_1  6.5306  0.001  0.534  0.548   0.00%
+Stripe_Red             0.9 breaker_room_1  6.5306  0.201  0.288  0.305   0.00%
+Plastic_White          0.6 breaker_room_1  6.5306  0.471  0.658  0.872   0.00%
+Paint_Orange           0.5 breaker_room_1  6.5306  0.282  0.491  0.519   0.00%
+Cam_Body               0.4 breaker_room_1  6.5306  0.153  0.244  0.464   0.00%
+Clock_Face             0.2 breaker_room_1  6.5306  0.328  0.637  0.646   0.00%
 ```
 
 Alarm set (`lightmap_night`):
@@ -67,8 +67,8 @@ Alarm set (`lightmap_night`):
 ```
 material                m2           map       k    p50    p90    p99     >=1
 Ceiling_Concrete     237.6 breaker_room_2  6.2833  0.032  0.161  0.471   0.01%
-Wall_Service         234.0 breaker_room_2  6.2833  0.156  0.506  0.709   0.00%
-Floor_Concrete       224.0 breaker_room_2  6.2833  0.066  0.183  0.398   0.00%
+Wall_Service         234.0 breaker_room_2  6.2833  0.156  0.505  0.710   0.00%
+Floor_Concrete       224.0 breaker_room_2  6.2833  0.066  0.182  0.398   0.00%
 Trafo_Paint          101.2 breaker_room_3  6.2833  0.006  0.037  0.059   0.00%
 Breaker_Paint         38.5 breaker_room_3  6.2833  0.002  0.087  0.429   0.00%
 Steel                 27.1 breaker_room_3  6.2833  0.033  0.242  0.562   0.00%
@@ -100,6 +100,6 @@ greybox --check: GATES PASS
 layout JSON: IDENTICAL: world/breaker_room.json is byte for byte the greybox's
 worlddoc: OK world/breaker_room.json: 25 colliders, 2 doors, 0 markers, 2 links, 1 zones, 8 spots, 0 errors, 3 warnings
 glb_inspect: pass       tris: 5746 triangles, budget 300000 / pass       mb: 1.09 MB, budget 8
-privacy: privacy grep: 14 files, 0 with hits
+privacy: privacy grep: 15 files, 0 with hits
 ```
 

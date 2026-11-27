@@ -23,12 +23,12 @@ Built by `tools/blender/build_secretops_dress.py` around the greybox's layout (`
 
 | Map | Set | Page | Size | px/m | Gain G | Shown gain (caps) |
 |---|---|---|---|---|---|---|
-| `labs_a_0` | normal | shell | 2048 | 38.3 | 0.22956 | 0.7143 |
-| `labs_a_1` | normal | props | 2048 | 59.4 | 0.22956 | 0.7143 |
+| `labs_a_0` | normal | shell | 2048 | 38.3 | 0.22956 | 1.1278 |
+| `labs_a_1` | normal | props | 2048 | 59.4 | 0.22956 | 1.1278 |
 | `labs_a_2` | alarm | shell | 2048 | 38.3 | 2.7925 | 0.8115 |
 | `labs_a_3` | alarm | props | 2048 | 59.4 | 2.7925 | 0.8115 |
 
-Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 237 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.19 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
+Cycles on the rented GPU (GPU), 512 samples, diffuse direct and indirect, OIDN, 8 px margin; 237 s for both sets. Texel = G L / (C + G L) with C = 1.2 and lightmap intensity pi C, G set so the median wall texel shows 0.34 (normal) or 0.26 (alarm) of its light; `caps.json` then scales each set's intensity so the walls show p50 0.3 (normal) or 0.155 (alarm) and caps any material that would pass p90 0.88 or p99 0.97.
 
 ## Brightness (`lab_display.py`, as the page shows it)
 
@@ -36,30 +36,30 @@ Normal set:
 
 ```
 material                m2           map       k    p50    p90    p99     >=1
-Wall_Lab             738.0      labs_a_0  2.6928  0.190  0.229  0.251   0.00%
-Ceiling_Tile         653.8      labs_a_0  2.6928  0.168  0.185  0.260   0.00%
-Floor_Lab            623.9      labs_a_0  2.6928  0.173  0.210  0.238   0.00%
-Plastic_White        171.2      labs_a_1  2.6928  0.001  0.205  0.271   0.00%
-Plastic_Grey          71.6      labs_a_1  2.6928  0.000  0.076  0.078   0.00%
-Bench_Top             65.6      labs_a_1  2.6928  0.001  0.004  0.004   0.00%
-Lamp_Housing          57.8      labs_a_1  2.6928  0.295  0.295  0.302   0.00%
-Paint_Dark            22.3      labs_a_1  2.6928  0.000  0.003  0.004   0.00%
-Skirting              21.1      labs_a_1  2.6928  0.008  0.011  0.012   0.00%
-Stripe_Teal           21.0      labs_a_1  2.6928  0.059  0.075  0.078   0.00%
-Door_Frame            15.1      labs_a_1  2.6928  0.073  0.093  0.097   0.00%
-Steel                 10.1      labs_a_1  2.6928  0.052  0.112  0.139   0.00%
-Liquid                 9.3      labs_a_1  2.6928  0.033  0.039  0.044   0.00%
-Steel_Dark             7.4      labs_a_1  2.6928  0.020  0.026  0.033   0.00%
-Door_Steel             4.4      labs_a_1  2.6928  0.000  0.118  0.119   0.00%
-Door_Keycard           4.4      labs_a_1  2.6928  0.000  0.117  0.126   0.00%
-Plastic_Black          2.5      labs_a_1  2.6928  0.000  0.001  0.001   0.00%
-Notice                 2.0      labs_a_1  2.6928  0.045  0.217  0.229   0.00%
-Stripe_Red             1.3      labs_a_1  2.6928  0.092  0.121  0.122   0.00%
-Sign_Plate             0.8      labs_a_1  2.6928  0.177  0.206  0.218   0.00%
-Clock_Face             0.4      labs_a_1  2.6928  0.200  0.238  0.245   0.00%
-Cam_Body               0.4      labs_a_1  2.6928  0.141  0.166  0.197   0.00%
-Specimen               0.3      labs_a_1  2.6928  0.001  0.001  0.002   0.00%
-Hazard                 0.1      labs_a_1  2.6928  0.005  0.166  0.171   0.00%
+Wall_Lab             738.0      labs_a_0  4.2517  0.300  0.362  0.396   0.00%
+Ceiling_Tile         653.8      labs_a_0  4.2517  0.265  0.292  0.411   0.00%
+Floor_Lab            623.9      labs_a_0  4.2517  0.273  0.331  0.376   0.00%
+Plastic_White        171.2      labs_a_1  4.2517  0.001  0.324  0.429   0.00%
+Plastic_Grey          71.6      labs_a_1  4.2517  0.000  0.120  0.124   0.00%
+Bench_Top             65.6      labs_a_1  4.2517  0.002  0.006  0.006   0.00%
+Lamp_Housing          57.8      labs_a_1  4.2517  0.466  0.466  0.477   0.00%
+Paint_Dark            22.3      labs_a_1  4.2517  0.000  0.005  0.006   0.00%
+Skirting              21.1      labs_a_1  4.2517  0.013  0.017  0.018   0.00%
+Stripe_Teal           21.0      labs_a_1  4.2517  0.093  0.119  0.124   0.00%
+Door_Frame            15.1      labs_a_1  4.2517  0.115  0.147  0.153   0.00%
+Steel                 10.1      labs_a_1  4.2517  0.082  0.176  0.220   0.00%
+Liquid                 9.3      labs_a_1  4.2517  0.052  0.062  0.070   0.00%
+Steel_Dark             7.4      labs_a_1  4.2517  0.031  0.041  0.053   0.00%
+Door_Steel             4.4      labs_a_1  4.2517  0.000  0.186  0.188   0.00%
+Door_Keycard           4.4      labs_a_1  4.2517  0.000  0.185  0.199   0.00%
+Plastic_Black          2.5      labs_a_1  4.2517  0.000  0.001  0.002   0.00%
+Notice                 2.0      labs_a_1  4.2517  0.071  0.343  0.362   0.00%
+Stripe_Red             1.3      labs_a_1  4.2517  0.145  0.190  0.193   0.00%
+Sign_Plate             0.8      labs_a_1  4.2517  0.279  0.325  0.344   0.00%
+Clock_Face             0.4      labs_a_1  4.2517  0.316  0.375  0.386   0.00%
+Cam_Body               0.4      labs_a_1  4.2517  0.223  0.263  0.311   0.00%
+Specimen               0.3      labs_a_1  4.2517  0.002  0.002  0.003   0.00%
+Hazard                 0.1      labs_a_1  4.2517  0.008  0.262  0.270   0.00%
 ```
 
 Alarm set (`lightmap_night`):
@@ -100,6 +100,6 @@ greybox --check: GATES PASS
 layout JSON: IDENTICAL: world/labs_a.json is byte for byte the greybox's
 worlddoc: OK world/labs_a.json: 66 colliders, 3 doors, 0 markers, 3 links, 1 zones, 10 spots, 0 errors, 4 warnings
 glb_inspect: pass       tris: 10656 triangles, budget 300000 / pass       mb: 1.16 MB, budget 8
-privacy: privacy grep: 14 files, 0 with hits
+privacy: privacy grep: 15 files, 0 with hits
 ```
 

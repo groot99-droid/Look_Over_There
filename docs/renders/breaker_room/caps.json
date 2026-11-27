@@ -1,8 +1,8 @@
 {
  "normal": {
-  "gain": 1.4961,
+  "gain": 1.7323,
   "walls_p50_before": 0.127,
-  "target": 0.19,
+  "target": 0.22,
   "factor": {}
  },
  "alarm": {
