@@ -1,0 +1,10 @@
+material                m2           map       k    p50    p90    p99     >=1
+Grass              16170.8   racetrack_0  1.0000  0.526  0.574  0.603   0.00%
+Asphalt             3336.3   racetrack_0  1.0000  0.217  0.233  0.250   0.00%
+Hedge               2219.2   racetrack_0  1.0000  0.259  0.302  0.327   0.00%
+Concrete            1977.0   racetrack_1  1.0000  0.335  0.606  0.621   0.00%
+Steel               1253.2   racetrack_1  1.0000  0.580  0.580  0.580   0.00%
+Curb_Red             200.4   racetrack_0  1.0000  0.737  0.740  0.740   0.00%
+Curb_White           170.4   racetrack_0  1.0000  0.817  0.820  0.820   0.00%
+Shutter               82.3   racetrack_1  1.0000  0.476  0.559  0.565   0.00%
+Signs                 28.8   racetrack_1  1.0000  0.784  0.799  0.965   0.46%

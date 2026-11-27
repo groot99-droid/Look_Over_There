@@ -1,0 +1,43 @@
+{
+ "0": {
+  "size": 2048,
+  "p1_p10_p50_p90": [
+   0.0,
+   0.042,
+   0.997,
+   1.0
+  ],
+  "samples": 256,
+  "distance_m": 1.5,
+  "device": "GPU",
+  "seconds": 13,
+  "materials": [
+   "Grass",
+   "Asphalt",
+   "Curb_Red",
+   "Curb_White",
+   "Hedge"
+  ],
+  "px_per_m": 10.1
+ },
+ "1": {
+  "size": 2048,
+  "p1_p10_p50_p90": [
+   0.001,
+   0.012,
+   0.75,
+   0.999
+  ],
+  "samples": 256,
+  "distance_m": 0.8,
+  "device": "GPU",
+  "seconds": 11,
+  "materials": [
+   "Concrete",
+   "Steel",
+   "Shutter",
+   "Signs"
+  ],
+  "px_per_m": 24.7
+ }
+}
