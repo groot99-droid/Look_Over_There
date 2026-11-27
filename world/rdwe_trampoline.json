@@ -1,0 +1,395 @@
+{
+ "scene": "rdwe_trampoline",
+ "colliders": [
+  {
+   "s": "AngledWall_E",
+   "min": [
+    14.4,
+    0.0,
+    -21.0
+   ],
+   "max": [
+    15.0,
+    2.4,
+    -13.0
+   ]
+  },
+  {
+   "s": "AngledWall_W",
+   "min": [
+    -15.0,
+    0.0,
+    -21.0
+   ],
+   "max": [
+    -14.4,
+    2.4,
+    -13.0
+   ]
+  },
+  {
+   "s": "Beyond_bounce",
+   "min": [
+    15.35,
+    -0.05,
+    5.28
+   ],
+   "max": [
+    15.55,
+    2.25,
+    6.72
+   ]
+  },
+  {
+   "s": "Beyond_gods",
+   "min": [
+    -15.55,
+    -0.05,
+    -8.85
+   ],
+   "max": [
+    -15.35,
+    2.55,
+    -7.15
+   ]
+  },
+  {
+   "s": "Column_1",
+   "min": [
+    -13.6,
+    0.0,
+    -16.5
+   ],
+   "max": [
+    -12.6,
+    9.0,
+    -15.5
+   ]
+  },
+  {
+   "s": "Column_2",
+   "min": [
+    -13.6,
+    0.0,
+    -6.5
+   ],
+   "max": [
+    -12.6,
+    9.0,
+    -5.5
+   ]
+  },
+  {
+   "s": "Column_3",
+   "min": [
+    -13.6,
+    0.0,
+    3.5
+   ],
+   "max": [
+    -12.6,
+    9.0,
+    4.5
+   ]
+  },
+  {
+   "s": "Column_4",
+   "min": [
+    -13.6,
+    0.0,
+    13.5
+   ],
+   "max": [
+    -12.6,
+    9.0,
+    14.5
+   ]
+  },
+  {
+   "s": "Park_Ceiling",
+   "min": [
+    -15.2,
+    9.0,
+    -25.2
+   ],
+   "max": [
+    15.2,
+    9.2,
+    25.2
+   ]
+  },
+  {
+   "s": "Park_Floor",
+   "min": [
+    -15.2,
+    -0.3,
+    -25.2
+   ],
+   "max": [
+    15.2,
+    0.0,
+    25.2
+   ]
+  },
+  {
+   "s": "Park_Wall_E_1",
+   "min": [
+    15.0,
+    0.0,
+    -25.0
+   ],
+   "max": [
+    15.2,
+    9.0,
+    5.51
+   ]
+  },
+  {
+   "s": "Park_Wall_E_2",
+   "min": [
+    15.0,
+    2.14,
+    5.51
+   ],
+   "max": [
+    15.2,
+    9.0,
+    6.49
+   ]
+  },
+  {
+   "s": "Park_Wall_E_3",
+   "min": [
+    15.0,
+    0.0,
+    6.49
+   ],
+   "max": [
+    15.2,
+    9.0,
+    25.0
+   ]
+  },
+  {
+   "s": "Park_Wall_N_1",
+   "min": [
+    -15.2,
+    0.0,
+    -25.2
+   ],
+   "max": [
+    15.2,
+    9.0,
+    -25.0
+   ]
+  },
+  {
+   "s": "Park_Wall_S_1",
+   "min": [
+    -15.2,
+    0.0,
+    25.0
+   ],
+   "max": [
+    15.2,
+    9.0,
+    25.2
+   ]
+  },
+  {
+   "s": "Park_Wall_W_1",
+   "min": [
+    -15.2,
+    0.0,
+    -25.0
+   ],
+   "max": [
+    -15.0,
+    9.0,
+    -8.62
+   ]
+  },
+  {
+   "s": "Park_Wall_W_2",
+   "min": [
+    -15.2,
+    2.44,
+    -8.62
+   ],
+   "max": [
+    -15.0,
+    9.0,
+    -7.38
+   ]
+  },
+  {
+   "s": "Park_Wall_W_3",
+   "min": [
+    -15.2,
+    0.0,
+    -7.38
+   ],
+   "max": [
+    -15.0,
+    9.0,
+    25.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_bounce",
+   "level": "rdwe_trampoline",
+   "hinge": [
+    15.0,
+    0.0,
+    5.53
+   ],
+   "width": 0.94,
+   "height": 2.1,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "bounce",
+   "look": "a padded vent door, orange foam, at floor level"
+  },
+  {
+   "name": "DoorLeaf_gods",
+   "level": "rdwe_trampoline",
+   "hinge": [
+    -15.0,
+    0.0,
+    -7.4
+   ],
+   "width": 1.2,
+   "height": 2.4,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "gods",
+   "look": "a tall marble door with a meander frieze (reserved for the god rooms)"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "bounce",
+   "at": [
+    14.25,
+    0.0,
+    6.0
+   ],
+   "arrive": [
+    13.1,
+    0.0,
+    6.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "glow",
+   "at": [
+    0.0,
+    0.0,
+    -22.0
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -20.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "gods",
+   "at": [
+    -14.25,
+    0.0,
+    -8.0
+   ],
+   "arrive": [
+    -13.1,
+    0.0,
+    -8.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "vent",
+   "at": [
+    0.0,
+    0.0,
+    22.6
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    21.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "trigger",
+   "name": "Zone_trigger_beds",
+   "min": [
+    -11.2,
+    0.0,
+    -21.2
+   ],
+   "max": [
+    11.8,
+    0.3,
+    17.2
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "beacon",
+   "name": "Spot_beacon_1",
+   "position": [
+    0.0,
+    0.0,
+    -21.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the red glow appears after 110 m walked"
+  },
+  {
+   "kind": "scuff",
+   "name": "Spot_scuff_1",
+   "position": [
+    2.0,
+    0.0,
+    19.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the same scuff mark passes under your feet: the page wraps you back"
+  }
+ ]
+}

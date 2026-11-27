@@ -1,0 +1,60 @@
+## python tools/blender/build_rdwe_greybox.py --check . --phase A
+GATE links: 7 pairs with both sides built (14 sides, the one-way ones included), 0 that loop on their own room, 3 that leave the set; 27 links in the files, every one accounted for
+  waiting for a later phase (10): rdwe_grocery.entrance -> rdwe_finale; rdwe_dining.pantry -> rdwe_long_table; rdwe_hallway.door_a -> rdwe_kids_bedroom; rdwe_hallway.door_b -> rdwe_upside_room; rdwe_hallway.door_c -> rdwe_door_hall; rdwe_teal.void -> rdwe_void_room; rdwe_teal2.grid -> rdwe_green_grid; rdwe_flooded.frame -> rdwe_changing_rooms; rdwe_trampoline.bounce -> rdwe_crossroads; rdwe_grocery.stockroom -> rdwe_vending_room
+GATE navigable: 7 of 7 rooms reachable from rdwe_dining; 7 can get back to it (no true exit: the finale's one way out is the ending)
+GATE overlaps: 0 interpenetrating collider pairs of 21776 checked (none allowed)
+GATE clearances: 73 links, arrivals, spots and spawns clear by 0.28 m with a floor under them; 54 door-front points (0.5 and 1 m in) clear
+GATE steps: 26 step boxes in 3 flights, one box a step; the highest rise 0.250 m (at most 0.27 m)
+GATE corridors: 7 corridor rects, the narrowest 2.40 m (at least 1.6 m), none blocked
+GATE extent: the largest room is 50.4 m across (a store floor, about 52 m, at most)
+GATE spots: every room has its trick's spot and the ones it needs; 0 SecCam; beacon x1, cart x1, frame x1, grid x3, hum x1, lamp x1, photo x4, scuff x1, tin x3, watch x1, window x1
+GATE doors: 27 door leaves, no two with the same look; 18 exits with one Link_ each, 2 arrival-only, 7 that never open; every exit fixed
+GATES PASS
+
+## node tools/worlddoc.mjs check (Phase A)
+  warning: scene rdwe_dining is not in the world manifest yet: a new scene to add
+  warning: link house: the manifest has no link from this door yet: a new link to add
+  warning: link loop: the manifest has no link from this door yet: a new link to add
+  warning: link pantry: the manifest has no link from this door yet: a new link to add
+  warning: link stairs: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_dining.json: 52 colliders, 4 doors, 1 markers, 4 links, 0 zones, 4 spots, 0 errors, 5 warnings
+  warning: scene rdwe_hallway is not in the world manifest yet: a new scene to add
+  warning: link dining: the manifest has no link from this door yet: a new link to add
+  warning: link door_a: the manifest has no link from this door yet: a new link to add
+  warning: link door_b: the manifest has no link from this door yet: a new link to add
+  warning: link door_c: the manifest has no link from this door yet: a new link to add
+  warning: link well: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_hallway.json: 65 colliders, 10 doors, 0 markers, 5 links, 0 zones, 1 spots, 0 errors, 6 warnings
+  warning: scene rdwe_teal is not in the world manifest yet: a new scene to add
+  warning: link sleep: the manifest has no link from this door yet: a new link to add
+  warning: link void: the manifest has no link from this door yet: a new link to add
+  warning: link well: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_teal.json: 17 colliders, 2 doors, 0 markers, 3 links, 0 zones, 2 spots, 0 errors, 4 warnings
+  warning: scene rdwe_teal2 is not in the world manifest yet: a new scene to add
+  warning: link arch: the manifest has no link from this door yet: a new link to add
+  warning: link grid: the manifest has no link from this door yet: a new link to add
+  warning: link sleep: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_teal2.json: 15 colliders, 2 doors, 0 markers, 3 links, 0 zones, 3 spots, 0 errors, 4 warnings
+  warning: scene rdwe_flooded is not in the world manifest yet: a new scene to add
+  warning: link arch: the manifest has no link from this door yet: a new link to add
+  warning: link frame: the manifest has no link from this door yet: a new link to add
+  warning: link grate: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_flooded.json: 21 colliders, 3 doors, 0 markers, 3 links, 1 zones, 2 spots, 0 errors, 4 warnings
+  warning: scene rdwe_trampoline is not in the world manifest yet: a new scene to add
+  warning: link bounce: the manifest has no link from this door yet: a new link to add
+  warning: link glow: the manifest has no link from this door yet: a new link to add
+  warning: link gods: the manifest has no link from this door yet: a new link to add
+  warning: link vent: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_trampoline.json: 18 colliders, 2 doors, 0 markers, 4 links, 1 zones, 2 spots, 0 errors, 5 warnings
+  warning: scene rdwe_grocery is not in the world manifest yet: a new scene to add
+  warning: link entrance: the manifest has no link from this door yet: a new link to add
+  warning: link exit: the manifest has no link from this door yet: a new link to add
+  warning: link glow: the manifest has no link from this door yet: a new link to add
+  warning: link gods: the manifest has no link from this door yet: a new link to add
+  warning: link stockroom: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_grocery.json: 189 colliders, 4 doors, 0 markers, 5 links, 0 zones, 4 spots, 0 errors, 6 warnings
+
+## node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
