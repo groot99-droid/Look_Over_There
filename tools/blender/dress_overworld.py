@@ -104,9 +104,9 @@ MAT = {
     "Plastic_White": (None, (0.93, 0.91, 0.86), 1.0, 0.35, 0, True), "Plastic_Grey": (None, (0.81, 0.78, 0.72), 1.0, 0.4, 0, True),
     "Plastic_Pink": (None, (0.97, 0.66, 0.77), 1.0, 0.35, 0, True), "Plastic_Mint": (None, (0.62, 0.88, 0.78), 1.0, 0.35, 0, True),
     "Plastic_Yellow": (None, (0.97, 0.86, 0.52), 1.0, 0.35, 0, True), "Plastic_Blue": (None, (0.60, 0.77, 0.97), 1.0, 0.35, 0, True),
-    "Plastic_Coral": (None, (0.90, 0.56, 0.56), 1.0, 0.35, 0, True),
+    "Plastic_Coral": (None, (0.90, 0.56, 0.56), 1.0, 0.35, 0, True), "Roof_Blue": (None, (0.56, 0.72, 0.92), 1.0, 0.4, 0, True),
     "Parasol_Pink": (None, (0.94, 0.70, 0.80), 1.0, 0.7, 0, True), "Parasol_White": (None, (0.93, 0.91, 0.87), 1.0, 0.7, 0, True),
-    "Paving": ("paving", (1, 1, 1), 2.0, 0.85, 0, True), "Timetable": ("timetable", (1, 1, 1), None, 0.4, 0, True),
+    "Paving": ("paving", (1, 1, 1), 2.0, 0.85, 0, True), "Timetable_Print": ("timetable", (1, 1, 1), None, 0.4, 0, True),
     "Ticket_Face": ("ticket_face", (1, 1, 1), None, 0.4, 0, True), "Sign_Bus": ("bus_flag", (1, 1, 1), None, 0.4, 0, True),
     "Sign_Dest": ("dest_sign", (1, 1, 1), None, 0.4, 0, True),
     "Glass": (None, (0.80, 0.92, 0.95), 1.0, 0.05, 0, False),     # the shelter's panes: see-through (alpha 0.3), not baked
@@ -210,6 +210,11 @@ def gsphere(g, c, r, sub=2):
     faces = [tuple(v.index for v in f.verts) for f in bm.faces]
     bm.free()
     return g.add(verts, faces, True)
+
+
+def gbox_open(g, mn, mx):
+    """A box with no bottom face (it lies on the ground, where nobody sees it and the AO page would waste room on it)."""
+    return g.add(box_v(mn, mx), [(0, 1, 3, 2), (4, 6, 7, 5), (2, 3, 7, 6), (0, 2, 6, 4), (1, 5, 7, 3)])   # gbox's faces, less (0, 4, 5, 1)
 
 
 def gquad_y(g, x0, x1, z0, z1, y):
@@ -680,11 +685,11 @@ def set_box(b):
         return False
     mn, mx = mn_mx(b)
     if n == "Platform":
-        to_object(n, gbox(Geo(), mn, mx), "Paving", bevel=0.015)
+        to_object(n, gbox_open(Geo(), mn, mx), "Paving", bevel=0.015)
     elif n.startswith(("Shelter_Back", "Shelter_Side")):
         glass_panel(b)
     elif n == "Shelter_Roof":
-        to_object(n, gbox(Geo(), mn, mx), "Plastic_Blue", bevel=0.04)
+        to_object(n, gbox(Geo(), mn, mx), "Roof_Blue", bevel=0.04)
     elif n == "Shelter_Bench":
         bench_geo(b)
     elif n == "Timetable":
@@ -693,7 +698,7 @@ def set_box(b):
             gbox(g, (x0, mn[1], mn[2] + 0.02), (x0 + 0.06, mx[1], mx[2] - 0.02))
         to_object(n, g, "Steel", bevel=0.006)
         to_object("decor_Timetable_Face", gbox(Geo(), (mn[0] + 0.06, mn[1] + 0.7, mn[2] + 0.03), (mx[0] - 0.06, mx[1] - 0.05, mx[2] - 0.03)),
-                  "Timetable", uv="fit")
+                  "Timetable_Print", uv="fit")
     elif n == "Ticket_Machine":
         to_object(n, gbox(Geo(), mn, mx), "Plastic_Coral", bevel=0.03)
         to_object("decor_Ticket_Machine_Face", gbox(Geo(), (mn[0] + 0.08, mn[1] + 0.25, mx[2]), (mx[0] - 0.08, mx[1] - 0.06, mx[2] + 0.008)),
@@ -703,7 +708,7 @@ def set_box(b):
     elif n == "decor_Bay_Lines":
         bay_paint(b)
     elif n == "decor_Bay_Kerb_Paint":
-        to_object(n, gbox(Geo(), mn, (mx[0], mx[1] + 0.002, mx[2])), "Paint_White")
+        to_object(n, gbox_open(Geo(), mn, (mx[0], mx[1] + 0.002, mx[2])), "Paint_White")
     else:
         return False
     return True
@@ -742,9 +747,9 @@ def bay_paint(b):
     y0, y1 = mn[1] + 0.003, mn[1] + 0.008
     g = Geo()
     w = 0.1
-    gbox(g, (mn[0], y0, mx[2] - w), (mx[0], y1, mx[2]))
+    gbox_open(g, (mn[0], y0, mx[2] - w), (mx[0], y1, mx[2]))
     for x0 in (mn[0], mx[0] - w):
-        gbox(g, (x0, y0, mn[2]), (x0 + w, y1, mx[2] - w))
+        gbox_open(g, (x0, y0, mn[2]), (x0 + w, y1, mx[2] - w))
     # facing the bay (south, +z) from the platform, east (+x) is on your left: the letters run toward -x, their tops to the south
     cell, gap, word = 0.28, 0.28, "BUS"
     xl = (len(word) * 3 * cell + (len(word) - 1) * gap) / 2
@@ -754,7 +759,7 @@ def bay_paint(b):
             for c, on in enumerate(row):
                 if on == "#":
                     x, z = xl - i * (3 * cell + gap) - c * cell, ztop - r * cell
-                    gbox(g, (x - cell, y0, z - cell), (x, y1, z))
+                    gbox_open(g, (x - cell, y0, z - cell), (x, y1, z))
     to_object(b["name"], g, "Line_Yellow")
 
 

@@ -276,6 +276,94 @@ def hopscotch(n=(512, 1024)):
     return np.asarray(im, float) / 255
 
 
+# ---- the bus station's (each with its own seeded noise, so a run of one name makes the same pixels as a run of all)
+def paving(n=512, slabs=4):
+    """Pale lilac-grey square slabs (tile 2 m: four 0.5 m slabs a side), soft joints, each slab a touch different."""
+    r = np.random.default_rng(31)
+    t = 0.5 * pnoise(n, n, 24, rng=r) + 0.5 * pnoise(n, n, 3, rng=r)
+    t = (t - t.min()) / max(t.max() - t.min(), 1e-9)
+    c = mix((0.74, 0.72, 0.76), (0.84, 0.82, 0.85), t)
+    p = n // slabs
+    tint = r.uniform(-0.025, 0.025, (slabs, slabs))
+    yy, xx = np.mgrid[0:n, 0:n]
+    c += tint[yy // p, xx // p][..., None]
+    joint = (xx % p < 3) | (yy % p < 3)
+    c[joint] = c[joint] * 0.78
+    return np.clip(c, 0, 1)
+
+
+def printed(n, bg, draw):
+    im = Image.new("RGB", n, tuple(int(v * 255) for v in bg))
+    draw(ImageDraw.Draw(im), *n)
+    return np.asarray(im, float) / 255
+
+
+def _centre(d, w, y, t, f, fill):
+    d.text(((w - d.textlength(t, font=f)) / 2, y), t, fill=fill, font=f)
+
+
+def timetable(n=(512, 640)):
+    """The station's timetable: a bus every 15 minutes to Hallam Row, all day. Nothing about it is wrong."""
+    ink, head = (40, 52, 84), (96, 132, 196)
+
+    def draw(d, w, h):
+        d.rectangle([0, 0, w, 118], fill=head)
+        _centre(d, w, 14, "BUS STATION", font(44), (250, 248, 240))
+        _centre(d, w, 66, "to HALLAM ROW", font(36), (250, 248, 240))
+        d.text((28, 136), "Departures, every day", fill=ink, font=font(26))
+        y0 = 180
+        times = [f"{hh:02d}:{mm:02d}" for hh in range(6, 18) for mm in (0, 15, 30, 45)]
+        for k, t in enumerate(times):
+            col, row = k // 12, k % 12
+            d.text((28 + col * 120, y0 + row * 32), t, fill=ink, font=font(24))
+        for col in range(1, 4):
+            d.line([(18 + col * 120, y0), (18 + col * 120, y0 + 12 * 32)], fill=(180, 186, 204), width=2)
+        d.rectangle([0, h - 56, w, h], fill=(232, 228, 214))
+        _centre(d, w, h - 46, "Just a ride.", font(28), ink)
+        d.rectangle([3, 3, w - 4, h - 4], outline=ink, width=6)
+    return printed(n, (0.96, 0.95, 0.91), draw)
+
+
+def ticket_face(n=(256, 544)):
+    """The ticket machine's front: a screen, four buttons, a coin slot and the ticket tray."""
+    def draw(d, w, h):
+        _centre(d, w, 18, "TICKETS", font(40), (250, 244, 236))
+        d.rounded_rectangle([28, 80, w - 28, 210], 12, fill=(170, 222, 214), outline=(70, 70, 80), width=4)
+        _centre(d, w, 124, "HALLAM ROW", font(24), (40, 70, 80))
+        for k, c in enumerate(((246, 214, 120), (156, 200, 255), (160, 224, 200), (247, 168, 196))):
+            x, y = 40 + (k % 2) * 100, 240 + (k // 2) * 70
+            d.rounded_rectangle([x, y, x + 76, y + 50], 10, fill=c, outline=(80, 70, 80), width=3)
+        d.rounded_rectangle([w / 2 - 50, 400, w / 2 + 50, 416], 6, fill=(60, 56, 64))
+        _centre(d, w, 422, "coins", font(18), (250, 244, 236))
+        d.rounded_rectangle([30, 470, w - 30, 520], 10, fill=(70, 62, 72))
+    return printed(n, (0.86, 0.50, 0.52), draw)
+
+
+def bus_flag(n=(432, 512)):
+    """The stop's flag: a bus and BUS STOP, Hallam Row under it."""
+    def draw(d, w, h):
+        d.ellipse([46, 24, w - 46, w - 68], fill=(238, 234, 224), outline=(60, 72, 120), width=10)
+        cx, cy = w / 2, (w - 44) / 2
+        d.rounded_rectangle([cx - 110, cy - 70, cx + 110, cy + 44], 18, fill=(96, 132, 196))
+        for k in range(4):
+            d.rectangle([cx - 96 + k * 50, cy - 56, cx - 60 + k * 50, cy - 14], fill=(220, 236, 250))
+        for wx in (cx - 66, cx + 66):
+            d.ellipse([wx - 22, cy + 28, wx + 22, cy + 72], fill=(50, 50, 60))
+        _centre(d, w, h - 128, "BUS STOP", font(56), (60, 72, 120))
+        _centre(d, w, h - 60, "HALLAM ROW", font(34), (60, 72, 120))
+    return printed(n, (0.94, 0.82, 0.50), draw)
+
+
+def dest_sign(n=(1024, 160)):
+    """The board under the shelter's roof: where the bus goes, and how often."""
+    def draw(d, w, h):
+        d.text((36, 38), "HALLAM ROW", fill=(255, 214, 140), font=font(76))
+        f = font(44)
+        t = "every 15 min"
+        d.text((w - 36 - d.textlength(t, font=f), 60), t, fill=(255, 214, 140), font=f)
+    return printed(n, (0.16, 0.20, 0.32), draw)
+
+
 ALL = {
     "grass": grass, "hedge": hedge, "bark": bark, "deck": planks, "siding": siding, "shingles": shingles, "asphalt": asphalt,
     "concrete": concrete, "plaster": plaster,
@@ -288,6 +376,7 @@ ALL = {
     "sign_back": lambda: sign_board(["THE WAY BACK"], arrow="left"),
     "more_to_come": more_to_come, "fake_door": fake_door, "window_lit": window_lit, "puzzle_board": puzzle_board, "door_wood": door_wood,
     "hopscotch": hopscotch,
+    "paving": paving, "timetable": timetable, "ticket_face": ticket_face, "bus_flag": bus_flag, "dest_sign": dest_sign,
 }
 
 if __name__ == "__main__":
