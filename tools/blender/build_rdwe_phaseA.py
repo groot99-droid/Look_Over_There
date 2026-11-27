@@ -129,7 +129,10 @@ def apply_caps(sc):
     f, fn = cj.get("factor", {}), cj.get("factor_night", cj.get("factor", {}))
     for m in j["materials"]:
         ex = m.get("extras", {})
-        base = ex.pop("base", None) or {k: ex[k] for k in ("lightmap_intensity", "lightmap_night_intensity") if k in ex}
+        if "lightmap" not in ex:
+            continue
+        assert "base" in ex, f"{m['name']}: no uncapped intensities (re-pack the raw GLB before capping again)"
+        base = ex.pop("base")
         for k, ff in (("lightmap_intensity", f), ("lightmap_night_intensity", fn)):
             if k in base:
                 ex[k] = round(base[k] * ff.get(m["name"], 1.0), 4)
