@@ -1,0 +1,29 @@
+{
+ "gain": 2.375,
+ "target_p99": 0.98,
+ "target_p90": 0.9,
+ "factor": {
+  "Leaf_Room": 2.375,
+  "Brass": 2.375,
+  "Curtain": 2.375,
+  "Decal_Ceiling": 2.375,
+  "Decal_Floor": 2.375,
+  "Gilt": 2.375,
+  "Grille": 2.375,
+  "Lamp_Dead": 2.375,
+  "Picture": 2.375,
+  "Plastic_Black": 2.375,
+  "Plastic_White": 2.375,
+  "Red_Paint": 2.375,
+  "Trim_Wood": 2.375,
+  "TV_Plastic": 2.375,
+  "Upholstery": 2.375,
+  "Window_Frame": 2.375,
+  "Window_Void": 2.375,
+  "Carpet_Room": 2.375,
+  "Ceiling_Popcorn": 2.375,
+  "Door_Jamb": 2.375,
+  "Threshold": 2.375,
+  "Wall_Room": 2.375
+ }
+}

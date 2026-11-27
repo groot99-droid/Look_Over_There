@@ -1,0 +1,23 @@
+{
+ "gain": 2.474,
+ "target_p99": 0.98,
+ "target_p90": 0.9,
+ "factor": {
+  "Leaf_Room": 2.474,
+  "Brass": 2.474,
+  "Decal_Ghost": 1.4181,
+  "Gilt": 2.3892,
+  "Mirror": 2.474,
+  "Plastic_Black": 2.474,
+  "Plastic_White": 2.474,
+  "Trim_White": 2.474,
+  "Trim_Wood": 2.474,
+  "Wainscot_Trim": 2.474,
+  "Ceiling_Plaster": 2.474,
+  "Door_Jamb": 2.474,
+  "Parquet": 2.474,
+  "Plaster_Cream": 2.474,
+  "Threshold": 2.474,
+  "Wainscot": 2.474
+ }
+}

@@ -1,0 +1,24 @@
+{
+ "gain": 0.4293,
+ "target_p99": 0.98,
+ "target_p90": 0.9,
+ "factor": {
+  "Leaf_Room": 0.4293,
+  "Brass": 0.4293,
+  "Decal_Ceiling": 0.4293,
+  "Decal_Floor": 0.4293,
+  "Enamel": 0.4293,
+  "Grille": 0.4293,
+  "Lamp_Dead": 0.4293,
+  "Plastic_Black": 0.4293,
+  "Plastic_White": 0.4293,
+  "Porthole": 0.4293,
+  "Steel": 0.4293,
+  "Block_Lower": 0.4293,
+  "Ceiling_Tile": 0.4293,
+  "Jamb_Steel": 0.4293,
+  "Paint_Upper": 0.4293,
+  "Threshold": 0.4293,
+  "Vinyl_Floor": 0.4293
+ }
+}
