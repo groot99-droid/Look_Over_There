@@ -86,7 +86,7 @@ MAT = {
     "Fake_Door": ("fake_door", (1, 1, 1), None, 0.6, 0, True), "Puzzle_Board": ("puzzle_board", (1, 1, 1), None, 0.7, 0, True),
     "Door_Wood": ("door_wood", (1, 1, 1), 1.0, 0.6, 0, False),
     "Window_Lit": ("window_lit", (1, 1, 1), None, 0.2, 1.2, False), "Lamp_Emit": (None, (1.0, 0.94, 0.80), 1.0, 0.3, 4.0, False),
-    "Gap_Glow": (None, (1.0, 0.86, 0.94), 1.0, 0.5, 3.0, False),
+    "Gap_Glow": (None, (0.98, 0.80, 0.90), 1.0, 0.5, 1.1, False),
     "Steel": (None, (0.62, 0.66, 0.74), 1.0, 0.35, 0, True), "Paint_White": (None, (0.90, 0.90, 0.86), 1.0, 0.6, 0, True),
     "Line_Yellow": (None, (0.95, 0.82, 0.30), 1.0, 0.6, 0, True), "Trim_White": (None, (0.92, 0.90, 0.86), 1.0, 0.5, 0, True),
     "Stone": (None, (0.72, 0.68, 0.80), 1.0, 0.6, 0, True), "Mushroom_Cap": (None, (0.92, 0.42, 0.50), 1.0, 0.4, 0, True),
@@ -890,6 +890,28 @@ def uv_area(ob):
     return tot
 
 
+def chop(ob, step=40.0, longest=60.0):
+    """Cut a merged mesh that runs longer than `longest` into `step`-metre pieces (split along the cuts), so its AO islands fit the page:
+    a 480 m road verge is one island otherwise, and no page holds it at the outdoor texel density. Flat faces only meet at the cuts."""
+    bm = bmesh.new()
+    bm.from_mesh(ob.data)
+    for axis in (0, 1):
+        co = [v.co[axis] for v in bm.verts]
+        if not co or max(co) - min(co) <= longest:
+            continue
+        k = math.floor(min(co) / step) + 1
+        while k * step < max(co):
+            n = Vector((0, 0, 0))
+            n[axis] = 1.0
+            res = bmesh.ops.bisect_plane(bm, geom=list(bm.verts) + list(bm.edges) + list(bm.faces), plane_co=n * (k * step), plane_no=n)
+            cut = [e for e in res["geom_cut"] if isinstance(e, bmesh.types.BMEdge)]
+            if cut:
+                bmesh.ops.split_edges(bm, edges=cut)
+            k += 1
+    bm.to_mesh(ob.data)
+    bm.free()
+
+
 def lightmap_uv(objs):
     for o in objs:
         uvs = o.data.uv_layers
@@ -954,6 +976,9 @@ def denoise_image(img, Sz):
     return a.reshape(Sz, Sz, 4)
 
 
+GROUND_PAGE = {"road": ("Grass", "Asphalt"), "endless_hills": ("Grass",)}       # scenes whose ground gets an AO page of its own (the rest share the other page)
+
+
 def stage_bake():
     import time
     t0 = time.time()
@@ -962,45 +987,55 @@ def stage_bake():
     ART.hide_render = True
     setup_cycles(SAMPLES, bake=True)
     objs = [o for n, o in exp.items() if n in MAT and MAT[n][5]]
-    print("AO atlas:", [o.name for o in objs])
-    Sz, dens = lightmap_uv(objs)
-    img = bpy.data.images.new("AO_0", Sz, Sz, alpha=False, float_buffer=True)
-    img.colorspace_settings.name = "Non-Color"
-    for o in objs:
-        nt = o.data.materials[0].node_tree
-        node = nt.nodes.new("ShaderNodeTexImage")
-        node.name = "BAKE_TARGET"
-        node.image = img
-        nt.nodes.active = node
-        o.data.uv_layers.active = o.data.uv_layers["lightmap"]
-    select_only(objs)
-    tb = time.time()
-    bpy.ops.object.bake(type="AO", margin=MARGIN_PX, margin_type="EXTEND", use_clear=True, target="IMAGE_TEXTURES")
-    print(f"  AO bake {Sz}x{Sz} at {SAMPLES} samples took {time.time() - tb:.0f} s")
-    a = denoise_image(img, Sz)
-    ao = np.clip(a[..., :3].mean(axis=2), 0, 1)
-    used = ao > 1e-3                                              # the atlas's empty space stays 0
-    pc = [round(float(v), 3) for v in np.percentile(ao[used], [1, 10, 50, 90])]
-    out = np.ones((Sz, Sz, 4), np.float32)
-    out[..., 0] = out[..., 1] = out[..., 2] = ao                    # linear grey: three.js reads aoMap's red channel as data
-    png = bpy.data.images.new("AO_png", Sz, Sz, alpha=False)
-    png.colorspace_settings.name = "Non-Color"
-    png.pixels.foreach_set(out.ravel())
-    png.filepath_raw = str(WORK / f"{SCENE}_0.png")
-    png.file_format = "PNG"
-    png.save()
-    for o in objs:
-        m = o.data.materials[0]
-        m["aomap"] = AO_URL
-        m["aomap_intensity"] = 1.0
-        m["aomap_colorspace"] = "linear"
-        nt = m.node_tree
-        for nd in [nd for nd in nt.nodes if nd.name.startswith("BAKE_TARGET")]:
-            nt.nodes.remove(nd)
-    bpy.data.images.remove(img)
-    bpy.data.images.remove(png)
-    rep = {"size": Sz, "px_per_m": round(dens, 1), "samples": SAMPLES, "ao_distance_m": AO_DIST, "ao_p1_p10_p50_p90": pc,
-           "materials": sorted(o.name for o in objs), "seconds": round(time.time() - t0), "device": bpy.context.scene.cycles.device}
+    if SCENE == "road":
+        for o in objs:
+            chop(o)
+    g0 = GROUND_PAGE.get(SCENE)
+    groups = [[o for o in objs if o.name in g0], [o for o in objs if o.name not in g0]] if g0 else [objs]
+    pages = []
+    for objs_g in groups:                                          # every page unwrapped first (the unwrap works on the selection)
+        print("AO page", len(pages), [o.name for o in objs_g])
+        pages.append(lightmap_uv(objs_g))
+    reps = []
+    for n, objs_g in enumerate(groups):
+        Sz, dens = pages[n]
+        img = bpy.data.images.new(f"AO_{n}", Sz, Sz, alpha=False, float_buffer=True)
+        img.colorspace_settings.name = "Non-Color"
+        for o in objs_g:
+            nt = o.data.materials[0].node_tree
+            node = nt.nodes.new("ShaderNodeTexImage")
+            node.name = "BAKE_TARGET"
+            node.image = img
+            nt.nodes.active = node
+            o.data.uv_layers.active = o.data.uv_layers["lightmap"]
+        select_only(objs_g)
+        tb = time.time()
+        bpy.ops.object.bake(type="AO", margin=MARGIN_PX, margin_type="EXTEND", use_clear=True, target="IMAGE_TEXTURES")
+        print(f"  AO bake {n}: {Sz}x{Sz} at {SAMPLES} samples took {time.time() - tb:.0f} s")
+        a = denoise_image(img, Sz)
+        ao = np.clip(a[..., :3].mean(axis=2), 0, 1)
+        used = ao > 1e-3                                          # the atlas's empty space stays 0
+        pc = [round(float(v), 3) for v in np.percentile(ao[used], [1, 10, 50, 90])]
+        out = np.ones((Sz, Sz, 4), np.float32)
+        out[..., 0] = out[..., 1] = out[..., 2] = ao                # linear grey: three.js reads aoMap's red channel as data
+        png = bpy.data.images.new("AO_png", Sz, Sz, alpha=False)
+        png.colorspace_settings.name = "Non-Color"
+        png.pixels.foreach_set(out.ravel())
+        png.filepath_raw = str(WORK / f"{SCENE}_{n}.png")
+        png.file_format = "PNG"
+        png.save()
+        for o in objs_g:
+            m = o.data.materials[0]
+            m["aomap"] = f"world/lightmaps/{SCENE}_{n}.webp"
+            m["aomap_intensity"] = 1.0
+            m["aomap_colorspace"] = "linear"
+            nt = m.node_tree
+            for nd in [nd for nd in nt.nodes if nd.name.startswith("BAKE_TARGET")]:
+                nt.nodes.remove(nd)
+        bpy.data.images.remove(img)
+        bpy.data.images.remove(png)
+        reps.append({"page": n, "size": Sz, "px_per_m": round(dens, 1), "ao_p1_p10_p50_p90": pc, "materials": sorted(o.name for o in objs_g)})
+    rep = {"samples": SAMPLES, "ao_distance_m": AO_DIST, "pages": reps, "seconds": round(time.time() - t0), "device": bpy.context.scene.cycles.device}
     print("BAKE", rep)
     (WORK / "bake.json").write_text(json.dumps(rep, indent=1))
     ART.hide_render = False

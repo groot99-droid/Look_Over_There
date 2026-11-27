@@ -152,16 +152,20 @@ def foliage(n=512, a=(0.86, 0.52, 0.72), b=(0.98, 0.74, 0.86)):
     return mix(a, b, t ** 0.8)
 
 
-def sign_board(text_lines, n=(1024, 256), bg=(0.92, 0.86, 0.66), fg=(0.30, 0.20, 0.14), arrow=None):
+def sign_board(text_lines, n=(1024, 410), bg=(0.92, 0.86, 0.66), fg=(0.30, 0.20, 0.14), arrow=None):
     w, h = n
     base = planks(w, base=((bg[0] * 0.92, bg[1] * 0.92, bg[2] * 0.92), bg), boards=4)[:h, :w]
     im = Image.fromarray((np.clip(base, 0, 1) * 255).astype(np.uint8))
     d = ImageDraw.Draw(im)
     f = font(int(h * 0.42 / max(1, len(text_lines)) * 1.6))
+    room = w - h * 0.8 - 70 if arrow else w - 60                      # the text fits beside the arrow
+    while max(d.textlength(t, font=f) for t in text_lines) > room and f.size > 12:
+        f = font(f.size - 4)
     y = h * 0.5 - len(text_lines) * f.size * 0.6
     for line in text_lines:
         tw = d.textlength(line, font=f)
-        x = (w - tw) / 2 + (h * 0.18 if arrow == "left" else -h * 0.18 if arrow == "right" else 0)
+        x0, x1 = (h * 0.8 if arrow == "left" else 30), (w - h * 0.8 if arrow == "right" else w - 30)
+        x = (x0 + x1 - tw) / 2
         d.text((x, y), line, fill=tuple(int(v * 255) for v in fg), font=f)
         y += f.size * 1.15
     if arrow:
