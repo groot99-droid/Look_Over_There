@@ -1,0 +1,556 @@
+{
+ "scene": "mirror_bathroom",
+ "colliders": [
+  {
+   "s": "Restroom_Ceiling",
+   "min": [
+    -5.2,
+    3.0,
+    -4.2
+   ],
+   "max": [
+    5.2,
+    3.2,
+    4.2
+   ]
+  },
+  {
+   "s": "Restroom_Floor",
+   "min": [
+    -5.2,
+    -0.3,
+    -4.2
+   ],
+   "max": [
+    5.2,
+    0.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Restroom_Wall_E_1",
+   "min": [
+    5.0,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    5.2,
+    3.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Restroom_Wall_N_1",
+   "min": [
+    -5.2,
+    0.0,
+    -4.2
+   ],
+   "max": [
+    5.2,
+    3.0,
+    -4.0
+   ]
+  },
+  {
+   "s": "Restroom_Wall_S_1",
+   "min": [
+    -5.2,
+    0.0,
+    4.0
+   ],
+   "max": [
+    -4.07,
+    3.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Restroom_Wall_S_2",
+   "min": [
+    -4.07,
+    2.16,
+    4.0
+   ],
+   "max": [
+    -3.13,
+    3.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Restroom_Wall_S_3",
+   "min": [
+    -3.13,
+    0.0,
+    4.0
+   ],
+   "max": [
+    5.2,
+    3.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Restroom_Wall_W_1",
+   "min": [
+    -5.2,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -5.0,
+    3.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Stall_Front",
+   "min": [
+    -2.2,
+    0.0,
+    2.4
+   ],
+   "max": [
+    -1.65,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Front_2",
+   "min": [
+    -0.95,
+    0.0,
+    2.4
+   ],
+   "max": [
+    -0.4,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Front_3",
+   "min": [
+    -0.4,
+    0.0,
+    2.4
+   ],
+   "max": [
+    0.15,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Front_4",
+   "min": [
+    0.85,
+    0.0,
+    2.4
+   ],
+   "max": [
+    1.4,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Front_5",
+   "min": [
+    1.4,
+    0.0,
+    2.4
+   ],
+   "max": [
+    1.95,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Front_6",
+   "min": [
+    2.65,
+    0.0,
+    2.4
+   ],
+   "max": [
+    3.2,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Front_7",
+   "min": [
+    3.2,
+    0.0,
+    2.4
+   ],
+   "max": [
+    3.75,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Front_8",
+   "min": [
+    4.45,
+    0.0,
+    2.4
+   ],
+   "max": [
+    5.0,
+    2.1,
+    2.45
+   ]
+  },
+  {
+   "s": "Stall_Partition",
+   "min": [
+    -2.2,
+    0.0,
+    2.45
+   ],
+   "max": [
+    -2.15,
+    2.1,
+    4.0
+   ]
+  },
+  {
+   "s": "Stall_Partition_2",
+   "min": [
+    -0.4,
+    0.0,
+    2.45
+   ],
+   "max": [
+    -0.35,
+    2.1,
+    4.0
+   ]
+  },
+  {
+   "s": "Stall_Partition_3",
+   "min": [
+    1.4,
+    0.0,
+    2.45
+   ],
+   "max": [
+    1.45,
+    2.1,
+    4.0
+   ]
+  },
+  {
+   "s": "Stall_Partition_4",
+   "min": [
+    3.2,
+    0.0,
+    2.45
+   ],
+   "max": [
+    3.25,
+    2.1,
+    4.0
+   ]
+  },
+  {
+   "s": "Stall_Partition_5",
+   "min": [
+    4.95,
+    0.0,
+    2.45
+   ],
+   "max": [
+    5.0,
+    2.1,
+    4.0
+   ]
+  },
+  {
+   "s": "Vanity",
+   "min": [
+    -4.6,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    4.6,
+    0.85,
+    -3.4
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_stall_1",
+   "level": "mirror_bathroom",
+   "hinge": [
+    -1.65,
+    0.0,
+    2.4
+   ],
+   "width": 0.7,
+   "height": 1.9,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "stall"
+  },
+  {
+   "name": "DoorLeaf_stall_2",
+   "level": "mirror_bathroom",
+   "hinge": [
+    0.15,
+    0.0,
+    2.4
+   ],
+   "width": 0.7,
+   "height": 1.9,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "stall"
+  },
+  {
+   "name": "DoorLeaf_stall_3",
+   "level": "mirror_bathroom",
+   "hinge": [
+    1.95,
+    0.0,
+    2.4
+   ],
+   "width": 0.7,
+   "height": 1.9,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "stall"
+  },
+  {
+   "name": "DoorLeaf_stall_4",
+   "level": "mirror_bathroom",
+   "hinge": [
+    3.75,
+    0.0,
+    2.4
+   ],
+   "width": 0.7,
+   "height": 1.9,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "stall"
+  },
+  {
+   "name": "DoorLeaf_wing_cinema",
+   "level": "mirror_bathroom",
+   "hinge": [
+    -3.13,
+    0.0,
+    4.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "restroom door"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "mirror_bathroom",
+   "level": "mirror_bathroom",
+   "kind": "Spawn",
+   "position": [
+    -3.6,
+    0.0,
+    2.7
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "mirror",
+   "at": [
+    0.75,
+    0.0,
+    -2.95
+   ],
+   "arrive": [
+    0.75,
+    0.0,
+    -2.35
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "wing_cinema",
+   "at": [
+    -3.6,
+    0.0,
+    3.4
+   ],
+   "arrive": [
+    -3.6,
+    0.0,
+    2.7
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_1",
+   "position": [
+    3.75,
+    0.0,
+    -2.9
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "role": "monster",
+   "what": "at the end basin, facing its mirror"
+  },
+  {
+   "kind": "mirror",
+   "name": "Spot_mirror_1",
+   "position": [
+    -3.75,
+    0.0,
+    -2.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "mirror": "Mirror_1",
+   "portal": 0
+  },
+  {
+   "kind": "mirror",
+   "name": "Spot_mirror_2",
+   "position": [
+    -2.25,
+    0.0,
+    -2.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "mirror": "Mirror_2",
+   "portal": 0
+  },
+  {
+   "kind": "mirror",
+   "name": "Spot_mirror_3",
+   "position": [
+    -0.75,
+    0.0,
+    -2.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "mirror": "Mirror_3",
+   "portal": 0
+  },
+  {
+   "kind": "mirror",
+   "name": "Spot_mirror_4",
+   "position": [
+    0.75,
+    0.0,
+    -2.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "mirror": "Mirror_4",
+   "portal": 1
+  },
+  {
+   "kind": "mirror",
+   "name": "Spot_mirror_5",
+   "position": [
+    2.25,
+    0.0,
+    -2.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "mirror": "Mirror_5",
+   "portal": 0
+  },
+  {
+   "kind": "mirror",
+   "name": "Spot_mirror_6",
+   "position": [
+    3.75,
+    0.0,
+    -2.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "mirror": "Mirror_6",
+   "portal": 0
+  },
+  {
+   "kind": "puzzle",
+   "name": "Spot_puzzle_1",
+   "position": [
+    0.0,
+    0.0,
+    -1.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "which mirror is a way through: the one whose reflection is right"
+  }
+ ]
+}
