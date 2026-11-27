@@ -2531,6 +2531,12 @@ def stage_bake():
     props = [o for k, o in sorted(exp.items()) if o not in shell and o.data.materials[0].name not in NO_LIGHTMAP] + leaves
     report = {}
     sets = ["day"] + (["alt"] if SCENE in ALT else [])
+    metal = {}                                            # bake metals as if matte: the page multiplies the light by their colour, and a
+    for m in bpy.data.materials:                          # metal's diffuse pass is black
+        bs = next((nd for nd in m.node_tree.nodes if nd.type == "BSDF_PRINCIPLED"), None) if m.node_tree else None
+        if bs and bs.inputs["Metallic"].default_value > 0:
+            metal[m.name] = bs.inputs["Metallic"].default_value
+            bs.inputs["Metallic"].default_value = 0.0
     for n, objs in enumerate((shell, props)):
         print(f"lightmap {n}: {[o.name for o in objs]}")
         S, dens = rect_uv(objs, PAGES[SCENE][n]) if n == 0 else lightmap_uv(objs, PAGES[SCENE][n])
@@ -2584,6 +2590,8 @@ def stage_bake():
             bpy.data.images.remove(img)
             bpy.data.images.remove(png)
     set_light_set("day")
+    for name, v in metal.items():
+        next(nd for nd in bpy.data.materials[name].node_tree.nodes if nd.type == "BSDF_PRINCIPLED").inputs["Metallic"].default_value = v
     stills_dir(SCENE).mkdir(parents=True, exist_ok=True)
     (stills_dir(SCENE) / "bake.json").write_text(json.dumps(report, indent=1))
     for c in ("Art", "Skin"):
@@ -2760,7 +2768,7 @@ def stage_check():
     import check_layout
     for o in bpy.data.collections["Arch"].objects:
         o.hide_render = False
-    code = check_layout.main(["--scene", SCENE, "--collection", "Art"])
+    code = check_layout.main(["--scene", SCENE, "--collection", "Art", "--links"])
     for o in bpy.data.collections["Arch"].objects:
         o.hide_render = True
     print("CHECK_LAYOUT exit", code)

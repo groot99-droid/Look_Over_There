@@ -103,23 +103,24 @@ curtains on a brass rod over a window that is not there. The steep green-carpete
 two brackets, and the black door at the top with a hair of light round it. Doors: the white six-panel front door with its brass knocker, the
 pantry's panelled oak door, the cream door with no frame and no handle (the loop), the black stair door.
 
-- GLB 2.62 MB, 25 554 triangles, 30 draw calls; lightmaps `_0` / `_1` 2048 / 2048 at 43.1 / 52.0 px/m (110 KB / 515 KB), alt `_2` / `_3` (106 KB / 505 KB).
-- Light: two dome lights (900 W area lights) and four soft fills over the room, the green lamp (160 W, off in the alt set), a glow at the top of
-  the stairs and one down the stairwell. Gain 0.42; capped: China 0.397, Flower_Pink 0.329.
+- GLB 2.62 MB, 25554 triangles, 30 draw calls; lightmaps `_0` / `_1` 2048 / 2048 at 53.8 / 52.2 px/m (109 KB / 517 KB), alt `_2` / `_3` (106 KB / 506 KB).
+- Light: two dome lights (900 W area lights) and four soft fills over the room, the green lamp (160 W, off in the alt set), a glow at the top of the stairs and one down the stairwell. Gain 0.42; capped: China 0.398, Flower_Pink 0.329.
 
 | Material | m2 | p50 | p90 | p99 |
 |---|---|---|---|---|
-| Ceiling_Dining | 347.1 | 0.063 | 0.106 | 0.167 |
+| Ceiling_Dining | 347.1 | 0.063 | 0.106 | 0.166 |
 | Shag_Green | 334.6 | 0.147 | 0.319 | 0.612 |
-| Wall_Cream | 300.0 | 0.300 | 0.557 | 0.813 |
+| Wall_Cream | 300.0 | 0.300 | 0.556 | 0.813 |
 | Maple | 89.3 | 0.001 | 0.101 | 0.187 |
 | Stair_Wall | 73.2 | 0.007 | 0.041 | 0.079 |
-| China | 68.0 | 0.096 | 0.591 | 0.970 |
-| Rug_Rings | 40.9 | 0.223 | 0.796 | 0.952 |
+| China | 68.0 | 0.098 | 0.591 | 0.971 |
+| Trim_Cream | 45.1 | 0.171 | 0.464 | 0.695 |
+| China_Rim | 42.9 | 0.000 | 0.082 | 0.326 |
 
-No material is over p90 0.9 or p99 0.98 (the full table, the alt set's too, is in the gate output). The stairwell is dark by design ("the
-dark, steep stairwell"); its walls read at p90 0.04. The ceiling is dimmer than the walls (lit from below by the down lights, and tinted by the
-green carpet). The maple's p50 near 0 counts the faces no one sees (undersides, the table's pedestal in its own shadow).
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+The stairwell is dark by design ("the dark, steep stairwell"). The ceiling is dimmer than the walls (lit from below by the down lights, and
+tinted by the green carpet). The alt set (the green lamp off) measures within a few hundredths of the day set except round the sideboard.
 
 ## Review stills
 
