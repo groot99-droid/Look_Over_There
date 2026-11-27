@@ -44,6 +44,7 @@ def legs4(bm, x0, x1, z0, z1, y0, y1, r=0.022, inset=0.05, round_=True):
 
 def table(name, b, top, legm, t=0.04, r=0.022, inset=0.06, round_=False, apron=True):
     mn, mx = b["min"], b["max"]
+    inset = min(inset, r + 0.035)                  # the legs reach the box's corners (the layout check covers the box within 5 cm)
     part(name, top, lambda bm: box(bm, mn[0], mx[0], mx[1] - t, mx[1], mn[2], mx[2]))
 
     def lg(bm):
@@ -124,12 +125,13 @@ def cabinet(name, b, body, front=None, doors=2, face="S", plinth=0.08, handle="C
 def plant(tag, cx, cz, y0, height, rng, pot_r=0.2, pot_mat="Pot_Clay", leaf_mat="Plant_Leaf", spread=0.45, solid=True):
     """A potted plant: the pot and the leaves, both solid over the plant's collider (the leaves kept inside its footprint), or both decor."""
     nm = tag if solid else "decor_" + tag
-    part(nm, pot_mat, lambda bm: cyl(bm, (cx, y0, cz), (cx, y0 + pot_r * 1.6, cz), pot_r * 0.78, pot_r, 14))
     if solid and tag in K.BOX:
         b = K.BOX[tag]
         half = min(b["max"][0] - cx, cx - b["min"][0], b["max"][2] - cz, cz - b["min"][2])
         height = b["max"][1] - y0 - pot_r * 1.5
         spread = min(spread, half / max(height, 0.1))
+        pot_r = half - 0.015
+    part(nm, pot_mat, lambda bm: cyl(bm, (cx, y0, cz), (cx, y0 + pot_r * 1.6, cz), pot_r * 0.78, pot_r, 14))
 
     def leaves(bm):
         n = 14
@@ -173,6 +175,8 @@ def pendant(tag, x, z, drop, shade_r=0.22, shade_mat="Shade", cord_mat="Iron", b
         part("decor_" + tag + "_Shade", shade_mat, lambda bm: cyl(bm, (x, yb - 0.05, z), (x, yb + 0.14, z), shade_r, 0.04, 20, cap=False))
     elif kind == "globe":
         part("decor_" + tag + "_Shade", shade_mat, lambda bm: sphere(bm, (x, yb, z), shade_r, 16))
+        light("POINT", (x, yb - shade_r - 0.04, z), watts, color, 0.06, sets)          # under the globe: an opal globe would hold the light in
+        return
     if bulb:
         part("decor_" + tag + "_Bulb", "Lamp_Emit", lambda bm: sphere(bm, (x, yb - 0.02, z), 0.045, 10))
     light("POINT", (x, yb - 0.08, z), watts, color, 0.06, sets)
@@ -558,21 +562,21 @@ def dress_lights_out():
     part("Floor_Lamp", "Brass", lambda bm: (cyl(bm, (lx, 0.0, lz), (lx, 0.03, lz), 0.2, 0.2, 18), cyl(bm, (lx, 0.03, lz), (lx, 1.4, lz), 0.016, 0.016, 8)))
     part("Floor_Lamp_Shade", "Shade_Silk", lambda bm: cyl(bm, (lx, 1.38, lz), (lx, 1.72, lz), 0.25, 0.16, 20, cap=False))
     part("decor_Floor_Lamp_Bulb", "Lamp_S1", lambda bm: sphere(bm, (lx, 1.5, lz), 0.05, 10))
-    light("POINT", (lx, 1.52, lz), 70.0, WARM, 0.12, sets=["s1"])
+    light("POINT", (lx, 1.52, lz), 70.0, WARM, 0.12, sets=["switch_1"])
     # switch 2: the tube batten over the south door
     tb = K.BOX["decor_Tube_Batten"]
     part("decor_Tube_Body", "Trim_White", lambda bm: box(bm, tb["min"][0], tb["max"][0], tb["max"][1] - 0.05, tb["max"][1], tb["min"][2], tb["max"][2]))
     part("decor_Tube", "Lamp_S2", lambda bm: cyl(bm, (tb["min"][0] + 0.05, tb["max"][1] - 0.08, (tb["min"][2] + tb["max"][2]) / 2),
                                                  (tb["max"][0] - 0.05, tb["max"][1] - 0.08, (tb["min"][2] + tb["max"][2]) / 2), 0.016, 0.016, 10))
     light("AREA", ((tb["min"][0] + tb["max"][0]) / 2, tb["max"][1] - 0.1, (tb["min"][2] + tb["max"][2]) / 2), 55.0, TUBE, aim=(0, -1, 0),
-          size=(2.0, 0.1), sets=["s2"])
+          size=(2.0, 0.1), sets=["switch_2"])
     # switch 3: the red bulb on its cord, and the door of light on the bare north wall
     part("decor_Red_Bulb", "Lamp_S3", lambda bm: sphere(bm, (0.0, 2.12, -5.5), 0.06, 12))
     part("decor_Red_Rose", "Bakelite", lambda bm: cyl(bm, (0.0, 3.15, -5.5), (0.0, 3.2, -5.5), 0.06, 0.06, 12))
     part("decor_Red_Cord", "Rubber", lambda bm: cyl(bm, (0.0, 2.18, -5.5), (0.0, 3.15, -5.5), 0.005, 0.005, 6))
-    light("POINT", (0.0, 2.1, -5.4), 24.0, (1.0, 0.12, 0.06), 0.05, sets=["s3"])
+    light("POINT", (0.0, 2.1, -5.4), 24.0, (1.0, 0.12, 0.06), 0.05, sets=["switch_3"])
     ld = K.BOX["decor_Light_Door"]
-    light("AREA", (0.0, 1.1, K.Z0 + 0.03), 90.0, (1.0, 0.92, 0.8), aim=(0, 0, -1), size=(1.1, 2.2), sets=["s3"], name="Light_Door")
+    light("AREA", (0.0, 1.1, K.Z0 + 0.03), 90.0, (1.0, 0.92, 0.8), aim=(0, 0, -1), size=(1.1, 2.2), sets=["switch_3"], name="Light_Door")
     # the armchair in the corner, its table and a glass
     armchair("Armchair", K.BOX["Armchair"], "Velvet_Plum", "Wood_Dark", back="N")
     table("Side_Table", K.BOX["Side_Table"], "Wood_Dark", "Wood_Dark", t=0.03, inset=0.04, apron=False)
@@ -580,15 +584,15 @@ def dress_lights_out():
     part("decor_Glass", "Glass_Door", lambda bm: cyl(bm, (4.15, stb["max"][1], -5.45), (4.15, stb["max"][1] + 0.1, -5.45), 0.03, 0.035, 10))
     rug("Rug", -4.6, 4.6, -3.6, 4.0, "Rug_Plum")
     # a faint glow under the steel door, in every set (the void is not quite dark)
-    K.EMIT_SETS.update({"Lamp_S1": {"s1": 6.0, "s2": 0.0, "s3": 0.0, "export": 6.0}, "Lamp_S2": {"s1": 0.0, "s2": 6.0, "s3": 0.0, "export": 6.0},
-                        "Lamp_S3": {"s1": 0.0, "s2": 0.0, "s3": 6.0, "export": 6.0}})
+    K.EMIT_SETS.update({"Lamp_S1": {"switch_1": 6.0, "switch_2": 0.0, "switch_3": 0.0, "export": 6.0}, "Lamp_S2": {"switch_1": 0.0, "switch_2": 6.0, "switch_3": 0.0, "export": 6.0},
+                        "Lamp_S3": {"switch_1": 0.0, "switch_2": 0.0, "switch_3": 6.0, "export": 6.0}})
     light("AREA", (0.0, K.H - 0.05, 0.0), 6.0, (0.6, 0.6, 1.0), aim=(0, -1, 0), size=(6, 6), name="Night_Fill")
 
 
 LIGHTS_OUT = dict(
-    sets=["s1", "s2", "s3"],
+    sets=["switch_1", "switch_2", "switch_3"],
     pages=(2048,),
-    grade={"target": 0.9, "shoulder": 1.15, "mode": "each", "set_gain": {"s3": 0.8}},
+    grade={"target": 0.9, "shoulder": 1.15, "mode": "each", "set_gain": {"switch_3": 0.8}},
     mats={"Carpet_Stars": dict(gen="carpet", rough=1.0, tile=1.6, group="struct"),
           "Paper_Violet": dict(gen="paper", rough=0.9, tile=0.9, group="struct"),
           "Panel_Dark": dict(diff="dark_wood_diff_1k.jpg", tint=(0.6, 0.5, 0.55), rough=0.5, tile=1.2, group="struct"),
@@ -1161,10 +1165,10 @@ def bench(name, b, seat_mat, leg_mat, slats=True):
 
     def legs(bm):
         if along_x:
-            for x in (mn[0] + 0.12, mx[0] - 0.12):
+            for x in (mn[0] + 0.035, mx[0] - 0.035):
                 box(bm, x - 0.025, x + 0.025, 0.0, mx[1] - 0.04, mn[2] + 0.03, mx[2] - 0.03)
         else:
-            for z in (mn[2] + 0.12, mx[2] - 0.12):
+            for z in (mn[2] + 0.035, mx[2] - 0.035):
                 box(bm, mn[0] + 0.03, mx[0] - 0.03, 0.0, mx[1] - 0.04, z - 0.025, z + 0.025)
     part(name + "_Legs", leg_mat, legs)
 
@@ -1273,7 +1277,7 @@ ATLAS_MIRROR = Atlas([("clock", 256, 256, clock_face(10.2, hands=True)), ("sign"
 
 MIRROR_ROOM = dict(
     pages=(2048, 2048),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 0.9, "shoulder": 1.15, "caps": {"Panel_White": 0.88, "Trim_White": 0.9}},
     mats={"Floor_Parquet": dict(diff="herringbone_parquet_diff_1k.jpg", tint=(1.0, 0.92, 0.86), rough=0.4, tile=1.6, group="struct"),
           "Paper_Magenta": dict(gen="paper", rough=0.9, tile=0.9, group="struct"),
           "Panel_White": dict(color=(0.90, 0.88, 0.86), rough=0.5, group="struct"),
@@ -1426,7 +1430,7 @@ def dress_waiting_room():
     wc = K.BOX["Water_Cooler"]
     wx, wz = (wc["min"][0] + wc["max"][0]) / 2, (wc["min"][2] + wc["max"][2]) / 2
     part("Water_Cooler", "Plastic_White", lambda bm: box(bm, wc["min"][0], wc["max"][0], 0.0, 1.0, wc["min"][2], wc["max"][2]))
-    part("Water_Cooler_Bottle", "Glass_Blue", lambda bm: cyl(bm, (wx, 1.0, wz), (wx, 1.3, wz), 0.13, 0.13, 16), smooth=True)
+    part("Water_Cooler_Bottle", "Glass_Blue", lambda bm: cyl(bm, (wx, 1.0, wz), (wx, 1.3, wz), 0.17, 0.17, 16), smooth=True)
     pl = K.BOX["Plant"]
     plant("Plant", (pl["min"][0] + pl["max"][0]) / 2, (pl["min"][2] + pl["max"][2]) / 2, 0.0, 1.2, np.random.default_rng(52), 0.25)
     mt = K.BOX["Magazine_Table"]
@@ -1448,7 +1452,7 @@ def dress_waiting_room():
     picture("decor_Hatch_Sign", "Signs_Wait", (0.0, 2.45, K.Z1 - 0.012), "-z", 1.6, 0.2, ATLAS_WAIT.uv("hatch"))
     cs = K.BOX["Coat_Stand"]
     cx, cz = (cs["min"][0] + cs["max"][0]) / 2, (cs["min"][2] + cs["max"][2]) / 2
-    part("Coat_Stand", "Chrome", lambda bm: (cyl(bm, (cx, 0.0, cz), (cx, 1.8, cz), 0.02, 0.02, 10),
+    part("Coat_Stand", "Chrome", lambda bm: (cyl(bm, (cx, 0.0, cz), (cx, 1.8, cz), 0.02, 0.02, 10), cyl(bm, (cx, 0.0, cz), (cx, 0.02, cz), 0.19, 0.19, 20),
                                              [cyl(bm, (cx, 0.02, cz), (cx + 0.18 * math.cos(a), 0.0, cz + 0.18 * math.sin(a)), 0.012, 0.012, 6)
                                               for a in (0.3, 2.4, 4.5)]))
     part("decor_Umbrella", "Iron", lambda bm: cyl(bm, (cx + 0.08, 0.05, cz + 0.05), (cx + 0.1, 0.95, cz + 0.02), 0.04, 0.015, 8))
@@ -2195,7 +2199,7 @@ def dress_office_night():
     wc = K.BOX["Water_Cooler"]
     part("Water_Cooler", "Plastic_White", lambda bm: box(bm, wc["min"][0], wc["max"][0], 0.0, 1.0, wc["min"][2], wc["max"][2]))
     part("Water_Cooler_Bottle", "Glass_Blue", lambda bm: cyl(bm, ((wc["min"][0] + wc["max"][0]) / 2, 1.0, (wc["min"][2] + wc["max"][2]) / 2),
-                                                            ((wc["min"][0] + wc["max"][0]) / 2, 1.3, (wc["min"][2] + wc["max"][2]) / 2), 0.13, 0.13, 16), smooth=True)
+                                                            ((wc["min"][0] + wc["max"][0]) / 2, 1.3, (wc["min"][2] + wc["max"][2]) / 2), 0.17, 0.17, 16), smooth=True)
     for n in ("Plant_1", "Plant_2"):
         b = K.BOX[n]
         plant(n, (b["min"][0] + b["max"][0]) / 2, (b["min"][2] + b["max"][2]) / 2, 0.0, 1.3, np.random.default_rng(111 + len(n)), 0.25)
@@ -2796,6 +2800,10 @@ if __name__ == "__main__":
         return cast(a[a.index(n) + 1]) if n in a else d
     ids = arg("--scenes", "").split(",")
     stages = set(arg("--stage", "art,layout,check,bake,export,render").split(","))
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except Exception:
+        pass
     print("BLENDER", bpy.app.version_string)
     for sid in ids:
         try:

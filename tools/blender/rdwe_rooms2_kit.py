@@ -73,6 +73,7 @@ def reset(sid, spec):
     for c in (K.ART, K.DOORS, K.LAYOUT, K.STAND):
         sc.collection.children.link(c)
     K.HOLES = door_holes()
+    K.SOLIDS = [b for b in K.GB.boxes if (b["col"] and not b["name"].startswith("Beyond_")) or ("ceiling" in b["tags"] and b.get("art"))]
 
 
 def work():
@@ -1132,7 +1133,43 @@ def stage_check():
 
 
 # ---------------------------------------------------------------- export objects: merged by material, faces nobody sees dropped
+def hidden_inside(bm, oname):
+    """Cut a big plain mesh (a wall, a floor, a block) on a 1 m grid, and drop the cells that lie against another collider's box (a wall
+    behind the narrowing walls, the floor under a cabinet, a hidden core): their light is never seen."""
+    if len(bm.faces) > 64 or oname.startswith(("Beyond_", "decor_")):
+        return
+    bm.verts.ensure_lookup_table()
+    lo = [min(v.co[i] for v in bm.verts) for i in range(3)]
+    hi = [max(v.co[i] for v in bm.verts) for i in range(3)]
+    if max(hi[i] - lo[i] for i in range(3)) < 1.5:
+        return
+    for ax in range(3):
+        c = math.floor(lo[ax]) + 1.0
+        while c < hi[ax] - 1e-3:
+            no = [0.0, 0.0, 0.0]
+            no[ax] = 1.0
+            co = [0.0, 0.0, 0.0]
+            co[ax] = c
+            bmesh.ops.bisect_plane(bm, geom=list(bm.verts) + list(bm.edges) + list(bm.faces), plane_co=co, plane_no=no)
+            c += 1.0
+    bm.normal_update()
+    mid = [(lo[0] + hi[0]) / 2, (lo[2] + hi[2]) / 2, -(lo[1] + hi[1]) / 2]
+    boxes = [b for b in K.SOLIDS if not all(b["min"][i] - 1e-3 <= mid[i] <= b["max"][i] + 1e-3 for i in range(3))]   # not the box it dresses
+    bad = []
+    for f in bm.faces:
+        c, n = f.calc_center_median(), f.normal
+        p = (c.x + n.x * 0.01, c.z + n.z * 0.01, -(c.y + n.y * 0.01))
+        for b in boxes:
+            if b["name"] == oname:
+                continue
+            if all(b["min"][i] + 1e-3 < p[i] < b["max"][i] - 1e-3 for i in range(3)):
+                bad.append(f)
+                break
+    bmesh.ops.delete(bm, geom=bad, context="FACES")
+
+
 def cull(bm, mname, oname):
+    hidden_inside(bm, oname)
     e = 2e-3
     two = K.MATDEF.get(mname, {}).get("two_sided")
     bad = []
