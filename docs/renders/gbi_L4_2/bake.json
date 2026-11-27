@@ -1,0 +1,128 @@
+{
+ "day_0": {
+  "map": 0,
+  "size": 2048,
+  "px_per_m": 18.8,
+  "scale": 2.3124,
+  "knee": 1.7242,
+  "raw_p50_p90_p99_max": [
+   0.871,
+   1.985,
+   2.1253,
+   52.1962
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 40,
+  "materials": [
+   "M_D_ceil_L4",
+   "M_D_floor_L4",
+   "M_D_wall_L4",
+   "M_GBI_kit"
+  ]
+ },
+ "day_1": {
+  "map": 1,
+  "size": 2048,
+  "px_per_m": 33.8,
+  "scale": 2.5698,
+  "knee": 1.154,
+  "raw_p50_p90_p99_max": [
+   0.4712,
+   1.6547,
+   8.8965,
+   29.0924
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 88,
+  "materials": [
+   "M_Fixture_Housing",
+   "M_GBI_accent_1",
+   "M_GBI_accent_2",
+   "M_GBI_accent_3",
+   "M_GBI_accent_4",
+   "M_GBI_accent_5",
+   "M_GBI_canvas",
+   "M_GBI_frame",
+   "M_GBI_tape",
+   "M_GBI_textile",
+   "M_GBI_textile_dark",
+   "M_GBI_wood",
+   "M_U_arrow",
+   "M_U_blue",
+   "M_U_rug_blue",
+   "M_U_rug_grey",
+   "M_U_rug_red",
+   "M_U_yellow",
+   "M_X_dark",
+   "M_X_steel",
+   "M_X_white",
+   "coffee_table_round_01",
+   "sofa_02"
+  ]
+ },
+ "night_0": {
+  "map": 2,
+  "size": 2048,
+  "px_per_m": 18.8,
+  "scale": 0.3204,
+  "knee": 0.1659,
+  "raw_p50_p90_p99_max": [
+   0.0637,
+   0.2519,
+   0.5319,
+   54.028
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 56,
+  "materials": [
+   "M_D_ceil_L4",
+   "M_D_floor_L4",
+   "M_D_wall_L4",
+   "M_GBI_kit"
+  ]
+ },
+ "night_1": {
+  "map": 3,
+  "size": 2048,
+  "px_per_m": 33.8,
+  "scale": 0.1803,
+  "knee": 0.0727,
+  "raw_p50_p90_p99_max": [
+   0.0337,
+   0.1379,
+   0.4574,
+   9.8381
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 123,
+  "materials": [
+   "M_Fixture_Housing",
+   "M_GBI_accent_1",
+   "M_GBI_accent_2",
+   "M_GBI_accent_3",
+   "M_GBI_accent_4",
+   "M_GBI_accent_5",
+   "M_GBI_canvas",
+   "M_GBI_frame",
+   "M_GBI_tape",
+   "M_GBI_textile",
+   "M_GBI_textile_dark",
+   "M_GBI_wood",
+   "M_U_arrow",
+   "M_U_blue",
+   "M_U_rug_blue",
+   "M_U_rug_grey",
+   "M_U_rug_red",
+   "M_U_yellow",
+   "M_X_dark",
+   "M_X_steel",
+   "M_X_white",
+   "coffee_table_round_01",
+   "sofa_02"
+  ]
+ }
+}

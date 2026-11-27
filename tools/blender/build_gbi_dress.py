@@ -71,14 +71,14 @@ PAGES = {s: [2048, 2048] for s in SK.SCENES}     # fixed lightmap pages per scen
 NIGHT_OFFSET = 2
 WHITE_CAP = 12.0
 SHOULDER = (80.0, 2.5)                           # light above the map's 80th percentile rolls off toward 2.5 x it
-TARGET = {"day": {"L4": 0.50, "L3": 0.55}, "night": {"L4": 0.15, "L3": 0.15}}   # the walls' displayed p50 the gain aims for
+TARGET = {"day": {"L4": 0.50, "L3": 0.55, "L2": 0.45, "L1": 0.45, "B1": 0.55}, "night": {f: 0.15 for f in ("L4", "L3", "L2", "L1", "B1")}}   # the walls' displayed p50 the gain aims for
 P99, P90 = 0.97, 0.88
 WALLS = ("M_D_wall_",)
 
 # the lights (Cycles watts) and the toggled materials' strengths
-PANEL_W = {"L4": 95.0, "L3": 55.0}
+PANEL_W = {"L4": 95.0, "L3": 55.0, "L2": 55.0, "L1": 50.0, "B1": 55.0}
 PANEL_EMIT, NIGHT_EMIT, EMERG_EMIT, EMERG_W, EXIT_W = 4.0, 4.0, 6.0, 22.0, 2.5
-GRID = {"L4": 4.0, "L3": 4.5}
+GRID = {"L4": 4.0, "L3": 4.5, "L2": 4.5, "L1": 4.0, "B1": 4.5}
 
 
 def work():
@@ -541,8 +541,10 @@ def make_materials():
     # the shell: the greybox's role names, filled with the store's own materials
     store_material(f"M_D_floor_{F}")
     store_material(f"M_D_ceil_{F}")
-    store_material("M_U_wall_L4" if F == "L4" else "M_D_wall_L3", f"M_D_wall_{F}")
-    store_material("M_U_wall_L4" if F == "L4" else "M_D_wall_L3", "M_GBI_kit")        # the casings round the kit pieces: the floor's wall
+    store_material("M_U_wall_L4" if F == "L4" else f"M_D_wall_{F}", f"M_D_wall_{F}")
+    store_material("M_U_wall_L4" if F == "L4" else f"M_D_wall_{F}", "M_GBI_kit")
+    if F == "B1":
+        store_material("M_Water")                                               # the store's pool water (alpha blend, unbaked)        # the casings round the kit pieces: the floor's wall
     # the store's own small materials
     for n in ("M_X_white", "M_X_dark", "M_X_steel", "M_X_exit", "M_Fixture_Housing", "M_U_bluepaint", "M_U_blue", "M_U_yellow", "M_U_arrow",
               "M_X_orange", "M_U_rug_blue", "M_U_rug_grey", "M_U_rug_red"):
@@ -553,10 +555,8 @@ def make_materials():
     material("M_GBI_nightlight", color=(1.0, 0.97, 0.86), rough=0.3, emit=(WARM, NIGHT_EMIT))
     material("Emergency_Emit", color=(1.0, 0.95, 0.88), rough=0.3, emit=((1.0, 0.93, 0.82), EMERG_EMIT))
     # roles the greybox named, now dressed
-    if F == "L4":
-        material("M_GBI_furn_L4", color=srgb_lin("#f26b0f"), rough=0.5)          # the store's orange (M_X_orange)
-    else:
-        material("M_GBI_furn_L3", color=srgb_lin("#ebeae4"), rough=0.85)         # white plinths
+    material(f"M_GBI_furn_{F}", color=srgb_lin({"L4": "#f26b0f", "L3": "#ebeae4", "L2": "#8a6a48", "L1": "#6e6a62", "B1": "#d8e4ea"}[F]),
+             rough=0.6)                                                         # L4 the store's orange, L3 white plinths, L2 desk wood, L1 grey, B1 tile
     material("M_D_trim", color=srgb_lin("#c9cac6"), rough=0.6)
     material("M_D_door", color=srgb_lin("#a88b66"), rough=0.6)
     material("M_GBI_vent", img=g["gen_brushed"], tint=srgb_lin("#c4c8cc"), rough=0.4, tile=0.5)
@@ -573,7 +573,10 @@ def make_materials():
     # the hazards: unbaked (the page moves them); lava glows
     material("M_GBI_hazard_lava", img=g["gen_lava"], emit=((1.0, 0.35, 0.05), 2.0), rough=0.6, tile=1.0)
     material("M_GBI_hazard_blade", img=g["gen_brushed"], tint=srgb_lin("#b8bcc0"), rough=0.3, tile=0.3)
-    material("M_GBI_hazard_crush", color=srgb_lin("#d8d6cf") if F == "L3" else srgb_lin("#e07020"), rough=0.7)
+    material("M_GBI_hazard_crush", color=srgb_lin({"L4": "#e07020", "L3": "#d8d6cf", "L2": "#b8ac8c", "L1": "#c9b98a", "B1": "#dfe8ec"}[F]), rough=0.7)
+    material("M_GBI_hazard_tide", color=srgb_lin("#3d8fa8"), rough=0.1, alpha=0.6)
+    material("M_GBI_hazard_gas", color=srgb_lin("#8fc23a"), rough=0.9, alpha=0.35)
+    material("M_GBI_fabric", color=srgb_lin("#5f6b78"), rough=0.95)            # cubicle panels
     material("Standin_Grey", color=(0.4, 0.4, 0.4), rough=0.9)
 
 
@@ -1265,6 +1268,8 @@ def greybox_decor():
                                                      if (mx[2] - mn[2]) > (mx[0] - mn[0]) else
                                                      [((mn[0] - 0.12, mn[1], mn[2] - 0.12), (mx[0] + 0.12, mx[1] - 0.001, mn[2] - 0.02)),
                                                       ((mn[0] - 0.12, mn[1], mx[2] + 0.02), (mx[0] + 0.12, mx[1] - 0.001, mx[2] + 0.12))])])
+        elif "Water" in n:                                                  # a pool's surface: the store's water, unbaked
+            joined(n, [("M_Water", [(mn, mx)])])
         elif "Dock_Door" in n:
             joined(n, [("M_GBI_shutter", [(mn, (mx[0], mx[1] - 0.3, mx[2]))]), ("M_X_dark", [((mn[0], mx[1] - 0.3, mn[2]), (mx[0], mx[1], mx[2] + 0.12))]),
                        ("M_U_yellow", [((mn[0] - 0.15, mn[1], mn[2]), (mn[0], mx[1], mx[2] + 0.06)), ((mx[0], mn[1], mn[2]), (mx[0] + 0.15, mx[1], mx[2] + 0.06))])])
@@ -1438,19 +1443,15 @@ def wall_band(side, a0, a1, y0, y1, mat="M_U_blue", stripe=True):
     joined(f"Band_{side}_{int(a0)}", parts_)
 
 
-def picture(name, side_or_x, a, y, w=0.6, h=0.84, wall=None):
-    """The store's Poly Haven picture frame on a wall face (outer wall `side`), its back on the face."""
-    P, nrm, right = wall_frame(side_or_x)
+def picture(name, side, a, y, w=0.6, h=0.84):
+    """A framed print on an outer wall face: a dark frame and a pale print, 3 cm proud (inside the layout check's 5 cm)."""
+    P, nrm, right = wall_frame(side)
     c = P(a, y, 0.0)
-    mn = [c[0] - abs(right[0]) * w / 2, c[1] - h / 2, c[2] - abs(right[2]) * w / 2]
-    mx = [c[0] + abs(right[0]) * w / 2, c[1] + h / 2, c[2] + abs(right[2]) * w / 2]
-    for i in (0, 2):
-        if nrm[i] > 0:
-            mx[i] += 0.025
-        elif nrm[i] < 0:
-            mn[i] -= 0.025
-    yaw = math.degrees(math.atan2(nrm[0], nrm[2])) + 180.0         # this model's picture faces its +Y (the sofa's front is its -Y)
-    return place_model(name, "Set_hanging_picture_frame_01", mn, mx, yaw=yaw, mode="stretch")
+    frame = oriented_box(c, right, nrm, w, h, 0.0, 0.03)
+    art = oriented_box(c, right, nrm, w - 0.1, h - 0.1, 0.0, 0.034)
+    f = part(name + "_frame", "M_GBI_frame", lambda bm: cube(bm, *frame))
+    p_ = part(name + "_print", "M_GBI_canvas", lambda bm: cube(bm, *art))
+    return join(name, [f, p_])
 
 
 # ---------------------------------------------------------------- the chambers
@@ -1584,11 +1585,94 @@ def dress_L3_4():
     decal("Tape_lava_w", "M_GBI_tape", -10.0, -9.88, -7.9, -0.1, Y)
 
 
+
+
+# ---------------------------------------------------------------- L2, L1, B1: offices, cartons, pools
+def desk(b, top="M_GBI_furn"):
+    """An office desk over the greybox box: a top, two pedestal ends and a modesty panel; a monitor or a few papers on some."""
+    (x0, y0, z0), (x1, y1, z1) = b["min"], b["max"]
+    along_x = (x1 - x0) >= (z1 - z0)
+    ends = [((x0, y0, z0), (x0 + 0.05, y1 - 0.03, z1)), ((x1 - 0.05, y0, z0), (x1, y1 - 0.03, z1))] if along_x else         [((x0, y0, z0), (x1, y1 - 0.03, z0 + 0.05)), ((x0, y0, z1 - 0.05), (x1, y1 - 0.03, z1))]
+    panel = [((x0 + 0.05, y0 + 0.25, (z0 + z1) / 2 - 0.01), (x1 - 0.05, y1 - 0.03, (z0 + z1) / 2 + 0.01))] if along_x else         [(((x0 + x1) / 2 - 0.01, y0 + 0.25, z0 + 0.05), ((x0 + x1) / 2 + 0.01, y1 - 0.03, z1 - 0.05))]
+    rng = np.random.default_rng(int(abs(x0 * 17 + z0 * 5)) + 31)
+    dark = []
+    if rng.random() < 0.6:
+        cx, cz = (x0 + x1) / 2 + (rng.random() - 0.5) * 0.6, (z0 + z1) / 2
+        dark.append(((cx - 0.25, y1, cz - 0.06), (cx + 0.25, y1 + 0.38, cz + 0.06)) if along_x else ((cx - 0.06, y1, cz - 0.25), (cx + 0.06, y1 + 0.38, cz + 0.25)))
+    joined(b["name"], [(f"M_GBI_furn_{FLOOR}", [((x0, y1 - 0.03, z0), (x1, y1, z1))]), ("M_X_steel", ends + panel), ("M_X_dark", dark)])
+
+
+def cartons(b):
+    """A stack of cartons left where the greybox has a box: three or four cartons, taped."""
+    (x0, y0, z0), (x1, y1, z1) = b["min"], b["max"]
+    xm = (x0 + x1) / 2
+    items = [((x0, y0, z0), (xm - 0.02, y0 + (y1 - y0) * 0.55, z1)), ((xm + 0.02, y0, z0), (x1, y0 + (y1 - y0) * 0.5, z1)),
+             ((x0 + 0.1, y0 + (y1 - y0) * 0.55, z0 + 0.05), (xm + 0.2, y1, z1 - 0.1))]
+    joined(b["name"], [("M_GBI_card", items)])
+
+
+def cubicle(b):
+    """A cubicle panel (the greybox's 1.4 m partition): grey fabric between aluminium caps."""
+    (x0, y0, z0), (x1, y1, z1) = b["min"], b["max"]
+    joined(b["name"], [("M_GBI_fabric", [((x0, y0 + 0.08, z0), (x1, y1 - 0.03, z1))]),
+                       ("M_X_steel", [((x0, y1 - 0.03, z0), (x1, y1, z1)), ((x0, y0, z0), (x1, y0 + 0.08, z1))])])
+
+
+def dress_L2_2():
+    for b in furniture("Boxes_"):
+        cartons(b)
+    vents()
+    greybox_decor()
+
+
+def dress_L2_3():
+    for b in furniture("Core_Table"):
+        desk(b)
+    greybox_decor()
+
+
+def dress_L2_4():
+    for b in furniture("Desk_"):
+        desk(b)
+    greybox_decor()
+
+
+def dress_L1_2():
+    for b in SK.colliders(M):
+        if b["name"].startswith(("Pod_Back", "Pod_Side")):
+            cubicle(b)
+        elif b["name"].startswith("Pod_Desk"):
+            (x0, y0, z0), (x1, y1, z1) = b["min"], b["max"]
+            joined(b["name"], [(f"M_GBI_furn_{FLOOR}", [((x0, y1 - 0.03, z0), (x1, y1, z1))]),
+                               ("M_X_steel", [((x0 + 0.02, y0, z0 + 0.02), (x0 + 0.06, y1 - 0.03, z1 - 0.02)), ((x1 - 0.06, y0, z0 + 0.02), (x1 - 0.02, y1 - 0.03, z1 - 0.02))])])
+    greybox_decor()
+
+
+def dress_L1_3():
+    for b in furniture("Desk_"):
+        desk(b)
+    vents()
+    greybox_decor()
+
+
+def dress_L1_4():
+    for b in furniture("Desk_") + furniture("Conf_Table"):
+        desk(b)
+    greybox_decor()
+
+
+def dress_B1():
+    greybox_decor()
+    vents()
+
+
 def _t(v):
     return GB._tag(v)
 
 
-DRESS = {"gbi_L4_1": dress_L4_1, "gbi_L4_2": dress_L4_2, "gbi_L4_3": dress_L4_3, "gbi_L3_2": dress_L3_2, "gbi_L3_3": dress_L3_3, "gbi_L3_4": dress_L3_4}
+DRESS = {"gbi_L4_1": dress_L4_1, "gbi_L4_2": dress_L4_2, "gbi_L4_3": dress_L4_3, "gbi_L3_2": dress_L3_2, "gbi_L3_3": dress_L3_3, "gbi_L3_4": dress_L3_4,
+         "gbi_L2_2": dress_L2_2, "gbi_L2_3": dress_L2_3, "gbi_L2_4": dress_L2_4, "gbi_L1_2": dress_L1_2, "gbi_L1_3": dress_L1_3, "gbi_L1_4": dress_L1_4,
+         "gbi_B1_2": dress_B1, "gbi_B1_3": dress_B1, "gbi_B1_4": dress_B1}
 
 
 # ---------------------------------------------------------------- the file
@@ -1639,7 +1723,7 @@ def build_all():
 
 
 # ---------------------------------------------------------------- bake
-NO_LIGHTMAP = {"Lamp_Emit", "Emergency_Emit", "M_GBI_nightlight", "M_X_exit"}
+NO_LIGHTMAP = {"Lamp_Emit", "Emergency_Emit", "M_GBI_nightlight", "M_X_exit", "M_Water"}
 
 
 def cull_flush(bm, cols):
@@ -2210,7 +2294,12 @@ def strip_jpeg_comments(path):
 
 DETAIL = {"gbi_L4_1": ((3.0, 1.6, 16.5), (16.0, 1.0, 16.2), 62), "gbi_L4_2": ((-11.5, 1.6, 12.2), (-23.0, 0.6, 9.0), 62),
           "gbi_L4_3": ((-0.6, 1.6, 9.0), (-18.0, 1.6, 9.2), 62), "gbi_L3_2": ((-0.5, 1.55, 9.0), (-4.0, 0.9, 14.0), 62),
-          "gbi_L3_3": ((-23.0, 1.55, 15.0), (12.0, 1.3, 13.0), 62), "gbi_L3_4": ((-24.5, 1.55, 19.5), (10.0, 1.3, 19.8), 62)}
+          "gbi_L3_3": ((-23.0, 1.55, 15.0), (12.0, 1.3, 13.0), 62), "gbi_L3_4": ((-24.5, 1.55, 19.5), (10.0, 1.3, 19.8), 62),
+          "gbi_L2_2": ((2.0, 1.6, 14.0), (-4.35, 1.1, 8.0), 62), "gbi_L2_3": ((-18.0, 1.55, 19.0), (18.0, 1.3, 19.0), 62),
+          "gbi_L2_4": ((-11.0, 1.55, 24.0), (-11.0, 1.3, -10.0), 62), "gbi_L1_2": ((-2.0, 1.6, 10.5), (-9.0, 0.8, 0.0), 62),
+          "gbi_L1_3": ((0.0, 1.55, 24.0), (0.0, 1.3, -18.0), 62), "gbi_L1_4": ((-14.0, 1.55, 16.0), (-14.0, 1.3, -12.0), 62),
+          "gbi_B1_2": ((-14.0, 1.6, 20.0), (8.0, 0.3, -2.0), 62), "gbi_B1_3": ((-24.0, 1.55, 6.0), (20.0, 1.3, 6.0), 62),
+          "gbi_B1_4": ((-18.0, 1.6, 16.0), (0.0, 0.3, 3.0), 62)}
 
 
 def shots():

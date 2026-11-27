@@ -21,11 +21,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_gbi_greybox as GB  # noqa: E402
 
-SCENES = ("gbi_L4_1", "gbi_L4_2", "gbi_L4_3", "gbi_L3_2", "gbi_L3_3", "gbi_L3_4")
+SCENES = ("gbi_L4_1", "gbi_L4_2", "gbi_L4_3", "gbi_L3_2", "gbi_L3_3", "gbi_L3_4", "gbi_L2_2", "gbi_L2_3", "gbi_L2_4", "gbi_L1_2", "gbi_L1_3",
+          "gbi_L1_4", "gbi_B1_2", "gbi_B1_3", "gbi_B1_4")
 FRONT = 0.004            # a face is seen if the point this far in front of it is in the air
 # colliders the dressing draws (their art is furniture, not shell); everything else that is not the kit's is shell
-FURNITURE = ("Gondola_", "Island_", "Cash_Desk", "Display_", "Sofa_", "Bed_", "Rack_", "Pallets_", "Plinth_", "Vent_")
-SOLID_FURNITURE = ("Gondola_", "Island_", "Cash_Desk", "Plinth_", "Vent_", "Pallets_", "Bed_")   # their art fills the box: no shell drawn under them
+FURNITURE = ("Gondola_", "Island_", "Cash_Desk", "Display_", "Sofa_", "Bed_", "Rack_", "Pallets_", "Plinth_", "Vent_", "Boxes_", "Desk_",
+             "Core_Table", "Conf_Table", "Pod_")
+SOLID_FURNITURE = ("Gondola_", "Island_", "Cash_Desk", "Plinth_", "Vent_", "Pallets_", "Bed_", "Boxes_", "Pod_Back", "Pod_Side")   # their art fills the box: no shell drawn under them
 
 
 def model(scene):
