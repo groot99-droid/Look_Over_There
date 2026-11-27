@@ -73,7 +73,7 @@ export const FARWAY = {
       // the dreamcore forest and meadow (shared/forest.js): the road from the parking lot, a path north through the trees, then the meadow with the shed and the house.
       // Both are presence scenes: a room's players see each other walk there. The house's door is Right Door, Wrong Exit (solo only); the shed is locked until its addon.
       id: "dreamcore_forest", name: "Dreamcore forest and meadow", status: "built", tone: "dreamcore",
-      scenes: [{id: "forest", floorY: 0, files: ["world/forest.json"], presence: true}, {id: "meadow", floorY: 0, files: ["world/meadow.json"], presence: true}],
+      scenes: [{id: "forest", floorY: 0, files: ["world/forest.json"], presence: true}, {id: "meadow", floorY: 0, files: ["world/meadow.glb", "world/meadow.json"], presence: true}],
     },
     {
       // v0 (session 9): Hallam Row as a blockout street, reached by the bus. Its layout and the day clock are in shared/city.js; world/street.json is made from it by tools/make_street.mjs.
