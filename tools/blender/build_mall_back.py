@@ -1383,7 +1383,7 @@ def scaffold_deck():
 
 def site_stair():
     """The site stair up to the deck: twelve galvanised treads, each its step's box at most 0.2 m deep (so the layout check reads it as a step, not
-    a wall), yellow nosings, passable stringers (decor_), and the handrail on the Stair_Rail box."""
+    a wall), yellow nosings, passable stringers (decor_), and a handrail on each Stair_Rail box (east, and west: Stair_Rail_2)."""
     for i in range(12):
         zf, zb, top = -1.6 - 0.3 * i, -1.9 - 0.3 * i, 0.25 * (i + 1)
 
@@ -1396,14 +1396,14 @@ def site_stair():
         part(f"Stair_Nosing_{i:02d}", "Hazard_Paint", lambda bm, zf=zf, top=top: cube(bm, (-10.98, top, zf - 0.05), (-9.82, top + 0.003, zf - 0.003)), tile=0.4)
     for x0, x1 in ((-11.06, -11.0), (-9.8, -9.74)):
         part("decor_Stair_Stringer", "Steel_Galv", lambda bm, x0=x0, x1=x1: slab_x(bm, [(0.0, -1.35), (2.75, -5.2), (3.0, -5.2), (0.3, -1.6)], x0, x1))
-    X = -9.775
-
-    def rail(bm):
+    def rail(bm, X):
         for z, top in ((-1.65, 1.29), (-3.4, 2.75), (-5.15, 4.05)):
             cyl(bm, (X, 0.0, z), (X, top, z), TUBE, seg=8)
         cyl(bm, (X, 1.25, -1.65), (X, 3.976, -5.15), TUBE, seg=8)
         cyl(bm, (X, 0.75, -1.65), (X, 3.5, -5.15), TUBE, seg=8)
-    part("Stair_Handrail", "Scaffold_Tube", rail)
+    part("Stair_Handrail", "Scaffold_Tube", lambda bm: rail(bm, -9.775))
+    # the west side (Stair_Rail_2, over the 1 m gap to the wall): the same handrail and knee rail, inside the box x -11.05 to -11.0
+    part("Stair_Handrail_W", "Scaffold_Tube", lambda bm: rail(bm, -11.025))
 
 
 def stud_wall():
