@@ -1,0 +1,107 @@
+python tools/blender/build_secretops_greybox.py --check .
+GATE links: 16 pairs inside the area (32 sides, each in its file), 4 that leave it; 36 links in the files, every one accounted for
+GATE graph: every one of the 13 scenes is reached from each of the 3 entries (service_entry, hidden_entry, b2_entry)
+GATE overlaps: 902 colliders in 13 files, 0 pairs share volume
+GATE clearances: 27 corridor and aisle rects, the narrowest 1.80 m (at least 1.6 m), none blocked; 30 doorways, the narrowest 1.00 m (at least 1.0 m) and 2.19 m high or more; ceilings 2.8 to 3.2 m but the spaces marked tall (the dock 4 m, the arena 7 m); steps at most 0.27 m
+GATE arrivals: 36 arrivals, each with at least 2 m clear ahead (the least 3.2 m): side doors into a corridor look along it
+GATE walkable: 199 links, arrivals and spots each on floor a walker (r 0.28 m) can stand on, and in each scene all on one connected piece of it (doors count as open)
+  corridors_a: 6 links; 2 loops round blocks 24.6, 24.6 m long
+  corridors_b: 5 links; 2 loops round blocks 19, 19 m long
+  labs_a: 3 links; 6 loops round blocks 6, 6, 7.8, 7.8, 8, 8 m long
+  labs_b: 3 links; 2 loops round blocks 13, 13 m long
+GATE routes: corridors_a, corridors_b, labs_a, labs_b each have at least 3 links and at least one loop round a block 6 m long or more (a wall, a bench row, a lab), so there is more than one way through
+GATE required: breaker_room: Spot_breaker_*>=3; control_room: Chair_control*>=1, DoorLeaf_cell*>=1, Spot_puzzle_*>=3, Spot_chair_*>=1, Zone_trigger_cell*>=1, Spot_admin_*>=1; registrar_hall: Rack_*>=40, FloorPanel_*>=200, SecCam_*>=12, Spot_breaker_*>=4, CeilingPanel_*>=1, Zone_hazard_pit*>=1, Spot_core_*>=1, Spot_agent_*>=4; checkpoint_1: Spot_reader_*>=1; checkpoint_2: Spot_reader_*>=1; checkpoint_3: Spot_reader_*>=1; service_entry: Zone_water_pool*>=1; the control room has exactly one chair
+GATE panel grid: 200 of 20 x 10 FloorPanel_<x>_<z>, 2 m each, tiling the field x -20 to 20, z -10 to 10 exactly (800 m^2, no gap, no overlap, no other floor in it), tops at y 0, the pit 8 m under
+GATE arena: 48 Rack_<n> (each its own object, standing on panels), cameras on every wall (N 4, S 4, W 2, E 2)
+GATE cameras: 54 SecCam_<nn> in 12 restricted scenes (every restricted scene has them, hidden_entry none), each with its own rig object, pan, tilt and zoom; every one on a circuit a breaker cuts: A 5 scenes, B 2 scenes, C 3 scenes, R1 1 scenes, R2 1 scenes, R3 1 scenes, R4 1 scenes, R5 1 scenes
+GATE shooter: every agent spawn at least 12 m from the arrivals going deeper and 6 m from those coming back; every scene with agents has cover and ammo
+  service_entry: 1 agents, 1 patrol routes, cover 4 full / 2 half, ammo 2, loot 1, longest straight line 26.4 m
+  hidden_entry: 0 agents, 0 patrol routes, cover 0 full / 2 half, ammo 1, loot 2, longest straight line 15.7 m
+  b2_entry: 1 agents, 1 patrol routes, cover 0 full / 2 half, ammo 1, loot 1, longest straight line 32.8 m
+  checkpoint_1: 2 agents, 1 patrol routes, cover 4 full / 5 half, ammo 2, loot 1, longest straight line 23.4 m
+  corridors_a: 3 agents, 1 patrol routes, cover 5 full / 5 half, ammo 2, loot 1, longest straight line 40.2 m
+  labs_a: 2 agents, 1 patrol routes, cover 6 full / 8 half, ammo 2, loot 2, longest straight line 31.4 m
+  breaker_room: 1 agents, 0 patrol routes, cover 2 full / 1 half, ammo 1, loot 1, longest straight line 22.4 m
+  checkpoint_2: 2 agents, 1 patrol routes, cover 1 full / 6 half, ammo 1, loot 1, longest straight line 23.4 m
+  corridors_b: 3 agents, 1 patrol routes, cover 2 full / 2 half, ammo 2, loot 1, longest straight line 43.4 m
+  labs_b: 3 agents, 1 patrol routes, cover 7 full / 4 half, ammo 2, loot 2, longest straight line 35.4 m
+  checkpoint_3: 3 agents, 0 patrol routes, cover 2 full / 3 half, ammo 1, loot 1, longest straight line 25.4 m
+  registrar_hall: 6 agents, 0 patrol routes, cover 48 full / 0 half, ammo 4, loot 1, longest straight line 46.4 m
+  control_room: 1 agents, 0 patrol routes, cover 1 full / 1 half, ammo 1, loot 1, longest straight line 19.6 m
+  spots: admin x1, agent x28, ammo x22, breaker x8, chair x1, core x1, filed x11, locker x1, loot x16, patrol x28, puzzle x3, reader x7
+GATES PASS
+
+node tools/worlddoc.mjs check <the 13 scene files>
+  warning: link checkpoint_1: the manifest has no link from this door yet: a new link to add
+  warning: link freight_lift: the manifest has no link from this door yet: a new link to add
+  warning: link pool_dive: the manifest has no link from this door yet: a new link to add
+OK world/service_entry.json: 50 colliders, 2 doors, 0 markers, 3 links, 2 zones, 9 spots, 0 errors, 3 warnings
+  warning: link corridors_a: the manifest has no link from this door yet: a new link to add
+  warning: link repeating_room: the manifest has no link from this door yet: a new link to add
+OK world/hidden_entry.json: 28 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 2 warnings
+  warning: scene b2_entry is not in the world manifest yet: a new scene to add
+  warning: link checkpoint_1: the manifest has no link from this door yet: a new link to add
+  warning: link laboratory: the manifest has no link from this door yet: a new link to add
+OK world/b2_entry.json: 36 colliders, 3 doors, 0 markers, 2 links, 1 zones, 9 spots, 0 errors, 3 warnings
+  warning: scene checkpoint_1 is not in the world manifest yet: a new scene to add
+  warning: link b2_entry: the manifest has no link from this door yet: a new link to add
+  warning: link corridors_a: the manifest has no link from this door yet: a new link to add
+  warning: link service_entry: the manifest has no link from this door yet: a new link to add
+OK world/checkpoint_1.json: 36 colliders, 4 doors, 0 markers, 3 links, 1 zones, 11 spots, 0 errors, 4 warnings
+  warning: scene corridors_a is not in the world manifest yet: a new scene to add
+  warning: link breaker_room: the manifest has no link from this door yet: a new link to add
+  warning: link checkpoint_1: the manifest has no link from this door yet: a new link to add
+  warning: link checkpoint_2: the manifest has no link from this door yet: a new link to add
+  warning: link hidden_entry: the manifest has no link from this door yet: a new link to add
+  warning: link labs_a_east: the manifest has no link from this door yet: a new link to add
+  warning: link labs_a_west: the manifest has no link from this door yet: a new link to add
+OK world/corridors_a.json: 100 colliders, 8 doors, 0 markers, 6 links, 1 zones, 11 spots, 0 errors, 7 warnings
+  warning: scene labs_a is not in the world manifest yet: a new scene to add
+  warning: link corridors_a_east: the manifest has no link from this door yet: a new link to add
+  warning: link corridors_a_west: the manifest has no link from this door yet: a new link to add
+  warning: link labs_b: the manifest has no link from this door yet: a new link to add
+OK world/labs_a.json: 66 colliders, 3 doors, 0 markers, 3 links, 1 zones, 10 spots, 0 errors, 4 warnings
+  warning: scene breaker_room is not in the world manifest yet: a new scene to add
+  warning: link corridors_a: the manifest has no link from this door yet: a new link to add
+  warning: link corridors_b: the manifest has no link from this door yet: a new link to add
+OK world/breaker_room.json: 25 colliders, 2 doors, 0 markers, 2 links, 1 zones, 8 spots, 0 errors, 3 warnings
+  warning: scene checkpoint_2 is not in the world manifest yet: a new scene to add
+  warning: link corridors_a: the manifest has no link from this door yet: a new link to add
+  warning: link corridors_b: the manifest has no link from this door yet: a new link to add
+OK world/checkpoint_2.json: 41 colliders, 3 doors, 0 markers, 2 links, 1 zones, 10 spots, 0 errors, 3 warnings
+  warning: scene corridors_b is not in the world manifest yet: a new scene to add
+  warning: link breaker_room: the manifest has no link from this door yet: a new link to add
+  warning: link checkpoint_2: the manifest has no link from this door yet: a new link to add
+  warning: link checkpoint_3: the manifest has no link from this door yet: a new link to add
+  warning: link labs_b_east: the manifest has no link from this door yet: a new link to add
+  warning: link labs_b_west: the manifest has no link from this door yet: a new link to add
+OK world/corridors_b.json: 86 colliders, 5 doors, 0 markers, 5 links, 1 zones, 12 spots, 0 errors, 6 warnings
+  warning: scene labs_b is not in the world manifest yet: a new scene to add
+  warning: link corridors_b_east: the manifest has no link from this door yet: a new link to add
+  warning: link corridors_b_west: the manifest has no link from this door yet: a new link to add
+  warning: link labs_a: the manifest has no link from this door yet: a new link to add
+OK world/labs_b.json: 35 colliders, 4 doors, 0 markers, 3 links, 1 zones, 11 spots, 0 errors, 4 warnings
+  warning: scene checkpoint_3 is not in the world manifest yet: a new scene to add
+  warning: link corridors_b: the manifest has no link from this door yet: a new link to add
+  warning: link registrar_hall: the manifest has no link from this door yet: a new link to add
+OK world/checkpoint_3.json: 49 colliders, 6 doors, 0 markers, 2 links, 2 zones, 7 spots, 0 errors, 3 warnings
+  warning: scene registrar_hall is not in the world manifest yet: a new scene to add
+  warning: link checkpoint_3: the manifest has no link from this door yet: a new link to add
+  warning: link control_room: the manifest has no link from this door yet: a new link to add
+OK world/registrar_hall.json: 317 colliders, 2 doors, 0 markers, 2 links, 3 zones, 16 spots, 0 errors, 3 warnings
+  warning: scene control_room is not in the world manifest yet: a new scene to add
+  warning: link registrar_hall: the manifest has no link from this door yet: a new link to add
+OK world/control_room.json: 33 colliders, 2 doors, 0 markers, 1 links, 2 zones, 10 spots, 0 errors, 2 warnings
+exit 0
+
+node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
+
+export check: python tools/blender/build_secretops_greybox.py --check <Blender out> --against <--preview out>
+GATE export: the 13 files match the model's preview to the millimetre: 13 of 13
+GATES PASS
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over the 58 files of this commit and the owner sheet
+  privacy grep: 0 with hits (C:/Windows/Fonts, the sheets' font folder, is allowed)

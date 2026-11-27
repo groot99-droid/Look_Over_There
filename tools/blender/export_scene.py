@@ -11,11 +11,13 @@ The format is the page's (world/L1.json): `scene`, `colliders`, `doors`, `camera
 | `DoorLeaf_<name>` (origin = hinge) | `doors`: {name, level, hinge, width, height, closed_yaw_deg, swing_deg, state, + its other custom properties} |
 | `Marker_<name>` empty, `kind`      | `markers`: {name, room, level, kind, position}                                                       |
 | `Link_<id>` + `Arrive_<id>`        | `links`: {door: <id>, at, arrive, face} (face: the Arrive empty's -Y axis, as game (x, z))          |
-| `SecCam_<nn>`                      | `cameras` (none of the scenes built so far has one)                                                  |
+| `SecCam_<nn>` empty                | `cameras`: {id, level, position, facing_deg, + its custom properties (rig, pan, tilt, zoom, ...)}     |
 | `Zone_<kind>_<name>` mesh          | `zones`: {kind, name, min, max}                                                                      |
 | `Spot_<kind>[_<n>]` empty          | `spots`: {kind, name, position, face, yaw_deg, scale, + the empty's other custom properties}         |
 
-A spot's `face` is its empty's -Y axis as game (x, z), as for Arrive_; `yaw_deg` is the same direction as a three.js rotation.y: a model whose
+A camera's `facing_deg` is its empty's -Y axis as the page's yaw (index.html aimFeed: it looks along (sin, cos) of it), and its custom
+properties may be groups (pan, tilt, zoom) or arrays (view_range_m), written as objects and lists, as in world/L1.json. A mesh named SecCam_
+(its rig, which the page moves and smashes) is art, not a camera. A spot's `face` is its empty's -Y axis as game (x, z), as for Arrive_; `yaw_deg` is the same direction as a three.js rotation.y: a model whose
 front is +z, given `rotation.y = yaw_deg * PI / 180`, faces `face`. `scale` is the empty's custom property `scale` (1 when it has none).
 
 Everything is read from the whole file (any collection); numbers are rounded to the millimetre. It fails on a Link_ without its Arrive_.
@@ -78,6 +80,15 @@ def collect(scene):
             kind = n.split("_")[1]
             mn, mx = _box(ob)
             out["zones"].append({"kind": kind, "name": n, "min": mn, "max": mx})
+        elif n.startswith("SecCam_") and ob.type == "EMPTY":
+            f = facing(ob)
+            c = {"id": n, "level": scene, "position": _g(ob.matrix_world.translation), "facing_deg": round(math.degrees(math.atan2(f[0], f[1])), 1) + 0.0}
+            for k in ob.keys():
+                v = ob[k]
+                v = v.to_dict() if hasattr(v, "to_dict") else v.to_list() if hasattr(v, "to_list") else v
+                if k not in c and isinstance(v, (int, float, str, dict, list)):
+                    c[k] = v
+            out["cameras"].append(c)
         elif n.startswith("Spot_") and ob.type == "EMPTY":
             f = facing(ob)
             sp = {"kind": n.split("_")[1], "name": n, "position": _g(ob.matrix_world.translation), "face": f,
@@ -93,7 +104,7 @@ def write(scene, path=None):
     path = Path(path) if path else ROOT / f"world/{scene}.json"
     d = collect(scene)
     path.write_text(json.dumps(d, indent=1) + "\n")
-    print(f"EXPORT_SCENE {path.name}: {len(d['colliders'])} colliders, {len(d['doors'])} doors, {len(d['markers'])} markers, {len(d['links'])} links, "
+    print(f"EXPORT_SCENE {path.name}: {len(d['colliders'])} colliders, {len(d['doors'])} doors, {len(d['cameras'])} cameras, {len(d['markers'])} markers, {len(d['links'])} links, "
           f"{len(d['zones'])} zones, {len(d['spots'])} spots")
     return d
 

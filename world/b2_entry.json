@@ -1,0 +1,841 @@
+{
+ "scene": "b2_entry",
+ "colliders": [
+  {
+   "s": "Barrier_01",
+   "min": [
+    24.0,
+    0.0,
+    -6.2
+   ],
+   "max": [
+    25.2,
+    1.1,
+    -5.6
+   ]
+  },
+  {
+   "s": "Bench_01",
+   "min": [
+    -3.0,
+    0.0,
+    -9.0
+   ],
+   "max": [
+    3.0,
+    0.45,
+    -8.4
+   ]
+  },
+  {
+   "s": "Bench_02",
+   "min": [
+    -3.0,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    3.0,
+    0.45,
+    -5.4
+   ]
+  },
+  {
+   "s": "Ceiling_001",
+   "min": [
+    -6.0,
+    3.0,
+    -14.0
+   ],
+   "max": [
+    6.0,
+    3.2,
+    -9.0
+   ]
+  },
+  {
+   "s": "Ceiling_002",
+   "min": [
+    22.0,
+    3.0,
+    -12.0
+   ],
+   "max": [
+    28.0,
+    3.2,
+    -9.0
+   ]
+  },
+  {
+   "s": "Ceiling_003",
+   "min": [
+    -6.0,
+    3.0,
+    -9.0
+   ],
+   "max": [
+    28.0,
+    3.2,
+    -6.6
+   ]
+  },
+  {
+   "s": "Ceiling_004",
+   "min": [
+    -6.0,
+    3.0,
+    -6.6
+   ],
+   "max": [
+    6.0,
+    3.2,
+    -3.2
+   ]
+  },
+  {
+   "s": "Ceiling_005",
+   "min": [
+    22.0,
+    3.0,
+    -6.6
+   ],
+   "max": [
+    28.0,
+    3.2,
+    -3.6
+   ]
+  },
+  {
+   "s": "Ceiling_006",
+   "min": [
+    -1.6,
+    2.8,
+    -3.0
+   ],
+   "max": [
+    1.6,
+    3.0,
+    0.0
+   ]
+  },
+  {
+   "s": "Desk_01",
+   "min": [
+    23.0,
+    0.0,
+    -11.8
+   ],
+   "max": [
+    25.5,
+    1.0,
+    -11.0
+   ]
+  },
+  {
+   "s": "Floor_001",
+   "min": [
+    -6.2,
+    -0.3,
+    -14.2
+   ],
+   "max": [
+    6.2,
+    0.0,
+    -9.2
+   ]
+  },
+  {
+   "s": "Floor_002",
+   "min": [
+    21.8,
+    -0.3,
+    -12.2
+   ],
+   "max": [
+    28.2,
+    0.0,
+    -9.2
+   ]
+  },
+  {
+   "s": "Floor_003",
+   "min": [
+    -6.2,
+    -0.3,
+    -9.2
+   ],
+   "max": [
+    28.2,
+    0.0,
+    -6.4
+   ]
+  },
+  {
+   "s": "Floor_004",
+   "min": [
+    -6.2,
+    -0.3,
+    -6.4
+   ],
+   "max": [
+    6.2,
+    0.0,
+    -3.0
+   ]
+  },
+  {
+   "s": "Floor_005",
+   "min": [
+    21.8,
+    -0.3,
+    -6.4
+   ],
+   "max": [
+    28.2,
+    0.0,
+    -3.4
+   ]
+  },
+  {
+   "s": "Floor_006",
+   "min": [
+    -1.8,
+    -0.3,
+    -3.0
+   ],
+   "max": [
+    1.8,
+    0.0,
+    0.2
+   ]
+  },
+  {
+   "s": "Lintel_01",
+   "min": [
+    -0.7,
+    2.3,
+    -3.2
+   ],
+   "max": [
+    0.7,
+    3.0,
+    -3.0
+   ]
+  },
+  {
+   "s": "Lockers_01",
+   "min": [
+    -6.0,
+    0.0,
+    -13.0
+   ],
+   "max": [
+    -5.4,
+    2.0,
+    -4.0
+   ]
+  },
+  {
+   "s": "Lockers_02",
+   "min": [
+    5.4,
+    0.0,
+    -13.6
+   ],
+   "max": [
+    6.0,
+    2.0,
+    -9.6
+   ]
+  },
+  {
+   "s": "Lockers_03",
+   "min": [
+    5.4,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    6.0,
+    2.0,
+    -3.6
+   ]
+  },
+  {
+   "s": "Wall_001",
+   "min": [
+    -6.2,
+    0.0,
+    -14.2
+   ],
+   "max": [
+    6.2,
+    3.0,
+    -14.0
+   ]
+  },
+  {
+   "s": "Wall_002",
+   "min": [
+    -6.2,
+    0.0,
+    -14.0
+   ],
+   "max": [
+    -6.0,
+    3.0,
+    -3.2
+   ]
+  },
+  {
+   "s": "Wall_003",
+   "min": [
+    6.0,
+    0.0,
+    -14.0
+   ],
+   "max": [
+    6.2,
+    3.0,
+    -9.2
+   ]
+  },
+  {
+   "s": "Wall_004",
+   "min": [
+    21.8,
+    0.0,
+    -12.2
+   ],
+   "max": [
+    28.2,
+    3.0,
+    -12.0
+   ]
+  },
+  {
+   "s": "Wall_005",
+   "min": [
+    21.8,
+    0.0,
+    -12.0
+   ],
+   "max": [
+    22.0,
+    3.0,
+    -9.2
+   ]
+  },
+  {
+   "s": "Wall_006",
+   "min": [
+    28.0,
+    0.0,
+    -12.0
+   ],
+   "max": [
+    28.2,
+    3.0,
+    -3.6
+   ]
+  },
+  {
+   "s": "Wall_007",
+   "min": [
+    6.0,
+    0.0,
+    -9.2
+   ],
+   "max": [
+    22.0,
+    3.0,
+    -9.0
+   ]
+  },
+  {
+   "s": "Wall_008",
+   "min": [
+    6.0,
+    0.0,
+    -6.6
+   ],
+   "max": [
+    22.0,
+    3.0,
+    -6.4
+   ]
+  },
+  {
+   "s": "Wall_009",
+   "min": [
+    6.0,
+    0.0,
+    -6.4
+   ],
+   "max": [
+    6.2,
+    3.0,
+    -3.2
+   ]
+  },
+  {
+   "s": "Wall_010",
+   "min": [
+    21.8,
+    0.0,
+    -6.4
+   ],
+   "max": [
+    22.0,
+    3.0,
+    -3.6
+   ]
+  },
+  {
+   "s": "Wall_011",
+   "min": [
+    21.8,
+    0.0,
+    -3.6
+   ],
+   "max": [
+    28.2,
+    3.0,
+    -3.4
+   ]
+  },
+  {
+   "s": "Wall_012",
+   "min": [
+    -6.2,
+    0.0,
+    -3.2
+   ],
+   "max": [
+    -0.7,
+    3.0,
+    -3.0
+   ]
+  },
+  {
+   "s": "Wall_013",
+   "min": [
+    0.7,
+    0.0,
+    -3.2
+   ],
+   "max": [
+    6.2,
+    3.0,
+    -3.0
+   ]
+  },
+  {
+   "s": "Wall_014",
+   "min": [
+    -1.8,
+    0.0,
+    -3.0
+   ],
+   "max": [
+    -1.6,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Wall_015",
+   "min": [
+    1.6,
+    0.0,
+    -3.0
+   ],
+   "max": [
+    1.8,
+    2.8,
+    0.0
+   ]
+  },
+  {
+   "s": "Wall_016",
+   "min": [
+    -1.8,
+    0.0,
+    0.0
+   ],
+   "max": [
+    1.8,
+    2.8,
+    0.2
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_checkpoint_1",
+   "level": "b2_entry",
+   "hinge": [
+    28.0,
+    0.0,
+    -8.27
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "goes_to": "checkpoint_1",
+   "link_door": "checkpoint_1"
+  },
+  {
+   "name": "DoorLeaf_decon",
+   "level": "b2_entry",
+   "hinge": [
+    0.47,
+    0.0,
+    -3.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_laboratory",
+   "level": "b2_entry",
+   "hinge": [
+    0.47,
+    0.0,
+    0.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "goes_to": "lab laboratory (the B2 door)",
+   "link_door": "laboratory"
+  }
+ ],
+ "cameras": [
+  {
+   "id": "SecCam_01",
+   "level": "b2_entry",
+   "position": [
+    0.0,
+    2.65,
+    -13.7
+   ],
+   "facing_deg": 0.0,
+   "rig": "SecCam_01_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.65,
+   "circuit": "A",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.37
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.61
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.23,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_02",
+   "level": "b2_entry",
+   "position": [
+    21.7,
+    2.65,
+    -8.7
+   ],
+   "facing_deg": -90.0,
+   "rig": "SecCam_02_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.65,
+   "circuit": "A",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.74
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.22
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_03",
+   "level": "b2_entry",
+   "position": [
+    27.7,
+    2.65,
+    -11.7
+   ],
+   "facing_deg": -45.0,
+   "rig": "SecCam_03_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.65,
+   "circuit": "A",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.11
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.83
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.69,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  }
+ ],
+ "markers": [],
+ "links": [
+  {
+   "door": "checkpoint_1",
+   "at": [
+    27.3,
+    0.0,
+    -7.8
+   ],
+   "arrive": [
+    26.6,
+    0.0,
+    -7.8
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "laboratory",
+   "at": [
+    0.0,
+    0.0,
+    -0.7
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -1.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "restricted",
+   "name": "Zone_restricted_b2_entry",
+   "min": [
+    -6.0,
+    0.0,
+    -14.0
+   ],
+   "max": [
+    28.0,
+    3.0,
+    0.0
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "agent",
+   "name": "Spot_agent_1",
+   "position": [
+    12.0,
+    0.0,
+    -7.8
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "role": "spawn"
+  },
+  {
+   "kind": "ammo",
+   "name": "Spot_ammo_1",
+   "position": [
+    24.5,
+    0.0,
+    -4.4
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "filed",
+   "name": "Spot_filed_1",
+   "position": [
+    3.6,
+    0.0,
+    -10.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "phase": 2
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1",
+   "position": [
+    -4.8,
+    0.0,
+    -8.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    -4.6,
+    0.0,
+    -13.2
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "patrol",
+   "name": "Spot_patrol_B_1",
+   "position": [
+    -3.5,
+    0.0,
+    -12.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "route": "B",
+   "order": 1,
+   "loop": 1
+  },
+  {
+   "kind": "patrol",
+   "name": "Spot_patrol_B_2",
+   "position": [
+    3.5,
+    0.0,
+    -12.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "route": "B",
+   "order": 2,
+   "loop": 1
+  },
+  {
+   "kind": "patrol",
+   "name": "Spot_patrol_B_3",
+   "position": [
+    3.5,
+    0.0,
+    -7.2
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "route": "B",
+   "order": 3,
+   "loop": 1
+  },
+  {
+   "kind": "patrol",
+   "name": "Spot_patrol_B_4",
+   "position": [
+    -3.5,
+    0.0,
+    -7.2
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "route": "B",
+   "order": 4,
+   "loop": 1
+  }
+ ]
+}
