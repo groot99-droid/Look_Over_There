@@ -9,20 +9,39 @@ This README covers all four scenes. Each scene's folder (`docs/renders/<scene>/`
 
 | File | What it is |
 |---|---|
-| `world/floor_1_lower.glb`, `world/floor_1_upper.glb` | the corridors' art: 2.35 MB / 13 440 triangles / 93 draw calls, and 2.25 MB / 11 900 / 86 |
+| `world/floor_1_lower.glb`, `world/floor_1_upper.glb` | the corridors' art: 2.33 MB / 13 240 triangles / 90 draw calls, and 2.25 MB / 11 900 / 86 (re-baked with the connector kit placed) |
 | `world/rooms/motel_a.glb`, `world/rooms/motel_b.glb` | the rooms' art: 0.95 MB / 1 354 triangles / 26 draw calls, and 0.84 MB / 1 642 / 21 |
 | `world/lightmaps/<scene>_0.webp`, `_1.webp` | two lightmaps per scene (second UV set): `_0` the shell, `_1` everything in it |
 | `world/<scene>.json`, `world/rooms/<layout>.json` | the layout, re-written by `export_scene.py` from the dressed `.blend`: **byte for byte the greybox's** |
-| `blender/scenes/<scene>.blend` | the saved scenes (Git LFS): `Art` (`Props`, and `Arch`: the greybox's boxes in grey, for the layout check and the plan), `Skin` (the shell as seen), `Doors` (the leaves and their numbers), `Layout`, `Lights`, `Bake_Standins`, `Standins` |
+| `blender/scenes/<scene>.blend` | the saved scenes (Git LFS): `Art` (`Props`, and `Arch`: the greybox's boxes in grey, for the layout check and the plan), `Skin` (the shell as seen), `Doors` (the leaves and their numbers), `Layout`, `Lights` (with the kit elevator's lamps), `Bake_Standins` (with the kit elevator's art, lower level), `Standins` |
 | `tools/blender/build_hotel_floor1.py` | the re-runnable build (all four scenes) |
 | `tools/blender/hotel_floor1_skin.py` | pure Python: the shell as seen, the materials of its faces, the dressing slots; `python tools/blender/hotel_floor1_skin.py` prints them |
 | `tools/blender/check_layout.py` | two small extensions (below) |
 
 ## How it is built
 
-- **The layout is the greybox's, unchanged.** The build imports `tools/blender/build_hotel_greybox.py`'s model and makes every `COL_` box, `DoorLeaf_`,
+- **The layout is the greybox's.** The build imports `tools/blender/build_hotel_greybox.py`'s model and makes every `COL_` box, `DoorLeaf_`,
   `Link_`/`Arrive_`, `Marker_` and `Spot_` from it, with the same names and numbers. `export_scene.py` then writes the four layout files again, and
-  they are identical to the greybox's (git shows no change). Nothing was moved, so the greybox script is untouched and its `--check` still passes.
+  they are identical to the greybox's `--preview` (the rooms' are unchanged in git; the corridors' changed only by the kit, below).
+- **The connector kit** (`blender/kit/README.md`) is placed in the greybox's model (`_f1`, with floor 3's `kit_layout()`), as
+  `tools/blender/kit_place.py` places it:
+  - **The elevator** (lower level) at (-20, 0, 0), yaw 90. The kit's car (parked here; the page moves it) and landing replace the greybox's
+    `LiftCar` shell and plain lift door: 8 `Car_*_F1` and 4 `Landing_*_F1` colliders; the kit's door record lands exactly on `DoorLeaf_lift`
+    (hinge (-20, 0, -0.6), `closed_yaw_deg` -90) and keeps the id `lift`, now with `kind: elevator`, `leaves`, `slide_m` and `car`; the spots
+    `Spot_call_1_F1` and `Spot_panel_1_F1`. The kit's own `Link_`, `Arrive_` and `Marker_Landing` are left out: the greybox's `Link_lift`
+    (-19.4, 0, 0), `Arrive_lift` (-18.8, 0, 0) and spawn stay. This scene draws nothing inside the wall's opening (the kit's landing lines it);
+    the kit's art and lamps are appended as bake and still stand-ins only (`Bake_Standins`), never in this GLB.
+  - **The stair door** at every stair door, yaw -90, without the `stair_door_landing` node (the corridor, the stairwell's top landing and the
+    upper landing are the landings): `stairwell` (20, 0, 0) and `stairs_up` (26.6, 3.2, 0) on the lower level, `stairs_down` (20, 0, 0) on the
+    upper. Only the kit's door record is used: 1.04 m by 2.12 m, hinge 0.52 m off the middle (x 20.1 / 26.7, z 0.52), `closed_yaw_deg` 90,
+    `swing_deg` -90, `kind: stair door`. The ids stay the greybox's, so every link still meets. The openings widen from 0.94 m to the kit's
+    1.1 m (`Corridor_Wall_E_*` and `Stairwell_Wall_E_*` rebuilt round 1.1 m holes in `build_hotel_greybox.py`). The leaves are this scene's own
+    `Leaf_Fire` at the kit's size and hinge, in this GLB.
+  - **Two small changes, and why** (as on floor 3): the corridor gate's clear rectangle starts 8 cm in from the west wall, because the kit
+    landing's frame stands 6 cm proud of it; and the call-button spot moves 8 cm toward the corridor's middle (to (-19.55, 0, -0.80)), because
+    the kit's spot is inside a walker's 0.28 m of the north wall in a 2.2 m corridor.
+  - `place_kit()` checks that every layout object `kit_place.py` brings lands where the model has it (the door records, colliders and spots),
+    then removes the kit's copies. `kit_place.py` has floor 3's one-line fix (appended objects start from `matrix_basis`).
 - **The shell is only what can be seen** (`hotel_floor1_skin.py`): every face of a greybox box that looks into the air (the corridor, the door
   openings, the alcoves and closets, the lift car, the stairwell above its steps, a room's parts), cut where other boxes meet it. Walls' backs, slab
   undersides and faces pressed together are never drawn; a door opening needs no cutting, as there is no box behind it. This matters for the rooms:
@@ -48,19 +67,20 @@ This README covers all four scenes. Each scene's folder (`docs/renders/<scene>/`
   north or south, lower or upper, has that same surround, and the south rooms are the same rooms turned half round, so **one bake fits whichever
   door a room sits behind**. The stand-in is never exported.
 - **Toggled materials:** `Lamp_Emit` (the sconce shades, the alcove fittings, the bulkheads, the rooms' lamp shade, dome and bathroom light;
-  emissive 3) and `Emergency_Emit` (the EXIT signs' letters and the lift's floor indicator; emissive 5, red). Both are in the bake as on: if the
+  emissive 3) and `Emergency_Emit` (the EXIT signs' letters; emissive 5, red). The lift's indicator and call button are now the kit's. Both are in the bake as on: if the
   page switches them off, the baked light stays. No `Window_Lit`. `Glass_Clear` (the extinguisher cabinet's glazing) has no lightmap.
 - **Bake:** Cycles on the rented GPU (OptiX), 1024 samples, diffuse direct and indirect, 8 px margin, OIDN. A highlight shoulder rolls the light
   above each map's 70th percentile off toward 2.5 times it (`SHOULDER`), so the sconce scallops and the lamp pools stay soft instead of clipping;
   the white point is the map's 99.5th percentile, and `lightmap_intensity` is pi times it.
 - **Pages are fixed** (`PAGES`): the corridors 2048 + 2048, the rooms 1024 + 1024. The shell's UVs are packed by hand (every shell face is a
-  rectangle, so each is a pixel-aligned island, shelf-packed at the highest density that fits): 69.5 px/m (lower), 79.6 (upper), 75 (rooms). The
-  props are smart-projected and packed: 121, 131, 81 and 73 px/m.
+  rectangle, so each is a pixel-aligned island, shelf-packed at the highest density that fits): 70.6 px/m (lower), 79.6 (upper), 75 (rooms). The
+  props are smart-projected and packed: 121, 130, 81 and 73 px/m. A rectangle packed on its side now gets its UVs on its side too (`rect_uv`
+  wrote a rotated face's two extents swapped, so a tall face could run into the next row; fixed for the kit re-bake, with an assertion).
 
 | Map | Size | Density | `lightmap_intensity` before the gain | WebP |
 |---|---|---|---|---|
-| `floor_1_lower_0` / `_1` | 2048 / 2048 | 69.5 / 121.3 px/m | 2.659 / 2.326 | 205 KB / 668 KB |
-| `floor_1_upper_0` / `_1` | 2048 / 2048 | 79.6 / 130.7 px/m | 3.502 / 2.594 | 165 KB / 655 KB |
+| `floor_1_lower_0` / `_1` | 2048 / 2048 | 70.6 / 120.8 px/m | 2.952 / 2.370 | 222 KB / 644 KB |
+| `floor_1_upper_0` / `_1` | 2048 / 2048 | 79.6 / 130.1 px/m | 3.884 / 2.610 | 199 KB / 655 KB |
 | `motel_a_0` / `_1` | 1024 / 1024 | 75.0 / 81.0 px/m | 4.249 / 3.371 | 31 KB / 107 KB |
 | `motel_b_0` / `_1` | 1024 / 1024 | 75.2 / 72.9 px/m | 2.804 / 2.680 | 37 KB / 104 KB |
 
@@ -68,21 +88,21 @@ This README covers all four scenes. Each scene's folder (`docs/renders/<scene>/`
 
 Measured with `lab_display.py` on the packed GLBs (displayed = texture x base colour x lightmap texel x intensity / pi, no tone mapping). Each
 scene has one **gain** on its lightmap intensities (`caps.json`), found from the uncapped GLB so the big shell surfaces reach p99 0.9 (p90 0.85):
-1.673 (lower), 1.297 (upper), 1.0 (motel_a, held by the bathroom tiles), 1.579 (motel_b). The same file would cap any material over p99 0.97 or
+1.51 (lower), 1.178 (upper) after the kit re-bake (held by the popcorn ceiling's p99), 1.0 (motel_a, held by the bathroom tiles), 1.579 (motel_b). The same file would cap any material over p99 0.97 or
 p90 0.88; after the shoulder none was, so every factor is the gain. Main surfaces:
 
 | Scene | Material | m2 | p50 | p90 | p99 |
 |---|---|---|---|---|---|
-| floor_1_lower | Wall_Upper | 143.1 | 0.241 | 0.648 | 0.819 |
-| | Ceiling_Popcorn | 93.3 | 0.192 | 0.796 | 0.899 |
-| | Carpet_Runner | 88.0 | 0.100 | 0.149 | 0.294 |
-| | Wall_Lower | 74.8 | 0.130 | 0.176 | 0.486 |
-| | Stair_Paint | 67.8 | 0.123 | 0.318 | 0.472 |
-| floor_1_upper | Wall_Upper | 143.1 | 0.205 | 0.617 | 0.819 |
-| | Ceiling_Popcorn | 93.3 | 0.164 | 0.784 | 0.900 |
-| | Carpet_Runner | 88.0 | 0.091 | 0.134 | 0.272 |
-| | Wall_Lower | 77.5 | 0.103 | 0.149 | 0.462 |
-| | Stair_Paint | 17.0 | 0.168 | 0.370 | 0.459 |
+| floor_1_lower | Wall_Upper | 149.9 | 0.215 | 0.640 | 0.815 |
+| | Ceiling_Popcorn | 93.3 | 0.175 | 0.790 | 0.900 |
+| | Carpet_Runner | 88.0 | 0.103 | 0.145 | 0.290 |
+| | Wall_Lower | 67.6 | 0.115 | 0.151 | 0.196 |
+| | Stair_Paint | 67.1 | 0.108 | 0.302 | 0.469 |
+| floor_1_upper | Wall_Upper | 151.5 | 0.182 | 0.613 | 0.821 |
+| | Ceiling_Popcorn | 93.3 | 0.151 | 0.783 | 0.900 |
+| | Carpet_Runner | 88.0 | 0.092 | 0.130 | 0.258 |
+| | Wall_Lower | 68.7 | 0.095 | 0.131 | 0.164 |
+| | Stair_Paint | 16.7 | 0.171 | 0.366 | 0.462 |
 | motel_a | Wall_Room | 52.2 | 0.201 | 0.378 | 0.637 |
 | | Ceiling_Room | 23.7 | 0.247 | 0.615 | 0.848 |
 | | Carpet_Room | 20.3 | 0.091 | 0.153 | 0.215 |
@@ -93,7 +113,10 @@ p90 0.88; after the shoulder none was, so every factor is the gain. Main surface
 
 No material in any scene is over p90 0.9 or p99 0.98; the most clipped is motel_a's Tile_Wall at 0.06 % of its area. The walls read (p50 0.20 to
 0.25) except the corridors' darker lower band below the chair rail (0.10 to 0.13), which is a darker finish on purpose. Carpets are dark by
-design. Some prop materials show p50 0 (Wood_Laminate, Linen_White, Window_Frame) because their measured area includes faces no one sees
+design. The corridors' end walls now take the upper finish above the chair rail (the skin's finish split read the wrong axis as the height
+on x-facing walls, so they were all `Wall_Lower`; fixed for the re-bake), hence the moved areas. The closets' paint (17.7 m2 a level) reads 0:
+the closets are shut and their lights dead, so no light reaches them in the bake (the earlier non-zero reading came from the packing overlap
+above). Some prop materials show p50 0 (Wood_Laminate, Linen_White, Window_Frame) because their measured area includes faces no one sees
 (under the beds' spreads, inside the window recesses).
 
 ## Review stills
@@ -112,13 +135,14 @@ not in the repo.
 
 ## Gates
 
-- `blender -b blender/scenes/<scene>.blend --python tools/blender/check_layout.py -- --scene <scene>`: **PASS 88 of 88** (lower), **63 of 63**
-  (upper), **16 of 16** (motel_a), **17 of 17** (motel_b). Every collider is covered (the shell's boxes by the grey `Arch` twins, whose seen faces
+- `blender -b blender/scenes/<scene>.blend --python tools/blender/check_layout.py -- --scene <scene>`: **PASS 95 of 95** (lower, with the kit),
+  **63 of 63** (upper), **16 of 16** (motel_a), **17 of 17** (motel_b). Every collider is covered (the shell's boxes by the grey `Arch` twins, whose seen faces
   are the skin; the furniture's by the furniture itself), every tall solid stands on a collider, the markers are clear.
 - `python tools/blender/build_hotel_greybox.py --check .`: GATES PASS.
-- `export_scene.py` writes the same four layout files (no diff).
+- `export_scene.py` writes the same four layout files as the greybox's `--preview` (the same JSON content; the corridors' changed in git only
+  by the kit).
 - `node tools/worlddoc.mjs check`: OK, 0 errors on all four (warnings only that the links and room scenes are new to the manifest).
-- `glb_inspect.py --budget tris=300000,mb=8`: pass on all four (2.24, 2.15, 0.91, 0.80 MB as it counts).
+- `glb_inspect.py --budget tris=300000,mb=8`: pass on all four (2.22, 2.15, 0.91, 0.80 MB as it counts).
 - `node --test shared/*.test.js`: 297 pass, 0 fail.
 - Axes: the marker-cube check (`--stage axes`) passes in every scene.
 - Privacy: the GLBs, WebPs, JSON, stills, scripts and `.blend`s hold no user name, local path, session id or e-mail.
@@ -164,19 +188,16 @@ python tools/blender/build_hotel_floor1.py --pack <scene> --work <dir>          
    (`room_x`, 0, `room_z`) turned `room_yaw_deg`, with its lightmaps. Its door wall overlaps the corridor's exactly and draws only the room side.
 3. **Doors:** leaves are nodes `DoorLeaf_<door>`; the numbers `DoorNum_<n>` are their children. The leaves' layout properties are in the JSON, not
    the GLB's extras.
-4. **The lift (floor_1_lower):** the opening in the west wall (x -20.2 to -20, z -0.6 to 0.6, y 0 to 2.2) is clean, with a brushed-steel frame, the
-   call buttons on its north side and a floor indicator over it. `DoorLeaf_lift` is in the layout as before (hinge (-20, 0, -0.6), 1.2 x 2.2 m,
-   `closed_yaw_deg` -90, `kind: elevator`) but has no leaf in the GLB: **the connector kit's elevator doors link in here.** The kit
-   (`claude/blender-hotel-kit`, `blender/kit/README.md`) places its elevator at `at` (-20, 0, 0), `yaw` 90, which lands its door record on this one;
-   it then replaces the greybox's placeholder car (`LiftCar_*` colliders, lined plain dark here as `Lift_Shaft`). `Link_lift` (-19.4, 0, 0) and
-   `Arrive_lift` (-18.8, 0, 0) facing +x stay.
-5. **The stair doors** are the greybox's 0.94 m openings with plain steel fire doors. The kit's stair door (1.1 m) goes at x 20 (`at` (20, 0, 0),
-   `yaw` -90, without its `stair_door_landing` node, the corridor being the landing); that widens the opening, a layout change for the greybox
-   script, so it was left for that step.
+4. **The lift (floor_1_lower):** the connector kit's elevator: draw `world/kit/elevator.glb` at (-20, 0, 0), yaw 90 (its own lightmap
+   `kit_elevator_0`; its car `elevator_car` and leaves `LiftLeaf_L`/`LiftLeaf_R` move as `blender/kit/README.md` says). This GLB draws nothing
+   inside the west wall's opening (the kit's landing lines it). `DoorLeaf_lift` carries the kit's `leaves`, `slide_m` and `car`.
+5. **The stair doors** (`stairwell`, `stairs_up`, `stairs_down`) are 1.1 m openings with this GLB's own `Leaf_Fire` leaves at the kit's size and
+   hinge: do not place `world/kit/stair_door.glb` here. They open onto this scene's own stairwell and landing; if the page draws its lit passage
+   (`buildPassage`) behind every door of `kind: stair door`, it should not behind these.
 
 ## Open
 
 - Not seen in the browser: the page's shading, the leaves swinging and a room loading behind a door are untested.
-- The kit's lift doors and stair door are not placed yet (above).
+- The elevator is seen in the stills only from the far end (`2_wide`); no still frames it close.
 - Only one leaf per kind is baked: the doors next to the corridor's ends and the stairwell's top door show the middle door's light.
 - The room leaves' backs carry light from a stand-in room in the corridor bake, not from the real room behind each door.

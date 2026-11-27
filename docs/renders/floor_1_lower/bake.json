@@ -1,26 +1,26 @@
 {
  "0": {
   "size": 2048,
-  "px_per_m": 69.5,
-  "scale": 0.8464,
-  "knee": 0.37,
+  "px_per_m": 70.6,
+  "scale": 0.9396,
+  "knee": 0.4162,
   "raw_p50_p90_p99_p995_max": [
-   0.218,
-   0.823,
-   2.86,
-   3.733,
-   15.549
+   0.231,
+   0.808,
+   2.831,
+   3.652,
+   15.213
   ],
   "p50_p90_p99_p995_max": [
-   0.218,
-   0.619,
-   0.824,
-   0.846,
-   0.905
+   0.231,
+   0.657,
+   0.912,
+   0.94,
+   1.015
   ],
   "samples": 1024,
   "device": "GPU",
-  "seconds": 67,
+  "seconds": 105,
   "materials": [
    "Carpet_Field",
    "Carpet_Runner",
@@ -28,9 +28,6 @@
    "Closet_Paint",
    "Door_Jamb",
    "Jamb_Steel",
-   "Lift_Ceiling",
-   "Lift_Shaft",
-   "Lift_Steel",
    "Stair_Ceiling",
    "Stair_Concrete",
    "Stair_Paint",
@@ -41,26 +38,26 @@
  },
  "1": {
   "size": 2048,
-  "px_per_m": 121.3,
-  "scale": 0.7405,
-  "knee": 0.2966,
+  "px_per_m": 120.8,
+  "scale": 0.7544,
+  "knee": 0.3022,
   "raw_p50_p90_p99_p995_max": [
-   0.195,
-   0.712,
-   101.679,
-   180.177,
-   2272.698
+   0.199,
+   0.731,
+   107.769,
+   179.207,
+   2071.275
   ],
   "p50_p90_p99_p995_max": [
-   0.195,
-   0.511,
-   0.74,
-   0.74,
-   0.741
+   0.199,
+   0.523,
+   0.754,
+   0.754,
+   0.755
   ],
   "samples": 1024,
   "device": "GPU",
-  "seconds": 72,
+  "seconds": 96,
   "materials": [
    "Brass",
    "Decal_Ceiling",

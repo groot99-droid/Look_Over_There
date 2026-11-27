@@ -36,7 +36,7 @@ OK world/lobby.json: 44 colliders, 3 doors, 1 markers, 2 links, 0 zones, 12 spot
 OK world/atrium.json: 93 colliders, 26 doors, 1 markers, 26 links, 0 zones, 0 spots, 0 errors, 26 warnings
   warning: link lift: the manifest has no link from this door yet: a new link to add
   warning: link stairs_up: the manifest has no link from this door yet: a new link to add
-OK world/floor_1_lower.json: 86 colliders, 15 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 2 warnings
+OK world/floor_1_lower.json: 93 colliders, 15 doors, 1 markers, 2 links, 0 zones, 6 spots, 0 errors, 2 warnings
   warning: link stairs_down: the manifest has no link from this door yet: a new link to add
 OK world/floor_1_upper.json: 61 colliders, 13 doors, 1 markers, 1 links, 0 zones, 4 spots, 0 errors, 1 warnings
   warning: link dining: the manifest has no link from this door yet: a new link to add

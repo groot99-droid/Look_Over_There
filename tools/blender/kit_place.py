@@ -34,7 +34,9 @@ def place(piece, suffix, at, yaw_deg=0.0, art=False, collection=None):
             if coll.name == "Layout" and not base.startswith(PREFIXES):
                 continue
             ob.name = f"{base}_{suffix}"
-            ob.matrix_world = m @ ob.matrix_world
+            # an appended object is in no scene yet, so its matrix_world has not been evaluated (it reads as identity): an empty placed by its
+            # location would land on `at`. Its own transform is matrix_basis (the kit's layout and art objects have no parent).
+            ob.matrix_world = m @ (ob.matrix_basis.copy() if ob.parent is None else ob.matrix_world)
             if base.startswith("DoorLeaf_") and "closed_yaw_deg" in ob.keys():
                 y = (float(ob["closed_yaw_deg"]) + yaw_deg + 180.0) % 360.0 - 180.0
                 ob["closed_yaw_deg"] = round(y, 1)
