@@ -1,0 +1,87 @@
+{
+ "0": {
+  "size": 2048,
+  "px_per_m": 89.0,
+  "scale": 1.1085,
+  "knee": 0.4874,
+  "shoulder": [
+   70.0,
+   2.5
+  ],
+  "raw_p50_p90_p99_p995_max": [
+   0.332,
+   0.723,
+   3.006,
+   4.62,
+   27.646
+  ],
+  "p50_p90_p99_p995_max": [
+   0.332,
+   0.665,
+   1.054,
+   1.109,
+   1.199
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 95,
+  "materials": [
+   "Carpet_Hall",
+   "Ceiling_Hall",
+   "Door_Jamb",
+   "Threshold",
+   "Wainscot",
+   "Wall_Hall"
+  ]
+ },
+ "1": {
+  "size": 2048,
+  "px_per_m": 31.9,
+  "scale": 0.5713,
+  "knee": 0.2295,
+  "shoulder": [
+   70.0,
+   2.5
+  ],
+  "raw_p50_p90_p99_p995_max": [
+   0.08,
+   0.493,
+   11.861,
+   46.899,
+   1995.236
+  ],
+  "p50_p90_p99_p995_max": [
+   0.08,
+   0.379,
+   0.564,
+   0.571,
+   0.574
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 111,
+  "materials": [
+   "Book_Cover",
+   "Brass",
+   "Candle",
+   "Clock_Face",
+   "Decal_Ceiling",
+   "Frame_Gilt",
+   "Glass_Green",
+   "Key_Tag_Red",
+   "Leaf_Brass",
+   "Leaf_Hall",
+   "Leather",
+   "Ledger_Page",
+   "Marble",
+   "Number_Plates",
+   "Picture",
+   "Plastic_Black",
+   "Plastic_White",
+   "Skirting",
+   "Trim_Cream",
+   "Trim_Wood",
+   "Wood_Dark"
+  ]
+ }
+}

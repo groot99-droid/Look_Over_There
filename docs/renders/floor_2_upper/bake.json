@@ -1,0 +1,96 @@
+{
+ "0": {
+  "size": 2048,
+  "px_per_m": 80.5,
+  "scale": 1.2443,
+  "knee": 0.5409,
+  "shoulder": [
+   70.0,
+   2.5
+  ],
+  "raw_p50_p90_p99_p995_max": [
+   0.232,
+   1.1,
+   3.579,
+   5.821,
+   38.433
+  ],
+  "p50_p90_p99_p995_max": [
+   0.232,
+   0.872,
+   1.181,
+   1.244,
+   1.335
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 102,
+  "materials": [
+   "Carpet_Field",
+   "Carpet_Green",
+   "Ceiling_Plaster",
+   "Closet_Paint",
+   "Door_Jamb",
+   "Jamb_Steel",
+   "Stair_Ceiling",
+   "Stair_Concrete",
+   "Stair_Paint",
+   "Threshold",
+   "Wainscot",
+   "Wall_Green"
+  ]
+ },
+ "1": {
+  "size": 2048,
+  "px_per_m": 35.3,
+  "scale": 0.6087,
+  "knee": 0.2438,
+  "shoulder": [
+   70.0,
+   2.5
+  ],
+  "raw_p50_p90_p99_p995_max": [
+   0.114,
+   0.672,
+   83.141,
+   202.452,
+   2831.551
+  ],
+  "p50_p90_p99_p995_max": [
+   0.114,
+   0.441,
+   0.608,
+   0.609,
+   0.609
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 108,
+  "materials": [
+   "Brass",
+   "Decal_Ceiling",
+   "Decal_Floor",
+   "Door_Handle",
+   "Dried_Stems",
+   "Frame_Gilt",
+   "Lamp_Dead",
+   "Leaf_Brass",
+   "Leaf_Card",
+   "Leaf_Closet",
+   "Leaf_Glass",
+   "Leaf_Room",
+   "Mirror",
+   "Picture",
+   "Plastic_Black",
+   "Plastic_White",
+   "Porcelain_Celadon",
+   "Red_Paint",
+   "Skirting",
+   "Stair_Door",
+   "Steel",
+   "Trim_Cream",
+   "Trim_Wood",
+   "Wood_Dark"
+  ]
+ }
+}

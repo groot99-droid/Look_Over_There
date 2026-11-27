@@ -1,0 +1,82 @@
+{
+ "0": {
+  "size": 1024,
+  "px_per_m": 70.0,
+  "scale": 0.8018,
+  "knee": 0.355,
+  "shoulder": [
+   70.0,
+   2.5
+  ],
+  "raw_p50_p90_p99_p995_max": [
+   0.227,
+   0.59,
+   1.926,
+   3.129,
+   22.649
+  ],
+  "p50_p90_p99_p995_max": [
+   0.227,
+   0.518,
+   0.753,
+   0.802,
+   0.875
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 15,
+  "materials": [
+   "Carpet_Room",
+   "Ceiling_Room",
+   "Wall_Room"
+  ]
+ },
+ "1": {
+  "size": 1024,
+  "px_per_m": 47.5,
+  "scale": 0.6313,
+  "knee": 0.2559,
+  "shoulder": [
+   70.0,
+   2.5
+  ],
+  "raw_p50_p90_p99_p995_max": [
+   0.116,
+   0.467,
+   6.501,
+   17.325,
+   657.729
+  ],
+  "p50_p90_p99_p995_max": [
+   0.116,
+   0.392,
+   0.617,
+   0.631,
+   0.639
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 47,
+  "materials": [
+   "Bedspread",
+   "Blotter",
+   "Book_Green",
+   "Brass",
+   "Door_Bath",
+   "Drape",
+   "Drape_Sheer",
+   "Frame_Gilt",
+   "Linen_White",
+   "Paper",
+   "Picture",
+   "Plastic_Black",
+   "Plastic_White",
+   "Skirting",
+   "Trim_Cream",
+   "Velvet_Green",
+   "Window_Frame",
+   "Window_Void",
+   "Wood_Dark"
+  ]
+ }
+}
