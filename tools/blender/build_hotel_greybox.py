@@ -587,6 +587,47 @@ def key_room(sid, title, what):
     return S
 
 
+# ---------------------------------------------------------------- connector-kit pieces in a scene's layout (blender/kit/README.md)
+# The dressed scenes place the kit with tools/blender/kit_place.py, which appends the piece's layout objects moved, turned and given `_<suffix>`.
+# kit_layout() writes the same records into this model from the piece's own layout file (world/kit/<piece>.json), so `--preview` gives the
+# file the dressed scene exports. `doors` renames a kit door to the scene's door id (the scene's link keeps its id); `cols` picks the colliders.
+def kit_point(at, yaw_deg, p):
+    """A kit point (x, y, z) in the scene, for the piece placed at `at`, turned by `yaw_deg` (three.js rotation.y)."""
+    a = math.radians(yaw_deg)
+    c, s = round(math.cos(a), 12), round(math.sin(a), 12)
+    return (at[0] + p[0] * c + p[2] * s, at[1] + p[1], at[2] - p[0] * s + p[2] * c)
+
+
+def kit_face(yaw_deg, f):
+    a = math.radians(yaw_deg)
+    c, s = round(math.cos(a), 12), round(math.sin(a), 12)
+    return (f[0] * c + f[1] * s, -f[0] * s + f[1] * c)
+
+
+def kit_layout(S, piece, suffix, at, yaw_deg, cols=lambda n: True, doors=None, spots=True, zones=True, markers=True, mat="wall"):
+    kit = json.loads((ROOT / f"world/kit/{piece}.json").read_text())
+    for c in kit["colliders"]:
+        if cols(c["s"]):
+            p, q = kit_point(at, yaw_deg, c["min"]), kit_point(at, yaw_deg, c["max"])
+            S.solid(f"{c['s']}_{suffix}", [min(p[i], q[i]) for i in range(3)], [max(p[i], q[i]) for i in range(3)], mat)
+    for d in kit["doors"]:
+        if doors is None or d["name"][len("DoorLeaf_"):] not in doors:
+            continue
+        yaw = (d["closed_yaw_deg"] + yaw_deg + 180.0) % 360.0 - 180.0
+        pr = {"width": d["width"], "height": d["height"], "closed_yaw_deg": round(yaw, 1), "swing_deg": d["swing_deg"], "state": d["state"]}
+        pr.update({k: v for k, v in d.items() if k not in pr and k not in ("name", "level", "hinge")})
+        S.doors.append({"name": S.uniq("DoorLeaf_" + doors[d["name"][len("DoorLeaf_"):]]), "hinge": [float(v) for v in kit_point(at, yaw_deg, d["hinge"])],
+                        "yaw": math.radians(yaw), "props": pr})
+    for sp in kit["spots"] if spots else []:
+        extra = {k: v for k, v in sp.items() if k not in ("kind", "name", "position", "face", "yaw_deg", "scale")}
+        S.empty(f"{sp['name']}_{suffix}", kit_point(at, yaw_deg, sp["position"]), face=kit_face(yaw_deg, sp["face"]), props=extra)
+    for z in kit["zones"] if zones else []:
+        p, q = kit_point(at, yaw_deg, z["min"]), kit_point(at, yaw_deg, z["max"])
+        S.zone(z["kind"], f"{z['name'][len('Zone_' + z['kind'] + '_'):]}_{suffix}", [min(p[i], q[i]) for i in range(3)], [max(p[i], q[i]) for i in range(3)])
+    for m in kit["markers"] if markers else []:
+        S.marker(f"{m['name']}_{suffix}", kit_point(at, yaw_deg, m["position"]), m["kind"])
+
+
 # ---------------------------------------------------------------- the roof
 def roof():
     S = Scene("roof", "Roof", "24 m by 24 m, open sky", mood="peaceful")
@@ -598,24 +639,15 @@ def roof():
     S.solid("Parapet_W", (-a - 0.3, 0.0, -a), (-a, 1.1, a), "parapet")
     S.solid("Parapet_E", (a, 0.0, -a), (a + 0.3, 1.1, a), "parapet")
     S.solid("Stair_Bulkhead", (6.0, 0.0, 6.0), (10.0, 2.8, 10.0), "wall")
-    S.door("floor_3", (6.0, 0.0, 8.0 - DOOR_W / 2), (0, 1), (-1, 0))
+    # the bulkhead's door is the kit's stair door (1.1 m opening, 1.04 m leaf; tools/blender/build_hotel_floor3_roof.py places it): the roof is
+    # its landing, so only its door record comes from the kit; the bulkhead stays one solid box
+    kit_layout(S, "stair_door", "roof_stair", (6.0, 0.0, 8.0), -90.0, cols=lambda n: False, doors={"stair": "floor_3"}, spots=False, zones=False, markers=False)
     S.link("floor_3", (5.4, 0.0, 8.0), (4.8, 0.0, 8.0), (-1, 0), "floor_3 (stairs down)")
     S.marker("Spawn", (4.8, 0.0, 8.0))
     S.label("stair bulkhead", 8.0, 10.8, kind="note")
-    # the safe house (from the kit later): shop, stash, save, crafting, respawn, locker
-    shell(S, "SafeHouse", -11.0, -5.0, -11.0, -6.0, 0.0, 2.8, holes={"S": [(-8.0, 1.0, DOOR_H)]}, fmat="carpet_tan", wmat="safe")
-    box(S, "SH_Counter", -10.8, -9.0, -10.8, -10.2, 0, 1.0, "counter")
-    box(S, "SH_Stash", -6.0, -5.2, -10.8, -10.0, 0, 1.0)
-    box(S, "SH_Bench", -5.8, -5.2, -8.6, -7.0, 0, 0.9)
-    box(S, "SH_Locker", -10.8, -10.3, -7.4, -6.6, 0, 2.0, "lift")
-    S.decor("Respawn_Pad", (-8.6, 0.0, -9.2), (-7.4, 0.04, -8.0), "pad")
-    S.zone("safe", "safe_house", (-11.0, 0.0, -11.0), (-5.0, 2.8, -6.0))
-    S.spot("shop", 1, (-9.9, 0.0, -9.5), face=(0, -1))
-    S.spot("stash", 1, (-5.6, 0.0, -9.4), face=(0, -1))
-    S.spot("save", 1, (-7.0, 0.0, -10.4), face=(0, -1))
-    S.spot("craft", 1, (-6.3, 0.0, -7.8), face=(1, 0))
-    S.spot("respawn", 1, (-8.0, 0.0, -8.6))
-    S.spot("locker", 1, (-9.8, 0.0, -7.0), face=(-1, 0))
+    # the safe house is the kit's (blender/kit/README.md: at (-8, 0, -5.8), yaw 0): its colliders, zone, marker and the six spots (shop, stash,
+    # save, crafting, respawn, locker), where the greybox had them, given the suffix
+    kit_layout(S, "safe_house", "roof", (-8.0, 0.0, -5.8), 0.0, mat="safe")
     S.label("safe house", -8.0, -5.2, kind="note")
     box(S, "HVAC", -3.0, 0.0, 4.0, 6.0, 0, 1.4, "column")
     box(S, "HVAC", 1.0, 3.0, -9.0, -7.0, 0, 1.2, "column")
@@ -867,8 +899,35 @@ def _f2(sid):
 
 def _f3(sid):
     rooms = floor_rooms(301, ["apartment"])
-    return corridor_floor(sid, "Floor 3: the apartments", rooms, "carpet_tan", ("lift", "atrium (floor 3 gallery)"), ("up", "roof", "roof"),
-                          [("alcove", "N", -5.5), ("alcove", "S", -2.5)], "peaceful")
+    S = corridor_floor(sid, "Floor 3: the apartments", rooms, "carpet_tan", ("lift", "atrium (floor 3 gallery)"), ("up", "roof", "roof"),
+                       [("alcove", "N", -5.5), ("alcove", "S", -2.5)], "peaceful")
+    # Dressed (tools/blender/build_hotel_floor3_roof.py) with the connector kit (blender/kit/README.md), as tools/blender/kit_place.py places it:
+    # - the elevator at (-20, 0, 0), yaw 90: the kit's car (parked here; the page moves it) and landing replace the LiftCar shell and the plain lift
+    #   door; the door record keeps the id `lift` (the link's), the kit's own Link_/Arrive_/Marker_ are left out (the greybox's stay);
+    # - the stair door at both stair doors, `stairwell` (20, 0, 0) and `roof` (26.6, 3.2, 0), yaw -90: the corridor and the top landing are the
+    #   landings, and the stairwell is behind the first, so only the kit's door record is used, and each opening widens from 0.94 m to the kit's 1.1 m.
+    drop = ("LiftCar_", "Corridor_Wall_E_", "Stairwell_Wall_E_")
+    gone = {b["name"] for b in S.boxes if b["name"].startswith(drop)} | {"DoorLeaf_lift", "DoorLeaf_stairwell", "DoorLeaf_roof"}
+    S.boxes = [b for b in S.boxes if b["name"] not in gone]
+    S.doors = [d for d in S.doors if d["name"] not in gone]
+    S._names -= gone
+    S.labels = [lb for lb in S.labels if not lb["text"].startswith("lift car")]
+    sw, sh = 1.1, DOOR_H
+    x0, x1, sx1 = -CORR_X, CORR_X, 26.6
+    wall(S, "Corridor_Wall_E", "z", x1, x1 + T, -CORR_Z, CORR_Z, 0.0, CORR_H, [(-sw / 2, sw / 2, 0.0, sh)])
+    wall(S, "Stairwell_Wall_E", "z", sx1, sx1 + T, -1.0, 1.0, 0.0, 6.0, [(-sw / 2, sw / 2, 3.2, 3.2 + sh)])
+    kit_layout(S, "elevator", "F3", (x0, 0.0, 0.0), 90.0, doors={"lift": "lift"}, zones=False, markers=False, mat="lift")
+    kit_layout(S, "stair_door", "F3", (x1, 0.0, 0.0), -90.0, cols=lambda n: False, doors={"stair": "stairwell"}, spots=False, zones=False, markers=False)
+    kit_layout(S, "stair_door", "F3_top", (sx1, 3.2, 0.0), -90.0, cols=lambda n: False, doors={"stair": "roof"}, spots=False, zones=False, markers=False)
+    S.label("elevator (kit)", -21.3, 1.8, kind="note")
+    # the kit's call-button spot stands 0.22 m from the north wall here (the corridor is 2.2 m wide; the kit's landing was drawn for the atrium's
+    # wider galleries), inside a walker's 0.28 m: it moves 8 cm toward the corridor's middle, still beside the button
+    for e in S.empties:
+        if e["name"] == "Spot_call_1_F3":
+            e["pos"][2] = round(e["pos"][2] + 0.08, 3)
+    # the kit landing's frame stands 6 cm proud of the west wall, so the clear corridor starts 8 cm in from it
+    S.corridors[0]["min"][0] = x0 + 0.08
+    return S
 
 
 SCENES = {

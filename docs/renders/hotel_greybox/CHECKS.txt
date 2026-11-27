@@ -58,9 +58,9 @@ OK world/reception.json: 12 colliders, 1 doors, 1 markers, 1 links, 0 zones, 3 s
 OK world/key_room.json: 11 colliders, 1 doors, 1 markers, 1 links, 0 zones, 2 spots, 0 errors, 2 warnings
   warning: link lift: the manifest has no link from this door yet: a new link to add
   warning: link roof: the manifest has no link from this door yet: a new link to add
-OK world/floor_3.json: 72 colliders, 13 doors, 1 markers, 2 links, 0 zones, 2 spots, 0 errors, 2 warnings
+OK world/floor_3.json: 79 colliders, 13 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 2 warnings
   warning: link floor_3: the manifest has no link from this door yet: a new link to add
-OK world/roof.json: 21 colliders, 1 doors, 1 markers, 1 links, 1 zones, 7 spots, 0 errors, 1 warnings
+OK world/roof.json: 22 colliders, 1 doors, 2 markers, 1 links, 1 zones, 7 spots, 0 errors, 1 warnings
   warning: scene sub_pool_01 is not in the world manifest yet: a new scene to add
   warning: link atrium: the manifest has no link from this door yet: a new link to add
   warning: link under_next: the manifest has no link from this door yet: a new link to add
