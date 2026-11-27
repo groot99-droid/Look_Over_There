@@ -1,0 +1,167 @@
+python tools/blender/build_hotel_greybox.py --check .
+GATE links: 47 pairs, 94 sides, 3 that leave the hotel or the scene; 97 links in the files
+GATE steps: 235 step boxes, the highest rise 0.250 m (at most 0.27 m)
+GATE corridors: 421 corridor and passage rects, the narrowest 1.60 m (at least 1.6 m), none blocked
+GATES PASS
+
+node tools/worlddoc.mjs check <the 31 scene files> world/rooms/*.json
+  warning: link street: the manifest has no link from this door yet: a new link to add
+OK world/lobby.json: 44 colliders, 3 doors, 1 markers, 2 links, 0 zones, 12 spots, 0 errors, 1 warnings
+  warning: link escalators_L0: the manifest has no link from this door yet: a new link to add
+  warning: link escalators_L12: the manifest has no link from this door yet: a new link to add
+  warning: link escalators_L4: the manifest has no link from this door yet: a new link to add
+  warning: link escalators_L8: the manifest has no link from this door yet: a new link to add
+  warning: link lift_L0: the manifest has no link from this door yet: a new link to add
+  warning: link lift_L12: the manifest has no link from this door yet: a new link to add
+  warning: link lift_L4: the manifest has no link from this door yet: a new link to add
+  warning: link lift_L8: the manifest has no link from this door yet: a new link to add
+  warning: link lobby: the manifest has no link from this door yet: a new link to add
+  warning: link maze: the manifest has no link from this door yet: a new link to add
+  warning: link maze_exit: the manifest has no link from this door yet: a new link to add
+  warning: link pool_01: the manifest has no link from this door yet: a new link to add
+  warning: link pool_02: the manifest has no link from this door yet: a new link to add
+  warning: link pool_03: the manifest has no link from this door yet: a new link to add
+  warning: link pool_04: the manifest has no link from this door yet: a new link to add
+  warning: link pool_05: the manifest has no link from this door yet: a new link to add
+  warning: link pool_06: the manifest has no link from this door yet: a new link to add
+  warning: link pool_07: the manifest has no link from this door yet: a new link to add
+  warning: link pool_08: the manifest has no link from this door yet: a new link to add
+  warning: link pool_09: the manifest has no link from this door yet: a new link to add
+  warning: link pool_10: the manifest has no link from this door yet: a new link to add
+  warning: link pool_11: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_L0: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_L12: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_L4: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_L8: the manifest has no link from this door yet: a new link to add
+OK world/atrium.json: 93 colliders, 26 doors, 1 markers, 26 links, 0 zones, 0 spots, 0 errors, 26 warnings
+  warning: link lift: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_up: the manifest has no link from this door yet: a new link to add
+OK world/floor_1_lower.json: 86 colliders, 15 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 2 warnings
+  warning: link stairs_down: the manifest has no link from this door yet: a new link to add
+OK world/floor_1_upper.json: 61 colliders, 13 doors, 1 markers, 1 links, 0 zones, 4 spots, 0 errors, 1 warnings
+  warning: link dining: the manifest has no link from this door yet: a new link to add
+  warning: link lift: the manifest has no link from this door yet: a new link to add
+  warning: link reception: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_up: the manifest has no link from this door yet: a new link to add
+OK world/floor_2_lower.json: 90 colliders, 17 doors, 1 markers, 4 links, 0 zones, 4 spots, 0 errors, 4 warnings
+  warning: link key_room: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_down: the manifest has no link from this door yet: a new link to add
+OK world/floor_2_upper.json: 63 colliders, 14 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 2 warnings
+  warning: scene dining is not in the world manifest yet: a new scene to add
+  warning: link floor_2: the manifest has no link from this door yet: a new link to add
+OK world/dining.json: 27 colliders, 1 doors, 1 markers, 1 links, 0 zones, 2 spots, 0 errors, 2 warnings
+  warning: scene reception is not in the world manifest yet: a new scene to add
+  warning: link floor_2: the manifest has no link from this door yet: a new link to add
+OK world/reception.json: 12 colliders, 1 doors, 1 markers, 1 links, 0 zones, 3 spots, 0 errors, 2 warnings
+  warning: scene key_room is not in the world manifest yet: a new scene to add
+  warning: link floor_2: the manifest has no link from this door yet: a new link to add
+OK world/key_room.json: 11 colliders, 1 doors, 1 markers, 1 links, 0 zones, 2 spots, 0 errors, 2 warnings
+  warning: link lift: the manifest has no link from this door yet: a new link to add
+  warning: link roof: the manifest has no link from this door yet: a new link to add
+OK world/floor_3.json: 72 colliders, 13 doors, 1 markers, 2 links, 0 zones, 2 spots, 0 errors, 2 warnings
+  warning: link floor_3: the manifest has no link from this door yet: a new link to add
+OK world/roof.json: 21 colliders, 1 doors, 1 markers, 1 links, 1 zones, 7 spots, 0 errors, 1 warnings
+  warning: scene sub_pool_01 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_01.json: 21 colliders, 1 doors, 1 markers, 2 links, 2 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene sub_pool_02 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_02.json: 31 colliders, 1 doors, 1 markers, 3 links, 1 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_03 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_03.json: 21 colliders, 1 doors, 1 markers, 3 links, 2 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_04 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_04.json: 29 colliders, 1 doors, 1 markers, 3 links, 1 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_05 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_05.json: 21 colliders, 1 doors, 1 markers, 3 links, 2 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_06 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_06.json: 29 colliders, 1 doors, 1 markers, 3 links, 1 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_07 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_07.json: 21 colliders, 1 doors, 1 markers, 3 links, 2 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_08 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_08.json: 28 colliders, 1 doors, 1 markers, 3 links, 1 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_09 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_09.json: 21 colliders, 1 doors, 1 markers, 3 links, 2 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_10 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_next: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_10.json: 28 colliders, 1 doors, 1 markers, 3 links, 1 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene sub_pool_11 is not in the world manifest yet: a new scene to add
+  warning: link atrium: the manifest has no link from this door yet: a new link to add
+  warning: link under_b1: the manifest has no link from this door yet: a new link to add
+  warning: link under_prev: the manifest has no link from this door yet: a new link to add
+OK world/sub_pool_11.json: 21 colliders, 1 doors, 1 markers, 3 links, 2 zones, 1 spots, 0 errors, 4 warnings
+  warning: scene maze_01 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link way_on: the manifest has no link from this door yet: a new link to add
+OK world/maze_01.json: 34 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene maze_02 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link way_on: the manifest has no link from this door yet: a new link to add
+OK world/maze_02.json: 25 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene maze_03 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link way_on: the manifest has no link from this door yet: a new link to add
+OK world/maze_03.json: 39 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene maze_04 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link way_on: the manifest has no link from this door yet: a new link to add
+OK world/maze_04.json: 32 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene maze_05 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link way_on: the manifest has no link from this door yet: a new link to add
+OK world/maze_05.json: 38 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene maze_06 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link way_on: the manifest has no link from this door yet: a new link to add
+OK world/maze_06.json: 32 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene maze_07 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link way_on: the manifest has no link from this door yet: a new link to add
+OK world/maze_07.json: 43 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene escalators is not in the world manifest yet: a new scene to add
+  warning: link atrium_L0: the manifest has no link from this door yet: a new link to add
+  warning: link atrium_L12: the manifest has no link from this door yet: a new link to add
+  warning: link atrium_L4: the manifest has no link from this door yet: a new link to add
+  warning: link atrium_L8: the manifest has no link from this door yet: a new link to add
+OK world/escalators.json: 64 colliders, 4 doors, 1 markers, 4 links, 0 zones, 0 spots, 0 errors, 5 warnings
+  warning: scene other_stairs is not in the world manifest yet: a new scene to add
+  warning: link atrium_L0: the manifest has no link from this door yet: a new link to add
+  warning: link atrium_L12: the manifest has no link from this door yet: a new link to add
+  warning: link atrium_L4: the manifest has no link from this door yet: a new link to add
+  warning: link atrium_L8: the manifest has no link from this door yet: a new link to add
+OK world/other_stairs.json: 66 colliders, 4 doors, 1 markers, 4 links, 0 zones, 0 spots, 0 errors, 5 warnings
+  warning: scene clue_room is not in the world manifest yet: a new scene to add
+OK world/rooms/clue_room.json: 11 colliders, 0 doors, 1 markers, 0 links, 0 zones, 4 spots, 0 errors, 1 warnings
+  warning: scene empty_room is not in the world manifest yet: a new scene to add
+OK world/rooms/empty_room.json: 9 colliders, 0 doors, 1 markers, 0 links, 0 zones, 0 spots, 0 errors, 1 warnings
+  warning: scene green_room is not in the world manifest yet: a new scene to add
+OK world/rooms/green_room.json: 13 colliders, 0 doors, 1 markers, 0 links, 0 zones, 2 spots, 0 errors, 1 warnings
+  warning: scene motel_a is not in the world manifest yet: a new scene to add
+OK world/rooms/motel_a.json: 14 colliders, 0 doors, 1 markers, 0 links, 0 zones, 2 spots, 0 errors, 1 warnings
+  warning: scene motel_b is not in the world manifest yet: a new scene to add
+OK world/rooms/motel_b.json: 15 colliders, 0 doors, 1 markers, 0 links, 0 zones, 3 spots, 0 errors, 1 warnings
