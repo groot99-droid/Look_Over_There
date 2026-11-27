@@ -35,6 +35,8 @@ Plain boxes, to scale, for the Right Door, Wrong Exit rooms: the seven that exis
 | `rdwe_flooded` | A | a corridor 50 m by 5 m, 4 m high (was 34 by 3.2 by 2.9), water over the floor | `arch`: arrival only: out of rdwe_teal2's arch; `frame`: rdwe_changing_rooms; `grate`: rdwe_trampoline (the grate gives way: the fall down the shaft) | 21 colliders, 3 doors; spots: frame x1, photo x1 |
 | `rdwe_trampoline` | A | 30 m by 50 m, 9 m high (one cell was 14 by 28; the page repeats it) | `gods`: the six god rooms (reserved: Nyx, Selene, Hypnos, Morpheus, Oneiros, Thanatos, built elsewhere); `bounce`: rdwe_crossroads; `vent`: arrival only: you fall out of the vent from rdwe_flooded's grate; `glow`: rdwe_grocery (walk to the red glow: the anomaly) | 18 colliders, 2 doors; spots: beacon x1, scuff x1 |
 | `rdwe_grocery` | A | 50 m by 50 m, 5 m high (was 38 by 46 by 4): a maze of shelving, 10 by 10 aisles of 5 m | `entrance`: rdwe_finale (the locked entrance doors open once every room is done); `exit`: rdwe_dining (the loop: you are back at the start); `gods`: arrival only (reserved): the last god room comes out here; `stockroom`: rdwe_vending_room; `glow`: arrival only: from rdwe_trampoline's red glow (the locked doors behind you) | 189 colliders, 4 doors; spots: cart x1, tin x3 |
+| `rdwe_repeating_room` | B | 12 m by 12 m, 3.2 m high; a recess 2 m deep behind a baffle on the east wall | `lift`: rdwe_elevator_lobby (lift 3); `library`: rdwe_melting_library; `again`: this room again: you come back in by the south door (it repeats); `secret_ops`: secret_ops.hidden_entry (rdwe.repeating_room>secret_ops: the one entrance with no clearance) | 31 colliders, 5 doors; spots: change x3, view x1 |
+| `rdwe_finale` | B | 48 m by 44 m, 4.5 m high: a hall and four wings (offices, the house, the server room, the aisles) | `grocery`: arrival only: through the grocery's entrance doors, once the map is complete; `win`: grocery.main_floor (rdwe.finale>grocery: the one ending; opens when every camera is off) | 67 colliders, 2 doors, 10 cameras; spots: agent x6, computer x4, hide x12, seeker x1 |
 
 ## How the rooms connect
 
@@ -46,7 +48,9 @@ Each line is a room and its exits (`door > where it goes`). Pressing F at one si
 - **teal2**: sleep < teal (arrival); arch > flooded (one way)
 - **flooded**: arch < teal2 (arrival); grate > trampoline (one way)
 - **trampoline**: vent < flooded (arrival); glow > grocery (one way); gods > rdwe_nyx, the first god room; the god rooms' own doors decide their order
-- **grocery**: glow < trampoline (arrival); exit > dining (one way); gods > rdwe_thanatos, the last god room, comes out here
+- **grocery**: glow < trampoline (arrival); exit > dining (one way); entrance > finale (one way); gods > rdwe_thanatos, the last god room, comes out here
+- **repeating_room**: again > itself; secret_ops > secret_ops.hidden_entry
+- **finale**: grocery < grocery (arrival); win > grocery.main_floor
 
 ### Every link
 
@@ -59,10 +63,14 @@ Each line is a room and its exits (`door > where it goes`). Pressing F at one si
 | `rdwe_flooded.grate` | `rdwe_trampoline.vent` | one_way | the grate gives way: the fall down the shaft, out of a vent |
 | `rdwe_trampoline.glow` | `rdwe_grocery.glow` | one_way | walk to the red glow: the anomaly |
 | `rdwe_grocery.exit` | `rdwe_dining.loop` | one_way | the EXIT closes the loop: you are back in the dining room |
+| `rdwe_grocery.entrance` | `rdwe_finale.grocery` | one_way | the locked entrance opens once the map is complete: the finale |
 
 Links inside one room, and links that leave the set:
 
+- `rdwe_repeating_room.again` (loop): the north door arrives through the south door: the same room, changed
 - `rdwe_dining.house` (doors): the way in: the dreamcore house's door in the meadow, and the gate on L4; they arrive here, facing the stairs. Manifest: built: forest.house>rdwe and the Overworld gate DoorLeaf_Gate_RDW (both arrive in room dining)
+- `rdwe_finale.win` (doors): grocery.main_floor: the one ending, once every camera is off. Manifest: planned: rdwe.finale>grocery (its `from` names room grocery; the coordinator may move it to rdwe_finale)
+- `rdwe_repeating_room.secret_ops` (gate): secret_ops.hidden_entry: the one entrance with no clearance. Manifest: planned: rdwe.repeating_room>secret_ops
 - `rdwe_trampoline.gods` (doors): rdwe_nyx, the first god room; the god rooms' own doors decide their order. Manifest: reserved: the six god rooms (chapters H to M, built elsewhere)
 - `rdwe_grocery.gods` (doors): rdwe_thanatos, the last god room, comes out here. Manifest: reserved: the arrival from the last god room
 

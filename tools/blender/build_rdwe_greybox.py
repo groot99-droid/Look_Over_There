@@ -1566,10 +1566,13 @@ def check(base, ids=None):
             for t in outs:
                 back[t].add(s)
         r2 = reach("rdwe_dining", back)
-        if built - r1:
+        full = set(ids) >= set(PHASE_A + PHASE_B + PHASE_C)
+        if built - r1 and full:
             bad.append(f"not reachable from rdwe_dining: {sorted(built - r1)}")
+        elif built - r1:
+            print(f"  not reachable yet (their doors lead to rooms of a later phase): {', '.join(sorted(built - r1))}")
         stuck = sorted(built - r2 - {"rdwe_finale"})
-        if stuck and set(ids) >= set(PHASE_A + PHASE_B + PHASE_C):
+        if stuck and full:
             bad.append(f"no way back to rdwe_dining from: {stuck}")
         elif stuck:
             print(f"  no way back yet (their other doors are in a later phase): {', '.join(stuck)}")
