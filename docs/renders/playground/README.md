@@ -15,7 +15,7 @@ The Overworld's playground (`docs/BLENDER_AREAS.md` section 4: "Real equipment, 
 ## What is in it
 
 - **The ground:** a sunny lawn (generated grass texture, tinted), the sandy path east to west, a red rubber safety pad under each piece, sand in the sandbox.
-- **The hedges** round the edge, with a round-edged top; an arch over each gap (east to the lot, west to the tree house) with a PLAYGROUND sign on both faces. The arch's posts stand inside the hedge.
+- **The hedges** round the edge, with a round-edged top; an arch over each gap (east to the lot, west to the tree house) with a PLAYGROUND sign on both faces. The arch's posts stand inside the hedge. The south gap (x -3 to 3, added with the sports courts) has the same arch, its sign reading SPORTS on the playground's side and PLAYGROUND on the other.
 - **The eight pieces**, built on the greybox's boxes: round steel posts and bars wherever the greybox has a thin box (the swing frame, the monkey bars' rails and uprights, the climbing frame, the lamp posts, the kiosk-style rails), plastic plates with softened edges, a guard rail of three bars on the slide's platform, yellow side rails down the chute, treads on the ladders and steps.
 - **The moving parts** (table below): rubber swing seats on round chains, the seesaw's plank and handles, the merry-go-round as a round deck with a red top ring, its handrails and a ring rail, the spring riders as a horse, a duck and a bee (body, head, handle, seat) on a steel coil spring, the sandbox digger's seat and arm, the climbing frame's ship's wheel.
 - **Along the path:** a low white picket fence each side (gates opposite each piece and the facades), four slatted benches with steel legs, a green bin at the end of each bench, four lamp posts with round lamp heads (`Lamp_Emit`), hopscotch and a painted line of dots on the path.
@@ -50,7 +50,7 @@ Baked in Cycles on the rented GPU (`--samples 256`), Cycles' AO bake, OIDN-denoi
 | Map | Size | What | AO distance | px/m | AO p10 / p50 / p90 |
 |---|---|---|---|---|---|
 | `playground_0` | 2048 | the lawn and its skirt, the path, the pads, the sand, the soil of the beds, the hedges | 1.5 m | 16.9 | 0.04 / 1.00 / 1.00 |
-| `playground_1` | 2048 | everything standing: equipment, fence, benches, bins, lamps' posts, facades, signs, arches | 0.8 m | 19.1 | 0.04 / 0.56 / 1.00 |
+| `playground_1` | 2048 | everything standing: equipment, fence, benches, bins, lamps' posts, facades, signs, arches | 0.8 m | 19.0 | 0.03 / 0.56 / 1.00 |
 
 The undersides of boxes standing on the ground are dropped before the bake (never seen).
 
@@ -60,49 +60,53 @@ AO-only materials are lit by the page, so the table gives what each shows under 
 
 ```
 material                m2           map       k    p50    p90    p99     >=1
-Grass               8430.4  playground_0  1.0000  0.535  0.574  0.601   0.00%
-Hedge               1542.7  playground_0  1.0000  0.256  0.301  0.326   0.00%
-Path                 400.0  playground_0  1.0000  0.685  0.705  0.721   0.00%
+Grass               8430.4  playground_0  1.0000  0.535  0.574  0.603   0.00%
+Hedge               1519.6  playground_0  1.0000  0.256  0.302  0.326   0.00%
+Path                 400.0  playground_0  1.0000  0.687  0.708  0.721   0.00%
 Facade               228.4  playground_1  1.0000  0.764  0.787  0.794   0.00%
 Rubber               220.2  playground_0  1.0000  0.548  0.582  0.598   0.00%
-Fence_White          214.4  playground_1  1.0000  0.494  0.777  0.820   0.00%
+Fence_White          214.4  playground_1  1.0000  0.494  0.784  0.820   0.00%
+Steel                 53.1  playground_1  1.0000  0.553  0.580  0.580   0.00%
 Soil                  49.7  playground_0  1.0000  0.256  0.278  0.288   0.00%
-Steel                 46.2  playground_1  1.0000  0.553  0.580  0.580   0.00%
 Timber                44.3  playground_1  1.0000  0.541  0.609  0.629   0.00%
-Plastic_White         32.6  playground_1  1.0000  0.540  0.756  0.820   0.00%
+Plastic_White         32.6  playground_1  1.0000  0.543  0.756  0.820   0.00%
 Sand                  31.4  playground_0  1.0000  0.745  0.792  0.814   0.00%
-Signs                 22.2  playground_1  1.0000  0.608  0.799  0.807   0.00%
-Plastic_Blue          14.6  playground_1  1.0000  0.593  0.778  0.800   0.00%
+Signs                 29.3  playground_1  1.0000  0.617  0.799  0.823   0.00%
+Plastic_Blue          14.6  playground_1  1.0000  0.584  0.778  0.797   0.00%
 Window                12.3  playground_1  1.0000  0.360  0.360  0.360   0.00%
-Plastic_Green         12.1  playground_1  1.0000  0.579  0.620  0.620   0.00%
+Plastic_Green         12.1  playground_1  1.0000  0.584  0.620  0.620   0.00%
 Fake_Door              6.4  playground_1  1.0000  0.420  0.420  0.420   0.00%
-Plastic_Yellow         6.0  playground_1  1.0000  0.723  0.827  0.850   0.00%
-Bin_Green              5.7  playground_1  1.0000  0.361  0.412  0.417   0.00%
-Awning_E               2.2  playground_1  1.0000  0.377  0.687  0.793   0.00%
-Plastic_Red            0.9  playground_1  1.0000  0.518  0.762  0.793   0.00%
+Plastic_Yellow         6.0  playground_1  1.0000  0.710  0.840  0.850   0.00%
+Bin_Green              5.7  playground_1  1.0000  0.359  0.412  0.417   0.00%
+Awning_E               2.2  playground_1  1.0000  0.400  0.693  0.803   0.00%
+Plastic_Red            0.9  playground_1  1.0000  0.558  0.769  0.794   0.00%
 ```
 
 Nothing reaches 1; the hedges (the walls of this scene) read p50 0.26, over 0.15. The full table is `brightness.txt`.
 
+## The south gap to the sports courts (added after the first dressing)
+
+The owner asked for a basketball court, a tennis court and a racetrack beside the playground. They are their own scenes (`sports`, `racetrack`, `docs/renders/sports/`), reached through a new 6 m gap in the playground's south hedge, opposite the fence's gate at x 0: `Link_sports` at (0, 0, 38.6), `Arrive_sports` at (0, 0, 35.4) facing north, the corridor `gap_S` (x -2.5 to 2.5, z 33 to 39.2). The south hedge is now two boxes (`Hedge_S_1`, `Hedge_S_2`) either side of the gap; nothing else in the layout moved. The dressing adds the gap's arch, keeps the flowers out of the gap, and was re-run and re-baked (the same script and settings; the flowers along the hedges after the first one skipped shift a little, as the random draws move on).
+
 ## The layout
 
-`world/playground.json` is written by `export_scene.py` from the `.blend` and is equal (parsed) to `build_overworld_greybox.py --preview`'s. It changed from the greybox's on purpose, and only by additions: the dressing's low fence (`Fence_N_1` to `Fence_N_6`, `Fence_S_1` to `Fence_S_6`: 0.8 m high, 0.1 m thick, along z = +-5.6 from x -44 to 44, with 3 m gates opposite each piece at x -36, -12, 12, 36 and the facades at x 0) and four bins (`Bin_1` to `Bin_4`, 0.5 x 0.9 x 0.5 m, at the west end of each bench). They are solid things you cannot walk through, and every visible solid needs its `COL_` box (`docs/BLENDER_AREAS.md`, the collision rules), so they are added in the greybox script (`FENCE_*`, `fence_runs()`, `playground()`) and the layout re-exported. Nothing that was there moved: colliders, links, spots, the corridors and every piece's clear ground are as before; the greybox's gates still pass (the fence keeps out of every clear ground and the path's corridor). 107 colliders (91 before), 2 links, 14 spots.
+`world/playground.json` is written by `export_scene.py` from the `.blend` and is equal (parsed) to `build_overworld_greybox.py --preview`'s. It changed from the greybox's on purpose, and only by additions: the dressing's low fence (`Fence_N_1` to `Fence_N_6`, `Fence_S_1` to `Fence_S_6`: 0.8 m high, 0.1 m thick, along z = +-5.6 from x -44 to 44, with 3 m gates opposite each piece at x -36, -12, 12, 36 and the facades at x 0) and four bins (`Bin_1` to `Bin_4`, 0.5 x 0.9 x 0.5 m, at the west end of each bench). They are solid things you cannot walk through, and every visible solid needs its `COL_` box (`docs/BLENDER_AREAS.md`, the collision rules), so they are added in the greybox script (`FENCE_*`, `fence_runs()`, `playground()`) and the layout re-exported. Nothing that was there moved: colliders, links, spots, the corridors and every piece's clear ground are as before; the greybox's gates still pass (the fence keeps out of every clear ground and the path's corridor). 108 colliders (91 in the greybox, 107 after the fence and bins, 108 with the south hedge in two), 3 links (lot, tree_house, sports), 14 spots.
 
 ## Checks
 
-- Layout check (`check_layout.py`, run inside the art stage on `Art`, the `Play` collection skipped: the moving parts have no collider by design; the CLEAR points are the two links' `at` and `arrive`): **PASS, 108 of 108** (103 COVER, 1 STRAY: every tall solid over a collider, 4 CLEAR). Two shapes follow the check's rules: the steps that start 0.5 m or more above the ground are 19 cm treads under the step's top, and the slide platform's guard rails are three bars, so no solid piece under head height floats without a standing collider.
+- Layout check (`check_layout.py`, run inside the art stage on `Art`, the `Play` collection skipped: the moving parts have no collider by design; the CLEAR points are the two links' `at` and `arrive`): **PASS, 111 of 111** (104 COVER, 1 STRAY: every tall solid over a collider, 6 CLEAR). Two shapes follow the check's rules: the steps that start 0.5 m or more above the ground are 19 cm treads under the step's top, and the slide platform's guard rails are three bars, so no solid piece under head height floats without a standing collider.
 - `python tools/blender/build_overworld_greybox.py --check . --glb world`: **GATES PASS**, including "moving parts: 10 of 10 Play_<equipment>_<part> nodes in playground.glb on their pivots".
-- `node tools/worlddoc.mjs check world/playground.json`: **OK**, 107 colliders, 2 links, 14 spots, 0 errors, 4 warnings (the scene is 102 m by 78 m; the two links are new to the manifest; all as for the greybox).
-- `glb_inspect.py world/playground.glb --budget tris=300000,mb=8`: **pass**, 78,094 triangles, 4.11 MB (4.31 MB on disk), 35 materials, 52 draw calls (primitives).
+- `node tools/worlddoc.mjs check world/playground.json`: **OK**, 108 colliders, 3 links, 14 spots, 0 errors, 5 warnings (the scene is 102 m by 78 m; the three links are new to the manifest).
+- `glb_inspect.py world/playground.glb --budget tris=300000,mb=8`: **pass**, 78,300 triangles, 4.14 MB (4.34 MB on disk), 35 materials, 39 meshes.
 - `node --test shared/*.test.js`: 297 of 297 pass.
-- Privacy grep over the committed files (the `.blend` decompressed): clean (two hits of the bytes `C:/` inside compressed WebP/PNG data, not text).
+- Privacy grep over the committed files (the `.blend` decompressed): clean.
 
 ## Sources and licences
 
-No third-party asset is used. The textures (grass, path, paving, wood grain, hedge, plaster, the sign atlas and its 5 x 7 pixel font) are generated by `build_overworld_play.py --stage textures` (numpy), own work, under the repository's licence. Every model is built by the same script from boxes, cylinders, spheres and tubes.
+No third-party asset is used. The sign atlas (`signs.png`) gained six rows for the sports courts and the racetrack (SPORTS, RACETRACK, TENNIS, BASKETBALL, FINISH, PITS); its first nine rows are unchanged. The textures (grass, path, paving, wood grain, hedge, plaster, the sign atlas and its 5 x 7 pixel font) are generated by `build_overworld_play.py --stage textures` (numpy), own work, under the repository's licence. Every model is built by the same script from boxes, cylinders, spheres and tubes.
 
 ## Open
 
-- The coordinator wires the manifest; the playground's two links are the greybox's.
+- The coordinator wires the manifest; the playground's three links are the greybox's (`sports` is new: overworld.playground>sports and overworld.sports>playground).
 - The moving parts are at rest in the GLB; the page animates them from their `extras` (axis, motion, range).
 - The scene is 102 m by 78 m, over worlddoc's 60 m advice, as in the greybox.

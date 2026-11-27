@@ -183,9 +183,11 @@ F57 = {
     "Y": "10001 10001 01010 00100 00100 00100 00100", "-": "00000 00000 00000 11111 00000 00000 00000",
     " ": "00000 00000 00000 00000 00000 00000 00000",
 }
-SIGNS = ["WEAPONS", "GEAR", "FOOD", "KEYCARDS", "COSMETICS", "BUY-BACK", "MORE TO COME", "PLAYGROUND", "MARKET"]   # rows of 1024 x 128 (16 in all)
+SIGNS = ["WEAPONS", "GEAR", "FOOD", "KEYCARDS", "COSMETICS", "BUY-BACK", "MORE TO COME", "PLAYGROUND", "MARKET",   # rows of 1024 x 128 (16 in all)
+         "SPORTS", "RACETRACK", "TENNIS", "BASKETBALL", "FINISH", "PITS"]               # rows 9 to 14: the sports courts and the racetrack
 SIGN_COL = [(0.80, 0.16, 0.14), (0.14, 0.34, 0.74), (0.86, 0.58, 0.08), (0.44, 0.22, 0.62), (0.86, 0.36, 0.56), (0.16, 0.56, 0.42),
-            (0.10, 0.10, 0.12), (0.14, 0.50, 0.30), (0.80, 0.22, 0.30)]
+            (0.10, 0.10, 0.12), (0.14, 0.50, 0.30), (0.80, 0.22, 0.30),
+            (0.14, 0.34, 0.74), (0.80, 0.16, 0.14), (0.14, 0.50, 0.30), (0.86, 0.40, 0.08), (0.10, 0.10, 0.12), (0.10, 0.10, 0.12)]
 
 
 def text_mask(text, h, w, fill=0.62, maxw=0.9):
@@ -979,6 +981,7 @@ def extras():
             flower_bed(k, x, z)
         arch("E", G.PX + 0.6, "PLAYGROUND")
         arch("W", -G.PX - 0.6, "PLAYGROUND")
+        arch_x("S", G.PZ + 0.6, "SPORTS", "PLAYGROUND")
     else:
         arch("W", -G.MX - 0.6, "MARKET")
     flowers()
@@ -995,6 +998,20 @@ def arch(side, xc, text):
     finish(f"Arch_{side}_beam", bm, "Steel")
     sign_obj(f"Arch_{side}_sign_in", (xc - 0.04, 2.92, -2.6), (xc, 3.52, 2.6), text, (-1, 0, 0) if xc > 0 else (1, 0, 0))
     sign_obj(f"Arch_{side}_sign_out", (xc, 2.92, -2.6), (xc + 0.04, 3.52, 2.6), text, (1, 0, 0) if xc > 0 else (-1, 0, 0))
+
+
+def arch_x(side, zc, text_in, text_out, x0=0.0):
+    """arch() over a 6 m gap in a north or south hedge (the gap along x, centred on x0): text_in faces into the scene, text_out out of it."""
+    for k, xc in enumerate((x0 - 3.1, x0 + 3.1), 1):
+        bm = bmesh.new()
+        cyl(bm, (xc, 0.0, zc), (xc, 2.95, zc), 0.08, seg=12)
+        finish(f"Arch_{side}_post_{k}", bm, "Steel", smooth=True)
+    bm = bmesh.new()
+    cube(bm, (x0 - 3.18, 2.75, zc - 0.08), (x0 + 3.18, 2.9, zc + 0.08))
+    finish(f"Arch_{side}_beam", bm, "Steel")
+    sg = 1 if zc > 0 else -1                                   # the side the hedge is on: +z for the south hedge
+    sign_obj(f"Arch_{side}_sign_in", (x0 - 2.6, 2.92, min(zc, zc - sg * 0.04)), (x0 + 2.6, 3.52, max(zc, zc - sg * 0.04)), text_in, (0, 0, -sg))
+    sign_obj(f"Arch_{side}_sign_out", (x0 - 2.6, 2.92, min(zc, zc + sg * 0.04)), (x0 + 2.6, 3.52, max(zc, zc + sg * 0.04)), text_out, (0, 0, sg))
 
 
 def flower_bed(k, x, z, r=1.6):
@@ -1030,6 +1047,8 @@ def flowers():
         x, z = ((t * (X - 2), -Z + 0.5) if side == 0 else (t * (X - 2), Z - 0.5) if side == 1 else (-X + 0.5, t * (Z - 2)) if side == 2
                 else (X - 0.5, t * (Z - 2)))
         if abs(z) < 4.5 and abs(x) > X - 2:
+            continue
+        if SCENE == "playground" and z > Z - 2 and abs(x) < 4.5:        # the south gap to the sports courts
             continue
         if any(math.hypot(x - p[0], z - p[2]) < 1.6 for p in keep):
             continue

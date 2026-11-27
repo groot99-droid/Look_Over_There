@@ -53,6 +53,10 @@ MATS = {                    # flat greybox colours (linear RGB); no textures. Th
     "awning_a": (0.85, 0.25, 0.25), "awning_b": (0.20, 0.45, 0.85), "awning_c": (0.95, 0.70, 0.15), "awning_d": (0.55, 0.30, 0.75),
     "awning_e": (0.95, 0.45, 0.70), "awning_f": (0.25, 0.70, 0.55), "facade": (0.80, 0.74, 0.66), "fake_door": (0.40, 0.28, 0.20),
     "window": (0.35, 0.50, 0.62), "lamp": (0.95, 0.95, 0.80), "store": (0.74, 0.74, 0.72), "line": (0.95, 0.85, 0.20),
+    # the sports courts and the racetrack
+    "court_green": (0.18, 0.42, 0.24), "court_blue": (0.12, 0.28, 0.58), "court_orange": (0.72, 0.34, 0.16), "chainlink": (0.55, 0.57, 0.58),
+    "net": (0.08, 0.08, 0.09), "rail_green": (0.10, 0.36, 0.22), "concrete": (0.62, 0.62, 0.60), "tyre": (0.06, 0.06, 0.06),
+    "curb_red": (0.80, 0.10, 0.08), "curb_white": (0.90, 0.90, 0.88),
 }
 
 
@@ -659,7 +663,8 @@ def eq_climbing_frame(S):
 def playground():
     S = Scene("playground", "The playground: real equipment, each piece a mini-game that pays", "100 m by 76 m inside its hedge: eight pieces of "
               "equipment, each on its own clear ground, either side of a path", mood="dreamcore, too bright")
-    grounds(S, "Playground", -PX, PX, -PZ, PZ, mat="grass", gaps={"E": [(0.0, 6.0)], "W": [(0.0, 6.0)]})
+    # the south gap (x -3 to 3) leads to the sports courts (sports()); it was added with them, nothing else moved
+    grounds(S, "Playground", -PX, PX, -PZ, PZ, mat="grass", gaps={"E": [(0.0, 6.0)], "W": [(0.0, 6.0)], "S": [(0.0, 6.0)]})
     S.decor("Path", (-PX, 0.0, -2.0), (PX, 0.01, 2.0), "path")
     for fn in (eq_swing, eq_slide, eq_seesaw, eq_merry_go_round, eq_monkey_bars, eq_sandbox, eq_spring_riders, eq_climbing_frame):
         fn(S)
@@ -683,12 +688,253 @@ def playground():
     keeper(S, 3, (26.0, 0.0, PZ - 0.5), (0, 1), "watches")
     walk_gap(S, "lot", "E", 0.0, PX, "parking_lot (the lot's west edge)", -1)
     walk_gap(S, "tree_house", "W", 0.0, -PX, "tree_house (the path west)", 1)
+    walk_gap(S, "sports", "S", 0.0, PZ, "sports (the courts, through the south gap)", -1)
     S.label("to the parking lot", 44.0, 4.4, kind="note")
     S.label("to the tree house", -44.0, 4.4, kind="note")
+    S.label("to the sports courts", 4.6, PZ - 3.0, kind="note")
     S.corridor("path", -46.0, 46.0, -2.0, 2.0)
     S.corridor("gap_E", 45.0, 51.2, -2.5, 2.5)
     S.corridor("gap_W", -51.2, -45.0, -2.5, 2.5)
+    S.corridor("gap_S", -2.5, 2.5, 33.0, 39.2)
     S.still = ((46.0, 0.0, 1.0), (-1.0, -0.32), -3)
+    return S
+
+
+# ---------------------------------------------------------------- sports: a basketball court and a tennis court, through the playground's south gap
+SPX, SPZ = 30.0, 24.0
+TEN_X, TEN_L, TEN_W, TEN_SW = -14.0, 23.77, 10.97, 8.23       # the tennis court's centre x, its doubles length and width, the singles width
+TEN_FX, TEN_FZ, TEN_FH = 9.145, 18.29, 3.6                     # its chain-link fence: 18.29 m by 36.58 m (the run-off), 3.6 m high
+TEN_POST = TEN_W / 2 + 0.914                                   # the net posts, 0.914 m outside the doubles sidelines
+TEN_GATE = (4.7, 6.3)                                          # the gate in the fence's east side (z)
+BAS_X, BAS_L, BAS_W, BAS_RUN = 14.0, 28.0, 15.0, 2.0           # the basketball court (FIBA, 28 m by 15 m) and its run-off
+BAS_FENCE = (4.0, 24.0, -16.5, 16.5, 1.0)                     # its low fence: x0, x1, z0, z1, height
+BAS_GATE = (-10.0, -8.0)                                       # the gate in the low fence's west side (z)
+BAS_BOARD_Z, BAS_HOOP_Z, BAS_POLE_Z = 12.8, 12.425, 15.1       # the backboards' faces, the rings' centres and the poles (z, either end)
+
+
+def sports():
+    S = Scene("sports", "The sports courts: a basketball court and a tennis court", "60 m by 48 m inside its hedge: a full basketball court "
+              "(28 m by 15 m) behind a low fence and a tennis court (23.77 m by 10.97 m) in a tall chain-link fence, either side of a path",
+              mood="liminal: empty, seemingly normal")
+    grounds(S, "Sports", -SPX, SPX, -SPZ, SPZ, mat="grass", gaps={"N": [(0.0, 6.0)], "S": [(0.0, 6.0)]})
+    S.decor("Path", (-1.5, 0.0, -SPZ), (1.5, 0.01, SPZ), "path")
+    # the tennis court: its surround (the run-off) and the court, the net on two posts, the fence with a gate, the umpire's chair, two benches
+    cx = TEN_X
+    S.decor("Tennis_Surround", (cx - TEN_FX, 0.0, -TEN_FZ), (cx + TEN_FX, 0.01, TEN_FZ), "court_green")
+    S.decor("Tennis_Court", (cx - TEN_W / 2, 0.0, -TEN_L / 2), (cx + TEN_W / 2, 0.014, TEN_L / 2), "court_blue")
+    hw = 0.04
+    fx0, fx1 = cx - TEN_FX, cx + TEN_FX
+    wall(S, "Tennis_Fence_N", "x", -TEN_FZ - hw, -TEN_FZ + hw, fx0 - hw, fx1 + hw, 0.0, TEN_FH, mat="chainlink")
+    wall(S, "Tennis_Fence_S", "x", TEN_FZ - hw, TEN_FZ + hw, fx0 - hw, fx1 + hw, 0.0, TEN_FH, mat="chainlink")
+    wall(S, "Tennis_Fence_W", "z", fx0 - hw, fx0 + hw, -TEN_FZ + hw, TEN_FZ - hw, 0.0, TEN_FH, mat="chainlink")
+    wall(S, "Tennis_Fence_E", "z", fx1 - hw, fx1 + hw, -TEN_FZ + hw, TEN_FZ - hw, 0.0, TEN_FH, holes=[(TEN_GATE[0], TEN_GATE[1], 0.0, 2.3)],
+         mat="chainlink")
+    for nm, x in (("W", cx - TEN_POST), ("E", cx + TEN_POST)):
+        S.solid(f"Tennis_Net_Post_{nm}", (x - 0.05, 0.0, -0.05), (x + 0.05, 1.07, 0.05), "steel")
+    S.solid("Tennis_Net", (cx - TEN_POST + 0.05, 0.0, -0.03), (cx + TEN_POST - 0.05, 1.07, 0.03), "net")
+    S.solid("Umpire_Chair", (cx + TEN_POST + 0.8, 0.0, -0.5), (cx + TEN_POST + 1.8, 2.6, 0.5), "rail_green")
+    for k, (z0, z1) in enumerate(((1.2, 3.0), (-3.0, -1.2)), 1):
+        bench(S, f"Tennis_{k}", cx + TEN_POST + 0.85, cx + TEN_POST + 1.3, z0, z1)
+    S.part("tennis", "ball1", (cx + 1.6, 0.059, 1.1), [((cx + 1.567, 0.026, 1.067), (cx + 1.633, 0.092, 1.133), "plastic_yellow")],
+           "xyz", "physics", 0, {"radius_m": 0.033, "what": "a tennis ball by the net"})
+    S.spot("minigame", "tennis", (cx, 0.0, TEN_L / 2 + 0.6), face=(0, -1),
+           props={"equipment": "tennis", "parts": "Play_tennis_ball1", "pays": "money", "what": "serve and rally over the net"})
+    S.label("TENNIS", cx, -TEN_FZ - 1.6)
+    S.label("umpire's chair", cx + TEN_POST + 1.3, -1.4, kind="note")
+    S.corridor("tennis_gate", fx1 - 0.8, fx1 + 0.9, TEN_GATE[0], TEN_GATE[1])
+    # the basketball court: surround, court, the two keys and the centre circle, two hoops on poles behind the baselines, a low fence, benches
+    bx = BAS_X
+    S.decor("Basket_Surround", (bx - BAS_W / 2 - BAS_RUN, 0.0, -BAS_L / 2 - BAS_RUN), (bx + BAS_W / 2 + BAS_RUN, 0.01, BAS_L / 2 + BAS_RUN), "court_green")
+    S.decor("Basket_Court", (bx - BAS_W / 2, 0.0, -BAS_L / 2), (bx + BAS_W / 2, 0.014, BAS_L / 2), "court_orange")
+    for nm, sg in (("N", -1), ("S", 1)):
+        za, zb = sorted((sg * BAS_L / 2, sg * (BAS_L / 2 - 5.8)))
+        S.decor(f"Basket_Key_{nm}", (bx - 2.45, 0.0, za), (bx + 2.45, 0.016, zb), "court_blue")
+        zp = sg * BAS_POLE_Z
+        S.solid(f"Hoop_{nm}_Pole", (bx - 0.15, 0.0, zp - 0.15), (bx + 0.15, 3.5, zp + 0.15), "steel")
+        zf = sg * BAS_BOARD_Z
+        S.decor(f"Hoop_{nm}_Arm", (bx - 0.08, 3.25, min(zp, zf + sg * 0.05)), (bx + 0.08, 3.45, max(zp, zf + sg * 0.05)), "steel")
+        S.decor(f"Hoop_{nm}_Board", (bx - 0.9, 2.9, min(zf, zf + sg * 0.05)), (bx + 0.9, 3.95, max(zf, zf + sg * 0.05)), "plastic_white")
+        zh = sg * BAS_HOOP_Z
+        S.decor(f"Hoop_{nm}_Ring", (bx - 0.24, 3.03, zh - 0.24), (bx + 0.24, 3.07, zh + 0.24), "plastic_red")
+        S.decor(f"Hoop_{nm}_Net", (bx - 0.23, 2.62, zh - 0.23), (bx + 0.23, 3.03, zh + 0.23), "net")
+    S.decor("Basket_Circle", (bx - 1.8, 0.0, -1.8), (bx + 1.8, 0.016, 1.8), "court_blue")
+    x0, x1, z0, z1, fh = BAS_FENCE
+    wall(S, "Basket_Fence_N", "x", z0 - hw, z0 + hw, x0 - hw, x1 + hw, 0.0, fh, mat="rail_green")
+    wall(S, "Basket_Fence_S", "x", z1 - hw, z1 + hw, x0 - hw, x1 + hw, 0.0, fh, mat="rail_green")
+    wall(S, "Basket_Fence_W", "z", x0 - hw, x0 + hw, z0 + hw, z1 - hw, 0.0, fh, holes=[(BAS_GATE[0], BAS_GATE[1], 0.0, fh + 1.0)], mat="rail_green")
+    wall(S, "Basket_Fence_E", "z", x1 - hw, x1 + hw, z0 + hw, z1 - hw, 0.0, fh, mat="rail_green")
+    for k, (za, zb) in enumerate(((1.0, 3.5), (-3.5, -1.0)), 1):
+        bench(S, f"Basket_{k}", x0 + 0.4, x0 + 0.85, za, zb)
+    for k, (px, py, pz) in enumerate(((bx - 3.0, 0.146, 4.2), (x0 + 1.25, 0.142, -0.3)), 1):
+        S.part("basketball", f"ball{k}", (px, py, pz), [((px - 0.12, py - 0.12, pz - 0.12), (px + 0.12, py + 0.12, pz + 0.12), "plastic_red")],
+               "xyz", "physics", 0, {"radius_m": 0.12, "what": "a basketball" + (" by the bench" if k == 2 else " on the court")})
+    S.spot("minigame", "basketball", (bx, 0.0, -(BAS_L / 2 - 5.8) + 0.6), face=(0, -1),
+           props={"equipment": "basketball", "parts": "Play_basketball_ball1,Play_basketball_ball2", "pays": "money",
+                  "what": "shoot hoops: free throws against the clock"})
+    S.label("BASKETBALL", bx, -BAS_L / 2 - 3.2)
+    S.corridor("basket_gate", x0 - 1.0, x0 + 1.2, BAS_GATE[0], BAS_GATE[1])
+    # floodlight masts (off by day: their heads are Lamp_Emit) at the tennis fence's corners and the basketball fence's east side
+    for k, (x, z) in enumerate(((fx0 - 0.8, -TEN_FZ - 0.8), (fx1 + 0.8, -TEN_FZ - 0.8), (fx0 - 0.8, TEN_FZ + 0.8), (fx1 + 0.8, TEN_FZ + 0.8),
+                                 (x1 + 0.9, -9.0), (x1 + 0.9, 9.0)), 1):
+        S.solid(f"Flood_{k}", (x - 0.12, 0.0, z - 0.12), (x + 0.12, 9.0, z + 0.12), "steel")
+        S.decor(f"Flood_{k}_Head", (x - 0.7, 9.0, z - 0.7), (x + 0.7, 9.6, z + 0.7), "lamp")
+    # along the path: benches, bins and lamps
+    for k, (bx0, bz0) in enumerate(((-2.35, -10.0), (1.9, -4.0), (-2.35, 6.0), (1.9, 12.0)), 1):
+        bench(S, f"Path_{k}", bx0, bx0 + 0.45, bz0, bz0 + 1.8)
+        S.solid(f"Bin_{k}", (bx0, 0.0, bz0 - 0.75), (bx0 + 0.45, 0.9, bz0 - 0.3), "plastic_green")
+    for k, (x, z) in enumerate(((2.2, -16.0), (-2.2, 0.0), (2.2, 16.0)), 1):
+        lamp(S, k, x, z)
+    keeper(S, 1, (-20.0, 0.0, -SPZ + 0.5), (0, -1), "watches")
+    keeper(S, 2, (SPX - 0.5, 0.0, 12.0), (1, 0), "ignores")
+    walk_gap(S, "playground", "N", 0.0, -SPZ, "playground (its south gap)", 1)
+    walk_gap(S, "racetrack", "S", 0.0, SPZ, "racetrack (its north gap)", -1)
+    S.label("to the playground", 4.6, -SPZ + 2.6, kind="note")
+    S.label("to the racetrack", 4.6, SPZ - 2.6, kind="note")
+    S.corridor("path", -1.5, 1.5, -22.0, 22.0)
+    S.corridor("gap_N", -2.5, 2.5, -25.2, -20.0)
+    S.corridor("gap_S", -2.5, 2.5, 20.0, 25.2)
+    S.still = ((0.0, 0.0, -21.4), (0.0, 1.0), -3)
+    return S
+
+
+# ---------------------------------------------------------------- racetrack: a kart loop through the sports courts' south gap
+RT_X, RT_Z = 75.0, 50.0
+RT_CX, RT_CZ, RT_R, RT_W = 45.0, 15.0, 18.0, 8.0     # the bends' centres (+-45, +-15), the centreline's radius, the width: 353 m a lap
+RT_TYRE_R = (26.0, 26.65)                           # two rows of tyre stacks round the outside of each bend (the track's outer edge is at 22)
+RT_TYRE_H, RT_TYRE_PITCH = 0.78, 0.62               # a stack of three tyres; the stacks' spacing along the bend
+RT_START_X = 6.0                                    # the start/finish line, on the north straight (the karts run east along it: clockwise)
+RT_STAND = (-30.0, -2.0, -40.0, 8, 0.27, 0.8)       # the grandstand: x0, x1, its front (z), tiers, rise, depth
+RT_BENDS = [("NE", (RT_CX, -RT_CZ), -90.0), ("SE", (RT_CX, RT_CZ), 0.0), ("SW", (-RT_CX, RT_CZ), 90.0), ("NW", (-RT_CX, -RT_CZ), 180.0)]
+
+
+def track_centre(n_arc=24):
+    """The centreline as a closed loop of (x, z, nx, nz), n the outward normal: each bend's points, the straights between them."""
+    pts = []
+    for _, (cx, cz), a0 in RT_BENDS:
+        for i in range(n_arc + 1):
+            a = math.radians(a0 + 90.0 * i / n_arc)
+            pts.append((cx + RT_R * math.cos(a), cz + RT_R * math.sin(a), math.cos(a), math.sin(a)))
+    return pts
+
+
+def track_length():
+    p = track_centre(240)
+    return sum(math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]) for i in range(len(p)))
+
+
+def ribbon(pts, d0, d1, y):
+    """A strip between offsets d0 and d1 along the outward normal of a closed loop of points: (verts, quads)."""
+    verts = [(x + nx * d, y, z + nz * d) for x, z, nx, nz in pts for d in (d0, d1)]
+    n = len(pts)
+    faces = [(2 * i, 2 * ((i + 1) % n), 2 * ((i + 1) % n) + 1, 2 * i + 1) for i in range(n)]
+    return verts, faces
+
+
+def curb_segments(inner):
+    """The red and white curbs on the inside (inner=True) or outside of each bend: [(bend, r0, r1, a0, a1, colour)], about 1.2 m each."""
+    out = []
+    r0, r1 = (RT_R - RT_W / 2 - 1.0, RT_R - RT_W / 2 + 0.1) if inner else (RT_R + RT_W / 2 - 0.1, RT_R + RT_W / 2 + 1.0)
+    for key, (cx, cz), a0 in RT_BENDS:
+        n = max(2, int(round(math.pi / 2 * (r0 + r1) / 2 / 1.2)))
+        for i in range(n):
+            out.append((key, (cx, cz), r0, r1, a0 + 90.0 * i / n, a0 + 90.0 * (i + 1) / n, "curb_red" if i % 2 == 0 else "curb_white"))
+    return out
+
+
+def tyre_chunks():
+    """The tyre stacks round the outside of each bend, in chunks of three columns (two rows each): [(name, [(x, z, row, column)])]."""
+    out = []
+    rm = sum(RT_TYRE_R) / 2
+    for key, (cx, cz), a0 in RT_BENDS:
+        n = int(round(math.pi / 2 * rm / RT_TYRE_PITCH))
+        cols = [math.radians(a0 + 90.0 * (i + 0.5) / n) for i in range(n)]
+        for k in range(0, n, 3):
+            st = [(cx + r * math.cos(a), cz + r * math.sin(a), row, k + j) for j, a in enumerate(cols[k:k + 3]) for row, r in enumerate(RT_TYRE_R)]
+            out.append((f"Tyres_{key}_{k // 3 + 1:02d}", st))
+    return out
+
+
+def racetrack():
+    S = Scene("racetrack", "The racetrack: a small kart loop", f"150 m by 100 m inside its hedge: an 8 m asphalt loop of {track_length():.0f} m "
+              "(two straights and two short ones, four bends of 18 m) with red and white curbs, tyre walls round the bends, a start/finish gantry, "
+              "a grandstand and a pit lane", mood="liminal: empty, seemingly normal")
+    grounds(S, "Racetrack", -RT_X, RT_X, -RT_Z, RT_Z, mat="grass", gaps={"N": [(-38.0, 6.0)]})
+    hw = RT_W / 2
+    v, f = ribbon(track_centre(), -hw, hw, 0.012)
+    S.mesh("Track", v, f, "asphalt")
+    for col in ("curb_red", "curb_white"):
+        verts, faces = [], []
+        for inner in (True, False):
+            for key, (cx, cz), r0, r1, a0, a1, c in curb_segments(inner):
+                if c != col:
+                    continue
+                b = len(verts)
+                for r, a in ((r0, a0), (r1, a0), (r1, a1), (r0, a1)):
+                    verts.append((cx + r * math.cos(math.radians(a)), 0.03, cz + r * math.sin(math.radians(a))))
+                faces.append((b, b + 1, b + 2, b + 3))
+        S.mesh("Curbs_" + col.split("_")[1].capitalize(), verts, faces, col)
+    for name, st in tyre_chunks():
+        xs, zs = [p[0] for p in st], [p[1] for p in st]
+        S.solid(name, (min(xs) - 0.3, 0.0, min(zs) - 0.3), (max(xs) + 0.3, RT_TYRE_H, max(zs) + 0.3), "tyre")
+    # the pit lane inside the north straight: a pit wall along the track, the lane, its way in and out, six garages (shut)
+    zi = -(RT_CZ + RT_R - hw)                                       # the track's inner edge along the north straight (z -29)
+    S.solid("Pit_Wall", (-30.0, 0.0, zi + 0.4), (30.0, 1.0, zi + 0.8), "concrete")
+    S.decor("Pit_Lane", (-36.0, 0.0, zi + 0.9), (36.0, 0.014, zi + 6.9), "asphalt")
+    for nm, sg in (("W", -1), ("E", 1)):
+        a, b_, c, d, e = (sg * 46.0, zi), (sg * 30.0, zi), (sg * 30.0, zi + 0.9), (sg * 36.0, zi + 0.9), (sg * 36.0, zi + 6.9)
+        t = 0.9 / 6.9
+        fp = (a[0] + (e[0] - a[0]) * t, zi + 0.9)
+        verts = [(p[0], 0.014, p[1]) for p in (a, b_, c, fp, d, e)]
+        S.mesh(f"Pit_{'Entry' if sg < 0 else 'Exit'}", verts, [(0, 1, 2, 3), (3, 4, 5)], "asphalt")
+    S.solid("Pit_Garages", (-24.0, 0.0, zi + 7.4), (24.0, 3.6, zi + 13.4), "concrete")
+    for k, xc in enumerate((-20.0, -12.0, -4.0, 4.0, 12.0, 20.0), 1):
+        S.decor(f"Pit_Shutter_{k}", (xc - 2.2, 0.0, zi + 7.35), (xc + 2.2, 3.0, zi + 7.4), "steel")
+    S.decor("Pit_Sign", (-3.0, 3.05, zi + 7.34), (3.0, 3.55, zi + 7.4), "sign")
+    # the start/finish gantry: a pillar outside the track and one on the pit wall, a beam over the track with the lights and a sign
+    zo = -(RT_CZ + RT_R + hw)                                       # the track's outer edge along the north straight (z -37)
+    x = RT_START_X
+    S.solid("Gantry_Pillar_N", (x - 0.2, 0.0, zo - 1.6), (x + 0.2, 6.4, zo - 1.2), "steel")
+    S.solid("Gantry_Pillar_S", (x - 0.2, 0.0, zi + 0.4), (x + 0.2, 6.4, zi + 0.8), "steel")
+    S.decor("Gantry_Beam", (x - 0.2, 5.6, zo - 1.6), (x + 0.2, 6.4, zi + 0.8), "steel")
+    S.decor("Gantry_Sign", (x - 0.26, 5.65, -36.0), (x - 0.2, 6.35, -30.0), "sign")
+    S.decor("Gantry_Lights", (x - 0.35, 5.05, -34.4), (x - 0.2, 5.55, -31.6), "plastic_red")
+    S.spot("minigame", "racetrack", (x - 3.0, 0.0, -(RT_CZ + RT_R)), face=(1, 0),
+           props={"equipment": "racetrack", "pays": "money", "what": "a timed lap: cross the line, go round, cross it again (no kart yet)",
+                  "lap_m": round(track_length(), 1)})
+    # the grandstand outside the north straight: eight tiers you can climb (0.27 m each), a back wall, side walls and a roof, a low wall in front
+    x0, x1, zf, n, rise, dep = RT_STAND
+    for i in range(n):
+        S.solid(f"Step_stand_{i:02d}", (x0, 0.0, zf - dep * (i + 1)), (x1, rise * (i + 1), zf - dep * i), "concrete")
+        S.decor(f"Stand_Seats_{i:02d}", (x0 + 0.2, rise * (i + 1), zf - dep * (i + 1) + 0.05), (x1 - 0.2, rise * (i + 1) + 0.42, zf - dep * (i + 1) + 0.5),
+                "plastic_blue")
+    S.flights.append({"name": "stand", "y_start": 0.0, "y_end": round(rise * n, 3), "n": n, "rise": rise, "tread": dep})
+    zb = zf - dep * n
+    S.solid("Stand_Back", (x0 - 0.2, 0.0, zb - 0.4), (x1 + 0.2, 4.6, zb), "concrete")
+    S.solid("Stand_Side_W", (x0 - 0.2, 0.0, zb), (x0, rise * n + 0.4, zf), "concrete")
+    S.solid("Stand_Side_E", (x1, 0.0, zb), (x1 + 0.2, rise * n + 0.4, zf), "concrete")
+    S.solid("Stand_Roof", (x0 - 0.4, 4.6, zb - 0.4), (x1 + 0.4, 4.8, zf + 0.4), "roof", ("ceiling",))
+    S.solid("Stand_Wall", (x0 - 2.0, 0.0, zo - 1.2), (x1 + 2.0, 1.0, zo - 0.9), "concrete")
+    S.label("GRANDSTAND", (x0 + x1) / 2, zb - 1.6)
+    S.label("PITS", 0.0, zi + 10.4)
+    S.label("start / finish", x, zo - 3.0, kind="note")
+    for k, (lx, lz) in enumerate(((-44.0, -44.0), (2.0, -44.0), (30.0, -44.0)), 1):
+        lamp(S, k, lx, lz)
+    keeper(S, 1, (50.0, 0.0, -RT_Z + 0.5), (0, -1), "ignores")
+    keeper(S, 2, (-RT_X + 0.5, 0.0, 20.0), (-1, 0), "watches")
+    keeper(S, 3, (10.0, 0.0, RT_Z - 0.5), (0, 1), "watches")
+    # the gap in the north hedge (a walk gap, as walk_gap() makes it, but you arrive facing the grandstand and the gantry, south-east)
+    S.link("sports", (-38.0, 0.0, -RT_Z - 0.6), (-38.0, 0.0, -RT_Z + 2.6), (0.6, 0.8), "sports (its south gap)")
+    S.label("to the sports courts", -38.0, -RT_Z + 6.0, kind="note")
+    S.label(f"{track_length():.0f} m a lap, clockwise", 0.0, 0.0, kind="note")
+    c, r = RT_CZ + RT_R, RT_CX + RT_R
+    S.corridor("track_N", -RT_CX, RT_CX, -c - hw, -c + hw)
+    S.corridor("track_S", -RT_CX, RT_CX, c - hw, c + hw)
+    S.corridor("track_W", -r - hw, -r + hw, -RT_CZ, RT_CZ)
+    S.corridor("track_E", r - hw, r + hw, -RT_CZ, RT_CZ)
+    S.corridor("pit_lane", -36.0, 36.0, zi + 0.9, zi + 6.9)
+    S.corridor("stand_front", x0, x1, zf, zo - 1.2)
+    S.corridor("gap_N", -40.5, -35.5, -RT_Z - 1.2, -RT_Z + 5.0)
+    S.still = ((-38.0, 0.0, -RT_Z + 2.6), (0.7, 1.0), -2)
     return S
 
 
@@ -888,12 +1134,14 @@ def endless_hills():
 
 # ---------------------------------------------------------------- the scenes and how they join
 SCENES = {"table_and_chairs": table_and_chairs, "market": market, "playground": playground, "tree_house": tree_house,
-          "bus_station": bus_station, "road": road, "endless_hills": endless_hills}
+          "bus_station": bus_station, "road": road, "endless_hills": endless_hills, "sports": sports, "racetrack": racetrack}
 
 # Every link between two scenes of this set: (scene, door) <-> (scene, door). Pressing F at one side's Link_ (or walking through a walk gap)
 # puts you on the other side's Arrive_.
 PAIRS = [
     (("playground", "tree_house"), ("tree_house", "playground"), "walk", "the path west out of the playground, through the gap in its hedge"),
+    (("playground", "sports"), ("sports", "playground"), "walk", "the playground's south gap to the sports courts' north gap"),
+    (("sports", "racetrack"), ("racetrack", "sports"), "walk", "the sports courts' south gap to the racetrack's north gap"),
 ]
 
 
@@ -1201,6 +1449,21 @@ def check(base, ids=None, glb_dir=None):
             eqs = sorted({p["props"]["equipment"] for p in S.parts})
             print(f"GATE moving parts: {len(S.parts) - len(off)} of {len(S.parts)} Play_<equipment>_<part> nodes in playground.glb on their pivots "
                   f"({len(eqs)} pieces: {', '.join(eqs)}; the slide and the monkey bars have none)")
+    # the sports courts' balls: Play_<equipment>_<part> nodes of their own in sports.glb, on their pivots (the ball's centre), as the playground's
+    if "sports" in ids:
+        S = models["sports"]
+        dirs = [Path(glb_dir)] if glb_dir else [Path(base) / "glb", Path(base) / "docs/renders/overworld_greybox/glb"]
+        g = next((d / "sports.glb" for d in dirs if (d / "sports.glb").exists()), None)
+        if g is None:
+            print("GATE balls: no sports.glb next to the layout files (a --preview run): skipped")
+        else:
+            nodes = glb_nodes(g)
+            off = [p["name"] for p in S.parts if p["name"] not in nodes or max(abs(nodes[p["name"]]["t"][i] - p["pivot"][i]) for i in range(3)) > 0.002
+                   or nodes[p["name"]]["extras"].get("equipment") != p["props"]["equipment"]]
+            if off:
+                bad.append("balls off their pivots or missing in sports.glb: " + ", ".join(off))
+            print(f"GATE balls: {len(S.parts) - len(off)} of {len(S.parts)} Play_ nodes in sports.glb on their pivots "
+                  f"({', '.join(p['name'] for p in S.parts)})")
     # the hills tile: its edges match. Columns along opposite edges have the same tops; the surface's edge rows are the same height
     if "endless_hills" in docs:
         cols = [c for c in docs["endless_hills"]["colliders"] if c["s"].startswith("Ground_Hills_")]
