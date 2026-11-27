@@ -58,6 +58,8 @@ SCENE = None
 SCENES = ["rdwe_dining", "rdwe_hallway", "rdwe_teal", "rdwe_teal2", "rdwe_flooded", "rdwe_trampoline", "rdwe_grocery"]
 PAGES = {s: [2048, 2048] for s in SCENES}
 PAGES["rdwe_teal"] = PAGES["rdwe_teal2"] = [1536, 1536]
+PAGES["rdwe_trampoline"] = PAGES["rdwe_grocery"] = [2048, 2048, 2048]
+PAGE2 = {"rdwe_trampoline": {"Truss_Steel"}, "rdwe_grocery": {"Gondola", "Gondola_Back", "Kick"}}   # a third page: the big repeated props
 ALT = {"rdwe_dining": "the green lamp off"}            # scenes with a second light set (lightmap_night: maps n + 2)
 WHITE_CAP = 12.0
 SHOULDER = {"default": (75.0, 2.5)}
@@ -602,10 +604,10 @@ def room_materials():
         material("Ceiling_White", tex=PLASTER, tint=srgb_lin("#f8f6f0"), rough=0.95, tile=2.4)
         material("Sky_Paint", img=g["gen_sky"], rough=0.8, tile=1.0)
         material("Rail_Steel", img=GEN["gen_brushed"], tint=srgb_lin("#d0d4da"), rough=0.25, metal=1.0, tile=0.3)
-        material("Frame_Wood", tex=WOOD, tint=srgb_lin("#a86a3a"), rough=0.5, tile=0.6)
+        material("Frame_Wood", tex=WOOD, tint=srgb_lin("#ffb070"), rough=0.5, tile=0.6)
         material("Frame_Back", color=srgb_lin("#f3f1ea"), rough=0.9)
-        material("Cardboard", tex=PLYWOOD, tint=srgb_lin("#8a6a44"), rough=0.45, tile=0.8)
-        material("Cardboard_Light", tex=PLYWOOD, tint=srgb_lin("#b0905c"), rough=0.5, tile=0.8)
+        material("Cardboard", tex=PLYWOOD, tint=srgb_lin("#e8b880"), rough=0.45, tile=0.8)
+        material("Cardboard_Light", tex=PLYWOOD, tint=srgb_lin("#ffd8a0"), rough=0.5, tile=0.8)
         material("Wet_Paper", color=srgb_lin("#dcd6c6"), rough=0.35)
         material("Photo_Wet", img=mk_image("gen_photos", gen_photos(144, 512, 2)), rough=0.3)
         material("Grate_Steel", color=srgb_lin("#4a4d52"), rough=0.45, metal=0.9)
@@ -2529,6 +2531,9 @@ def stage_bake():
     shell = [o for k, o in sorted(exp.items()) if o.data.materials[0].name in skin_mats and o.data.materials[0].name not in NO_LIGHTMAP]
     leaves = [o for o in bpy.data.collections["Doors"].objects if o.type == "MESH" and any(s.material.name not in NO_LIGHTMAP for s in o.material_slots)]
     props = [o for k, o in sorted(exp.items()) if o not in shell and o.data.materials[0].name not in NO_LIGHTMAP] + leaves
+    big = [o for o in props if o.type == "MESH" and o not in leaves and o.data.materials[0].name in PAGE2.get(SCENE, set())]
+    props = [o for o in props if o not in big]
+    groups = (shell, props) + ((big,) if big else ())
     report = {}
     sets = ["day"] + (["alt"] if SCENE in ALT else [])
     metal = {}                                            # bake metals as if matte: the page multiplies the light by their colour, and a
@@ -2537,14 +2542,14 @@ def stage_bake():
         if bs and bs.inputs["Metallic"].default_value > 0:
             metal[m.name] = bs.inputs["Metallic"].default_value
             bs.inputs["Metallic"].default_value = 0.0
-    for n, objs in enumerate((shell, props)):
+    for n, objs in enumerate(groups):
         print(f"lightmap {n}: {[o.name for o in objs]}")
         S, dens = rect_uv(objs, PAGES[SCENE][n]) if n == 0 else lightmap_uv(objs, PAGES[SCENE][n])
         mats = sorted({s.material for o in objs for s in o.material_slots}, key=lambda m: m.name)
         for ls in sets:
             t0 = time.time()
             set_light_set(ls)
-            idx = n if ls == "day" else n + 2
+            idx = n if ls == "day" else n + len(groups)
             img = bpy.data.images.new(f"LM_{idx}", S, S, alpha=False, float_buffer=True)
             img.colorspace_settings.name = "Non-Color"
             for m in mats:
