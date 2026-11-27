@@ -621,7 +621,7 @@ def gen_painted_door(n=512):
     sh = (X > 0.08) & (X < 0.13) & leaf
     img[sh] = img[sh] * 0.7
     img[(Y < 0.012)] = C("#2a1e16")
-    return np.clip(img, 0, 1)
+    return np.clip(img[::-1], 0, 1)
 
 
 # ---------------------------------------------------------------- textures (Poly Haven, CC0, already in the repo) and materials
@@ -646,7 +646,7 @@ GENS = {   # generated images, made when a material first needs them
     "gen_plaid": lambda: gen_plaid(61),
     "gen_diamond": lambda: gen_diamond_carpet(62),
     "gen_tile_mint": lambda: gen_tiles(141, 8, "#a8f0c8", "#98e4bc", "#e8f4ec", 0.02),
-    "gen_checker": lambda: gen_checker(142, "#f2eee4", "#2a2a30", 4),
+    "gen_checker": lambda: gen_checker(142, "#f2eee4", "#5a5a6c", 4),
     "gen_checker_bw": lambda: gen_checker(143, "#e8e4dc", "#c8c0b0", 2, grout="#a8a090"),
     "gen_stripes_pink": lambda: gen_stripes(151, ["#ff9ac4", "#ffd2e4", "#ff9ac4", "#fff2f6"], [3, 1, 3, 0.5]),
     "gen_stripes_peach": lambda: gen_stripes(152, ["#f8b48c", "#f4d2b0"], [1, 1]),
@@ -663,6 +663,34 @@ GENS = {   # generated images, made when a material first needs them
 
 def gimg(key):
     return GEN[key] if key in GEN else mk_image(key, GENS[key]())
+
+
+def to_lin(x):
+    return np.where(x <= 0.04045, x / 12.92, ((x + 0.055) / 1.055) ** 2.4)
+
+
+def to_srgb(x):
+    x = np.clip(x, 0, 1)
+    return np.where(x <= 0.0031308, x * 12.92, 1.055 * np.power(x, 1 / 2.4) - 0.055)
+
+
+def tex_in(rel, hx, contrast=0.75, cap=0.85, size=512):
+    """A CC0 texture recoloured: its luminance detail (normalised to a mean of 1, contrast eased) times the colour `hx`, capped at `cap`
+    (linear), at `size` px. So every textured material has the albedo its colour says, whatever the photo's own exposure."""
+    key = f"tx_{Path(rel).stem}_{hx.strip('#')}"
+    if key in GEN:
+        return GEN[key]
+    im = image(rel)
+    w, h = im.size
+    a = np.empty(w * h * 4, np.float32)
+    im.pixels.foreach_get(a)
+    a = a.reshape(h, w, 4)[..., :3]
+    step = max(1, w // size)
+    a = a[::step, ::step]
+    lum = to_lin(a) @ np.array([0.2126, 0.7152, 0.0722])
+    d = 1.0 + (lum / max(float(lum.mean()), 1e-4) - 1.0) * contrast
+    out = np.clip(np.array(srgb_lin(hx))[None, None, :] * d[..., None], 0.0, cap)
+    return mk_image(key, to_srgb(out)[::-1])
 
 
 SPEC = {   # name: material() keywords; `gen` names a generated image, `hex` a colour (sRGB) for color or tint
@@ -833,6 +861,9 @@ def M(name):
     emit_tex = sp.pop("emit_tex", False)
     if g:
         sp["img"] = gimg(g)
+    if "tex" in sp and hx:
+        sp["img"] = tex_in(sp.pop("tex"), hx)
+        hx = None
     if hx:
         if g or "tex" in sp:
             sp["tint"] = srgb_lin(hx)
@@ -865,16 +896,16 @@ def leaf_mat(finish):
     kind, h = FINISH.get(finish, ("paint", "#888888"))
     col = srgb_lin(h)
     if kind == "tex":
-        return material(name, tex=WOOD, tint=tuple(min(1.0, c * 1.6) for c in col), rough=0.45, tile=0.9).name
+        return material(name, img=tex_in(WOOD, h), rough=0.45, tile=0.9).name
     if kind == "steel":
         return material(name, img=gimg("gen_brushed"), tint=col, rough=0.35, metal=0.85, tile=0.5).name
-    return material(name, tex=PAINT, tint=col, rough=0.3 if kind == "gloss" else 0.6, tile=1.0).name
+    return material(name, img=tex_in(PAINT, h), rough=0.3 if kind == "gloss" else 0.6, tile=1.0).name
 
 
 def common_materials():
     for n in ("Lamp_Emit", "Void", "Glass_Clear", "Brass", "Chrome", "Iron", "Glass_Knob", "Leaf_Glass", "Mirror", "Rubber_Black", "Plastic_White"):
         M(n)
-    material("Leaf_Painted", tex=PAINT, tint=srgb_lin("#e4d6b8"), rough=0.5, tile=1.0)
+    material("Leaf_Painted", img=tex_in(PAINT, "#e4d6b8"), rough=0.5, tile=1.0)
     material("Standin_Grey", color=(0.4, 0.38, 0.34), rough=0.9)
 
 
@@ -1642,7 +1673,9 @@ class Prop:
         mats = []
         for mat, pm in s.bms.items():
             bmesh.ops.recalc_face_normals(pm, faces=pm.faces)
-            uvl = pm.loops.layers.uv.new("UVMap")
+            uvl = pm.loops.layers.uv.get("UVMap") or pm.loops.layers.uv.new("UVMap")
+            for extra in [k for k in pm.loops.layers.uv.keys() if k != "UVMap"]:      # a text mesh brings its own layers: one UV set only
+                pm.loops.layers.uv.remove(pm.loops.layers.uv[extra])
             t = TILES.get(mat, 1.0)
             for f in pm.faces:
                 f.material_index = len(mats)
