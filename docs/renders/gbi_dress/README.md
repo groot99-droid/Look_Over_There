@@ -1,4 +1,4 @@
-# Going back in, floors L4 and L3: six chambers dressed and lit
+# Going back in, floors L4 to B1: fifteen chambers dressed and lit
 
 `gbi_L4_1` (showroom floor), `gbi_L4_2` (room sets), `gbi_L4_3` (stockroom), `gbi_L3_2` (white gallery), `gbi_L3_3` (colonnade) and
 `gbi_L3_4` (white maze): the greybox chambers of `docs/BLENDER_AREAS.md` section 6, dressed and lit (step 2), each in its floor's own materials from
@@ -121,6 +121,45 @@ wall.
 ### `gbi_L3_4`: white maze
 The plaster walls fold the room into one long path; the lava leg (`Hazard_lava_1`) is taped at its west end. In by the elevator (kit, south), out
 by the stair door down to `gbi_L2_1` (kit, north, its hallway cased).
+
+### `gbi_L2_2`: door grid
+The store's L2 materials (`M_D_floor_L2`, `M_D_wall_L2`, `M_D_ceil_L2`): a grid of small rooms behind plaster walls, a door in every side (each
+leaf its own node, closed, open or ajar as the greybox says), stacks of cartons left in a few rooms, the gas row down the middle
+(`Hazard_gas_1`, a translucent green cloud, unbaked). In by the stair door from `gbi_L2_1` (kit, cased), out by the painted-sky hall (kit, cased);
+the floor's safe house (kit) by the south wall, cased; the vent duct on the east wall, shut.
+
+### `gbi_L2_3`: long loop
+Rings inside rings of plaster walls; the core room's table; the chainsaw slots in the north corridor and the ring's south leg (`Hazard_blade_1`,
+`_2`). In by the hall door (south), out by the plain door north.
+
+### `gbi_L2_4`: split halls
+Three long halls side by side, desks left in them (a top, steel ends, a modesty panel, a dark monitor on some), the middle hall's closing walls
+(`Hazard_crush_1`, `_2`). Out by the stair door down to `gbi_L1_1` (kit, cased).
+
+### `gbi_L1_2`: cubicle farm
+The store's L1 materials. Twenty-four cubicles of grey fabric panels with aluminium caps round their desks, private offices along the north wall,
+the gas aisle (`Hazard_gas_1`). In by the stair door from `gbi_L1_1` (kit), out by the elevator (kit); the floor's safe house (kit) on the east
+wall, cased.
+
+### `gbi_L1_3`: corridor offices
+Two corridors crossing, offices in every quarter with their desks, the north leg's closing walls (`Hazard_crush_1`, `_2`), the vent duct on the
+north wall. In by the elevator (kit), out by the painted-sky hall (kit, cased).
+
+### `gbi_L1_4`: conference ring
+A ring corridor round the conference room (its long table), offices outside with desks, a blade in the west leg (`Hazard_blade_1`) and gas
+filling the conference room (`Hazard_gas_1`). Out by the stair door down to `gbi_B1_1` (kit, cased).
+
+### `gbi_B1_2`: lido
+The store's B1 materials (white tile). A pool under columns, its rim walls the floor's tile, the water the store's own `M_Water` (alpha blended,
+unbaked); the tide (`Hazard_tide_1`, a translucent sheet that rises). The floor's safe house (kit) on the west wall, cased.
+
+### `gbi_B1_3`: baths
+Bath cells off a tiled corridor, six pools of the store's water, the west bath's tide (`Hazard_tide_1`) and gas down the corridor
+(`Hazard_gas_1`); the vent duct on the west wall. Out by the painted-sky hall (kit, cased).
+
+### `gbi_B1_4`: the drain
+Wave 20, the run's end: a walkway round a flooding basin (`Hazard_tide_1`), columns, two chainsaw slots (`Hazard_blade_1` across the last dash,
+`_2` down the east walkway), the EXIT hall out (kit, cased).
 
 ## Checks (each chamber's `CHECKS.txt` has the full output)
 

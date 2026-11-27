@@ -76,9 +76,10 @@ P99, P90 = 0.97, 0.88
 WALLS = ("M_D_wall_",)
 
 # the lights (Cycles watts) and the toggled materials' strengths
-PANEL_W = {"L4": 95.0, "L3": 55.0, "L2": 55.0, "L1": 50.0, "B1": 55.0}
+PANEL_W = {"L4": 95.0, "L3": 55.0, "L2": 40.0, "L1": 36.0, "B1": 50.0}
 PANEL_EMIT, NIGHT_EMIT, EMERG_EMIT, EMERG_W, EXIT_W = 4.0, 4.0, 6.0, 22.0, 2.5
-GRID = {"L4": 4.0, "L3": 4.5, "L2": 4.5, "L1": 4.0, "B1": 4.5}
+GRID = {"L4": 4.0, "L3": 4.5, "L2": 3.0, "L1": 3.0, "B1": 4.0}     # the small rooms of L2 and L1 need a tighter grid
+NIGHT_EVERY = {"L4": 3, "L3": 3, "L2": 2, "L1": 2, "B1": 2}          # one panel in NIGHT_EVERY^2 stays on at night
 
 
 def work():
@@ -1057,7 +1058,8 @@ def blocked_above(x, z, hw, hd):
     for b in SK.colliders(M):
         if b["name"] in ("Floor", "Ceiling") or (b["max"][1] < Y + H - 0.3 and not SK.is_kit(b)):
             continue
-        if b["min"][0] - 0.3 < x + hw and b["max"][0] + 0.3 > x - hw and b["min"][2] - 0.3 < z + hd and b["max"][2] + 0.3 > z - hd:
+        g = 0.3 if FLOOR in ("L4", "L3") else 0.15
+        if b["min"][0] - g < x + hw and b["max"][0] + g > x - hw and b["min"][2] - g < z + hd and b["max"][2] + g > z - hd:
             return True
     for h in SK.hulls(M):
         if h["min"][0] - 0.3 < x + hw and h["max"][0] + 0.3 > x - hw and h["min"][2] - 0.3 < z + hd and h["max"][2] + 0.3 > z - hd:
@@ -1079,7 +1081,8 @@ def ceiling_panels():
             if blocked_above(x, z, 0.62, 0.32):
                 continue
             hous.append(((x - 0.64, top - 0.05, z - 0.34), (x + 0.64, top, z + 0.34)))
-            nightc = (i % 3 == 1 and j % 3 == 1)
+            k = NIGHT_EVERY[FLOOR]
+            nightc = (i % k == 1 and j % k == 1)
             (night if nightc else day).append((x, z))
             n += 1
             light(f"{'LB' if nightc else 'LD'}_panel_{i}_{j}", "AREA", (x, top - 0.07, z), PANEL_W[FLOOR], size=1.2, size_y=0.6,
