@@ -562,21 +562,21 @@ def dress_lights_out():
     part("Floor_Lamp", "Brass", lambda bm: (cyl(bm, (lx, 0.0, lz), (lx, 0.03, lz), 0.2, 0.2, 18), cyl(bm, (lx, 0.03, lz), (lx, 1.4, lz), 0.016, 0.016, 8)))
     part("Floor_Lamp_Shade", "Shade_Silk", lambda bm: cyl(bm, (lx, 1.38, lz), (lx, 1.72, lz), 0.25, 0.16, 20, cap=False))
     part("decor_Floor_Lamp_Bulb", "Lamp_S1", lambda bm: sphere(bm, (lx, 1.5, lz), 0.05, 10))
-    light("POINT", (lx, 1.52, lz), 70.0, WARM, 0.12, sets=["switch_1"])
+    light("POINT", (lx, 1.52, lz), 260.0, WARM, 0.12, sets=["switch_1"])
     # switch 2: the tube batten over the south door
     tb = K.BOX["decor_Tube_Batten"]
     part("decor_Tube_Body", "Trim_White", lambda bm: box(bm, tb["min"][0], tb["max"][0], tb["max"][1] - 0.05, tb["max"][1], tb["min"][2], tb["max"][2]))
     part("decor_Tube", "Lamp_S2", lambda bm: cyl(bm, (tb["min"][0] + 0.05, tb["max"][1] - 0.08, (tb["min"][2] + tb["max"][2]) / 2),
                                                  (tb["max"][0] - 0.05, tb["max"][1] - 0.08, (tb["min"][2] + tb["max"][2]) / 2), 0.016, 0.016, 10))
-    light("AREA", ((tb["min"][0] + tb["max"][0]) / 2, tb["max"][1] - 0.1, (tb["min"][2] + tb["max"][2]) / 2), 55.0, TUBE, aim=(0, -1, 0),
+    light("AREA", ((tb["min"][0] + tb["max"][0]) / 2, tb["max"][1] - 0.1, (tb["min"][2] + tb["max"][2]) / 2), 220.0, TUBE, aim=(0, -1, 0),
           size=(2.0, 0.1), sets=["switch_2"])
     # switch 3: the red bulb on its cord, and the door of light on the bare north wall
     part("decor_Red_Bulb", "Lamp_S3", lambda bm: sphere(bm, (0.0, 2.12, -5.5), 0.06, 12))
     part("decor_Red_Rose", "Bakelite", lambda bm: cyl(bm, (0.0, 3.15, -5.5), (0.0, 3.2, -5.5), 0.06, 0.06, 12))
     part("decor_Red_Cord", "Rubber", lambda bm: cyl(bm, (0.0, 2.18, -5.5), (0.0, 3.15, -5.5), 0.005, 0.005, 6))
-    light("POINT", (0.0, 2.1, -5.4), 24.0, (1.0, 0.12, 0.06), 0.05, sets=["switch_3"])
+    light("POINT", (0.0, 2.1, -5.4), 90.0, (1.0, 0.12, 0.06), 0.05, sets=["switch_3"])
     ld = K.BOX["decor_Light_Door"]
-    light("AREA", (0.0, 1.1, K.Z0 + 0.03), 90.0, (1.0, 0.92, 0.8), aim=(0, 0, -1), size=(1.1, 2.2), sets=["switch_3"], name="Light_Door")
+    light("AREA", (0.0, 1.1, K.Z0 + 0.03), 200.0, (1.0, 0.92, 0.8), aim=(0, 0, -1), size=(1.1, 2.2), sets=["switch_3"], name="Light_Door")
     # the armchair in the corner, its table and a glass
     armchair("Armchair", K.BOX["Armchair"], "Velvet_Plum", "Wood_Dark", back="N")
     table("Side_Table", K.BOX["Side_Table"], "Wood_Dark", "Wood_Dark", t=0.03, inset=0.04, apron=False)
@@ -586,7 +586,7 @@ def dress_lights_out():
     # a faint glow under the steel door, in every set (the void is not quite dark)
     K.EMIT_SETS.update({"Lamp_S1": {"switch_1": 6.0, "switch_2": 0.0, "switch_3": 0.0, "export": 6.0}, "Lamp_S2": {"switch_1": 0.0, "switch_2": 6.0, "switch_3": 0.0, "export": 6.0},
                         "Lamp_S3": {"switch_1": 0.0, "switch_2": 0.0, "switch_3": 6.0, "export": 6.0}})
-    light("AREA", (0.0, K.H - 0.05, 0.0), 6.0, (0.6, 0.6, 1.0), aim=(0, -1, 0), size=(6, 6), name="Night_Fill")
+    light("AREA", (0.0, K.H - 0.05, 0.0), 14.0, (0.6, 0.6, 1.0), aim=(0, -1, 0), size=(6, 6), name="Night_Fill")
 
 
 LIGHTS_OUT = dict(
@@ -613,6 +613,7 @@ LIGHTS_OUT = dict(
            "2_wide": ((5.4, 2.4, 5.4), (-3.0, 0.8, -3.0), 78.0),
            "3_detail": ((1.2, 1.5, 0.6), (0.0, 1.0, -5.9), 60.0)},
     set_shots=("1_arrival", "2_wide", "3_detail"),
+    exposure=1.0,
 )
 
 
@@ -899,11 +900,11 @@ def dress_ames_room():
     # the viewer: a brass post, its eyepiece at 1.55 m, looking north
     vb = K.BOX["Viewer"]
     vx, vz = (vb["min"][0] + vb["max"][0]) / 2, (vb["min"][2] + vb["max"][2]) / 2
-    part("Viewer", "Brass", lambda bm: (cyl(bm, (vx, 0.0, vz), (vx, 0.04, vz), 0.18, 0.18, 18), cyl(bm, (vx, 0.04, vz), (vx, 1.3, vz), 0.03, 0.03, 12)))
-    part("decor_Viewer_Eyepiece", "Brass", lambda bm: (box(bm, vx - 0.09, vx + 0.09, 1.3, 1.62, vz - 0.12, vz + 0.12),
-                                                       cyl(bm, (vx, 1.5, vz - 0.12), (vx, 1.5, vz - 0.22), 0.03, 0.035, 12),
-                                                       cyl(bm, (vx, 1.5, vz + 0.12), (vx, 1.5, vz + 0.2), 0.035, 0.035, 12)))
-    part("decor_Viewer_Lens", "Glass_Door", lambda bm: cyl(bm, (vx, 1.5, vz + 0.2), (vx, 1.5, vz + 0.205), 0.028, 0.028, 12))
+    part("Viewer", "Brass", lambda bm: (cyl(bm, (vx, 0.0, vz), (vx, 0.04, vz), 0.18, 0.18, 18), cyl(bm, (vx, 0.04, vz), (vx, 1.05, vz), 0.03, 0.03, 12),
+                                        box(bm, vx - 0.09, vx + 0.09, 1.05, 1.3, vz - 0.12, vz + 0.12)))
+    part("decor_Viewer_Eyepiece", "Brass", lambda bm: (cyl(bm, (vx, 1.2, vz - 0.12), (vx, 1.2, vz - 0.22), 0.03, 0.035, 12),
+                                                       cyl(bm, (vx, 1.2, vz + 0.12), (vx, 1.2, vz + 0.2), 0.035, 0.035, 12)))
+    part("decor_Viewer_Lens", "Glass_Door", lambda bm: cyl(bm, (vx, 1.2, vz + 0.2), (vx, 1.2, vz + 0.205), 0.028, 0.028, 12))
     for n in ("Chair_Deep", "Chair_Shallow"):
         armchair(n, K.BOX[n], "Velvet_Green", "Wood_Dark", back="N")
     rug("Rug", -2.4, 2.4, -1.6, 2.2, "Rug_Red")
@@ -996,7 +997,7 @@ def dress_shrink_hall():
 
 SHRINK_HALL = dict(
     pages=(2048, 1024),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 0.9, "shoulder": 1.15, "caps": {}},
     mats={"Floor_Boards": dict(diff="old_wood_floor_diff_1k.jpg", tint=(0.95, 0.82, 0.70), rough=0.5, tile=1.4, group="struct"),
           "Paper_Stripe": dict(gen="stripes", rough=0.9, tile=0.9, group="struct"),
           "Ceiling_Pink": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.95, 0.86, 0.86), rough=0.95, tile=2.0, group="struct"),
@@ -1370,7 +1371,7 @@ ATLAS_GALLERY = Atlas([("placard", 384, 256, sign(["THE WATCHER", "MARBLE, DATE 
 
 DONT_LOOK = dict(
     pages=(2048, 1024),
-    grade={"target": 0.95, "shoulder": 1.15},
+    grade={"target": 1.4, "shoulder": 1.15, "caps": {}},
     mats={"Marble_Floor": dict(diff="Marble012_color_1k.jpg", tint=(0.92, 0.9, 0.88), rough=0.2, tile=2.0, group="struct"),
           "Plaster_White": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.9, 0.89, 0.86), rough=0.95, tile=2.5, group="struct"),
           "Ceiling_White": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.92, 0.91, 0.9), rough=0.95, tile=2.5, group="struct"),
@@ -1475,7 +1476,7 @@ ATLAS_WAIT = Atlas([("number", 512, 128, sign(["NOW SERVING  07"], (0.05, 0.02, 
 
 WAITING_ROOM = dict(
     pages=(2048, 1024),
-    grade={"target": 0.95, "shoulder": 1.15},
+    grade={"target": 1.7, "shoulder": 1.15, "caps": {"Trim_White": 0.815}},
     mats={"Vinyl_Grey": dict(gen="vinyl", rough=0.5, tile=2.4, group="struct"),
           "Plaster_Mint": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.62, 0.88, 0.76), rough=0.95, tile=2.5, group="struct"),
           "Paint_Mint_Dark": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.30, 0.58, 0.48), rough=0.6, tile=2.5, group="struct"),
@@ -1627,7 +1628,7 @@ ATLAS_CLOCKS = Atlas([(f"face{i}", 256, 256, clock_face(0, hands=False, bg=bg, r
 
 WRONG_CLOCK = dict(
     pages=(2048, 2048),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 1.6, "shoulder": 1.15, "caps": {}},
     mats={"Floor_Parquet": dict(diff="herringbone_parquet_diff_1k.jpg", tint=(0.85, 0.72, 0.6), rough=0.4, tile=1.6, group="struct"),
           "Paper_Oxblood": dict(gen="paper", rough=0.9, tile=0.9, group="struct"),
           "Panel_Dark": dict(diff="dark_wood_diff_1k.jpg", tint=(0.7, 0.6, 0.55), rough=0.5, tile=1.2, group="struct"),
@@ -1824,7 +1825,7 @@ ATLAS_CHANGE = Atlas([("pool", 512, 128, sign("< TO POOL", (0.1, 0.45, 0.62), (0
 
 CHANGING_ROOMS = dict(
     pages=(2048, 1024),
-    grade={"target": 0.95, "shoulder": 1.15},
+    grade={"target": 0.95, "shoulder": 1.15, "caps": {"Trim_White": 0.83}},
     mats={"Mosaic": dict(gen="mosaic", rough=0.15, tile=0.8, group="struct"),
           "Tile_White": dict(gen="tile", rough=0.2, tile=0.6, group="struct"),
           "Ceiling_White": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.92, 0.94, 0.94), rough=0.95, tile=2.5, group="struct"),
@@ -1992,7 +1993,7 @@ ATLAS_LAUNDRY = Atlas([("maxi", 512, 128, sign("MAXI-WASH  80 KG", (0.85, 0.86, 
 
 LAUNDROMAT = dict(
     pages=(2048, 1024),
-    grade={"target": 0.95, "shoulder": 1.15},
+    grade={"target": 1.7, "shoulder": 1.15, "caps": {"Trim_White": 0.83}},
     mats={"Vinyl_Checker": dict(gen="checker", rough=0.4, tile=0.6, group="struct"),
           "Paint_Cyan": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.30, 0.78, 0.86), rough=0.6, tile=2.5, group="struct"),
           "Tile_White": dict(gen="tile", rough=0.25, tile=0.6, group="struct"),
@@ -2046,7 +2047,7 @@ def dress_motel_room():
         part(f"decor_{n}_Lamp", "Ceramic_Orange", lambda bm, cx=cx, cz=cz, ty=ty: cyl(bm, (cx, ty, cz), (cx, ty + 0.3, cz), 0.07, 0.1, 14))
         part(f"decor_{n}_Shade", "Shade_Linen", lambda bm, cx=cx, cz=cz, ty=ty: cyl(bm, (cx, ty + 0.28, cz), (cx, ty + 0.52, cz), 0.19, 0.14, 18, cap=False))
         part(f"decor_{n}_Bulb", "Lamp_Emit", lambda bm, cx=cx, cz=cz, ty=ty: sphere(bm, (cx, ty + 0.36, cz), 0.04, 8))
-        light("POINT", (cx, ty + 0.38, cz), 30.0, WARM, 0.06)
+        light("POINT", (cx, ty + 0.38, cz), 70.0, WARM, 0.06)
     nb = K.BOX["Nightstand_N"]
     P = Painter()
     P.add("beige", box, nb["min"][0] + 0.04, nb["min"][0] + 0.24, nb["max"][1], nb["max"][1] + 0.08, nb["min"][2] + 0.05, nb["min"][2] + 0.2)
@@ -2078,7 +2079,7 @@ def dress_motel_room():
     part("decor_AC", "Plastic_Beige", lambda bm: wall_box(bm, "E", 3.0, 4.0, 1.95, 2.35, 0.0, 0.25))
     part("decor_Smoke_Detector", "Plastic_Beige", lambda bm: cyl(bm, (2.75, K.H, -4.75), (2.75, K.H - 0.04, -4.75), 0.07, 0.07, 14))
     part("decor_Ceiling_Dome", "Shade_Glass", lambda bm: sphere(bm, (0.0, K.H - 0.02, 0.0), 0.22, 16, 0.35))
-    light("POINT", (0.0, K.H - 0.12, 0.0), 45.0, WARM, 0.1, name="Ceiling_Light")
+    light("POINT", (0.0, K.H - 0.15, 0.0), 120.0, WARM, 0.1, name="Ceiling_Light")
     rug("Bath_Mat", 1.1, 1.9, -4.9, -4.5, "Towel_White")
 
 
@@ -2570,7 +2571,7 @@ ATLAS_VEND = Atlas([("snacks", 256, 384, vend_front("snacks", 141)), ("drinks", 
 
 VENDING_ROOM = dict(
     pages=(2048, 1024),
-    grade={"target": 0.9, "shoulder": 1.15},
+    grade={"target": 1.5, "shoulder": 1.15, "caps": {"Trim_White": 0.83}},
     mats={"Vinyl_Dark": dict(gen="vinyl", rough=0.45, tile=1.2, group="struct"),
           "Paint_Navy": dict(diff="plastered_wall_04_diff_1k.jpg", tint=(0.20, 0.25, 0.55), rough=0.7, tile=2.5, group="struct"),
           "Ceiling_Tiles": dict(gen="ceiltile", rough=0.9, tile=1.2, group="struct"),
@@ -2625,7 +2626,7 @@ def dress_melting_library():
                         quad(bm, (xa1, ya, z0), (xb1, yb2, z1), (xb1, yb2 + 0.03, z1), (xa1, ya + 0.03, z0))
                         quad(bm, (xa0, ya, z0), (xa0, ya + 0.03, z0), (xb0, yb2 + 0.03, z1), (xb0, yb2, z1))
                 for zu in (-4.0, -2.0, 0.0, 2.0, 4.0):                          # the uprights, bent the same way
-                    ys = np.linspace(y0, y1, 8)
+                    ys = np.linspace(y0 + (0.0 if j == 0 else 0.01), y1, 8)      # above 1.8 m: the layout check sees it hang, not stand
                     for ya, yb2 in zip(ys, ys[1:]):
                         xa, xb = x + lean_x(ya, k), x + lean_x(yb2, k)
                         xa0, xa1 = max(b["min"][0], xa - 0.38), min(b["max"][0], xa + 0.38)

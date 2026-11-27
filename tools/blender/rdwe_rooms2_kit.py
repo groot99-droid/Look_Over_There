@@ -1733,7 +1733,7 @@ def ensure_cover(tol=0.04):
         main = max(inside, key=lambda o: (gbox(o)[1][1] - gbox(o)[0][1]))
         bm = bmesh.new()
         bm.from_mesh(main.data)
-        y0 = b["min"][1]
+        y0 = b["min"][1] + (0.012 if b["min"][1] > 0.5 else 0.0)      # a box off the floor: its plate just above the box's base
         mn, mx = b["min"], b["max"]
         cube(bm, (mn[0] + 0.01, y0, mn[2] + 0.01), (mx[0] - 0.01, y0 + 0.002, mx[2] - 0.01))
         ytop = gbox(main)[1][1]
