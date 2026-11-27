@@ -1,0 +1,32 @@
+{
+ "gain": 0.706,
+ "wall_materials": [
+  "Wall_Plaid"
+ ],
+ "wall_p50_before": 0.425,
+ "target_wall_p50": 0.3,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Brass": 0.706,
+  "Carpet_Tan": 0.706,
+  "Ceiling_Hall": 0.706,
+  "Chrome": 0.706,
+  "Fixture": 0.545,
+  "Glass_Knob": 0.697,
+  "Iron": 0.706,
+  "Leaf_Baize": 0.706,
+  "Leaf_BlackLacquer": 0.706,
+  "Leaf_CherryRed": 0.706,
+  "Leaf_Glass": 0.706,
+  "Leaf_Oak": 0.706,
+  "Leaf_PinkLaminate": 0.706,
+  "Leaf_SkyBlue": 0.706,
+  "Mirror": 0.706,
+  "Moss_Block": 0.706,
+  "Moss_Stone": 0.706,
+  "Trim_Hall": 0.706,
+  "Wall_Amber": 0.706,
+  "Wall_Plaid": 0.706
+ }
+}
