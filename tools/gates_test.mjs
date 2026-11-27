@@ -2,7 +2,7 @@
 // and check the player is back on L4 at the arrival point in the gate's link (world/L4.json).
 //   Right Door, Wrong Exit: the room chain is cancelled (walk.cancel(), what a player quitting does) or finishes ("reached" for every room)
 //   The Intern: the game window posts "intern-ending"
-// Also: in a room a gate does not open and the toast comes from the manifest's soloOnly flag.
+// Also: in a room a gate opens when the manifest does not mark it soloOnly (both games are coop since session 11; no shipped gate is solo only any more).
 // Usage: node tools/gates_test.mjs     (needs Playwright + Chromium; run from the repo root)
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
@@ -57,16 +57,16 @@ try {
     if (entered) { await new Promise(r => setTimeout(r, 4000)); await end(page); }
     await back(name, page, link);
   }
-  // the manifest says the Intern's gate is solo only (Right Door, Wrong Exit's is coop since session 11: tools/games_party_test.mjs); in a room the Intern's door refuses and says so
+  // neither gate is solo only since session 11 (tools/games_party_test.mjs, tools/intern_party_test.mjs): in a room the Intern's door opens onto the passage, with no refusal
   const gates = Object.fromEntries(REGISTRY.links.filter(l => l.connector === "gate" && l.status === "built").map(l => [l.from.door, l]));
-  check("the manifest marks the Intern's gate soloOnly and Right Door, Wrong Exit's not", gates.DoorLeaf_Gate_ITN.soloOnly === true && gates.DoorLeaf_Gate_RDW.soloOnly === false);
+  check("the manifest marks neither game gate soloOnly", gates.DoorLeaf_Gate_ITN.soloOnly === false && gates.DoorLeaf_Gate_RDW.soloOnly === false);
   const room = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage();
   await room.goto(`http://localhost:${srv.port}/?room=GATES&name=Ann&char=0&auto=1&ready=1`);
   await room.waitForFunction(() => window.__game && !document.getElementById("load") && window.__game.net.phase === "playing", null, {timeout: 240000});
   await room.evaluate(async () => { const g = window.__game; await g.loadScene("L4"); const dr = g.doors.find(d => d.d.name === "DoorLeaf_Gate_ITN"); g.openDoor(dr, true); });
   const toast = await room.evaluate(() => document.getElementById("toast")?.textContent || "");
-  const stayed = await room.evaluate(() => window.__game.S.id);
-  check("in a room a soloOnly gate (the Intern's) does not open and says so", /does not open in a room/.test(toast) && stayed === "L4", `${toast} / ${stayed}`);
+  const went = await room.waitForFunction(() => window.__game.S.id === "T" && !window.__game.loading, null, {timeout: 90000}).then(() => true, () => false);
+  check("in a room the Intern's gate opens onto the passage and does not refuse", went && !/does not open in a room/.test(toast), `${toast} / ${await room.evaluate(() => window.__game.S.id)}`);
   check("no page errors", errors.length === 0, errors.join(" | "));
 } catch (e) { console.log("ERROR", e.message); failed++; }
 await browser.close(); await srv.close(); console.log(failed ? `${failed} FAILED` : "ALL PASSED"); process.exit(failed ? 1 : 0);

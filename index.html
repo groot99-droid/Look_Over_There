@@ -576,18 +576,18 @@ const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.connec
 const roomShutGate = l => { const e = gateEntry(l); return !e || !!e.soloOnly; };
 // the room's view of me while I am inside a game: where, and which room of the game (the place the server relays by: `rdwe:teal`), sent from the game's own loop because the page's does not run
 const GN = {place: null, t: 0, last: null};
-function gameNetTick(pos, yaw) {
+function gameNetTick(pos, yaw, sub) {          // sub: which room of an Intern stage (its positions are in that room's own frame)
   if (!net.on || !GN.place) return;
   const now = performance.now(); if (now - GN.t < 1000 / 15) return; GN.t = now;
   const moving = GN.last ? Math.hypot(pos.x - GN.last[0], pos.z - GN.last[2]) > 0.002 : false; GN.last = [pos.x, pos.y, pos.z];
-  net.send({t: "s", scene: GN.place, x: r2(pos.x), y: r2(pos.y), z: r2(pos.z), yaw: r2(yaw), moving: moving ? 1 : 0});
+  net.send({t: "s", scene: GN.place, x: r2(pos.x), y: r2(pos.y), z: r2(pos.z), yaw: r2(yaw), moving: moving ? 1 : 0, ...(sub ? {sub} : {})});
 }
 function leaveGameNet() {
   if (net.on && GN.place) { const p = GN.last || [0, 0, 0]; net.send({t: "s", scene: null, x: r2(p[0]), y: r2(p[1]), z: r2(p[2]), yaw: 0}); }          // on the way back: nobody should see a ghost in the game for the seconds the floor loads
   GN.place = null; GN.last = null;
 }
 // the other players of this room of the game, with the last position the server gave us
-const gamePeers = () => net.on && GN.place ? [...net.peers.values()].filter(p => p.scene === GN.place && Number.isFinite(p.tx)).map(p => ({id: p.id, x: p.tx, y: p.ty, z: p.tz, yaw: p.tyaw, color: p.color})) : [];
+const gamePeers = () => net.on && GN.place ? [...net.peers.values()].filter(p => p.scene === GN.place && Number.isFinite(p.tx)).map(p => ({id: p.id, x: p.tx, y: p.ty, z: p.tz, yaw: p.tyaw, color: p.color, room: p.sub})) : [];
 async function enterGame(l) {
   if (inGame) return;
   inGame = l.game; loading = true; devOn.v = false;
@@ -609,11 +609,19 @@ async function enterGame(l) {
     walk.cancel();
   } else if (l.game === "intern") {
     const fr = document.createElement("iframe");              // its own window: removing it ends the game's renderer, listeners and drone with it
-    fr.src = `games/intern/index.html?scale=${INTERN_SCALE}`; fr.allow = "autoplay; gamepad; fullscreen";
+    const coop = net.on && !roomShutGate(l), stage0 = REGISTRY.gamePlaces[`intern:${l.room}`] ? l.room : "S0";          // in a party room: other players are drawn, and ours is sent
+    GN.place = coop ? `intern:${stage0}` : null; GN.t = 0; GN.last = null;
+    fr.src = `games/intern/index.html?scale=${INTERN_SCALE}` + (stage0 !== "S0" ? `&start=${stage0}` + (/^\w{1,24}$/.test(l.sub || "") ? `&room=${l.sub}` : "") : ""); fr.allow = "autoplay; gamepad; fullscreen";
     fr.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#000";
     mount.appendChild(fr);
     ending = await new Promise(res => {
-      const onMsg = e => { if (e.source === fr.contentWindow && e.data && e.data.type === "intern-ending") { removeEventListener("message", onMsg); res(e.data); } };
+      // the game says where its player is (stage, room of the stage, spot in that room's frame); the page passes it to the room and hands the game the others of that stage
+      const peersT = coop ? setInterval(() => fr.contentWindow && fr.contentWindow.postMessage({type: "intern-peers", peers: gamePeers()}, "*"), 100) : 0;
+      const onMsg = e => {
+        if (e.source !== fr.contentWindow || !e.data) return;
+        if (e.data.type === "intern-state" && coop) { const d = e.data, place = `intern:${d.stage}`; if (REGISTRY.gamePlaces[place] && [d.x, d.y, d.z, d.yaw].every(Number.isFinite) && /^\w{1,24}$/.test(d.room || "")) { GN.place = place; gameNetTick(d, d.yaw, d.room); } }
+        if (e.data.type === "intern-ending") { removeEventListener("message", onMsg); clearInterval(peersT); res(e.data); }
+      };
       addEventListener("message", onMsg);
       fr.addEventListener("load", () => { const st = fr.contentDocument.createElement("style"); st.textContent = "#sound-toggle{display:none!important}"; fr.contentDocument.head.appendChild(st); fr.contentWindow.focus(); setTimeout(() => { gf.style.opacity = 0; fr.contentWindow.focus(); }, 1800); });
     });
@@ -3209,7 +3217,7 @@ function onNet(m) {
     case "s": {
       const p = net.peers.get(m.id); if (!p) break;
       const moved = p.scene !== m.scene, wasDead = p.dead;
-      p.scene = m.scene; p.tx = m.x; p.ty = m.y; p.tz = m.z; p.tyaw = m.yaw; p.crouch = !!m.crouch; p.moving = !!m.moving; p.run = !!m.run; p.dead = !!m.dead; p.imm = !!m.imm; p.carry = !!m.carry; p.cloak = !!m.cloak; p.gun = !!m.gun; if (Number.isFinite(m.hp)) { const hp = Math.max(0, Math.min(MAX_HP, Math.round(m.hp / 5) * 5)); if (hp !== p.hp) { p.hp = hp; peerTag(p); } }
+      p.scene = m.scene; p.sub = m.sub; p.tx = m.x; p.ty = m.y; p.tz = m.z; p.tyaw = m.yaw; p.crouch = !!m.crouch; p.moving = !!m.moving; p.run = !!m.run; p.dead = !!m.dead; p.imm = !!m.imm; p.carry = !!m.carry; p.cloak = !!m.cloak; p.gun = !!m.gun; if (Number.isFinite(m.hp)) { const hp = Math.max(0, Math.min(MAX_HP, Math.round(m.hp / 5) * 5)); if (hp !== p.hp) { p.hp = hp; peerTag(p); } }
       { const tod = Number.isFinite(m.tod) ? Math.floor(m.tod * 6) / 6 : null; if (tod !== p.tod) { p.tod = tod; peerTag(p); } }          // their City clock, to the ten minutes (it is not yours)
       if (p.fresh || moved || Math.hypot(p.tx - p.x, p.tz - p.z) > 6) { p.x = p.tx; p.y = p.ty; p.z = p.tz; p.yaw = p.tyaw; p.fresh = false; }
       if (!wasDead && p.dead && m.scene === S.id) { net.alert = {id: p.id, until: performance.now() + 8000}; toast(`${p.name} was caught`); }     // the scream: an arrow toward the body
@@ -3297,11 +3305,11 @@ function goToFriend(id) {
 async function arriveAtFriend(m) {
   const p = net.peers.get(m.id), name = p ? p.name : "your friend";
   if (m.refused) { toast(`You cannot go to ${name} yet${(m.missing || []).includes("original_complete") ? ": finish the Original first" : ""}.`, 4200); return; }
-  const gp = REGISTRY.gamePlaces[m.scene];          // a friend inside a game (Right Door, Wrong Exit): walk in at their room. The way back is the gate's.
+  const gp = REGISTRY.gamePlaces[m.scene];          // a friend inside a game: walk in at their room (Right Door, Wrong Exit) or their stage (the Intern). The way back is the gate's.
   if (loading || dead || inGame || (!gp && !SCENES[m.scene]) || !REGISTRY.canReach(m.scene, heldFlags(), net.mode).ok || nightBound(m.scene)) return;
   if (FIN.results) { $("results").style.display = "none"; FIN.results = null; FIN.out = false; }          // from the results screen, as the walk out does
   if (S.id === CITY_SCENE && CITY.tr.active && m.scene !== CITY_SCENE) endTrash("left");                // leaving the street ends a trash route, as the bus does
-  if (gp) { const g = REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === gp.area && !x.soloOnly); if (!g) return; toast(`You are with ${name}: ${placeName(m.scene)}.`); await enterGame({game: gp.area, room: gp.room, scene: g.returnTo.scene, arrive: g.to.arrive, face: g.to.face}); return; }
+  if (gp) { const g = REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === gp.area && !x.soloOnly); if (!g) return; toast(`You are with ${name}: ${placeName(m.scene)}.`); await enterGame({game: gp.area, room: gp.room, sub: m.sub, scene: g.returnTo.scene, arrive: g.to.arrive, face: g.to.face}); return; }
   const pos = [m.x, m.y, m.z];
   if (m.scene === S.id) teleport(pos); else await loadScene(m.scene, {pos});
   toast(`You are with ${name}: ${placeName(m.scene)}.`);

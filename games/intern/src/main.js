@@ -9,6 +9,8 @@ import { createAudio } from './audio.js';
 import { createSfx } from './sfx.js';
 import { initBail } from './bail.js';
 import { initSoundToggle } from './soundToggle.js';
+import { initCoop } from './coop.js';
+import { baseOf } from './spine.js';
 
 async function loadJSON(path) {
   const res = await fetch(path);
@@ -94,13 +96,18 @@ async function boot() {
     }
   });
 
-  window.__NINETY_NINE__ = { state, director, stage, manifest, endings, library, audio, rooms }; // dev inspection only
+  const coop = initCoop({ stage, state, manifest }); // Look Over There host: the party's other players in this stage (seen only)
+  window.__NINETY_NINE__ = { state, director, stage, manifest, endings, library, audio, rooms, coop }; // dev inspection only
 
   initBail(director);
   initSoundToggle(audio);
   // Dev only: ?start=S5&render=H drops the candidate straight into a scene.
   const q = new URLSearchParams(location.search);
-  await director.start(q.get('start') || 'S0', q.get('render') || 'C');
+  // Look Over There host: ?start=S3&room=S3_H joins a friend at their stage, in the render whose room they are in.
+  const startId = q.get('start') || 'S0';
+  const branches = (manifest.scenes[startId] || {}).branches || {};
+  const friendRender = q.get('room') ? Object.keys(branches).find((k) => baseOf(rooms, branches[k].room) === q.get('room')) : null;
+  await director.start(startId, q.get('render') || friendRender || 'C');
 
   // Dev only: ?autopilot=SSRR... walks the candidate through by himself
   // (src/dev/autopilot.js, tools/walkthrough.cjs).

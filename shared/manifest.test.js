@@ -59,14 +59,15 @@ test("a drifted door link is caught", () => {
   assert.ok(checkManifest(FARWAY, {worldDocs: docs3}).errors.some(m => /does not list/.test(m)));
 });
 
-test("the two game gates say where to return to; Right Door, Wrong Exit is coop (a room can enter it, session 11) and the Intern is solo only", () => {
+test("the two game gates say where to return to; both games are coop (a room can enter them, session 11)", () => {
   for (const door of ["DoorLeaf_Gate_RDW", "DoorLeaf_Gate_ITN"]) {
     const l = REGISTRY.linkFrom("L4", door);
     assert.equal(l.connector, "gate", door);
     assert.deepEqual(l.returnTo, {area: "lot", scene: "L4"});
   }
   assert.equal(REGISTRY.linkFrom("L4", "DoorLeaf_Gate_RDW").soloOnly, false);
-  assert.equal(REGISTRY.linkFrom("L4", "DoorLeaf_Gate_ITN").soloOnly, true);
+  assert.equal(REGISTRY.linkFrom("L4", "DoorLeaf_Gate_ITN").soloOnly, false);
+  assert.equal(REGISTRY.links.find(l => l.id === "city.666>intern").soloOnly, true, "the job shift from the City stays solo");
 });
 
 // ---- the validator
@@ -220,7 +221,7 @@ test("a built link a room can follow joins scenes a room can be in; every other 
   for (const l of REGISTRY.links.filter(l => l.status === "built" && !l.soloOnly)) for (const e of [l.from, l.to])
     assert.ok(REGISTRY.floors[e.scene] !== undefined || REGISTRY.presence[e.scene] !== undefined || (e.scene === undefined && Object.values(REGISTRY.gamePlaces).some(g => g.area === e.area)), `${l.id}: ${e.scene || e.area}`);          // or the gate into a coop game: its places
   bad(d => { delete d.links.find(l => l.id === "city.street>grocery").soloOnly; }, /city\.street>grocery: a room could follow this link into main_floor/);
-  bad(d => { delete d.links.find(l => l.connector === "gate" && l.to.area === "intern").soloOnly; }, /a room could follow this link into intern/);          // the Intern is not coop: its gate must stay solo only
+  bad(d => { delete d.areas.find(a => a.id === "intern").coop; }, /a room could follow this link into intern/);          // a game that is not coop: its gate must say solo only
 });
 test("canReach: which scenes a room's player may be in, by the flags they hold", () => {
   assert.deepEqual(REGISTRY.canReach("L2", []), {ok: true, missing: []}, "the mode's floors are always open");
@@ -238,17 +239,18 @@ test("canReach: which scenes a room's player may be in, by the flags they hold",
 });
 
 // ---- co-op inside the games (session 11, slice 2): a game area marked `coop` has a place for each of its rooms or stages, and a room can follow its gate into it.
-// The shipped manifest has Right Door, Wrong Exit coop (slice 3) and the Intern solo only until it can show other players (slice 4), so these use a copy with co-op switched on for either.
+// The shipped manifest has both games coop (slices 3 and 4); these use a copy with co-op switched on for the games named and off for the other.
 const withCoop = (games = ["rdwe", "intern"]) => {
   const d = clone(FARWAY);
-  for (const a of d.areas) if (games.includes(a.id)) a.coop = true;
-  for (const l of d.links) if (l.connector === "gate" && l.status === "built" && games.includes(l.to.area)) delete l.soloOnly;
+  for (const a of d.areas) if (a.id === "rdwe" || a.id === "intern") { if (games.includes(a.id)) a.coop = true; else delete a.coop; }
+  for (const l of d.links) if (l.connector === "gate" && l.status === "built" && (l.to.area === "rdwe" || l.to.area === "intern")) { if (games.includes(l.to.area)) delete l.soloOnly; else l.soloOnly = true; }
   return d;
 };
-test("shipped: Right Door, Wrong Exit has game places a room reaches through its gate; the Intern has none", () => {
-  assert.deepEqual(Object.keys(REGISTRY.gamePlaces), ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"].map(r => `rdwe:${r}`));
+test("shipped: both games have game places a room reaches through their gates", () => {
+  assert.deepEqual(Object.keys(REGISTRY.gamePlaces), [...["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"].map(r => `rdwe:${r}`), ...["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"].map(r => `intern:${r}`)]);
   assert.equal(REGISTRY.canReach("rdwe:dining", []).ok, true, "no flag is needed for the gate");
-  assert.equal(REGISTRY.canReach("intern:S0", REGISTRY.manifest.flags).ok, false);
+  assert.equal(REGISTRY.canReach("intern:S0", []).ok, true, "nor for the Intern's");
+  assert.equal(REGISTRY.canReach("intern:S9", REGISTRY.manifest.flags).ok, false, "a stage the Intern does not have");
   assert.deepEqual(checkManifest(FARWAY, {worldDocs: worldDocs()}).warnings, []);
 });
 test("a coop game has a place per room (Right Door, Wrong Exit) or stage (the Intern), named area:room", () => {
@@ -272,9 +274,9 @@ test("coop is checked: it needs a built game with rooms or stages, and its gate 
   bad(d => { d.areas.find(a => a.id === "rdwe").coop = "yes"; }, /coop must be true/);
   bad(d => { delete d.areas.find(a => a.id === "rdwe").rooms; }, /coop needs rooms or spine/);
   bad(d => { d.areas.find(a => a.id === "hotel").coop = true; }, /only a built area can be coop/);          // the hotel is still planned (the dreamcore forest, the first example here, is built now)
-  bad(d => { d.areas.find(a => a.id === "intern").coop = true; }, /soloOnly/);          // coop game, but its gate still says soloOnly: say which one
+  bad(d => { d.links.find(l => l.to.area === "intern" && l.connector === "gate" && l.status === "built").soloOnly = true; }, /soloOnly/);          // coop game, but its gate says soloOnly: say which one
   const d = withCoop(["rdwe"]); const gate = d.links.find(l => l.to.area === "rdwe" && l.connector === "gate" && l.status === "built");
   gate.to.room = "nowhere"; assert.ok(validateManifest(d).some(m => /nowhere/.test(m)), "a gate into a room the game does not have");
-  const solo = clone(FARWAY); solo.links.find(l => l.to.area === "intern" && l.connector === "gate" && l.status === "built").soloOnly = false;
+  const solo = withCoop(["rdwe"]); solo.links.find(l => l.to.area === "intern" && l.connector === "gate" && l.status === "built").soloOnly = false;
   assert.ok(validateManifest(solo).some(m => /neither multiplayer nor presence|soloOnly/.test(m)), "a gate a room can follow into a game that is not coop");
 });
