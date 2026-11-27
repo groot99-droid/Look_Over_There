@@ -148,13 +148,13 @@ OK world/maze_07.json: 43 colliders, 2 doors, 1 markers, 2 links, 0 zones, 1 spo
   warning: link atrium_L12: the manifest has no link from this door yet: a new link to add
   warning: link atrium_L4: the manifest has no link from this door yet: a new link to add
   warning: link atrium_L8: the manifest has no link from this door yet: a new link to add
-OK world/escalators.json: 64 colliders, 4 doors, 1 markers, 4 links, 0 zones, 0 spots, 0 errors, 5 warnings
+OK world/escalators.json: 192 colliders, 4 doors, 1 markers, 4 links, 0 zones, 0 spots, 0 errors, 5 warnings
   warning: scene other_stairs is not in the world manifest yet: a new scene to add
   warning: link atrium_L0: the manifest has no link from this door yet: a new link to add
   warning: link atrium_L12: the manifest has no link from this door yet: a new link to add
   warning: link atrium_L4: the manifest has no link from this door yet: a new link to add
   warning: link atrium_L8: the manifest has no link from this door yet: a new link to add
-OK world/other_stairs.json: 66 colliders, 4 doors, 1 markers, 4 links, 0 zones, 0 spots, 0 errors, 5 warnings
+OK world/other_stairs.json: 73 colliders, 4 doors, 1 markers, 4 links, 0 zones, 0 spots, 0 errors, 5 warnings
   warning: scene clue_room is not in the world manifest yet: a new scene to add
 OK world/rooms/clue_room.json: 11 colliders, 0 doors, 1 markers, 0 links, 0 zones, 4 spots, 0 errors, 1 warnings
   warning: scene empty_room is not in the world manifest yet: a new scene to add

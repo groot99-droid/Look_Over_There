@@ -1,0 +1,21 @@
+{
+ "gain": 3.75,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Ceiling_Room": 3.75,
+  "Cord": 3.75,
+  "Curtain": 3.75,
+  "Decal_Bed": 3.75,
+  "Decal_Ghost": 3.75,
+  "Floor_Bare": 3.75,
+  "Grille": 3.75,
+  "Plastic_Black": 3.75,
+  "Plastic_White": 3.75,
+  "Tack_Strip": 3.75,
+  "Wall_Stripped": 3.75,
+  "Window_Frame": 3.75,
+  "Window_Void": 3.75,
+  "Wood_Laminate": 3.75
+ }
+}

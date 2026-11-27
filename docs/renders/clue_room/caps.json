@@ -1,0 +1,25 @@
+{
+ "gain": 4.712,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Brass": 4.712,
+  "Carpet_Clue": 4.712,
+  "Ceiling_Room": 4.712,
+  "Cork": 4.712,
+  "Folder_Buff": 4.712,
+  "Grille": 4.712,
+  "Lamp_Green": 4.712,
+  "Mug": 4.2512,
+  "Paper": 3.0218,
+  "Pin_Heads": 4.712,
+  "Plastic_Black": 4.712,
+  "Plastic_White": 4.712,
+  "String_Red": 4.712,
+  "Wall_Clue": 4.712,
+  "Window_Frame": 4.712,
+  "Window_Void": 4.712,
+  "Wood_Dark": 6.7568,
+  "Wood_Laminate": 4.712
+ }
+}

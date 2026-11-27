@@ -1,0 +1,26 @@
+{
+ "gain": 5.114,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Brass": 5.114,
+  "Decal_Floor": 5.114,
+  "Door_Jamb": 5.114,
+  "Leaf_Stair": 5.114,
+  "Leaf_Glass": 5.114,
+  "Rail_Steel": 15.342,
+  "Iron_Black": 5.114,
+  "Lamp_Dead": 5.114,
+  "Nosing_Yellow": 5.114,
+  "Plastic_White": 5.114,
+  "Red_Paint": 7.1429,
+  "Sign_Green": 5.114,
+  "Stair_Ceiling": 7.1429,
+  "Stair_Dado": 13.6364,
+  "Stair_Edge": 5.114,
+  "Stair_Floor": 8.3333,
+  "Stair_Paint": 5.114,
+  "Stair_Step": 14.7059,
+  "Stencil_Paint": 5.114
+ }
+}
