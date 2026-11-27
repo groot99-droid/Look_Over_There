@@ -2747,7 +2747,7 @@ def dress_melting_library():
 
 MELTING_LIBRARY = dict(
     pages=(2048, 2048),
-    grade={"target": 1.5, "shoulder": 1.15, "caps": {}},
+    grade={"target": 1.6, "shoulder": 1.15, "caps": {}},
     mats={"Floor_Parquet": dict(diff="herringbone_parquet_diff_1k.jpg", tint=(0.85, 0.72, 0.6), rough=0.4, tile=1.6, group="struct"),
           "Paper_Oxblood": dict(gen="paper", rough=0.9, tile=0.9, group="struct"),
           "Ceiling_Dark": dict(diff="dark_wood_diff_1k.jpg", tint=(0.7, 0.6, 0.55), rough=0.6, tile=1.6, group="struct"),
