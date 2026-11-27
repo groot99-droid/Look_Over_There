@@ -1,0 +1,6 @@
+{
+ "gain": 1.0,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {}
+}

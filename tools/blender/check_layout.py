@@ -104,7 +104,8 @@ def check(parts, world, constants=None, tol=TOL):
             continue
         for x in _samples(p["min"][0], p["max"][0], STEP / 2):
             for z in _samples(p["min"][2], p["max"][2], STEP / 2):
-                if not any(_in_plan(c, x, z, tol) for c in stand):
+                if not any(_in_plan(c, x, z, tol) for c in stand) and not any(_in_plan(c, x, z, tol) and c["min"][1] - tol <= p["min"][1] < c["max"][1] - tol
+                                                                             for c in colliders):   # or it sits in a collider at its own height (a flight's upper steps)
                     bad.append(f"{p['name']} at x {x:.2f}, z {z:.2f}")
                     break
             else:
@@ -153,7 +154,10 @@ def main(argv):
     def arg(n, d=None):
         return argv[argv.index(n) + 1] if n in argv else d
     scene = arg("--scene", "apartment")
-    world = json.loads((ROOT / f"world/{scene}.json").read_text())
+    wp = ROOT / f"world/{scene}.json"
+    if not wp.exists() and (ROOT / f"world/rooms/{scene}.json").exists():      # the hotel's room layouts (world/rooms/<layout>.json)
+        wp = ROOT / f"world/rooms/{scene}.json"
+    world = json.loads(wp.read_text())
     lay = ROOT / f"blender/layout/{scene}.json"
     constants = json.loads(lay.read_text()).get("constants") if lay.exists() else {}
     if arg("--boxes"):
