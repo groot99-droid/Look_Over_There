@@ -1,14 +1,16 @@
 # Going back in, floors L4 to B1: fifteen chambers dressed and lit
 
-`gbi_L4_1` (showroom floor), `gbi_L4_2` (room sets), `gbi_L4_3` (stockroom), `gbi_L3_2` (white gallery), `gbi_L3_3` (colonnade) and
-`gbi_L3_4` (white maze): the greybox chambers of `docs/BLENDER_AREAS.md` section 6, dressed and lit (step 2), each in its floor's own materials from
-the store's Blender file. L4 is the store's showroom (terrazzo floor, off-white walls, the dark open ceiling, the orange and blue of the store's
-fittings); L3 is the store's white plaster room (tan floor, white walls and ceiling). The tone is liminal: everything off and empty, but seemingly
-normal. Shelves nearly bare, a few cartons left, the floor arrows still pointing the way, every panel in the ceiling lit by day and one in nine at
-night, when the emergency spots take over.
+All fifteen new chambers of `docs/BLENDER_AREAS.md` section 6, dressed and lit (step 2), each in its floor's own materials from the store's
+Blender file: L4 (`gbi_L4_1` showroom floor, `_2` room sets, `_3` stockroom), L3 (`gbi_L3_2` white gallery, `_3` colonnade, `_4` white maze), L2
+(`gbi_L2_2` door grid, `_3` long loop, `_4` split halls), L1 (`gbi_L1_2` cubicle farm, `_3` corridor offices, `_4` conference ring) and B1
+(`gbi_B1_2` lido, `_3` baths, `_4` the drain). L4 is the store's showroom (terrazzo floor, off-white walls, the dark open ceiling, the store's orange
+and blue); L3 its white plaster room; L2 its dark carpet and yellowed wallpaper; L1 its offices; B1 its white-tiled pools. The five safe houses are
+the kit's room inside chamber 2 of each floor (not separate scenes). The tone is liminal: everything off and empty, but seemingly normal. Shelves
+nearly bare, desks left, the floor arrows still pointing the way, every panel in the ceiling lit by day; at night only the night circuit (one panel
+in nine on L4 and L3, one in four on the lower floors, whose rooms are small) and the emergency spots.
 
-Each chamber's folder (`docs/renders/<scene>/`) holds its four stills, its plan, `bake.json` (the bake's own report) and `caps.json` (the
-brightness factors). This README covers all six.
+Each chamber's folder (`docs/renders/<scene>/`) holds its four stills, its plan, `bake.json` (the bake's own report), `caps.json` (the
+brightness factors), `CHECKS.txt` (the gates) and a README with its sizes and brightness tables. This README covers all fifteen.
 
 | File | What it is |
 |---|---|
@@ -16,9 +18,9 @@ brightness factors). This README covers all six.
 | `world/lightmaps/<scene>_0.webp` .. `_3.webp` | four 2048 px lightmaps per chamber: `_0` shell and `_1` props by day (`lightmap`), `_2` and `_3` the same at night (`lightmap_night`) |
 | `world/<scene>.json` | the layout, written by `export_scene.py` from the dressed `.blend`: **identical** to the greybox's (no collider, door, link, zone, marker or spot changed) |
 | `blender/scenes/<scene>.blend` | the saved chamber (Git LFS): `Art` (`Props`; `Arch`: the shell's and the kit's colliders' grey twins, for the layout check only), `Skin`, `Doors`, `Layout`, `Hazards`, `Lights`, `Kit` (the kit pieces as stand-ins, never exported), `Export` |
-| `tools/blender/build_gbi_dress.py` | the re-runnable build (all six chambers): stages art, bake, export, check, render; `--pack`, `--gain` and `--measure` without Blender |
+| `tools/blender/build_gbi_dress.py` | the re-runnable build (all fifteen chambers): stages art, bake, export, check, render; `--pack`, `--gain` and `--measure` without Blender |
 | `tools/blender/gbi_dress_skin.py` | pure Python: the shell as seen, the kit pieces' hulls and casings; `python tools/blender/gbi_dress_skin.py` prints them |
-| `tools/blender/check_layout.py` | gains `--floor <y>`: heights are read from the chamber's floor (9.6 on L4, 6.4 on L3), so its STRAY and CLEAR rules bite as on a floor at 0 |
+| `tools/blender/check_layout.py` | gains `--floor <y>`: heights are read from the chamber's floor (9.6 on L4, 6.4 on L3, 3.2 on L2, 0 on L1, -3 on B1), so its STRAY and CLEAR rules bite as on a floor at 0 |
 
 ## How it is built
 
@@ -26,7 +28,7 @@ The hotel floors' method (`tools/blender/build_hotel_floor2.py` and its skin mod
 
 - **The layout is the greybox's, untouched.** The art stage makes every `COL_` box, `Zone_` box, `DoorLeaf_`, `Link_`/`Arrive_`, `Marker_` and
   `Spot_` (with every property) from `build_gbi_greybox.build(scene)`, then `export_scene.py` writes `world/<scene>.json`: the same file as the
-  greybox's for all six (checked: `git diff` is empty, and the greybox's `--check` model gate still passes).
+  greybox's for all fifteen (checked: `git diff` is empty, and the greybox's `--check` model gate still passes).
 - **The shell is only what can be seen** (`gbi_dress_skin.py`): the faces of the greybox's floor, ceiling, outer walls, partitions, columns and the
   elevator's shaft that look into the chamber's air, cut where boxes meet, faces hidden under solid furniture dropped. Their materials are the greybox's
   role names: `M_D_floor_<F>`, `M_D_wall_<F>`, `M_D_ceil_<F>`.
@@ -57,9 +59,9 @@ The hotel floors' method (`tools/blender/build_hotel_floor2.py` and its skin mod
 Two sets on the same UVs, as the store floors and the hotel lobby: every baked material carries `lightmap` / `lightmap_intensity` and
 `lightmap_night` / `lightmap_night_intensity`.
 
-- **Day:** the store's flush fluorescent panels (1.2 m by 0.6 m, every 4 m on L4 and 4.5 m on L3, an area light under each; the panel faces are
+- **Day:** the store's flush fluorescent panels (1.2 m by 0.6 m, every 4 m on L4, 4.5 m on L3, 3 m on L2 and L1, 4 m on B1, an area light under each; the panel faces are
   `Lamp_Emit`), the night circuit and the EXIT signs.
-- **Night (the store shut):** `Lamp_Emit` off; one panel in nine stays on (the night circuit, `M_GBI_nightlight`, always on); twin-spot
+- **Night (the store shut):** `Lamp_Emit` off; one panel in nine (L4, L3) or four (L2, L1, B1) stays on (the night circuit, `M_GBI_nightlight`, always on); twin-spot
   emergency lights (`Emergency_Emit`, on only at night) beside every way through and every 13 m along the outer walls; the EXIT signs (the store's
   `M_X_exit`, always on, as in the store).
 - Both `Lamp_Emit` and `Emergency_Emit` are exported at their full strength; the page switches them.
@@ -67,7 +69,7 @@ Two sets on the same UVs, as the store floors and the hotel lobby: every baked m
   (light above a map's 80th percentile rolls off toward 2.5 times it), white point at the 99.5th percentile (at most 12 x the 90th). The shell's faces
   are packed by hand on their page (each face its own pixel-aligned island); the props are smart-projected on theirs. Fixed pages: 2048 px each.
 - **Brightness** (`docs/renders/<scene>/caps.json`, from `build_gbi_dress.py --gain`): per set one gain brings the walls to a displayed p50 of 0.50
-  (L4) or 0.55 (L3) by day and 0.15 at night; any material that would pass p99 0.97 or p90 0.88 gets a lower factor of its own. `--pack` applies
+  (L4), 0.55 (L3, B1) or 0.45 (L2, L1) by day and 0.15 at night; any material that would pass p99 0.97 or p90 0.88 gets a lower factor of its own. `--pack` applies
   them to the GLB's extras. The tables below are `lab_display.py`'s (and its night twin's) on the final GLBs.
 
 ## Sources and licences
@@ -165,10 +167,10 @@ Wave 20, the run's end: a walkway round a flooding basin (`Hazard_tide_1`), colu
 
 - `check_layout.py --collection Art --floor <y>` on each dressed `.blend`: every check passes (COVER, STRAY, CLEAR).
 - `build_gbi_greybox.py --check . --glb docs/renders/gbi_greybox/glb`: GATES PASS (the model gate: the 15 layout files exactly as the model says);
-  run again with the six dressed GLBs in place of their greybox GLBs: every `Hazard_<kind>_<n>` is its own node on its origin, with its extras.
-- `export_scene.py` wrote the six layout files: `git diff` against the greybox's commit is empty.
+  run again with the dressed GLBs in place of their greybox GLBs: every `Hazard_<kind>_<n>` is its own node on its origin, with its extras.
+- `export_scene.py` wrote the fifteen layout files: `git diff` against the greybox's commit is empty.
 - `node tools/worlddoc.mjs check`: OK, 0 errors (the warnings say the scene and its links are new to the manifest).
-- `glb_inspect.py --budget tris=300000,mb=8`: pass for all six.
+- `glb_inspect.py --budget tris=300000,mb=8`: pass for all fifteen.
 - `node --test shared/*.test.js`: 297 of 297.
 - The privacy grep (the brief's patterns over every committed file, the `.blend` decompressed): no user name, absolute path, session id or
   e-mail. Its case-insensitive drive-letter pattern also matches two random byte runs inside compressed image data (`gbi_L3_3_3.webp`, and the packed
