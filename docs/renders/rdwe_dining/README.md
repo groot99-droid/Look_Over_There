@@ -1,11 +1,13 @@
-# Right Door, Wrong Exit, Phase A: the seven rooms dressed and lit
+# Right Door, Wrong Exit, Phases A and B: the seven rooms and the two set pieces dressed and lit
 
 `docs/BLENDER_AREAS.md`, section 7, step 2. The seven rooms that exist in `games/rdwe/scenes/*.js`, remade larger and psychedelic around the
 greybox (`tools/blender/build_rdwe_greybox.py`, `docs/renders/rdwe_greybox/`), in story order: `rdwe_dining`, `rdwe_hallway`, `rdwe_teal`,
 `rdwe_teal2`, `rdwe_flooded`, `rdwe_trampoline`, `rdwe_grocery`. Super Liminal, psychedelic: saturated, dreamlike, slightly wrong, and each
-room still recognisably itself (its palette, its furniture and its trick from the scene file, at the greybox's 1.2x to 3x scale).
+room still recognisably itself (its palette, its furniture and its trick from the scene file, at the greybox's 1.2x to 3x scale). Phase B
+adds the two set pieces on the same method: `rdwe_repeating_room` (the room that repeats, and the door seen from one angle) and
+`rdwe_finale` (the hide-and-seek map).
 
-This README covers all seven. Each room's folder (`docs/renders/<scene>/`) holds its three stills, its plan, `bake.json` and `caps.json`.
+This README covers all nine. Each room's folder (`docs/renders/<scene>/`) holds its three stills, its plan, `bake.json` and `caps.json`.
 Nothing is wired: no manifest change, and `games/rdwe/`, `index.html`, `shared/` and the tests are untouched.
 
 | File | What it is |
@@ -17,7 +19,7 @@ Nothing is wired: no manifest change, and `games/rdwe/`, `index.html`, `shared/`
 | `blender/textures/rdwe/` | the CC0 textures the build reads (below) |
 | `tools/blender/build_rdwe_phaseA.py` | the re-runnable build of all seven rooms |
 
-Built so far: `rdwe_dining`, `rdwe_hallway`, `rdwe_teal`, `rdwe_teal2`, `rdwe_flooded`, `rdwe_trampoline`, `rdwe_grocery`.
+Built so far: `rdwe_dining`, `rdwe_hallway`, `rdwe_teal`, `rdwe_teal2`, `rdwe_flooded`, `rdwe_trampoline`, `rdwe_grocery`, `rdwe_repeating_room`.
 
 ## How it is built
 
@@ -281,6 +283,33 @@ with STAFF ONLY.
 | Post_Cream | 550.4 | 0.259 | 0.407 | 0.497 |
 | Kick | 359.3 | 0.000 | 0.028 | 0.038 |
 | Strip_Housing | 149.5 | 0.286 | 0.543 | 0.548 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_repeating_room`: the room that repeats, and the door seen from one angle (Phase B)
+
+12 m by 12 m, 3.2 m high. Lilac paper printed with a lattice of little pink doors, each a hair different; a peach shag; a pale pink
+ceiling with one glowing pendant; a cream skirting and cornice. The pink velvet armchair, the side table with its lamp, and on the west wall a
+picture of this room with a picture of this room in it. The north door (`again`) and the south door you come back in by (`again_in`) are the
+same plain white flush door, a brass number plate on each: 12 going out, 13 coming back in. The lift and the library doors are their own
+looks. On the east wall the free-standing baffle, papered like the walls with a cream foot, hides the 2 m recess; at its far end the door seen
+from one angle (`secret_ops`) is a flush leaf in the wall's own door paper, with no frame and no handle, so from anywhere but `Spot_view_1` it
+is wall. The page-trick spots (`Spot_view_1`, `Spot_change_1` to `_3`) are untouched and nothing is placed on them; the page swaps the
+changes.
+
+- GLB 0.77 MB, 3496 triangles, 22 draw calls; lightmaps `_0` / `_1` 1536 / 1536 at 56.8 / 99.5 px/m (52 KB / 119 KB).
+- Light: the pendant (260 W), the table lamp (60 W), four soft fills, a faint light in the recess. Gain 1.087; capped: Carpet_Peach 0.847.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Wall_Doors | 190.7 | 0.300 | 0.598 | 0.958 |
+| Ceiling_Repeat | 158.2 | 0.193 | 0.262 | 0.341 |
+| Carpet_Peach | 153.8 | 0.652 | 0.861 | 0.970 |
+| Trim_Repeat | 19.4 | 0.421 | 0.694 | 0.857 |
+| Velvet_Pink | 10.3 | 0.114 | 0.252 | 0.290 |
+| Leaf_White | 9.9 | 0.074 | 0.723 | 0.788 |
+| Leaf_PinkLaminate | 9.1 | 0.000 | 0.660 | 0.732 |
+| Leaf_Oak | 9.1 | 0.000 | 0.104 | 0.164 |
 
 No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
 

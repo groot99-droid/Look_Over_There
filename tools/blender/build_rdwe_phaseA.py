@@ -55,18 +55,24 @@ DEVICE = arg("--device", "auto")
 MARGIN_PX = 8
 TEXDIR = ROOT / "blender/textures"
 SCENE = None
-SCENES = ["rdwe_dining", "rdwe_hallway", "rdwe_teal", "rdwe_teal2", "rdwe_flooded", "rdwe_trampoline", "rdwe_grocery"]
+SCENES = ["rdwe_dining", "rdwe_hallway", "rdwe_teal", "rdwe_teal2", "rdwe_flooded", "rdwe_trampoline", "rdwe_grocery", "rdwe_repeating_room",
+          "rdwe_finale"]
 PAGES = {s: [2048, 2048] for s in SCENES}
 PAGES["rdwe_teal"] = PAGES["rdwe_teal2"] = [1536, 1536]
 PAGES["rdwe_trampoline"] = PAGES["rdwe_grocery"] = [2048, 2048, 2048]
-PAGE2 = {"rdwe_trampoline": {"Truss_Steel"}, "rdwe_grocery": {"Gondola", "Gondola_Back", "Kick"}}   # a third page: the big repeated props
+PAGES["rdwe_repeating_room"] = [1536, 1536]
+PAGES["rdwe_finale"] = [2048, 2048, 2048]
+PAGE2 = {"rdwe_trampoline": {"Truss_Steel"}, "rdwe_grocery": {"Gondola", "Gondola_Back", "Kick"},
+         "rdwe_finale": {"Rack_Body", "Gondola", "Cubicle_Panel", "Cubicle_Frame"}}   # a third page: the big repeated props
 ALT = {"rdwe_dining": "the green lamp off"}            # scenes with a second light set (lightmap_night: maps n + 2)
 WHITE_CAP = 12.0
 SHOULDER = {"default": (75.0, 2.5)}
-FURNITURE = {"rdwe_dining": ("Table", "Chair_", "Sideboard", "China_Tower"), "rdwe_hallway": (), "rdwe_teal": ("Sofa_", "Plant"),
+FURNITURE = {"rdwe_repeating_room": ("Armchair", "Side_Table"),
+             "rdwe_finale": ("Cubicle_", "Desk_", "House_", "Rack_", "Aisle_Shelf_", "Hall_Fountain"),
+             "rdwe_dining": ("Table", "Chair_", "Sideboard", "China_Tower"), "rdwe_hallway": (), "rdwe_teal": ("Sofa_", "Plant"),
              "rdwe_teal2": ("Sofa", "Plant_Tall"), "rdwe_flooded": ("Rail_", "Heap_"), "rdwe_trampoline": ("Column_", "AngledWall_"),
              "rdwe_grocery": ("Shelf_", "Post_", "Cart", "Stanchion_")}
-NO_LIGHTMAP = {"Lamp_Emit", "Lamp_Emit_Green", "Emergency_Emit", "Window_Lit", "Grid_Emit", "Amber_Emit", "Glow_Emit", "Void", "Water", "Glass_Clear"}
+NO_LIGHTMAP = {"Lamp_Emit", "Lamp_Emit_Green", "Emergency_Emit_Green", "Screen_Emit", "Server_Emit", "Emergency_Emit", "Window_Lit", "Grid_Emit", "Amber_Emit", "Glow_Emit", "Void", "Water", "Glass_Clear"}
 NO_BAKE_VIS = {"Water", "Glass_Clear"}                   # hidden while baking (they would shade the floor under them)
 
 
@@ -394,6 +400,37 @@ def gen_rings(seed, n=512):
     return np.clip(out, 0, 1)
 
 
+def gen_door_paper(seed, n=512):
+    """The repeating room's paper: lilac, and on it a lattice of little pink doors, each a hair different (the room that repeats)."""
+    rng = np.random.default_rng(seed)
+    X, Y = grid(n)
+    base = lerp(C("#b89af0"), C("#a688e4"), vnoise(n, n, rng, 4, 6))
+    k = 6
+    fx, fy = np.mod(X * k, 1), np.mod(Y * k, 1)
+    ci, cj = np.floor(X * k).astype(int), np.floor(Y * k).astype(int)
+    jit = rng.random((k, k)) * 0.06
+    door = (np.abs(fx - 0.5) < 0.14 + jit[cj, ci] * 0.3) & (fy > 0.2) & (fy < 0.8)
+    knob = np.hypot(fx - 0.6, fy - 0.5) < 0.025
+    out = base.copy()
+    out[door] = C("#ff8ac8")
+    out[door & knob] = C("#ffe23a")
+    return np.clip(out, 0, 1)
+
+
+def gen_room_picture(seed, n=512):
+    """A picture of this room, with a picture of this room in it: lilac frames inside frames, a pink door at the heart."""
+    X, Y = grid(n)
+    out = np.zeros((n, n, 3)) + C("#b89af0")
+    for i in range(7):
+        m = 0.06 * i
+        band = (np.minimum(np.minimum(X - m, 1 - m - X), np.minimum(Y - m, 1 - m - Y)))
+        ring = (band > 0) & (band < 0.025)
+        out[ring] = C("#c8a040") if i % 2 else C("#7a5ad0")
+    door = (np.abs(X - 0.5) < 0.05) & (np.abs(Y - 0.52) < 0.09)
+    out[door] = C("#ff5aa8")
+    return np.clip(out, 0, 1)
+
+
 def gen_brushed(n=256):
     rng = np.random.default_rng(5)
     v = rng.random((n, 1)) * 0.5 + rng.random((n, n)) * 0.1
@@ -654,6 +691,52 @@ def room_materials():
         material("Tape_Yellow", color=srgb_lin("#ffd820"), rough=0.6)
         material("Strip_Housing", color=srgb_lin("#d5d2c8"), rough=0.5)
         material("Alu", img=GEN["gen_brushed"], tint=srgb_lin("#c0c4c8"), rough=0.35, metal=0.8, tile=0.4)
+    if s == "rdwe_repeating_room":
+        g = {k: mk_image(k, f()) for k, f in (("gen_doors", lambda: gen_door_paper(301)), ("gen_peach", lambda: gen_shag(302, "#e88a6a", "#ffb08a", "#ffd8b8")))}
+        material("Wall_Doors", img=g["gen_doors"], rough=0.8, tile=1.2)
+        material("Leaf_Lilac", img=g["gen_doors"], rough=0.8, tile=1.2)
+        material("Baffle_Paper", img=g["gen_doors"], rough=0.8, tile=1.2)
+        material("Carpet_Peach", img=g["gen_peach"], rough=1.0, tile=1.0)
+        material("Ceiling_Repeat", tex=PLASTER, tint=srgb_lin("#fff0f4"), rough=0.95, tile=2.4)
+        material("Trim_Repeat", tex=PAINT, tint=srgb_lin("#fff6ff"), rough=0.5, tile=1.0)
+        material("Leaf_White", tex=PAINT, tint=srgb_lin("#ffffff"), rough=0.35, tile=1.0)
+        material("Velvet_Pink", tex=LINEN, tint=srgb_lin("#ff5aa8"), rough=0.9, tile=0.5)
+        material("Wood_Table", tex=WOOD, tint=srgb_lin("#ffb878"), rough=0.4, tile=0.8)
+        material("Shade_Paper", color=srgb_lin("#fff0e0"), rough=0.9)
+        material("Picture_Room", img=mk_image("gen_room_pic", gen_room_picture(303)), rough=0.5)
+        material("Frame_Gilt", img=GEN["gen_brushed"], tint=srgb_lin("#c8a040"), rough=0.35, metal=0.8, tile=0.2)
+    if s == "rdwe_finale":
+        g = {k: mk_image(k, f()) for k, f in (("gen_vinyl_f", lambda: gen_speckle(401, "#dcd6e8", "#c8e8f0")),)}
+        material("Wall_Navy", tex=PAINT, tint=srgb_lin("#2a3a9a"), rough=0.7, tile=2.0)
+        material("Vinyl_Finale", img=g["gen_vinyl_f"], rough=0.25, tile=2.4)
+        material("Acoustic_Finale", tex=ACOUSTIC, tint=srgb_lin("#f4f0ff"), rough=0.9, tile=1.2)
+        material("Stripe_Pink", tex=PAINT, tint=srgb_lin("#ff3aa0"), rough=0.5, tile=1.0)
+        material("Kick_Finale", color=srgb_lin("#1a1e40"), rough=0.6)
+        material("Strip_Housing", color=srgb_lin("#d5d2c8"), rough=0.5)
+        material("Cubicle_Panel", tex=LINEN, tint=srgb_lin("#7a8ab8"), rough=0.95, tile=0.6)
+        material("Cubicle_Frame", img=GEN["gen_brushed"], tint=srgb_lin("#c0c4c8"), rough=0.35, metal=0.8, tile=0.4)
+        material("Desk_Top", tex=WOOD, tint=srgb_lin("#ffcf98"), rough=0.4, tile=0.8)
+        material("Monitor", color=srgb_lin("#1c1c20"), rough=0.4)
+        material("Screen_Emit", color=(0.2, 0.9, 1.0), rough=0.4, emit=((0.25, 0.85, 1.0), 3.0))
+        material("Quilt_Pink", tex=LINEN, tint=srgb_lin("#ff7ab8"), rough=0.95, tile=0.6)
+        material("Linen", tex=LINEN, tint=srgb_lin("#f4e6cc"), rough=0.95, tile=0.5)
+        material("Wood_House", tex=WOOD, tint=srgb_lin("#e09060"), rough=0.45, tile=0.8)
+        material("Maple", tex=WOOD, tint=srgb_lin("#ffb060"), rough=0.4, tile=0.9)
+        material("Leather", tex=LINEN, tint=srgb_lin("#ff8a24"), rough=0.4, tile=0.7)
+        material("Rack_Body", img=GEN["gen_brushed"], tint=srgb_lin("#3a3e48"), rough=0.4, metal=0.6, tile=0.5)
+        material("Rack_Grille", color=srgb_lin("#101216"), rough=0.6)
+        material("Server_Emit", color=(0.1, 1.0, 0.3), rough=0.5, emit=((0.15, 1.0, 0.35), 4.0))
+        material("Gondola", img=GEN["gen_brushed"], tint=srgb_lin("#c8c8c2"), rough=0.45, metal=0.4, tile=0.6)
+        material("Basin", tex=CONCRETE, tint=srgb_lin("#8af0ff"), rough=0.4, tile=1.0)
+        material("Water", color=srgb_lin("#bfe4f0"), rough=0.02, alpha=0.4)
+        material("Cam_White", color=srgb_lin("#e8e8e4"), rough=0.4)
+        material("Cam_Black", color=srgb_lin("#121214"), rough=0.3)
+        material("Vent_Grille", color=srgb_lin("#3a3a3e"), rough=0.5, metal=0.6)
+        material("Alu", img=GEN["gen_brushed"], tint=srgb_lin("#c0c4c8"), rough=0.35, metal=0.8, tile=0.4)
+        material("Leaf_Blue", tex=PAINT, tint=srgb_lin("#2a7aff"), rough=0.4, tile=1.0)
+        material("Emergency_Emit_Green", color=(0.1, 1.0, 0.3), rough=0.5, emit=((0.1, 1.0, 0.25), 6.0))
+        material("Rug_Finale", tex=LINEN, tint=srgb_lin("#30d8c0"), rough=1.0, tile=0.6)
+        material("Till", color=srgb_lin("#e8e4da"), rough=0.5)
     if s in ("rdwe_trampoline",):
         material("Marble_Door", tex=MARBLE, tint=srgb_lin("#f4f0ea"), rough=0.2, tile=1.0)
     if s == "rdwe_teal":
@@ -680,7 +763,9 @@ SHELL = {"rdwe_dining": {"cream": "Wall_Cream", "shag": "Shag_Green", "ceiling":
          "rdwe_teal2": {"teal": "Wall_Teal", "fleck": "Carpet_Fleck", "teal_cream": "Ceiling_Teal", "void": "Void"},
          "rdwe_flooded": {"tile": "Tile_Wall", "white": "Ceiling_White", "void": "Void"},
          "rdwe_trampoline": {"pad": "Pad_Wall", "concrete": "Concrete_Apron", "truss": "Truss_Deck", "void": "Void"},
-         "rdwe_grocery": {"wall": "Store_Wall", "vinyl": "Vinyl_Floor", "ceiling": "Acoustic", "void": "Void"}}
+         "rdwe_grocery": {"wall": "Store_Wall", "vinyl": "Vinyl_Floor", "ceiling": "Acoustic", "void": "Void"},
+         "rdwe_repeating_room": {"lilac": "Wall_Doors", "peach": "Carpet_Peach", "ceiling": "Ceiling_Repeat", "void": "Void"},
+         "rdwe_finale": {"navy": "Wall_Navy", "vinyl": "Vinyl_Finale", "ceiling": "Acoustic_Finale", "void": "Void"}}
 
 
 def shell_material(b, ax, side, centre):
@@ -689,7 +774,8 @@ def shell_material(b, ax, side, centre):
     s, n = SCENE, b["name"]
     if "ceiling" in b["tags"] or n.endswith("_Ceiling") or n == "Well_Ceiling":
         return {"rdwe_dining": "Ceiling_Dining", "rdwe_hallway": "Ceiling_Hall", "rdwe_teal": "Ceiling_Teal", "rdwe_teal2": "Ceiling_Teal",
-                "rdwe_flooded": "Ceiling_White", "rdwe_trampoline": "Truss_Deck", "rdwe_grocery": "Acoustic"}[s]
+                "rdwe_flooded": "Ceiling_White", "rdwe_trampoline": "Truss_Deck", "rdwe_grocery": "Acoustic",
+                "rdwe_repeating_room": "Ceiling_Repeat", "rdwe_finale": "Acoustic_Finale"}[s]
     if s == "rdwe_dining" and (n.startswith("Step_") or (n == "Landing" and ax == 1 and side > 0)):
         return "Stair_Carpet"
     if s == "rdwe_hallway" and b["mat"] == "plaid" and centre[0] > 40.0:
@@ -894,7 +980,7 @@ def layout_from_model(M):
             bm = bmesh.new()
             cube(bm, b["min"], b["max"])
             finish(b["name"], bm, "Standin_Grey", ARCH, tile=1.0)
-    for e in M.empties:
+    for e in M.empties + M.cams:
         ob = bpy.data.objects.new(e["name"], None)
         ob.location = B(e["pos"])
         if e["face"]:
@@ -910,7 +996,9 @@ def layout_from_model(M):
 # ---------------------------------------------------------------- the shell as seen
 # the air of each room (game min, max): a shell face is drawn only where the air in front of it is in here (or in a door's opening) and in no
 # other shell box. The dining room's stairwell, the hallway's well and the door openings are air too.
-AIR = {"rdwe_dining": [((-8.0, 0.0, -10.0), (8.0, 4.2, 10.0)), ((-1.3, 0.0, -10.0 - 12 * 0.36 - 1.6), (0.3, 5.6, -10.0))],
+AIR = {"rdwe_repeating_room": [((-6.0, 0.0, -6.0), (6.0, 3.2, 6.0)), ((5.9, 0.0, -3.8), (8.2, 2.6, -2.2))],
+       "rdwe_finale": [((-24.0, 0.0, -22.0), (24.0, 4.5, 22.0))],
+       "rdwe_dining": [((-8.0, 0.0, -10.0), (8.0, 4.2, 10.0)), ((-1.3, 0.0, -10.0 - 12 * 0.36 - 1.6), (0.3, 5.6, -10.0))],
        "rdwe_hallway": [((-4.0, 0.0, -1.6), (45.0, 4.6, 1.6)), ((40.0, -0.8, -0.8), (45.0, 1.2, 0.8))],
        "rdwe_teal": [((-7.0, 0.0, -9.0), (7.0, 4.0, 9.0))],
        "rdwe_teal2": [((-4.0, 0.0, -11.0), (4.0, 5.5, 11.0))],
@@ -1032,6 +1120,11 @@ STORY = {   # the story doors' own words -> (form, finish material, handle, extr
     "the fire exit": ("flush", "Steel_Door", "push bar", ()),
     "a bronze door": ("six-panel", "Bronze", "laurel", ()),
     "a stockroom door": ("flaps", "Flap_Rubber", "no handle", ("staff_only",)),
+    "the north door: plain white flush": ("flush", "Leaf_White", "chrome lever", ("number:12",)),
+    "the south door: the north door again": ("flush", "Leaf_White", "chrome lever", ("number:13",)),
+    "the door from one angle": ("flush", "Leaf_Lilac", "no handle", ()),
+    "the grocery's glass doors, from the other side": ("sliding_pair", "Alu", "no handle", ()),
+    "a pair of tall blue doors": ("double", "Leaf_Blue", "push bar", ()),
 }
 
 
@@ -1202,6 +1295,10 @@ def leaf_mesh(name, look, width, height):
         elif form == "flush":
             for x0, x1, z0, z1 in ((0.003, w, 0.006, 0.02), (0.003, w, h - 0.014, h)):
                 bx(x0, x1, -th - 0.003, th + 0.003, z0, z1, fmat)
+        elif form == "double":                           # a pair: two panelled halves meeting in the middle
+            bx(w / 2 - 0.006, w / 2 + 0.006, -th - 0.003, th + 0.003, 0.006, h, "Rubber_Black")
+            for x0, x1 in ((0.003, w / 2 - 0.006), (w / 2 + 0.006, w)):
+                panels([(x0 + 0.1, x1 - 0.1, 0.25, h * 0.48), (x0 + 0.1, x1 - 0.1, h * 0.55, h - 0.15)], fmat)
     # handles
     hx = w - 0.08
     hz = 0.98 if height > 1.2 else height * 0.45
@@ -1251,6 +1348,22 @@ def leaf_mesh(name, look, width, height):
                     bx(x, x + 0.06, -th - 0.008, -th, zc - 0.03, zc - 0.018, "Brass")
                     bx(x + 0.048, x + 0.06, -th - 0.008, -th, zc - 0.03, zc + 0.03, "Brass")
                     bx(x + 0.012, x + 0.06, -th - 0.008, -th, zc + 0.018, zc + 0.03, "Brass")
+        elif ex.startswith("number:"):
+            num = ex.split(":")[1]
+            for yy, sg in ((-th, -1), (th, 1)):
+                bx(w / 2 - 0.09, w / 2 + 0.09, *sorted((yy, yy + sg * 0.004)), 1.52, 1.66, "Brass")
+                tm = text_mesh(num, 0.09, 0.002)
+                tb = bmesh.new()
+                tb.from_mesh(tm)
+                bpy.data.meshes.remove(tm)
+                rot = Matrix(((1, 0, 0, w / 2), (0, 0, -1, yy + sg * 0.006), (0, 1, 0, 1.59), (0, 0, 0, 1))) if sg < 0 else \
+                    Matrix(((-1, 0, 0, w / 2), (0, 0, 1, yy + sg * 0.006), (0, 1, 0, 1.59), (0, 0, 0, 1)))
+                bmesh.ops.transform(tb, matrix=rot, verts=tb.verts)
+                m2 = bpy.data.meshes.new("n")
+                tb.to_mesh(m2)
+                tb.free()
+                pieces.setdefault("Rubber_Black", bmesh.new()).from_mesh(m2)
+                bpy.data.meshes.remove(m2)
         elif ex == "vent_slots":
             for i in range(5):
                 bx(0.15, w - 0.15, -th - 0.03, -th - 0.028, 1.6 + i * 0.07, 1.63 + i * 0.07, "Rubber_Black")
@@ -2128,8 +2241,215 @@ def dress_grocery():
     light("Exit_Glow", "POINT", ((es["min"][0] + es["max"][0]) / 2, 2.4, -Z + 0.5), 20.0, (1.0, 0.1, 0.06), size=0.2)
 
 
+def dress_repeating_room():
+    X, Z, H = 6.0, 6.0, 3.2
+    casings("Trim_Repeat", skip=("secret_ops",))
+    skirting("Trim_Repeat", room_runs(-X, X, -Z, Z), 0.0, h=0.14, cuts_extra=(("z", X, -3.85, -2.15),))
+    boxes("decor_Cornice", "Trim_Repeat", [((-X, H - 0.12, -Z), (X, H, -Z + 0.05)), ((-X, H - 0.12, Z - 0.05), (X, H, Z)),
+                                           ((-X, H - 0.12, -Z), (-X + 0.05, H, Z)), ((X - 0.05, H - 0.12, -Z), (X, H, Z))])
+    # the pink velvet armchair, over its box
+    a = gbx("Armchair")
+    x0, x1, z0, z1 = a["min"][0], a["max"][0], a["min"][2], a["max"][2]
+
+    def chair(bm):
+        cube(bm, (x0, 0.06, z0), (x1, 0.45, z1))
+        cube(bm, (x0, 0.45, z0), (x0 + 0.25, 0.9, z1))                  # the back against the west
+        cube(bm, (x0 + 0.25, 0.45, z0), (x1, 0.68, z0 + 0.2))
+        cube(bm, (x0 + 0.25, 0.45, z1 - 0.2), (x1, 0.68, z1))
+        for fx in (x0 + 0.08, x1 - 0.08):
+            for fz in (z0 + 0.08, z1 - 0.08):
+                cyl(bm, (fx, 0.0, fz), (fx, 0.06, fz), 0.04, seg=8)
+    part("Armchair", "Velvet_Pink", chair)
+    boxes("decor_Armchair_Cushion", "Velvet_Pink", [((x0 + 0.27, 0.45, z0 + 0.22), (x1 - 0.02, 0.56, z1 - 0.22))])
+    # the side table, a lamp on it (Lamp_Emit) and a clock whose hands the page may move
+    t = gbx("Side_Table")
+    tx, tz = (t["min"][0] + t["max"][0]) / 2, (t["min"][2] + t["max"][2]) / 2
+
+    def table(bm):
+        cyl(bm, (tx, 0.66, tz), (tx, 0.7, tz), 0.4, seg=32)
+        cyl(bm, (tx, 0.03, tz), (tx, 0.66, tz), 0.05, seg=12)
+        cube(bm, (t["min"][0], 0.0, t["min"][2]), (t["max"][0], 0.03, t["max"][2]))
+    part("Side_Table", "Wood_Table", table)
+    part("decor_Lamp_Base", "Trim_Repeat", lambda bm: cyl(bm, (tx, 0.7, tz), (tx, 1.05, tz), 0.06, 0.04, seg=12))
+    part("decor_Lamp_Shade", "Lamp_Emit", lambda bm: cyl(bm, (tx, 1.0, tz), (tx, 1.25, tz), 0.2, 0.13, seg=20, cap=False))
+    # a picture of this room, in which there is a picture of this room (on the west wall)
+    photo_quads("decor_Picture", "Picture_Room", [(0, -1.0, 1.0, 1.2, 2.2, -X + 0.02)], cells=1, axis="x", inward=1)
+    boxes("decor_Picture_Frame", "Frame_Gilt", [((-X, 1.12, -1.08), (-X + 0.05, 1.2, 1.08)), ((-X, 2.2, -1.08), (-X + 0.05, 2.28, 1.08)),
+                                               ((-X, 1.2, -1.08), (-X + 0.05, 2.2, -1.0)), ((-X, 1.2, 1.0), (-X + 0.05, 2.2, 1.08))])
+    # the baffle hides the recess: same paper, a cream cap; the recess and its door are the wall's lilac (the door seen from one angle)
+    b = gbx("Baffle")
+    boxes("decor_Baffle_Cap", "Trim_Repeat", [((b["min"][0] - 0.01, 0.0, b["min"][2] - 0.01), (b["max"][0] + 0.01, 0.12, b["max"][2] + 0.01))])
+    # one pendant in the middle of the ceiling, and soft fills
+    part("decor_Pendant", "Lamp_Emit", lambda bm: sphere(bm, (0.0, H - 0.55, 0.0), 0.28, seg=20))
+    part("decor_Pendant_Cord", "Trim_Repeat", lambda bm: cyl(bm, (0.0, H - 0.3, 0.0), (0.0, H, 0.0), 0.008, seg=6))
+    light("Pendant", "POINT", (0.0, H - 0.55, 0.0), 260.0, WARM, size=0.25)
+    light("Table_Lamp", "POINT", (tx, 1.12, tz), 60.0, WARM, size=0.12)
+    for k, (dx, dz) in enumerate(((-3.0, -3.0), (3.0, -3.0), (-3.0, 3.0), (3.0, 3.0))):
+        down_light(f"Fill_{k}", (dx, H - 0.05, dz), 90.0, (1.0, 0.88, 0.85), size=2.0)
+    light("Recess", "POINT", (7.2, 2.2, -3.0), 12.0, (1.0, 0.86, 0.9), size=0.2)
+
+
+def sec_cam(name, pos, face):
+    """A security camera on its wall: a white body on a black arm, the lens looking along `face` (game x, z), tilted down."""
+    x, y, z = pos
+    fx, fz = face
+    ln = math.hypot(fx, fz) or 1.0
+    fx, fz = fx / ln, fz / ln
+
+    def body(bm):
+        cyl(bm, (x - fx * 0.12, y + 0.02, z - fz * 0.12), (x + fx * 0.2, y - 0.04, z + fz * 0.2), 0.07, seg=12)
+    def arm(bm):
+        cyl(bm, (x - fx * 0.15, y + 0.12, z - fz * 0.15), (x - fx * 0.12, y + 0.02, z - fz * 0.12), 0.02, seg=6)
+        cyl(bm, (x + fx * 0.2, y - 0.04, z + fz * 0.2), (x + fx * 0.23, y - 0.045, z + fz * 0.23), 0.05, seg=12)
+    part(f"decor_{name}_Body", "Cam_White", body)
+    part(f"decor_{name}_Lens", "Cam_Black", arm)
+
+
+def dress_finale():
+    X, Z, H = 24.0, 22.0, 4.5
+    M = model()
+    casings("Kick_Finale")
+    skirting("Kick_Finale", room_runs(-X, X, -Z, Z), 0.0, h=0.14)
+    # a neon pink stripe round the hall and the wings at 1.2 m (the game's palette turning on you)
+    rects = []
+    for x0, x1, zz, sg in ((-X, X, -Z, 1), (-X, X, Z, -1)):
+        rects.append(((x0, 1.15, min(zz, zz + sg * 0.012)), (x1, 1.3, max(zz, zz + sg * 0.012))))
+    for xx, sg in ((-X, 1), (X, -1)):
+        rects.append(((min(xx, xx + sg * 0.012), 1.15, -Z), (max(xx, xx + sg * 0.012), 1.3, Z)))
+    boxes("decor_Stripe", "Stripe_Pink", rects)
+    # offices: cubicle partitions (fabric on aluminium), desks, a monitor on each (Screen_Emit)
+    for b in M.boxes:
+        n = b["name"]
+        if n.startswith("Cubicle_"):
+            mn, mx = b["min"], b["max"]
+            part(n, "Cubicle_Panel", lambda bm, mn=mn, mx=mx: cube(bm, (mn[0], 0.05, mn[2]), (mx[0], mx[1] - 0.04, mx[2])))
+            part(f"decor_{n}_Frame", "Cubicle_Frame", lambda bm, mn=mn, mx=mx: (cube(bm, (mn[0] - 0.005, mx[1] - 0.04, mn[2] - 0.005), (mx[0] + 0.005, mx[1], mx[2] + 0.005)),
+                                                                             cube(bm, (mn[0] - 0.005, 0.0, mn[2] - 0.005), (mx[0] + 0.005, 0.05, mx[2] + 0.005))))
+        elif n.startswith("Desk_"):
+            mn, mx = b["min"], b["max"]
+
+            def desk(bm, mn=mn, mx=mx):
+                cube(bm, (mn[0], 0.71, mn[2]), (mx[0], 0.75, mx[2]))
+                for lx in (mn[0] + 0.03, mx[0] - 0.06):
+                    cube(bm, (lx, 0.0, mn[2] + 0.03), (lx + 0.03, 0.71, mx[2] - 0.03))
+            part(n, "Desk_Top", desk)
+            cx, cz = (mn[0] + mx[0]) / 2, mn[2] + 0.2
+            boxes(f"decor_{n}_Monitor", "Monitor", [((cx - 0.3, 0.75, cz - 0.03), (cx + 0.3, 1.15, cz + 0.02)), ((cx - 0.04, 0.75, cz - 0.02), (cx + 0.04, 0.8, cz + 0.1))])
+            boxes(f"decor_{n}_Screen", "Screen_Emit", [((cx - 0.27, 0.78, cz + 0.02), (cx + 0.27, 1.12, cz + 0.024))])
+    # the house: a bed with a pink quilt, a wardrobe, a table with a laptop (the house's computer), an orange sofa, a round rug
+    b = gbx("House_Bed")
+    bx0, bx1, bz0, bz1 = b["min"][0], b["max"][0], b["min"][2], b["max"][2]
+    part("House_Bed", "Wood_House", lambda bm: (cube(bm, (bx0, 0.0, bz0), (bx1, 0.35, bz1)), cube(bm, (bx0, 0.35, bz0), (bx0 + 0.08, 0.6, bz1))))
+    boxes("decor_Bed_Quilt", "Quilt_Pink", [((bx0 + 0.08, 0.35, bz0 + 0.02), (bx1 - 0.02, 0.55, bz1 - 0.02))])
+    boxes("decor_Bed_Pillow", "Linen", [((bx0 + 0.12, 0.55, bz0 + 0.2), (bx0 + 0.6, 0.6, bz1 - 0.2))])
+    w = gbx("House_Wardrobe")
+    part("House_Wardrobe", "Wood_House", lambda bm: cube(bm, w["min"], w["max"]))
+    boxes("decor_Wardrobe_Doors", "Maple", [((w["max"][0], 0.1, w["min"][2] + 0.05), (w["max"][0] + 0.02, 2.1, (w["min"][2] + w["max"][2]) / 2 - 0.01)),
+                                           ((w["max"][0], 0.1, (w["min"][2] + w["max"][2]) / 2 + 0.01), (w["max"][0] + 0.02, 2.1, w["max"][2] - 0.05))])
+    t = gbx("House_Table")
+
+    def htable(bm):
+        cube(bm, (t["min"][0], 0.75, t["min"][2]), (t["max"][0], 0.8, t["max"][2]))
+        for lx in (t["min"][0] + 0.05, t["max"][0] - 0.1):
+            for lz in (t["min"][2] + 0.05, t["max"][2] - 0.1):
+                cube(bm, (lx, 0.0, lz), (lx + 0.05, 0.75, lz + 0.05))
+    part("House_Table", "Maple", htable)
+    boxes("decor_Laptop", "Monitor", [((-12.8, 0.8, 11.3), (-12.2, 0.82, 11.7)), ((-12.8, 0.82, 11.28), (-12.2, 1.12, 11.3))])
+    boxes("decor_Laptop_Screen", "Screen_Emit", [((-12.76, 0.84, 11.302), (-12.24, 1.1, 11.306))])
+    so = gbx("House_Sofa")
+    part("House_Sofa", "Leather", lambda bm: (cube(bm, (so["min"][0], 0.05, so["min"][2]), (so["max"][0], 0.45, so["max"][2])),
+                                             cube(bm, (so["min"][0], 0.45, so["max"][2] - 0.3), (so["max"][0], 0.9, so["max"][2])),
+                                             cube(bm, (so["min"][0], 0.0, so["min"][2]), (so["min"][0] + 0.02, 0.05, so["min"][2] + 0.02))))
+    part("decor_House_Rug", "Rug_Finale", lambda bm: cyl(bm, (-15.0, 0.0, 9.0), (-15.0, 0.01, 9.0), 2.6, seg=40))
+    # servers: rack rows (grilles, blinking lights: Server_Emit), the console on the last rack's south face
+    for k in range(4):
+        r = gbx(f"Rack_{k + 1}")
+        part(f"Rack_{k + 1}", "Rack_Body", lambda bm, r=r: cube(bm, r["min"], r["max"]))
+        grills, leds = [], []
+        for i in range(10):
+            xa = r["min"][0] + 0.1 + i * 1.19
+            for zz, sg in ((r["min"][2], -1), (r["max"][2], 1)):
+                q0, q1 = sorted((zz, zz + sg * 0.01))
+                grills.append(((xa, 0.15, q0), (xa + 1.0, 2.05, q1)))
+                for j in range(6):
+                    leds.append(((xa + 0.1 + 0.12 * (j % 3), 1.7 - 0.25 * j, min(q0, q1) - 0.004 * (sg < 0)), (xa + 0.16 + 0.12 * (j % 3), 1.73 - 0.25 * j, max(q0, q1) + 0.004 * (sg > 0))))
+        boxes(f"decor_Rack_Grilles_{k + 1}", "Rack_Grille", grills)
+        boxes(f"decor_Rack_Leds_{k + 1}", "Server_Emit", leds)
+    r4 = gbx("Rack_4")
+    boxes("decor_Console", "Monitor", [((14.5, 1.0, r4["max"][2]), (15.5, 1.6, r4["max"][2] + 0.08))])
+    boxes("decor_Console_Screen", "Screen_Emit", [((14.55, 1.05, r4["max"][2] + 0.08), (15.45, 1.55, r4["max"][2] + 0.085))])
+    # aisles: gondola runs over the shelf boxes, a till on the last one
+    for k in range(4):
+        s_ = gbx(f"Aisle_Shelf_{k + 1}")
+        x0, x1, z0, z1, top = s_["min"][0], s_["max"][0], s_["min"][2], s_["max"][2], s_["max"][1]
+
+        def gond(bm, x0=x0, x1=x1, z0=z0, z1=z1, top=top):
+            zc = (z0 + z1) / 2
+            cube(bm, (x0, 0.0, z0 + 0.04), (x1, 0.12, z1 - 0.04))
+            cube(bm, (x0, 0.12, zc - 0.03), (x1, top, zc + 0.03))
+            for y in (0.12, 0.5, 0.85, 1.2, 1.55):
+                cube(bm, (x0 + 0.02, y, z0), (x1 - 0.02, y + 0.03, z1))
+            for xe in (x0, x1 - 0.03):
+                cube(bm, (xe, 0.0, z0), (xe + 0.03, top, z1))
+        part(f"Aisle_Shelf_{k + 1}", "Gondola", gond)
+    s4 = gbx("Aisle_Shelf_4")
+    boxes("decor_Till", "Till", [((14.6, s4["max"][1], s4["max"][2] - 0.5), (15.4, s4["max"][1] + 0.25, s4["max"][2] - 0.1))])
+    boxes("decor_Till_Screen", "Screen_Emit", [((14.7, s4["max"][1] + 0.25, s4["max"][2] - 0.35), (15.3, s4["max"][1] + 0.45, s4["max"][2] - 0.33))])
+    # the hall's fountain: a cyan basin, a sheet of water (Water, unbaked), a spout
+    f = gbx("Hall_Fountain")
+    fx0, fx1, fz0, fz1 = f["min"][0], f["max"][0], f["min"][2], f["max"][2]
+
+    def basin(bm):
+        cube(bm, (fx0, 0.0, fz0), (fx1, 0.9, fz0 + 0.15))
+        cube(bm, (fx0, 0.0, fz1 - 0.15), (fx1, 0.9, fz1))
+        cube(bm, (fx0, 0.0, fz0 + 0.15), (fx0 + 0.15, 0.9, fz1 - 0.15))
+        cube(bm, (fx1 - 0.15, 0.0, fz0 + 0.15), (fx1, 0.9, fz1 - 0.15))
+        cube(bm, (fx0 + 0.15, 0.0, fz0 + 0.15), (fx1 - 0.15, 0.5, fz1 - 0.15))
+        cyl(bm, ((fx0 + fx1) / 2, 0.5, (fz0 + fz1) / 2), ((fx0 + fx1) / 2, 1.6, (fz0 + fz1) / 2), 0.12, 0.06, seg=16)
+    part("Hall_Fountain", "Basin", basin)
+    part("decor_Fountain_Water", "Water", lambda bm: cube(bm, (fx0 + 0.15, 0.75, fz0 + 0.15), (fx1 - 0.15, 0.76, fz1 - 0.15)))
+    # the ten security cameras (art; the layout's SecCam_ empties are where they look from), the agents' vents
+    for c in M.cams:
+        sec_cam(c["name"].replace("SecCam_", "Cam_"), c["pos"], c["face"])
+    for b in M.boxes:
+        if b["name"].startswith("decor_Vent_"):
+            mn, mx = b["min"], b["max"]
+            thin = min(range(3), key=lambda i: mx[i] - mn[i])
+            bars = []
+            for i in range(8):
+                if thin == 0:
+                    zz = mn[2] + (i + 0.5) * (mx[2] - mn[2]) / 8
+                    bars.append(((mn[0], mn[1], zz - 0.02), (mx[0], mx[1], zz + 0.02)))
+                else:
+                    xx = mn[0] + (i + 0.5) * (mx[0] - mn[0]) / 8
+                    bars.append(((xx - 0.02, mn[1], mn[2]), (xx + 0.02, mx[1], mx[2])))
+            boxes(b["name"] + "_Grille", "Vent_Grille", bars)
+            boxes(b["name"] + "_Dark", "Void", [(mn, mx)])
+    # the green EXIT over the win doors
+    d = next(dd for dd in M.doors if dd["name"] == "DoorLeaf_win")
+    (hx, hy, hz), run, inw, w_, h_ = door_geom(d)
+    xc = hx + run[0] * w_ / 2
+    boxes("decor_Exit_Box", "Strip_Housing", [((xc - 0.45, h_ + 0.25, -Z), (xc + 0.45, h_ + 0.6, -Z + 0.1))])
+    part("decor_Exit_Text", "Emergency_Emit_Green", lambda bm: add_text(bm, "EXIT", 0.25, 0.01, (xc, h_ + 0.425, -Z + 0.1), (1, 0, 0), (0, 1, 0), (0, 0, 1)))
+    # lights: strips over the hall and the wings, the house warmer, the server room dimmer and blue
+    strips, housing = [], []
+    for xx in (-21.0, -15.0, -9.0, -3.0, 3.0, 9.0, 15.0, 21.0):
+        for z0 in np.arange(-Z + 1.0, Z - 1.0, 4.0):
+            housing.append(((xx - 0.12, H - 0.08, z0), (xx + 0.12, H, z0 + 3.0)))
+            strips.append(((xx - 0.08, H - 0.1, z0 + 0.05), (xx + 0.08, H - 0.08, z0 + 2.95)))
+        for zc in (-15.0, -5.0, 5.0, 15.0):
+            col = (0.75, 0.85, 1.0) if (xx > 6 and zc < 0) else (1.0, 0.86, 0.7) if (xx < -6 and zc > 0) else (1.0, 0.94, 0.86)
+            pw = 300.0 if (xx > 6 and zc < 0) else 520.0
+            down_light(f"Strip_{int(xx)}_{int(zc)}", (xx, H - 0.15, zc), pw, col, size=0.4, size_y=8.0)
+    boxes("decor_Strip_Housing", "Strip_Housing", housing)
+    boxes("decor_Strips", "Lamp_Emit", strips)
+    light("Exit_Glow", "POINT", (xc, h_ + 0.4, -Z + 0.5), 25.0, (0.1, 1.0, 0.3), size=0.2)
+    light("Fountain_Glow", "POINT", (0.0, 1.8, -5.5), 40.0, (0.4, 0.9, 1.0), size=0.3)
+
+
 DRESS = {"rdwe_dining": dress_dining, "rdwe_hallway": dress_hallway, "rdwe_teal": dress_teal, "rdwe_teal2": dress_teal2, "rdwe_flooded": dress_flooded,
-         "rdwe_trampoline": dress_trampoline, "rdwe_grocery": dress_grocery}
+         "rdwe_trampoline": dress_trampoline, "rdwe_grocery": dress_grocery,
+         "rdwe_repeating_room": dress_repeating_room, "rdwe_finale": dress_finale}
 
 
 # ================================================================ build
@@ -2334,6 +2654,9 @@ def world_area(ob):
 
 def base_uv(o):
     uvs = o.data.uv_layers
+    for extra in [u.name for u in uvs][1:]:               # one texture UV only (a text mesh joined into a leaf brings its own): UV1 must be the lightmap
+        if extra != "lightmap":
+            uvs.remove(uvs[extra])
     if "UVMap" not in uvs:
         first = next((u for u in uvs if u.name != "lightmap"), None)
         if first is None:
@@ -2613,7 +2936,7 @@ def stage_bake():
 
 # ---------------------------------------------------------------- privacy
 KEEP_PROPS = {"lightmap", "lightmap_intensity", "lightmap_night", "lightmap_night_intensity"}
-LAYOUT_PREFIX = ("DoorLeaf_", "Marker_", "Spot_")
+LAYOUT_PREFIX = ("DoorLeaf_", "Marker_", "Spot_", "SecCam_")
 
 
 def set_path(owner, attr, value):
@@ -2688,6 +3011,11 @@ def load_scene_file():
     ART, PROPS, ARCH, SKIN, DOORS, LAYOUT, LIGHTS, ALTL = (c.get(n) for n in ("Art", "Props", "Arch", "Skin", "Doors", "Layout", "Lights", "Lights_Alt"))
     for m in bpy.data.materials:
         MATS[m.name] = m
+    for c in model().cams:                                # SecCam_ properties (an older save scrubbed them): the layout's, from the model
+        ob = bpy.data.objects.get(c["name"])
+        if ob is not None:
+            for k, v in c["props"].items():
+                ob[k] = v
 
 
 # ---------------------------------------------------------------- export
@@ -2817,6 +3145,10 @@ def strip_jpeg_comments(path):
 
 E = 1.55
 SHOTS = {
+    "rdwe_repeating_room": {"1_arrival": ((-3.5, E, 4.5), (6.9, 1.2, -3.0), 70), "2_wide": ((-5.4, 2.6, 5.4), (2.0, 0.6, -3.0), 78),
+                            "3_detail": ((-1.2, 1.5, 2.2), (-5.0, 1.2, 0.6), 65)},
+    "rdwe_finale": {"1_arrival": ((0.0, E, 19.6), (0.0, 1.3, -10.0), 75), "2_wide": ((-22.5, 4.0, 20.5), (2.0, 0.5, -4.0), 78),
+                    "3_detail": ((8.2, 1.6, -0.8), (15.0, 1.25, -3.8), 65)},
     "rdwe_dining": {"1_arrival": ((0.0, E, 9.0), (0.0, 1.3, -6.0), 75), "2_wide": ((7.0, 3.2, 9.2), (-3.0, 0.8, -4.0), 78),
                     "3_detail": ((-4.4, 1.7, -6.4), (-5.0, 1.6, -10.0), 62)},
     "rdwe_hallway": {"1_arrival": ((-2.6, E, 0.0), (20.0, 2.2, 0.0), 70), "2_wide": ((38.0, 1.2 + E, 0.9), (4.0, 1.6, -0.3), 65),
@@ -2892,7 +3224,7 @@ def stage_render():
             cam.data.sensor_fit = "VERTICAL"
         sc.camera = cam
         hidden = []
-        ceil = {"Ceiling_Dining", "Ceiling_Hall", "Ceiling_Teal", "Ceiling_White", "Truss_Deck", "Acoustic"}
+        ceil = {"Ceiling_Dining", "Ceiling_Hall", "Ceiling_Teal", "Ceiling_White", "Truss_Deck", "Acoustic", "Ceiling_Repeat", "Acoustic_Finale"}
         for o in list(bpy.data.collections["Skin"].objects) + list(bpy.data.collections["Props"].objects) + list(bpy.data.collections["Doors"].objects):
             if o.type != "MESH":
                 continue

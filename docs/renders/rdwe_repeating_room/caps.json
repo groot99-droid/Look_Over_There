@@ -1,0 +1,27 @@
+{
+ "gain": 1.087,
+ "wall_materials": [
+  "Wall_Doors"
+ ],
+ "wall_p50_before": 0.276,
+ "target_wall_p50": 0.3,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Brass": 1.087,
+  "Carpet_Peach": 0.847,
+  "Ceiling_Repeat": 1.087,
+  "Chrome": 1.087,
+  "Frame_Gilt": 1.087,
+  "Leaf_Lilac": 1.087,
+  "Leaf_Oak": 1.087,
+  "Leaf_PinkLaminate": 1.087,
+  "Leaf_White": 1.087,
+  "Picture_Room": 1.087,
+  "Rubber_Black": 1.087,
+  "Trim_Repeat": 1.087,
+  "Velvet_Pink": 1.087,
+  "Wall_Doors": 1.087,
+  "Wood_Table": 1.087
+ }
+}
