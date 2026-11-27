@@ -457,15 +457,15 @@ def dashes(b):
 
 
 # ---------------------------------------------------------------- the extra dressing (decor_, passable)
-def flowers(name, pts, y_of=lambda x, z: 0.0):
+def flowers(name, pts, y_of=lambda x, z: 0.0, size=1.0):
     """Small flowers: a stem and a five-petal head each, one object per colour (decor_: you walk through them)."""
     cols = ["Flower_Pink", "Flower_Yellow", "Flower_White", "Flower_Blue"]
     heads = {c: Geo() for c in cols}
     stems = Geo()
     for i, (x, z) in enumerate(pts):
         y = y_of(x, z)
-        h = float(RNG.uniform(0.12, 0.28))
-        r = float(RNG.uniform(0.05, 0.09))
+        h = float(RNG.uniform(0.12, 0.28)) * size
+        r = float(RNG.uniform(0.05, 0.09)) * size
         c = cols[int(RNG.integers(0, 4))]
         a0 = float(RNG.uniform(0, 2 * math.pi))
         stems.add([(x - 0.008, y - 0.02, z), (x + 0.008, y - 0.02, z), (x, y + h, z)], [(0, 1, 2)])
@@ -597,7 +597,7 @@ def extra_endless_hills():
         keep.append((x - 4.0, x + 4.0, z - 4.0, z + 4.0))
     for k in range(4):                                             # well inside the tile: nothing near an edge, so the seam stays clean
         q = [(-90, 0, -90, 0), (0, 90, -90, 0), (-90, 0, 0, 90), (0, 90, 0, 90)][k]
-        flowers(f"Hill_Flowers_{k + 1}", scatter(900, q[0], q[1], q[2], q[3], keep_out=keep, clump=10, spread=1.5), y_of=hy)
+        flowers(f"Hill_Flowers_{k + 1}", scatter(2200, q[0], q[1], q[2], q[3], keep_out=keep, clump=45, spread=2.8), y_of=hy, size=1.5)
     # the four puzzles' props (decor: the page decides what they do)
     p = {k: (x, z) for k, _w, x, z in GB.PUZZLES}
     x, z = p[1]                                                    # stacking stones
