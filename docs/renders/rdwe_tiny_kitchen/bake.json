@@ -1,0 +1,62 @@
+{
+ "0": {
+  "map": 0,
+  "size": 2048,
+  "gain": 1.9286,
+  "C": 1.12,
+  "px_per_m": 111.1,
+  "p50_p90_p99_p995_max": [
+   0.7518,
+   1.4714,
+   2.2362,
+   2.7073,
+   4.5782
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 48,
+  "materials": [
+   "Ceil_White",
+   "Floor_Checker",
+   "Wall_Mint_Tile"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "size": 2048,
+  "gain": 1.9286,
+  "C": 1.12,
+  "px_per_m": 83.8,
+  "p50_p90_p99_p995_max": [
+   0.451,
+   1.0829,
+   2.5002,
+   2.7838,
+   50.085
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 61,
+  "materials": [
+   "Brass",
+   "Ceil_Prop",
+   "China",
+   "Chrome",
+   "Enamel_Cream",
+   "Glass_Knob",
+   "Iron",
+   "Leaf_BrushedSteel",
+   "Leaf_Glass",
+   "Leaf_TealPaint",
+   "Linen_Red",
+   "Marble_Top",
+   "Paint_Mint",
+   "Paint_Red",
+   "Plastic_Black",
+   "Rubber_Black",
+   "Tiles_Small",
+   "Trim_Mint",
+   "Walnut"
+  ]
+ }
+}

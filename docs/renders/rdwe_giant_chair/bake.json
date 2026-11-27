@@ -1,0 +1,69 @@
+{
+ "0": {
+  "map": 0,
+  "size": 2048,
+  "gain": 1.2793,
+  "C": 1.12,
+  "px_per_m": 58.6,
+  "p50_p90_p99_p995_max": [
+   1.1334,
+   1.6103,
+   4.589,
+   5.8028,
+   83.1942
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 54,
+  "materials": [
+   "Ceil_Plaster",
+   "Floor_Shag_Rose",
+   "Wall_Peach_Paper"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "size": 2048,
+  "gain": 1.2793,
+  "C": 1.12,
+  "px_per_m": 19.5,
+  "p50_p90_p99_p995_max": [
+   0.4376,
+   1.5309,
+   2.8007,
+   3.6989,
+   247.5433
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 95,
+  "materials": [
+   "Brass",
+   "China",
+   "Chrome",
+   "Cover_Blue",
+   "Cover_Green",
+   "Cover_Red",
+   "Cover_Violet",
+   "Cover_Yellow",
+   "Frame_Gilt",
+   "Leaf_BottleGreen",
+   "Leaf_BrushedSteel",
+   "Leaf_Glass",
+   "Linen_Pink",
+   "Mug_White",
+   "Pages",
+   "Paint_Red",
+   "Photo",
+   "Plastic_Black",
+   "Plastic_White",
+   "Ribbon_Gold",
+   "Rug_Lilac",
+   "Trim_Cream",
+   "Velvet_Green",
+   "Velvet_Orange",
+   "Velvet_Orange_Tuft",
+   "Walnut"
+  ]
+ }
+}
