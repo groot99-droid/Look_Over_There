@@ -8,7 +8,7 @@ The format is the page's (world/L1.json): `scene`, `colliders`, `doors`, `camera
 | Blender object                     | Written as                                                                                          |
 |------------------------------------|-----------------------------------------------------------------------------------------------------|
 | `COL_<name>` mesh (a box)          | `colliders`: {s: <name>, min, max} (its world box, in game axes)                                     |
-| `DoorLeaf_<name>` (origin = hinge) | `doors`: {name, level, hinge, width, height, closed_yaw_deg, swing_deg, state} (custom properties) |
+| `DoorLeaf_<name>` (origin = hinge) | `doors`: {name, level, hinge, width, height, closed_yaw_deg, swing_deg, state, + its other custom properties} |
 | `Marker_<name>` empty, `kind`      | `markers`: {name, room, level, kind, position}                                                       |
 | `Link_<id>` + `Arrive_<id>`        | `links`: {door: <id>, at, arrive, face} (face: the Arrive empty's -Y axis, as game (x, z))          |
 | `SecCam_<nn>`                      | `cameras` (none of the scenes built so far has one)                                                  |
@@ -59,9 +59,13 @@ def collect(scene):
             mn, mx = _box(ob)
             out["colliders"].append({"s": n[4:], "min": mn, "max": mx})
         elif n.startswith("DoorLeaf_"):                   # the leaf itself (a mesh the page swings, origin at the hinge) or an empty
-            out["doors"].append({"name": n, "level": scene, "hinge": _g(ob.matrix_world.translation), "width": float(ob.get("width", 0.94)),
-                                 "height": float(ob.get("height", 2.16)), "closed_yaw_deg": float(ob.get("closed_yaw_deg", 0.0)),
-                                 "swing_deg": float(ob.get("swing_deg", 0.0)), "state": str(ob.get("state", "closed"))})
+            d = {"name": n, "level": scene, "hinge": _g(ob.matrix_world.translation), "width": float(ob.get("width", 0.94)),
+                 "height": float(ob.get("height", 2.16)), "closed_yaw_deg": float(ob.get("closed_yaw_deg", 0.0)),
+                 "swing_deg": float(ob.get("swing_deg", 0.0)), "state": str(ob.get("state", "closed"))}
+            for k in ob.keys():                           # the leaf's other custom properties, as for spots (the hotel's room doors: room_layout, room, ...)
+                if k not in d and isinstance(ob[k], (int, float, str)):
+                    d[k] = ob[k]
+            out["doors"].append(d)
         elif n.startswith("Marker_"):
             out["markers"].append({"name": n[7:], "room": str(ob.get("room", scene)), "level": scene, "kind": str(ob.get("kind", "Spawn")),
                                    "position": _g(ob.matrix_world.translation)})
@@ -89,7 +93,8 @@ def write(scene, path=None):
     path = Path(path) if path else ROOT / f"world/{scene}.json"
     d = collect(scene)
     path.write_text(json.dumps(d, indent=1) + "\n")
-    print(f"EXPORT_SCENE {path.name}: {len(d['colliders'])} colliders, {len(d['doors'])} doors, {len(d['markers'])} markers, {len(d['links'])} links")
+    print(f"EXPORT_SCENE {path.name}: {len(d['colliders'])} colliders, {len(d['doors'])} doors, {len(d['markers'])} markers, {len(d['links'])} links, "
+          f"{len(d['zones'])} zones, {len(d['spots'])} spots")
     return d
 
 
