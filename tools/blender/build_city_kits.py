@@ -257,10 +257,22 @@ def yard_concrete():
     return to_srgb(L * k[..., None] * tracks[..., None] * 0.95)
 
 
+def cabin_panel():
+    """The site office's steel cladding (512 px, a 2 m repeat): pale grey-green paint on vertical ribs every 10 cm, grime running down."""
+    S = 512
+    rng = np.random.default_rng(4142)
+    xx = np.arange(S)[None, :, None]
+    img = np.zeros((S, S, 3), np.float32) + to_srgb(np.array((0.30, 0.34, 0.32)))
+    img *= 0.86 + 0.16 * (0.5 + 0.5 * np.sin(xx * 2 * np.pi / (S / 20)))
+    grime = blur(rng.random((S, S)).astype(np.float32), 6, 3) * np.linspace(0.6, 1.0, S)[:, None]
+    return np.clip(img * (0.9 + 0.15 * (grime[..., None] - grime.mean())), 0, 1)
+
+
 def stage_textures():
     from PIL import Image
     TEX.mkdir(parents=True, exist_ok=True)
-    for fn, arr in (("signs_city.png", signs_atlas()), ("ad_poster.png", ad_poster()), ("yard_concrete.jpg", yard_concrete())):
+    for fn, arr in (("signs_city.png", signs_atlas()), ("ad_poster.png", ad_poster()), ("yard_concrete.jpg", yard_concrete()),
+                    ("cabin_panel.jpg", cabin_panel())):
         im = Image.fromarray((np.clip(arr, 0, 1) * 255 + 0.5).astype(np.uint8))
         p = TEX / fn
         if fn.endswith(".png"):
@@ -1124,7 +1136,7 @@ def depot_materials():
     material("Wall_Brick", diff="brick_red.jpg", tint=(1.0, 0.92, 0.88), rough=0.9, tile=2.6)
     material("Trim_Concrete", diff="concrete.jpg", tint=(0.80, 0.79, 0.76), rough=0.85, tile=2.0)
     material("Fence_Steel", color=(0.04, 0.09, 0.06), rough=0.5, metal=0.5)
-    material("Office_Panel", diff="gate.jpg", tint=(1.6, 1.62, 1.55), rough=0.6, tile=2.0)
+    material("Office_Panel", diff="cabin_panel.jpg", rough=0.6, tile=2.0)
     material("Office_Trim", color=(0.30, 0.31, 0.30), rough=0.6)
     material("Door_Leaf", color=(0.055, 0.09, 0.075), rough=0.45)
     material("Window_Dark", color=(0.03, 0.035, 0.045), rough=0.08)
@@ -1377,15 +1389,13 @@ def build_depot_yard():
             box(hd, (mx_ + aim * 0.05 - 0.2, 6.0, mz + dz - 0.22), (mx_ + aim * 0.05 + 0.2, 6.25, mz + dz + 0.22))
             quad(ln, [(mx_ + aim * 0.05 - 0.17, 5.995, mz + dz - 0.19), (mx_ + aim * 0.05 + 0.17, 5.995, mz + dz - 0.19),
                       (mx_ + aim * 0.05 + 0.17, 5.995, mz + dz + 0.19), (mx_ + aim * 0.05 - 0.17, 5.995, mz + dz + 0.19)], (0, -1, 0))
-    # the floor's paint: the truck's bay, a walkway to the office, a wash-down drain
+    # the floor's paint: the truck's bay; a wash-down drain
     pt = P.bm("decor_Paint", "Paint_Yellow")
     tx, tz = TRUCK_AT[0], TRUCK_AT[2]
     hx, hz = 1.75, 5.25
     yp = 0.004
     for (u0, u1, v0, v1) in ((tx - hx, tx - hx + 0.1, tz - hz, tz + hz), (tx + hx - 0.1, tx + hx, tz - hz, tz + hz), (tx - hx, tx + hx, tz - hz, tz - hz + 0.1)):
         quad(pt, [(u0, yp, v0), (u1, yp, v0), (u1, yp, v1), (u0, yp, v1)], (0, 1, 0))
-    for (u0, u1) in ((-10.4, -10.3), (-8.9, -8.8)):
-        quad(pt, [(u0, yp, -20.0), (u1, yp, -20.0), (u1, yp, -1.0), (u0, yp, -1.0)], (0, 1, 0))
     dr = P.bm("decor_Drain", "Drain_Iron")
     quad(dr, [(tx - 0.3, yp, -4.6), (tx + 0.3, yp, -4.6), (tx + 0.3, yp, -3.4), (tx - 0.3, yp, -3.4)], (0, 1, 0), [(0, 0), (1, 0), (1, 1), (0, 1)])
     P.done()
