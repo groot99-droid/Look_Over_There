@@ -1,0 +1,74 @@
+{
+ "day": {
+  "gain": 1.0653,
+  "big": [
+   "Tile_Floor_Bath",
+   "Ceiling_Grid",
+   "Tile_Wall_Bath",
+   "Paint_Bath"
+  ],
+  "factor": {
+   "Laminate_Stall": 1.0653,
+   "Chrome": 1.0653,
+   "Sign_Green": 1.0653,
+   "Leaf_Laminate": 1.0653,
+   "Mirror_Glass": 1.0653,
+   "Ceramic_White": 1.0653,
+   "Counter_Solid": 1.0653,
+   "Decal_Crack": 1.0653,
+   "Decal_Dust": 1.0653,
+   "Decal_Stain": 1.0653,
+   "Frame_Bronze": 1.0653,
+   "Frame_Chrome": 1.0653,
+   "Plastic_Black": 1.0653,
+   "Plastic_White": 1.0653,
+   "Plastic_Yellow": 1.0653,
+   "Sign_White": 0.9789,
+   "Steel_Dark": 1.0653,
+   "Steel_Galv": 1.0653,
+   "Tile_Skirt": 1.0653,
+   "Ceiling_Grid": 1.0653,
+   "Paint_Bath": 1.0653,
+   "Tile_Floor_Bath": 1.0653,
+   "Tile_Wall_Bath": 1.0653
+  }
+ },
+ "night": {
+  "gain": 20.5882,
+  "big": [
+   "Tile_Floor_Bath",
+   "Ceiling_Grid",
+   "Tile_Wall_Bath",
+   "Paint_Bath"
+  ],
+  "factor": {
+   "Laminate_Stall": 20.5882,
+   "Chrome": 20.5882,
+   "Sign_Green": 20.5882,
+   "Leaf_Laminate": 20.5882,
+   "Mirror_Glass": 20.5882,
+   "Ceramic_White": 20.5882,
+   "Counter_Solid": 20.5882,
+   "Decal_Crack": 20.5882,
+   "Decal_Dust": 20.5882,
+   "Decal_Stain": 20.5882,
+   "Frame_Bronze": 20.5882,
+   "Frame_Chrome": 20.5882,
+   "Plastic_Black": 20.5882,
+   "Plastic_White": 20.5882,
+   "Plastic_Yellow": 20.5882,
+   "Sign_White": 20.5882,
+   "Steel_Dark": 20.5882,
+   "Steel_Galv": 20.5882,
+   "Tile_Skirt": 20.5882,
+   "Ceiling_Grid": 20.5882,
+   "Paint_Bath": 20.5882,
+   "Tile_Floor_Bath": 20.5882,
+   "Tile_Wall_Bath": 20.5882
+  }
+ },
+ "target": {
+  "day": "big shell p99 0.93, p90 <= 0.85; every material p99 <= 0.98, p90 <= 0.9",
+  "night": "big shell p99 0.35; the same caps"
+ }
+}
