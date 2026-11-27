@@ -60,53 +60,54 @@ Floor 1's method and code (`build_hotel_floor1.py`, `hotel_floor1_skin.py` on `c
 - **Bake:** Cycles on the rented GPU (OptiX), 1024 samples, diffuse direct and indirect, 8 px margin, OIDN, a highlight shoulder (above the
   map's 70th percentile, toward 2.5 times it; the key room 35th / 2.0, the dining room 65th / 2.4), white point the 99.5th percentile.
 - **Pages are fixed** (`PAGES`): 2048 + 2048 for the corridors and key rooms, 1024 + 1024 for the green room. The shell is packed by hand
-  (pixel-aligned rectangles); the props are smart-projected.
+  (pixel-aligned rectangles; a rectangle packed on its side gets its UVs on its side, `u, t = (b * ph, a * pw)`, with an assertion that every
+  UV stays inside its packed box); the props are smart-projected.
 
 | Map | Size | Density (px/m) | `lightmap_intensity` before the gain | WebP |
 |---|---|---|---|---|
-| `floor_2_lower_0` / `_1` | 2048 / 2048 | 70.3 / 34.8 | 2.789 / 1.922 | 204 KB / 515 KB |
-| `floor_2_upper_0` / `_1` | 2048 / 2048 | 80.5 / 35.3 | 3.909 / 1.912 | 169 KB / 513 KB |
-| `dining_0` / `_1` | 2048 / 2048 | 88.6 / 44.5 | 2.840 / 1.774 | 112 KB / 601 KB |
-| `reception_0` / `_1` | 2048 / 2048 | 89.0 / 31.9 | 3.482 / 1.795 | 106 KB / 430 KB |
-| `key_room_0` / `_1` | 2048 / 2048 | 89.0 / 27.6 | 0.359 / 0.072 | 78 KB / 473 KB |
-| `green_room_0` / `_1` | 1024 / 1024 | 70.0 / 47.5 | 2.519 / 1.983 | 35 KB / 132 KB |
+| `floor_2_lower_0` / `_1` | 2048 / 2048 | 70.3 / 34.8 | 3.221 / 1.922 | 218 KB / 515 KB |
+| `floor_2_upper_0` / `_1` | 2048 / 2048 | 80.5 / 35.3 | 4.417 / 1.912 | 183 KB / 513 KB |
+| `dining_0` / `_1` | 2048 / 2048 | 88.6 / 44.5 | 2.808 / 1.774 | 114 KB / 601 KB |
+| `reception_0` / `_1` | 2048 / 2048 | 89.0 / 31.9 | 3.405 / 1.795 | 112 KB / 430 KB |
+| `key_room_0` / `_1` | 2048 / 2048 | 89.0 / 27.6 | 0.366 / 0.072 | 89 KB / 473 KB |
+| `green_room_0` / `_1` | 1024 / 1024 | 70.0 / 47.5 | 2.496 / 1.983 | 38 KB / 132 KB |
 
 ## Brightness (as the page shows it)
 
 Measured with `lab_display.py` on the packed GLBs (displayed = texture x base colour x lightmap texel x intensity / pi, no tone mapping). Each
 scene has one **gain** on its lightmap intensities (`caps.json`), chosen from the uncapped GLB so its walls (`Wall_*`) reach p50 0.16 (at most 6,
-8 for the key room): 3.404 (both corridors), 1.29 (dining), 3.019 (reception), 8.0 (key room), 2.162 (green room). Any material that would then
+8 for the key room): 3.265 (lower), 3.333 (upper), 1.333 (dining), 3.077 (reception), 7.619 (key room), 2.078 (green room). Any material that would then
 pass p99 0.97 or p90 0.88 is capped by its own factor (the ceilings, the cream trim, the closets' paint). No material in any scene is over p90
 0.9 or p99 0.98. Main surfaces:
 
 | Scene | Material | m2 | p50 | p90 | p99 |
 |---|---|---|---|---|---|
-| floor_2_lower | Wall_Green | 144.4 | 0.161 | 0.561 | 0.760 |
-| | Ceiling_Plaster | 93.3 | 0.110 | 0.826 | 0.971 |
-| | Carpet_Green | 88.0 | 0.085 | 0.179 | 0.500 |
-| | Wainscot | 70.3 | 0.306 | 0.594 | 0.729 |
-| | Stair_Paint | 67.1 | 0.215 | 0.593 | 0.908 |
-| floor_2_upper | Wall_Green | 147.0 | 0.153 | 0.677 | 0.970 |
-| | Ceiling_Plaster | 93.3 | 0.080 | 0.785 | 0.969 |
-| | Carpet_Green | 88.0 | 0.102 | 0.215 | 0.600 |
-| | Wainscot | 72.4 | 0.346 | 0.605 | 0.770 |
-| dining | Wall_Hall | 86.3 | 0.161 | 0.323 | 0.479 |
-| | Ceiling_Hall | 140.0 | 0.137 | 0.534 | 0.734 |
-| | Carpet_Hall | 140.0 | 0.026 | 0.057 | 0.146 |
-| | Wainscot | 44.7 | 0.151 | 0.339 | 0.601 |
-| reception | Wall_Hall | 94.9 | 0.160 | 0.406 | 0.717 |
-| | Ceiling_Hall | 140.0 | 0.151 | 0.603 | 0.970 |
-| | Carpet_Hall | 140.0 | 0.065 | 0.140 | 0.349 |
-| | Wainscot | 47.1 | 0.215 | 0.405 | 0.969 |
-| key_room | Wall_Hall | 94.9 | 0.162 | 0.208 | 0.246 |
-| | Ceiling_Hall | 140.0 | 0.246 | 0.363 | 0.480 |
-| | Carpet_Hall | 140.0 | 0.028 | 0.062 | 0.154 |
-| | Wainscot (dark wood) | 47.1 | 0.062 | 0.114 | 0.158 |
-| green_room | Wall_Room | 73.9 | 0.161 | 0.476 | 0.830 |
-| | Ceiling_Room | 34.8 | 0.237 | 0.629 | 0.970 |
-| | Carpet_Room | 34.8 | 0.037 | 0.062 | 0.122 |
+| floor_2_lower | Wall_Green | 144.4 | 0.160 | 0.606 | 0.839 |
+| | Ceiling_Plaster | 93.3 | 0.096 | 0.809 | 0.971 |
+| | Carpet_Green | 88.0 | 0.096 | 0.221 | 0.545 |
+| | Wainscot | 70.3 | 0.320 | 0.581 | 0.703 |
+| | Stair_Paint | 67.1 | 0.202 | 0.594 | 0.971 |
+| floor_2_upper | Wall_Green | 147.0 | 0.139 | 0.663 | 0.970 |
+| | Ceiling_Plaster | 93.3 | 0.072 | 0.770 | 0.970 |
+| | Carpet_Green | 88.0 | 0.114 | 0.263 | 0.632 |
+| | Wainscot | 72.4 | 0.342 | 0.590 | 0.721 |
+| dining | Wall_Hall | 86.3 | 0.160 | 0.323 | 0.488 |
+| | Ceiling_Hall | 140.0 | 0.142 | 0.549 | 0.750 |
+| | Carpet_Hall | 140.0 | 0.027 | 0.059 | 0.150 |
+| | Wainscot | 44.7 | 0.113 | 0.289 | 0.393 |
+| reception | Wall_Hall | 94.9 | 0.161 | 0.400 | 0.713 |
+| | Ceiling_Hall | 140.0 | 0.155 | 0.610 | 0.970 |
+| | Carpet_Hall | 140.0 | 0.067 | 0.142 | 0.355 |
+| | Wainscot | 47.1 | 0.264 | 0.513 | 0.753 |
+| key_room | Wall_Hall | 94.9 | 0.156 | 0.202 | 0.239 |
+| | Ceiling_Hall | 140.0 | 0.234 | 0.347 | 0.467 |
+| | Carpet_Hall | 140.0 | 0.027 | 0.060 | 0.150 |
+| | Wainscot (dark wood) | 47.1 | 0.048 | 0.107 | 0.151 |
+| green_room | Wall_Room | 73.9 | 0.161 | 0.467 | 0.794 |
+| | Ceiling_Room | 34.8 | 0.258 | 0.633 | 0.970 |
+| | Carpet_Room | 34.8 | 0.036 | 0.059 | 0.117 |
 
-The walls read (p50 0.15 to 0.16 everywhere). The carpets are dark green by design, as is the key room's dark wood panelling; the dark wood
+The walls read (p50 0.14 to 0.16: the upper corridor's damask is held to 0.139 by its own p99 cap). The carpets are dark green by design, as is the key room's dark wood panelling; the dark wood
 furniture and leaves show p50 near 0 partly because their measured area includes faces no one sees (undersides, backs against walls).
 
 ## Review stills
@@ -187,4 +188,4 @@ rented GPU box through `fw_remote.sh`, one Blender at a time.
 - Not seen in the browser: the page's shading, the leaves swinging, a room loading behind a door, the kit's elevator GLB in place.
 - Only one leaf per kind is baked; the doors near the corridor ends show the middle door's light.
 - The props maps' density is lower than floor 1's (28 to 48 px/m): the panelled wainscot and the furniture are many small islands.
-- The key room is lit by one lamp, as asked: its walls reach p50 0.16 only with a gain of 8, and its furniture stays dark.
+- The key room is lit by one lamp, as asked: its walls reach p50 0.156 only with a gain of 7.6, and its furniture stays dark.

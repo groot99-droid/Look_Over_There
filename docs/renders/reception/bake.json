@@ -2,29 +2,29 @@
  "0": {
   "size": 2048,
   "px_per_m": 89.0,
-  "scale": 1.1085,
-  "knee": 0.4874,
+  "scale": 1.0838,
+  "knee": 0.4768,
   "shoulder": [
    70.0,
    2.5
   ],
   "raw_p50_p90_p99_p995_max": [
-   0.332,
-   0.723,
-   3.006,
-   4.62,
-   27.646
+   0.32,
+   0.716,
+   2.872,
+   4.485,
+   27.599
   ],
   "p50_p90_p99_p995_max": [
-   0.332,
-   0.665,
-   1.054,
-   1.109,
-   1.199
+   0.32,
+   0.656,
+   1.028,
+   1.084,
+   1.174
   ],
   "samples": 1024,
   "device": "GPU",
-  "seconds": 95,
+  "seconds": 119,
   "materials": [
    "Carpet_Hall",
    "Ceiling_Hall",
@@ -59,7 +59,7 @@
   ],
   "samples": 1024,
   "device": "GPU",
-  "seconds": 111,
+  "seconds": 67,
   "materials": [
    "Book_Cover",
    "Brass",

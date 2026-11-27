@@ -2714,7 +2714,9 @@ def rect_uv(objs, S):
         for li in p.loop_indices:
             v = o.matrix_world @ o.data.vertices[o.data.loops[li].vertex_index].co
             a, b = (v - v0).dot(e1) / (w * w), (v - v0).dot(e2) / (h * h)
-            u, t = (b * pw, a * ph) if rot else (a * pw, b * ph)
+            # a rotated rectangle lies on its side: its e2 side (ph pixels) runs along u, its e1 side (pw) along t, as layout() reserved it
+            u, t = (b * ph, a * pw) if rot else (a * pw, b * ph)
+            assert -1e-3 <= u <= (ph if rot else pw) + 1e-3 and -1e-3 <= t <= (pw if rot else ph) + 1e-3, (o.name, u, t, rot)
             uv[li].uv = ((x0 + u) / S, (y0 + t) / S)
     print(f"  rect pack: {len(rects)} faces at {D:.1f} px/m on {S}")
     return S, D
