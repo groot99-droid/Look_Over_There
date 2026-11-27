@@ -150,7 +150,7 @@ All seven are entrance's files (`blender/textures/entrance/` on `claude/blender-
 
 - **Layout check** (`tools/blender/check_layout.py` on the `.blend`'s `Art`, through `--stage check`): PASS: 85 of 85 checks passed (83 colliders covered; STRAY: 122 tall solid meshes, each over a collider, 11 decor_ exempt; CLEAR: the spawn).
 - **Mannequins and links clear** (the build's own check, same stage): 13 of 13 places clear.
-- **Same layout:** `export_scene.py` writes `world/wing_books.json` from the `.blend`; it is the greybox's file unchanged (compared as JSON). `python tools/blender/build_mall_greybox.py --check .` still prints GATES PASS.
+- **Same layout:** `export_scene.py` writes `world/wing_books.json` from the `.blend`; it equals the greybox model's `--preview` output (compared as JSON). `python tools/blender/build_mall_greybox.py --check .` still prints GATES PASS.
 - `node tools/worlddoc.mjs check world/wing_books.json`: OK, 0 errors (the six warnings say the scene and its links are new to the manifest).
 - **Axes** (`--stage axes`): the marker at the arrival point comes out of the exporter where the game expects it.
 - `node --test shared/*.test.js`: 297 tests, 297 pass.

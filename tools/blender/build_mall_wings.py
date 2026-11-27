@@ -2821,12 +2821,29 @@ def stage_render():
     apply_light_set("day")
 
 
+def stage_relayout():
+    """Rebuild only the Layout collection (the COL_ boxes and the empties) from the greybox model in a saved, baked scene: for a change to the
+    greybox's layout that leaves the art as it is (no rebake)."""
+    global LAYOUT_C
+    LAYOUT_C = bpy.data.collections["Layout"]
+    for o in list(LAYOUT_C.objects):
+        me = o.data if o.type == "MESH" else None
+        bpy.data.objects.remove(o)
+        if me is not None and me.users == 0:
+            bpy.data.meshes.remove(me)
+    build_layout()
+    LAYOUT_C.hide_render = True
+    save_blend()
+
+
 if __name__ == "__main__":
     ST = set(STAGE.split(","))
     if ST & {"art", "all"}:
         build_all()
         save_blend()
-    if ST & {"layout", "art", "all"}:
+    if "relayout" in ST:
+        stage_relayout()
+    if ST & {"layout", "art", "all", "relayout"}:
         stage_layout()
     if ST & {"check", "all"}:
         stage_check()
