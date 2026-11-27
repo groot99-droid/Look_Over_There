@@ -411,6 +411,9 @@ STALLS = [  # (n, stock, x centre, side the stall's back is on, awning)
     (4, "keycards", -8.0, "S", "awning_d"), (5, "cosmetics", 8.0, "S", "awning_e"),
 ]
 MX, MZ = 32.0, 22.0
+# crate stacks the dressing added (x0, x1, z0, z1, height): two 0.8 m crates side by side, or one on another
+MARKET_CRATES = [(-11.4, -9.8, -20.4, -19.6, 0.6), (9.8, 10.6, -20.4, -19.6, 1.2), (20.6, 22.2, -20.4, -19.6, 0.6),
+                 (-14.0, -13.2, 19.6, 20.4, 1.2), (13.2, 14.8, 19.6, 20.4, 0.6), (-0.8, 0.8, 19.6, 20.4, 0.6)]
 
 
 def stall(S, n, stock, xc, side, aw):
@@ -461,6 +464,9 @@ def market():
         facade(S, k, "W", fz, 29.0)
     for k, (lx, lz) in enumerate(((-26.0, -14.0), (26.0, -14.0), (-26.0, 14.0), (26.0, 14.0), (0.0, -11.6), (0.0, 11.6)), 1):
         lamp(S, k, lx, lz)
+    # the dressing's crates (tools/blender/build_overworld_play.py): stacks against the back hedges between the stalls, each one box it fills
+    for k, (x0, x1, z0, z1, h) in enumerate(MARKET_CRATES, 1):
+        S.solid(f"Crates_{k}", (x0, 0.0, z0), (x1, h, z1), "timber")
     keeper(S, 1, (-20.0, 0.0, 21.5), (0, 1), "watches")
     keeper(S, 2, (24.0, 0.0, -21.5), (0, -1), "ignores")
     keeper(S, 3, (-31.5, 0.0, 14.0), (-1, 0), "watches")
@@ -478,6 +484,14 @@ def market():
 
 # ---------------------------------------------------------------- playground: real equipment, each a mini-game; moving parts on their pivots
 PX, PZ = 50.0, 38.0
+FENCE_Z, FENCE_H, FENCE_X, GATE_W = 5.6, 0.8, 44.0, 3.0       # the dressing's low fence: each side of the path, gates at the pieces and the facades
+FENCE_GATES = (-36.0, -12.0, 0.0, 12.0, 36.0)
+
+
+def fence_runs():
+    """The fence's runs along x (x0, x1), from -FENCE_X to FENCE_X with a GATE_W gap at each of FENCE_GATES."""
+    cuts = [-FENCE_X] + [v for g in FENCE_GATES for v in (g - GATE_W / 2, g + GATE_W / 2)] + [FENCE_X]
+    return [(cuts[i], cuts[i + 1]) for i in range(0, len(cuts), 2)]
 PLOTS = {"swing": (-36.0, -20.0), "slide": (-12.0, -20.0), "seesaw": (12.0, -20.0), "merry_go_round": (36.0, -20.0),
          "monkey_bars": (-36.0, 20.0), "sandbox": (-12.0, 20.0), "spring_riders": (12.0, 20.0), "climbing_frame": (36.0, 20.0)}
 
@@ -653,6 +667,13 @@ def playground():
         bench(S, k, x0, x0 + 2.0, z0, z0 + 0.5)
     for k, x in enumerate((-30.0, -6.0, 6.0, 30.0), 1):
         lamp(S, k, x, -3.0 if k % 2 else 3.0)
+    # the dressing's low fence and bins (tools/blender/build_overworld_play.py): a 0.8 m picket fence each side of the path, with a gate opposite
+    # each piece and the facades, and a bin at the end of each bench
+    for sg, nm in ((-1, "N"), (1, "S")):
+        for k, (xa, xb) in enumerate(fence_runs(), 1):
+            S.solid(f"Fence_{nm}_{k}", (xa, 0.0, sg * FENCE_Z - 0.05), (xb, FENCE_H, sg * FENCE_Z + 0.05), "timber")
+    for k, (x0, z0) in enumerate(((-26.0, -4.2), (22.0, -4.2), (-26.0, 3.7), (22.0, 3.7)), 1):
+        S.solid(f"Bin_{k}", (x0 - 0.75, 0.0, z0), (x0 - 0.25, 0.9, z0 + 0.5), "plastic_green")
     # two "more to come" facades against the north hedge
     facade(S, 1, "S", -4.0, -PZ + 1.2, width=7.6, label=False)
     facade(S, 2, "S", 4.0, -PZ + 1.2, width=7.6, label=False)
