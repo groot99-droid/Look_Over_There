@@ -12,7 +12,7 @@ Rules (a collider is a box {s, min, max}; "solid art" is every visible mesh whos
              (every 10 cm, both faces included) lies within 5 cm of the world box of some solid mesh.
   2. STRAY   no solid art taller than 0.2 m above the floor, reaching below head height, stands where no collider does: its floor plan lies within a
              collider that stands (starts near the floor and rises above 0.2 m), widened by 5 cm. A mesh named decor_* is exempt: it is passable.
-  3. CLEAR   the arrival points, door spots and markers (every `arrive` and `at` in the scene's constants, every marker of the collision file) are clear:
+  3. CLEAR   the arrival points, door spots and markers (every `arrive` and `at` in the scene's constants, every marker and link of the collision file) are clear:
              no standing collider and no solid art within the walker's radius (0.28 m).
 `python tools/blender/check_layout_test.py` tests the rules without Blender.
 """
@@ -55,6 +55,9 @@ def _stands(p):
 def points_of(world, constants):
     """(label, x, z) of every arrival point, door spot and marker the scene names."""
     pts = [(f"marker {m['name']}", m["position"][0], m["position"][2]) for m in world.get("markers", []) if "position" in m]
+    for lk in world.get("links", []):                  # a Blender-first scene's links (export_scene.py): where you press F and where you arrive
+        pts.append((f"link {lk['door']}.at", lk["at"][0], lk["at"][2]))
+        pts.append((f"link {lk['door']}.arrive", lk["arrive"][0], lk["arrive"][2]))
 
     def walk(o, path):
         if isinstance(o, dict):
@@ -104,7 +107,8 @@ def check(parts, world, constants=None, tol=TOL):
             continue
         for x in _samples(p["min"][0], p["max"][0], STEP / 2):
             for z in _samples(p["min"][2], p["max"][2], STEP / 2):
-                if not any(_in_plan(c, x, z, tol) for c in stand):
+                if not any(_in_plan(c, x, z, tol) for c in stand) and not any(_in_plan(c, x, z, tol) and c["min"][1] - tol <= p["min"][1] < c["max"][1] - tol
+                                                                             for c in colliders):   # or it sits in a collider at its own height (a flight's upper steps)
                     bad.append(f"{p['name']} at x {x:.2f}, z {z:.2f}")
                     break
             else:
