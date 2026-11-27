@@ -7,7 +7,8 @@
   (asserted below), so the geometry, UV0, the doors and the cameras do not change. three's GLTFLoader reads an attribute that is not in the
   Draco block as a plain accessor.
 - Each baked material gets `lightmap` and `lightmap_intensity` in its extras (docs/BLENDER.md, R1). The intensity is pi x the map's white
-  point x the exposure: the page shows texture x base colour x texel x intensity / pi.
+  point x the exposure: the page shows texture x base colour x texel x intensity / pi. `--caps` lowers it for named materials (small,
+  near-white or saturated props that would clip at the room's exposure) by a factor each.
 - The maps go to world/lightmaps/<scene>_<n>.webp (8-bit WebP q90, no metadata).
 - Scene extras that hold a machine's absolute user path (an add-on's script list, `sl_group`) are dropped; nothing on the page reads them.
 """
@@ -46,6 +47,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("scene"); ap.add_argument("work")
     ap.add_argument("--exposure", type=float, default=1.0)
+    ap.add_argument("--caps", default=None, help="json {factor: {material: f}}: those materials' intensity x f (small bright props capped so they do not clip)")
     ap.add_argument("--base", default=None, help="the GLB to add to (default world/<scene>.glb); it must have no TEXCOORD_1 yet")
     a = ap.parse_args()
     work = Path(a.work)
@@ -77,6 +79,7 @@ def main():
         added += 1
     j["buffers"][0]["byteLength"] = len(BIN) + (-len(BIN) % 4)
     out_dir = ROOT / "world" / "lightmaps"; out_dir.mkdir(parents=True, exist_ok=True)
+    caps = json.loads(Path(a.caps).read_text())["factor"] if a.caps else {}
     pages = {}
     for n, pg in rep["pages"].items():
         url = f"world/lightmaps/{a.scene}_{n}.webp"
@@ -87,6 +90,9 @@ def main():
         m = j["materials"][mr["index"]]
         assert m["name"] == name
         url, k = pages[mr["page"]]
+        if name in caps:
+            assert 0 < caps[name] <= 1, (name, caps[name])
+            k = round(k * caps[name], 4)
         m["extras"] = {**m.get("extras", {}), "lightmap": url, "lightmap_intensity": k}
     # scrub: an add-on of the machine that exported the store wrote its script list, with absolute paths of the user folder, into the scene's
     # extras (sl_group). The page reads none of it; drop any scene extra that holds such a path, so the public file carries none.
@@ -116,7 +122,7 @@ def main():
     dst = ROOT / "world" / f"{a.scene}.glb"
     dst.write_bytes(write_glb(j, BIN))
     print(f"{dst.name}: {len(raw)} -> {dst.stat().st_size} bytes (+{(dst.stat().st_size / len(raw) - 1) * 100:.1f} %), TEXCOORD_1 on {added} primitives, "
-          f"{len(rep['materials'])} materials baked, scene extras scrubbed: {scrubbed}, {len(pages)} maps: " + ", ".join(f"{u} x{k}" for u, k in pages.values()))
+          f"{len(rep['materials'])} materials baked ({len(caps)} capped), scene extras scrubbed: {scrubbed}, {len(pages)} maps: " + ", ".join(f"{u} x{k}" for u, k in pages.values()))
 
 
 if __name__ == "__main__":

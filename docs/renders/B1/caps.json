@@ -1,0 +1,19 @@
+{
+ "target_p99": 0.98,
+ "measured_at_exposure": 2.8,
+ "factor": {
+  "M_X_red": 0.7502,
+  "M_X_white": 0.6713,
+  "M_X_blue": 0.7638,
+  "M_X_rope": 0.87,
+  "M_D_toy_red": 0.7502,
+  "M_D_toy_white": 0.6713,
+  "M_D_toy_blue": 0.7502,
+  "life_jacket": 0.9099,
+  "M_D_toy_green": 0.8509,
+  "M_D_toy_orange": 0.651,
+  "M_D_toy_pink": 0.6713,
+  "plastic_monobloc_chair_01": 0.885,
+  "M_D_toy_yellow": 0.651
+ }
+}

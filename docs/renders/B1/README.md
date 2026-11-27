@@ -4,11 +4,11 @@ The first floor of the store's rebake (`docs/BLENDER.md`, R4, group A). B1 is th
 
 | File | What it is |
 |---|---|
-| `world/B1.glb` | the same model with `TEXCOORD_1` on the 50 baked primitives and `lightmap` / `lightmap_intensity` in 38 materials' extras: 5.54 MB (5 804 736 bytes; main's was 5 376 032, +8.0 %) |
+| `world/B1.glb` | the same model with `TEXCOORD_1` on the 50 baked primitives and `lightmap` / `lightmap_intensity` in 38 materials' extras: 5.54 MB (5 804 728 bytes; main's was 5 376 032, +8.0 %) |
 | `world/lightmaps/B1_0.webp` .. `B1_3.webp` | the baked light, four 2048 x 2048 maps, 8-bit WebP q90 (204, 926, 419 and 968 KB) |
 | `tools/blender/bake_store.py` | the bake, the review stills and the geometry proof (Blender, runs without the store file) |
 | `tools/store_lightmap_glb.py` | writes a bake into the shipped GLB without touching what is there (plain Python with numpy and Pillow) |
-| `docs/renders/B1/` | the three review stills, `bake.json` (the bake's own report) and this file |
+| `docs/renders/B1/` | the three review stills, `bake.json` (the bake's own report), `caps.json` (the small props' intensity caps) and this file |
 
 `blender/Look_Over_There.blend` is **not changed**, and neither are `split_scenes.py`, `index.html`, `shared/`, the manifest or the tests.
 
@@ -49,7 +49,7 @@ The store file has no lamp objects on B1: the light is the floor's own glowing p
 | `B1_2` | 12.6 px/m | 8 px | 0.485 | 4.2630 | the walls (and the stair's) |
 | `B1_3` | 24.1 px/m | 4 px | 0.543 | 4.7773 | the door frames, the housings, the dead panel, the ropes, ladders, toys and props |
 
-B1 is large (about 52 x 50 m, 15 960 m2 of inside faces baked), so the density is below R1's 32 px/m: four 2048 maps are the limit. Each map's white point is the 99.5th percentile of its inside faces' texels by area, with the lamp housings and the dead panel left out (they sit against the glowing panels and may clip). `lightmap_intensity` = pi x white point x exposure.
+B1 is large (about 52 x 50 m, 15 960 m2 of inside faces baked), so the density is below R1's 32 px/m: four 2048 maps are the limit. Each map's white point is the 99.5th percentile of its inside faces' texels by area, with the lamp housings and the dead panel left out (they sit against the glowing panels and may clip). `lightmap_intensity` = pi x white point x exposure, lowered for 13 small prop materials (below).
 
 ### How bright
 
@@ -73,7 +73,25 @@ What the page shows (`lab_display.py`: area-weighted samples over each material'
 
 Every main surface keeps p90 at or under 1.0 and p99 at or under 0.98. The ceiling and the floor read darker than the walls: the panels sit in the ceiling and light down and sideways, and the floor's tiles are dark under the water's tint. The trims are almost black: most of their area is hidden against walls and ceiling.
 
-The small bright props do clip at this exposure: the lane ropes' red, white and blue blocks (`M_X_red`, `_white`, `_blue`: p90 1.07 to 1.34, 13 to 19 % at white) and the pool toys (`M_D_toy_*`: up to 38 % at white), and a little of the chair and the life jacket. They are near-white and saturated colours lying in the light on the water; at white they still read as their colour. A lower exposure (1.8) keeps them under 1.0 but leaves the corridors' walls at about 0.4. The full table is on the owner sheet.
+Small props: at the room's exposure the lane ropes' red, white and blue blocks, the rope, the pool toys, the chair and the life jacket clipped (p99 1.07 to 1.49, up to 38 % at white). Their materials' `lightmap_intensity` is capped (`caps.json`: 13 materials, factors 0.65 to 0.91, each = 0.97 / its p99 at exposure 2.8), which brings each one's own displayed p99 to 0.97. No rebake: only those extras changed. The room keeps 2.8.
+
+| Capped prop | factor | `lightmap_intensity` | p90 | p99 (before the cap) |
+|---|---|---|---|---|
+| `M_X_red` (rope blocks) | 0.750 | 3.5839 | 0.84 | 0.97 (1.29) |
+| `M_X_blue` | 0.764 | 3.6489 | 0.82 | 0.97 (1.27) |
+| `M_X_white` | 0.671 | 3.2070 | 0.90 | 0.97 (1.45) |
+| `M_X_rope` | 0.870 | 4.1563 | 0.28 | 0.97 (1.12) |
+| `M_D_toy_red` | 0.750 | 3.5839 | 0.81 | 0.97 (1.29) |
+| `M_D_toy_white` | 0.671 | 3.2070 | 0.96 | 0.97 (1.45) |
+| `M_D_toy_blue` | 0.750 | 3.5839 | 0.90 | 0.97 (1.29) |
+| `M_D_toy_pink` | 0.671 | 3.2070 | 0.94 | 0.97 (1.45) |
+| `M_D_toy_yellow` | 0.651 | 3.1100 | 0.93 | 0.97 (1.49) |
+| `M_D_toy_orange` | 0.651 | 3.1100 | 0.92 | 0.97 (1.49) |
+| `M_D_toy_green` | 0.851 | 4.0650 | 0.67 | 0.97 (1.14) |
+| `plastic_monobloc_chair_01` | 0.885 | 4.2279 | 0.78 | 0.97 (1.10) |
+| `life_jacket` | 0.910 | 4.3469 | 0.75 | 0.97 (1.07) |
+
+Every other baked material is uncapped and already under 0.98 (the brightest, `M_X_chrome`, 0.96). The owner sheet has the full table.
 
 ## Review stills (Cycles, OptiX, 128 samples adaptive, OIDN, 1920 x 1080, AgX, exposure +1.49 EV = x2.8, like the page)
 
@@ -87,7 +105,7 @@ The small bright props do clip at this exposure: the lane ropes' red, white and 
 ![wide](2_wide.jpg)
 ![detail](3_detail.jpg)
 
-These are Blender renders with Cycles' real light, reflections and the water's surface; the page shows the same light without the reflections. The stills' JPEG comment and APP1 segments were stripped.
+These are Blender renders with Cycles' real light, reflections and the water's surface; the page shows the same light without the reflections, and the 13 capped props a little darker than here. The stills' JPEG comment and APP1 segments were stripped.
 
 ## Sources
 
@@ -121,12 +139,12 @@ From the repo root, with Blender 5.2 and Python with numpy and Pillow. Start fro
 ```
 git checkout <main> -- world/B1.glb && cp world/B1.glb <main glb>      # the shipped model before the bake (Git LFS)
 blender -b --factory-startup --python tools/blender/bake_store.py -- --scene B1 --stage bake --samples 512 --work <work>
-python tools/store_lightmap_glb.py B1 <work> --base <main glb> --exposure 2.8
+python tools/store_lightmap_glb.py B1 <work> --base <main glb> --exposure 2.8 --caps docs/renders/B1/caps.json
 blender -b --factory-startup --python tools/blender/bake_store.py -- --scene B1 --stage compare --a <main glb> --b world/B1.glb --work <work>
 blender -b --factory-startup --python tools/blender/bake_store.py -- --scene B1 --stage render --render-samples 128 --exposure-ev 1.49 --work <work>
 ```
 
-The bake, the stills and the comparison open no `.blend` (the world grey is set in the script; the store file has no lamp on B1). A GPU is used when Cycles finds one. `--stage compare` also writes `<work>/B1_decoded.glb`, a Draco-free copy for brightness tools that cannot decode Draco. The exposure changes only the extras, so it can be retuned with `store_lightmap_glb.py` alone, without a rebake.
+The bake, the stills and the comparison open no `.blend` (the world grey is set in the script; the store file has no lamp on B1). A GPU is used when Cycles finds one. `--stage compare` also writes `<work>/B1_decoded.glb`, a Draco-free copy for brightness tools that cannot decode Draco. The exposure and the caps change only the extras, so they can be retuned with `store_lightmap_glb.py` alone, without a rebake (a cap is 0.98-or-less / the material's p99 at the chosen exposure, measured with a brightness tool on `B1_decoded.glb`).
 
 ## For L1 to L4 and Exterior
 
