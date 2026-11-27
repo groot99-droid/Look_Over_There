@@ -104,7 +104,8 @@ def check(parts, world, constants=None, tol=TOL):
             continue
         for x in _samples(p["min"][0], p["max"][0], STEP / 2):
             for z in _samples(p["min"][2], p["max"][2], STEP / 2):
-                if not any(_in_plan(c, x, z, tol) for c in stand):
+                if not any(_in_plan(c, x, z, tol) for c in stand) and not any(_in_plan(c, x, z, tol) and c["min"][1] - tol <= p["min"][1] < c["max"][1] - tol
+                                                                             for c in colliders):   # or it sits in a collider at its own height (a flight's upper steps)
                     bad.append(f"{p['name']} at x {x:.2f}, z {z:.2f}")
                     break
             else:

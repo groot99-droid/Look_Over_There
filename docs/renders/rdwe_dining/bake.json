@@ -1,0 +1,154 @@
+{
+ "0": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 53.8,
+  "scale": 2.9724,
+  "knee": 1.4496,
+  "raw_p50_p90_p99_p995_max": [
+   0.906,
+   2.344,
+   5.96,
+   6.531,
+   13.636
+  ],
+  "p50_p90_p99_p995_max": [
+   0.906,
+   2.083,
+   2.917,
+   2.972,
+   3.295
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 57,
+  "materials": [
+   "Ceiling_Dining",
+   "Shag_Green",
+   "Stair_Carpet",
+   "Stair_Wall",
+   "Wall_Cream"
+  ]
+ },
+ "2": {
+  "set": "alt",
+  "size": 2048,
+  "px_per_m": 53.8,
+  "scale": 2.9724,
+  "knee": 1.409,
+  "raw_p50_p90_p99_p995_max": [
+   0.877,
+   2.305,
+   5.932,
+   6.527,
+   9.641
+  ],
+  "p50_p90_p99_p995_max": [
+   0.877,
+   2.038,
+   2.849,
+   2.905,
+   3.091
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 50,
+  "materials": [
+   "Ceiling_Dining",
+   "Shag_Green",
+   "Stair_Carpet",
+   "Stair_Wall",
+   "Wall_Cream"
+  ]
+ },
+ "1": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 52.2,
+  "scale": 2.6759,
+  "knee": 1.174,
+  "raw_p50_p90_p99_p995_max": [
+   0.6,
+   2.261,
+   9.405,
+   11.383,
+   244.706
+  ],
+  "p50_p90_p99_p995_max": [
+   0.6,
+   1.846,
+   2.625,
+   2.676,
+   2.922
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 71,
+  "materials": [
+   "Brass",
+   "Ceramic_Green",
+   "China",
+   "China_Rim",
+   "Flower_Pink",
+   "Frame_Dark",
+   "Frame_Gilt",
+   "Leaf_Black",
+   "Leaf_Cream",
+   "Leaf_Green",
+   "Leaf_Oak",
+   "Leaf_White",
+   "Linen",
+   "Maple",
+   "Maple_Dark",
+   "Photo",
+   "Rug_Rings",
+   "Sheer",
+   "Trim_Cream"
+  ]
+ },
+ "3": {
+  "set": "alt",
+  "size": 2048,
+  "px_per_m": 52.2,
+  "scale": 2.6759,
+  "knee": 1.1353,
+  "raw_p50_p90_p99_p995_max": [
+   0.578,
+   2.178,
+   8.74,
+   10.834,
+   41.027
+  ],
+  "p50_p90_p99_p995_max": [
+   0.578,
+   1.782,
+   2.527,
+   2.584,
+   2.768
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 87,
+  "materials": [
+   "Brass",
+   "Ceramic_Green",
+   "China",
+   "China_Rim",
+   "Flower_Pink",
+   "Frame_Dark",
+   "Frame_Gilt",
+   "Leaf_Black",
+   "Leaf_Cream",
+   "Leaf_Green",
+   "Leaf_Oak",
+   "Leaf_White",
+   "Linen",
+   "Maple",
+   "Maple_Dark",
+   "Photo",
+   "Rug_Rings",
+   "Sheer",
+   "Trim_Cream"
+  ]
+ }
+}
