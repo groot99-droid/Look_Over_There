@@ -1789,6 +1789,10 @@ def build_decor():
                 D.cyl("Emergency_Emit" if k == 0 else "Plastic_White", (mn[0] - 0.002, y, (mn[2] + mx[2]) / 2), (mn[0] - 0.012, y, (mn[2] + mx[2]) / 2), 0.025, seg=10)
         else:
             D.box("Paint_Grey", mn, mx)
+    for b in S.boxes:                                        # the pool's water: a clear surface at the top of its water zone
+        if b.get("zone") == "water":
+            mn, mx = b["min"], b["max"]
+            D.quad("Water", [(mn[0], mx[1], mx[2]), (mx[0], mx[1], mx[2]), (mx[0], mx[1], mn[2]), (mn[0], mx[1], mn[2])])
     for i in range(0, len(arches) - 1, 2):                   # the scanner arches: a header across each pair of posts
         a, b = arches[i], arches[i + 1]
         mn = [min(a["min"][k], b["min"][k]) for k in range(3)]
@@ -2977,6 +2981,10 @@ def pack(sc):
         im = Image.open(png).convert("RGB")
         dst = out / f"{sc}_{i}.webp"
         im.save(dst, "WEBP", quality=90, method=6)
+        for meth in (5, 4, 3):                            # compressed bytes that happen to read like a drive path trip the privacy grep
+            if not re.search(rb"c:[/\\]", dst.read_bytes(), re.I):
+                break
+            im.save(dst, "WEBP", quality=90, method=meth)
         print(f"{dst.relative_to(ROOT)}  {im.size[0]}x{im.size[1]}  {dst.stat().st_size / 1e3:.0f} KB")
     raw = w / f"{sc}_raw.glb"
     caps_p = stills_dir(sc) / "caps.json"
