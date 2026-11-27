@@ -520,16 +520,25 @@ def bookstore():
     S.solid("Window_Plinth", (1.6, 0.0, 7.0), (x1 - 0.4, 0.4, z1), "furniture")
     S.decor("Window_Glass", (x0 + 0.4, 0.4, z1 - 0.04), (-1.0, 2.6, z1), "glass")
     S.decor("Window_Glass", (1.0, 0.4, z1 - 0.04), (x1 - 0.4, 2.6, z1), "glass")
+    # added with the dressing (claude/blender-mall-shops): the children's corner in the west front, two reading chairs in the east front
+    S.solid("Kids_Bins", (x0 + 0.4, 0.0, 4.5), (x0 + 1.0, 0.7, 6.95), "furniture")
+    S.solid("Kids_Table", (-8.4, 0.0, 4.9), (-6.6, 0.55, 6.5), "furniture")
+    S.solid("Reading_Chair", (4.7, 0.0, 5.2), (5.55, 0.95, 6.05), "furniture")
+    S.solid("Reading_Table", (5.75, 0.0, 5.35), (6.35, 0.55, 5.9), "furniture")
+    S.solid("Reading_Chair_2", (6.55, 0.0, 5.2), (7.4, 0.95, 6.05), "furniture")
     S.mannequin(1, (-5.5, 0.4, 7.4), (0, 1), "dressing", "in the window display, reading, its back to the shop")
     S.mannequin(2, (5.5, 0.4, 7.4), (0, 1), "dressing", "in the window display, an armful of books")
     S.mannequin(3, (-5.7, 0.0, -2.0), (1, 0), "monster", "browsing between the bookcase runs")
     S.mannequin(4, (8.4, 0.0, -6.8), (-1, 0), "npc", "in the back corner, on its knees by the bottom shelf")
     S.corridor("main_aisle", -1.6, 1.6, -7.55, 6.9)
     S.corridor("back_aisle", x0 + 0.45, x1 - 0.45, -7.55, -5.85)
-    S.corridor("front_aisle", x0 + 0.45, x1 - 0.45, 1.8, 6.9)
+    S.corridor("front_aisle", x0 + 0.45, x1 - 0.45, 1.8, 4.3)             # was to z 6.9: the children's corner and the reading chairs sit south of it
+    S.corridor("desk_door", 7.9, x1 - 0.45, 1.8, 6.9)                     # the way to the INFORMATION door past the reading chairs
     for xa, xb in ((x0 + 0.45, -7.65), (-6.75, -4.65), (4.65, 6.75), (7.65, x1 - 0.45)):
         S.corridor("run_aisle", xa, xb, -5.8, 1.6)
     S.label("BOOKSTORE", 0.0, 3.6)
+    S.label("children's corner", -7.5, 4.6, kind="note")
+    S.label("reading chairs", 6.0, 4.8, kind="note")
     S.label("window display", -5.5, 6.5, kind="note")
     S.label("window display", 5.5, 6.5, kind="note")
     S.label("wall shelves", 0.0, -7.2, kind="note")
@@ -558,6 +567,7 @@ def bookstore_desk():
     S.door("office", (4.13, 0.0, -1.6), (1, 0), (0, -1), props={"kind": "office"})
     box(S, "Office_Desk", 4.4, 5.8, -3.8, -3.0, 0.0, 0.75, "furniture")
     box(S, "Filing_Cabinet", 3.3, 3.8, -3.9, -3.3, 0.0, 1.3, "column")
+    box(S, "Stock_Rack", 5.6, 6.0, -2.95, -1.85, 0.0, 2.2, "column")        # added with the dressing: the back stock room's steel shelving
     S.label("office", 4.6, -2.4, kind="note")
     for k, x in enumerate((-4.5, -3.3, -2.1), 1):
         S.decor("Queue_Post", (x - 0.05, 0.0, 1.6), (x + 0.05, 0.95, 1.7), "rail")
@@ -609,6 +619,9 @@ def cinema_lobby():
     for z in (-1.0, 4.0):
         S.decor("Poster", (x0, 1.0, z + 1.5), (x0 + 0.04, 2.4, z + 2.5), "sign")
     sheeted(S, "Cardboard_Standee", -11.5, -10.5, -4.0, -3.4, 1.9)
+    # added with the dressing: the concession's upright drinks fridge, and a cupboard closing the space under the balcony stair
+    box(S, "Drinks_Fridge", 7.4, 8.4, -8.0, -7.3, 0.0, 2.0, "counter")
+    box(S, "Understair_Cupboard", 9.5, x1, z0, -5.0, 0.0, 2.7, "wall")
     S.mannequin(1, (-4.6, 0.0, 4.0), (-1, 0), "dressing", "first in the queue at the box office")
     S.mannequin(2, (-4.6, 0.0, 5.0), (-1, 0), "dressing", "second in the queue")
     S.mannequin(3, (-4.6, 0.0, 6.0), (-1, 0), "monster", "last in the queue; it is not always there")
@@ -670,6 +683,9 @@ def food_court():
             if k % 3 == 0:
                 S.decor("Chairs_Stacked", (x - 0.3, 0.75, z - 0.3), (x + 0.3, 1.5, z + 0.3), "sheet")
     box(S, "Tray_Return", 9.5, 11.5, 10.6, 11.6, 0.0, 1.4, "counter")
+    for xa in (-14.6, 10.0):                                                  # added with the dressing: four litter bins
+        for za in (-5.3, 4.7):
+            box(S, "Bin", xa, xa + 0.6, za, za + 0.6, 0.0, 1.1, "counter")
     sheeted(S, "Kiddie_Train", -13.8, -11.8, 9.4, 11.2, 1.3)
     S.mannequin(1, (-7.5, 0.45, -4.27), (0, 1), "dressing", "seated, a tray in front of it")
     S.mannequin(2, (4.0, 0.45, 2.73), (0, 1), "dressing", "seated, facing the doors")

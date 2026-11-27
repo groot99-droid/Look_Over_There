@@ -1,0 +1,297 @@
+== layout check: bookstore (build_mall_shops.py --stage check)
+PASS  COVER  Bookcase_Run: 9 mesh(es) cover it (12825 sample points, every one within 5 cm of art)
+PASS  COVER  Bookcase_Run_2: 9 mesh(es) cover it (12825 sample points, every one within 5 cm of art)
+PASS  COVER  Bookcase_Run_3: 9 mesh(es) cover it (12825 sample points, every one within 5 cm of art)
+PASS  COVER  Bookcase_Run_4: 9 mesh(es) cover it (12825 sample points, every one within 5 cm of art)
+PASS  COVER  Kids_Bins: 6 mesh(es) cover it (1456 sample points, every one within 5 cm of art)
+PASS  COVER  Kids_Table: 2 mesh(es) cover it (2261 sample points, every one within 5 cm of art)
+PASS  COVER  Reading_Chair: 4 mesh(es) cover it (1100 sample points, every one within 5 cm of art)
+PASS  COVER  Reading_Chair_2: 3 mesh(es) cover it (1100 sample points, every one within 5 cm of art)
+PASS  COVER  Reading_Table: 4 mesh(es) cover it (343 sample points, every one within 5 cm of art)
+PASS  COVER  Sheeted_Display_Table: 3 mesh(es) cover it (1755 sample points, every one within 5 cm of art)
+PASS  COVER  Sheeted_Display_Table_2: 3 mesh(es) cover it (1755 sample points, every one within 5 cm of art)
+PASS  COVER  Sheeted_Display_Table_3: 3 mesh(es) cover it (1755 sample points, every one within 5 cm of art)
+PASS  COVER  Sheeted_Display_Table_4: 5 mesh(es) cover it (1755 sample points, every one within 5 cm of art)
+PASS  COVER  Shelf_E: 11 mesh(es) cover it (14875 sample points, every one within 5 cm of art)
+PASS  COVER  Shelf_N: 24 mesh(es) cover it (25125 sample points, every one within 5 cm of art)
+PASS  COVER  Shelf_W: 15 mesh(es) cover it (17125 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Ceiling: 76 mesh(es) cover it (101475 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Floor: 64 mesh(es) cover it (135300 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_E_1: 22 mesh(es) cover it (14097 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_E_2: 16 mesh(es) cover it (528 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_E_3: 18 mesh(es) cover it (2997 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_N_1: 19 mesh(es) cover it (22755 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_S_1: 18 mesh(es) cover it (10434 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_S_2: 16 mesh(es) cover it (741 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_S_3: 21 mesh(es) cover it (10434 sample points, every one within 5 cm of art)
+PASS  COVER  Shop_Wall_W_1: 19 mesh(es) cover it (17871 sample points, every one within 5 cm of art)
+PASS  COVER  Window_Plinth: 18 mesh(es) cover it (4455 sample points, every one within 5 cm of art)
+PASS  COVER  Window_Plinth_2: 19 mesh(es) cover it (4455 sample points, every one within 5 cm of art)
+PASS  STRAY  88 tall solid mesh(es), each over a collider; 23 decor_* mesh(es) exempt
+PASS  CLEAR  marker Spawn (0.00, 6.70): clear within 0.28 m
+PASS  CLEAR  links.bookstore_desk.arrive (8.70, 5.00): clear within 0.28 m
+PASS  CLEAR  links.bookstore_desk.at (9.40, 5.00): clear within 0.28 m
+PASS  CLEAR  links.wing_books.arrive (0.00, 6.70): clear within 0.28 m
+PASS  CLEAR  links.wing_books.at (0.00, 7.40): clear within 0.28 m
+PASS  SPOT   Spot_mannequin_1 (-5.50, 0.40, 7.40): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_2 (5.50, 0.40, 7.40): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_3 (-5.70, 0.00, -2.00): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_4 (8.40, 0.00, -6.80): clear within 0.25 m
+
+== layout check: bookstore_desk (build_mall_shops.py --stage check)
+PASS  COVER  Back_Counter: 7 mesh(es) cover it (5810 sample points, every one within 5 cm of art)
+PASS  COVER  Cash_Desk: 7 mesh(es) cover it (5124 sample points, every one within 5 cm of art)
+PASS  COVER  Cash_Desk_Return: 7 mesh(es) cover it (1932 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Ceiling: 24 mesh(es) cover it (31875 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Floor: 32 mesh(es) cover it (42500 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Wall_E_1: 15 mesh(es) cover it (8019 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Wall_N_1: 20 mesh(es) cover it (12375 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Wall_S_1: 12 mesh(es) cover it (12375 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Wall_W_1: 13 mesh(es) cover it (5643 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Wall_W_2: 11 mesh(es) cover it (396 sample points, every one within 5 cm of art)
+PASS  COVER  Desk_Wall_W_3: 13 mesh(es) cover it (1683 sample points, every one within 5 cm of art)
+PASS  COVER  Filing_Cabinet: 3 mesh(es) cover it (588 sample points, every one within 5 cm of art)
+PASS  COVER  Office_Desk: 5 mesh(es) cover it (1215 sample points, every one within 5 cm of art)
+PASS  COVER  Office_Wall_S_1: 12 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Office_Wall_S_2: 13 mesh(es) cover it (396 sample points, every one within 5 cm of art)
+PASS  COVER  Office_Wall_S_3: 14 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Office_Wall_W: 11 mesh(es) cover it (2475 sample points, every one within 5 cm of art)
+PASS  COVER  Sheeted_Returns_Trolley: 5 mesh(es) cover it (1188 sample points, every one within 5 cm of art)
+PASS  COVER  Stock_Rack: 8 mesh(es) cover it (1380 sample points, every one within 5 cm of art)
+PASS  STRAY  45 tall solid mesh(es), each over a collider; 10 decor_* mesh(es) exempt
+PASS  CLEAR  marker Spawn (-4.70, 2.00): clear within 0.28 m
+PASS  CLEAR  links.bookstore.arrive (-4.70, 2.00): clear within 0.28 m
+PASS  CLEAR  links.bookstore.at (-5.40, 2.00): clear within 0.28 m
+PASS  SPOT   Spot_mannequin_1 (0.00, 0.00, -2.30): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_2 (5.10, 0.00, -2.40): clear within 0.25 m
+
+== layout check: cinema_lobby (build_mall_shops.py --stage check)
+PASS  COVER  Back_Counter: 7 mesh(es) cover it (7050 sample points, every one within 5 cm of art)
+PASS  COVER  Balcony_Rail: 8 mesh(es) cover it (4752 sample points, every one within 5 cm of art)
+PASS  COVER  Balcony_Rail_2: 6 mesh(es) cover it (44 sample points, every one within 5 cm of art)
+PASS  COVER  Balcony_Slab: 38 mesh(es) cover it (29884 sample points, every one within 5 cm of art)
+PASS  COVER  Box_Office: 9 mesh(es) cover it (30132 sample points, every one within 5 cm of art)
+PASS  COVER  Concession_Counter: 16 mesh(es) cover it (15228 sample points, every one within 5 cm of art)
+PASS  COVER  Drinks_Fridge: 8 mesh(es) cover it (1848 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Ceiling: 45 mesh(es) cover it (121275 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Floor: 29 mesh(es) cover it (161700 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Wall_E_1: 28 mesh(es) cover it (29463 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Wall_N_1: 44 mesh(es) cover it (44835 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Wall_S_1: 21 mesh(es) cover it (20313 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Wall_S_2: 16 mesh(es) cover it (2625 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Wall_S_3: 21 mesh(es) cover it (20313 sample points, every one within 5 cm of art)
+PASS  COVER  Lobby_Wall_W_1: 26 mesh(es) cover it (29463 sample points, every one within 5 cm of art)
+PASS  COVER  Screen_1_Door: 6 mesh(es) cover it (1050 sample points, every one within 5 cm of art)
+PASS  COVER  Screen_2_Door: 6 mesh(es) cover it (1050 sample points, every one within 5 cm of art)
+PASS  COVER  Screen_3_Door: 6 mesh(es) cover it (850 sample points, every one within 5 cm of art)
+PASS  COVER  Screen_4_Door: 6 mesh(es) cover it (850 sample points, every one within 5 cm of art)
+PASS  COVER  Screen_5_Door: 6 mesh(es) cover it (850 sample points, every one within 5 cm of art)
+PASS  COVER  Sheeted_Cardboard_Standee: 2 mesh(es) cover it (1540 sample points, every one within 5 cm of art)
+PASS  COVER  Stair_Wall: 4 mesh(es) cover it (814 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_00: 5 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_01: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_02: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_03: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_04: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_05: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_06: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_07: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_08: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_09: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_10: 6 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Step_balcony_11: 8 mesh(es) cover it (368 sample points, every one within 5 cm of art)
+PASS  COVER  Understair_Cupboard: 14 mesh(es) cover it (22568 sample points, every one within 5 cm of art)
+PASS  STRAY  60 tall solid mesh(es), each over a collider; 8 decor_* mesh(es) exempt
+PASS  CLEAR  marker Spawn (0.00, 6.70): clear within 0.28 m
+PASS  CLEAR  links.wing_cinema.arrive (0.00, 6.70): clear within 0.28 m
+PASS  CLEAR  links.wing_cinema.at (0.00, 7.40): clear within 0.28 m
+PASS  SPOT   Spot_mannequin_1 (-4.60, 0.00, 4.00): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_2 (-4.60, 0.00, 5.00): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_3 (-4.60, 0.00, 6.00): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_4 (0.00, 0.00, -7.20): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_5 (-6.00, 3.00, -5.60): clear within 0.25 m
+
+== layout check: food_court (build_mall_shops.py --stage check)
+PASS  COVER  Bench: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_10: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_11: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_12: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_13: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_14: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_15: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_16: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_17: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_18: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_19: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_2: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_20: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_21: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_22: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_23: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_24: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_25: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_26: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_27: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_28: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_29: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_3: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_30: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_31: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_32: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_33: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_34: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_35: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_36: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_37: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_38: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_39: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_4: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_40: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_5: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_6: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_7: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_8: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bench_9: 6 mesh(es) cover it (390 sample points, every one within 5 cm of art)
+PASS  COVER  Bin: 6 mesh(es) cover it (588 sample points, every one within 5 cm of art)
+PASS  COVER  Bin_2: 6 mesh(es) cover it (588 sample points, every one within 5 cm of art)
+PASS  COVER  Bin_3: 7 mesh(es) cover it (588 sample points, every one within 5 cm of art)
+PASS  COVER  Bin_4: 7 mesh(es) cover it (588 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Ceiling: 25 mesh(es) cover it (224175 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Floor: 179 mesh(es) cover it (230480 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_E_1: 17 mesh(es) cover it (44103 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_N_1: 21 mesh(es) cover it (50142 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_N_2: 11 mesh(es) cover it (1320 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_N_3: 15 mesh(es) cover it (4392 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_S_1: 16 mesh(es) cover it (25803 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_S_2: 15 mesh(es) cover it (2625 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_S_3: 16 mesh(es) cover it (25803 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_W_1: 15 mesh(es) cover it (19947 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_W_2: 13 mesh(es) cover it (2625 sample points, every one within 5 cm of art)
+PASS  COVER  Court_Wall_W_3: 15 mesh(es) cover it (19947 sample points, every one within 5 cm of art)
+PASS  COVER  Sheeted_Kiddie_Train: 3 mesh(es) cover it (5586 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_10: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_2: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_3: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_4: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_5: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_6: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_7: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_8: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Counter_9: 14 mesh(es) cover it (2340 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition: 15 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_10: 9 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_11: 9 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_12: 8 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_2: 21 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_3: 21 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_4: 21 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_5: 21 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_6: 21 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_7: 15 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_8: 8 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Partition_9: 9 mesh(es) cover it (2574 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter: 9 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_10: 5 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_2: 9 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_3: 9 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_4: 9 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_5: 9 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_6: 9 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_7: 5 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_8: 5 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Stall_Shutter_9: 5 mesh(es) cover it (1716 sample points, every one within 5 cm of art)
+PASS  COVER  Table: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_10: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_11: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_12: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_13: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_14: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_15: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_16: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_17: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_18: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_19: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_2: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_20: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_3: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_4: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_5: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_6: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_7: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_8: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Table_9: 7 mesh(es) cover it (1089 sample points, every one within 5 cm of art)
+PASS  COVER  Tray_Return: 3 mesh(es) cover it (3465 sample points, every one within 5 cm of art)
+PASS  STRAY  161 tall solid mesh(es), each over a collider; 18 decor_* mesh(es) exempt
+PASS  CLEAR  marker Spawn (0.00, 10.70): clear within 0.28 m
+PASS  CLEAR  links.entrance.arrive (-13.70, 0.00): clear within 0.28 m
+PASS  CLEAR  links.entrance.at (-14.40, 0.00): clear within 0.28 m
+PASS  CLEAR  links.service_corridor.arrive (12.50, -10.70): clear within 0.28 m
+PASS  CLEAR  links.service_corridor.at (12.50, -11.40): clear within 0.28 m
+PASS  CLEAR  links.wing_entertainment.arrive (0.00, 10.70): clear within 0.28 m
+PASS  CLEAR  links.wing_entertainment.at (0.00, 11.40): clear within 0.28 m
+PASS  SPOT   Spot_mannequin_1 (-7.50, 0.45, -4.27): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_2 (4.00, 0.45, 2.73): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_3 (7.50, 0.45, 7.27): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_4 (-4.00, 0.00, -8.60): clear within 0.25 m
+PASS  SPOT   Spot_mannequin_5 (11.20, 0.00, -2.00): clear within 0.25 m
+
+== python tools/blender/build_mall_shops.py --compare
+COMPARE bookstore: SAME as the greybox model (28 colliders, 3 doors, 2 links, 4 spots, 1 markers)
+COMPARE bookstore_desk: SAME as the greybox model (19 colliders, 2 doors, 1 links, 3 spots, 1 markers)
+COMPARE cinema_lobby: SAME as the greybox model (35 colliders, 2 doors, 1 links, 5 spots, 1 markers)
+COMPARE food_court: SAME as the greybox model (110 colliders, 5 doors, 3 links, 5 spots, 1 markers)
+
+== python tools/blender/build_mall_greybox.py --check .
+GATE links: 22 pairs, 44 sides, 5 that leave this set; 49 links in the files
+  off this set: food_court.entrance -> entrance
+  off this set: service_corridor.network -> the hidden network (freight lift, not built)
+  off this set: wing_books.entrance -> entrance
+  off this set: wing_cinema.entrance -> entrance
+  off this set: wing_entertainment.entrance -> entrance
+GATE navigable: 18 of 18 scenes reachable from entrance through the links
+GATE steps: 72 step boxes, one box a step, the highest rise 0.250 m (at most 0.27 m)
+GATE corridors: 54 corridor, aisle and doorway rects, the narrowest 1.65 m (at least 1.6 m), none blocked
+GATE mirrors: 6 of 6 Mirror_<n> nodes in mirror_bathroom.glb, the portal ['Mirror_4']
+  mannequin spots: 49 in 16 scenes
+GATES PASS
+
+== node tools/worlddoc.mjs check
+  warning: scene bookstore is not in the world manifest yet: a new scene to add
+  warning: link bookstore_desk: the manifest has no link from this door yet: a new link to add
+  warning: link wing_books: the manifest has no link from this door yet: a new link to add
+OK world/bookstore.json: 28 colliders, 3 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 3 warnings
+  warning: scene bookstore_desk is not in the world manifest yet: a new scene to add
+  warning: link bookstore: the manifest has no link from this door yet: a new link to add
+OK world/bookstore_desk.json: 19 colliders, 2 doors, 1 markers, 1 links, 0 zones, 3 spots, 0 errors, 2 warnings
+  warning: scene cinema_lobby is not in the world manifest yet: a new scene to add
+  warning: link wing_cinema: the manifest has no link from this door yet: a new link to add
+OK world/cinema_lobby.json: 35 colliders, 2 doors, 1 markers, 1 links, 0 zones, 5 spots, 0 errors, 2 warnings
+  warning: scene food_court is not in the world manifest yet: a new scene to add
+  warning: link entrance: the manifest has no link from this door yet: a new link to add
+  warning: link service_corridor: the manifest has no link from this door yet: a new link to add
+  warning: link wing_entertainment: the manifest has no link from this door yet: a new link to add
+OK world/food_court.json: 110 colliders, 5 doors, 1 markers, 3 links, 0 zones, 5 spots, 0 errors, 4 warnings
+
+== glb_inspect --budget tris=300000,mb=8
+bookstore:
+materials  23: Book_Loose, Book_Spines, Brass, Carpet_Shop, Ceiling_Tile, Cloth_Sheet, Decal_Dust, Doors, Emergency_Emit, Fabric_Chair, Glass_Paper, Lamp_Emit, Lens_Dead, Metal_Dark, Paint_Palette, Plastic_White, Shelf_Back, Sign_Exit, Sign_Paint, Trim_Paint, Wall_Paint, Wood_Desk, Wood_Shelf
+pass       tris: 66714 triangles, budget 300000
+pass       mb: 6.65 MB, budget 8
+bookstore_desk:
+materials  22: Book_Loose, Carpet_Shop, Ceiling_Tile, Cloth_Sheet, Decal_Dust, Doors, Emergency_Emit, Floor_Vinyl, Laminate, Lamp_Emit, Lens_Dead, Metal_Dark, Metal_Steel, Paint_Palette, Plastic_White, Sign_Exit, Sign_Paint, Trim_Paint, Wall_Lower, Wall_Paint, Wood_Desk, Wood_Light
+pass       tris: 6546 triangles, budget 300000
+pass       mb: 1.87 MB, budget 8
+cinema_lobby:
+materials  23: Brass, Carpet_Cinema, Ceiling_Dark, Ceiling_Paint, Cloth_Sheet, Decal_Dust, Doors, Emergency_Emit, Fabric_Padded, Floor_Vinyl, Glass_Clear, Lamp_Emit, Lens_Dead, Metal_Dark, Metal_Steel, Paint_Palette, Plastic_White, Poster_Print, Sign_Exit, Sign_Paint, Trim_Dark, Wall_Fabric, Wall_Paint
+pass       tris: 10106 triangles, budget 300000
+pass       mb: 1.48 MB, budget 8
+food_court:
+materials  24: Brass, Ceiling_Paint, Cloth_Sheet, Decal_Dust, Doors, Emergency_Emit, Floor_Border, Floor_Terrazzo, Laminate, Lamp_Emit, Lens_Dead, Metal_Dark, Metal_Steel, Paint_Palette, Plastic_White, Shutter_Metal, Sign_Exit, Sign_Paint, Skylight_Glass, Trim_Dark, Trim_Paint, Wall_Paint, Wall_Tile, Wood_Light
+pass       tris: 20068 triangles, budget 300000
+pass       mb: 2.61 MB, budget 8
+
+== node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
