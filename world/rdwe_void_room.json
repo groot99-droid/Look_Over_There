@@ -28,6 +28,19 @@
    ]
   },
   {
+   "s": "Coat_Stand",
+   "min": [
+    -4.6,
+    0.0,
+    3.6
+   ],
+   "max": [
+    -4.2,
+    1.8,
+    4.0
+   ]
+  },
+  {
    "s": "Lone_Chair",
    "min": [
     1.6,
@@ -169,6 +182,19 @@
     4.0,
     5.0
    ]
+  },
+  {
+   "s": "Side_Table",
+   "min": [
+    2.32,
+    0.0,
+    0.7
+   ],
+   "max": [
+    2.72,
+    0.62,
+    1.1
+   ]
   }
  ],
  "doors": [
@@ -260,6 +286,38 @@
    "yaw_deg": 180.0,
    "scale": 1.0,
    "what": "no light: only the lit door's outline"
+  },
+  {
+   "kind": "dark",
+   "name": "Spot_dark_2",
+   "position": [
+    1.9,
+    0.0,
+    1.62
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the chair faces the lit door: sit, and its outline brightens; stand, and the black comes back"
+  },
+  {
+   "kind": "dark",
+   "name": "Spot_dark_3",
+   "position": [
+    -3.0,
+    0.0,
+    -1.2
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "halfway to the lit door: the teal room's doorway behind you is gone"
   }
  ]
 }

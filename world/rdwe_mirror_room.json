@@ -2,6 +2,32 @@
  "scene": "rdwe_mirror_room",
  "colliders": [
   {
+   "s": "Armchair_E",
+   "min": [
+    6.8,
+    0.0,
+    -2.7
+   ],
+   "max": [
+    7.6,
+    0.95,
+    -1.9
+   ]
+  },
+  {
+   "s": "Armchair_W",
+   "min": [
+    -7.6,
+    0.0,
+    -2.7
+   ],
+   "max": [
+    -6.8,
+    0.95,
+    -1.9
+   ]
+  },
+  {
    "s": "Beyond_moon",
    "min": [
     -8.55,
@@ -41,6 +67,32 @@
    ]
   },
   {
+   "s": "Coffee_Table_E",
+   "min": [
+    4.4,
+    0.0,
+    -2.8
+   ],
+   "max": [
+    5.6,
+    0.45,
+    -2.0
+   ]
+  },
+  {
+   "s": "Coffee_Table_W",
+   "min": [
+    -5.6,
+    0.0,
+    -2.8
+   ],
+   "max": [
+    -4.4,
+    0.45,
+    -2.0
+   ]
+  },
+  {
    "s": "Glass_N",
    "min": [
     -0.05,
@@ -64,6 +116,32 @@
     0.05,
     3.4,
     5.0
+   ]
+  },
+  {
+   "s": "Lamp_Table_E",
+   "min": [
+    7.4,
+    0.0,
+    -4.7
+   ],
+   "max": [
+    7.9,
+    0.65,
+    -4.2
+   ]
+  },
+  {
+   "s": "Lamp_Table_W",
+   "min": [
+    -7.9,
+    0.0,
+    -4.7
+   ],
+   "max": [
+    -7.4,
+    0.65,
+    -4.2
    ]
   },
   {
@@ -223,6 +301,32 @@
    ]
   },
   {
+   "s": "Sideboard_E",
+   "min": [
+    0.6,
+    0.0,
+    4.5
+   ],
+   "max": [
+    2.6,
+    0.9,
+    5.0
+   ]
+  },
+  {
+   "s": "Sideboard_W",
+   "min": [
+    -2.6,
+    0.0,
+    4.5
+   ],
+   "max": [
+    -0.6,
+    0.9,
+    5.0
+   ]
+  },
+  {
    "s": "Sofa_E",
    "min": [
     3.5,
@@ -371,6 +475,38 @@
    "yaw_deg": 90.0,
    "scale": 1.0,
    "what": "the mirror's gap: step through to the reflection"
+  },
+  {
+   "kind": "trick",
+   "name": "Spot_trick_2",
+   "position": [
+    3.0,
+    0.0,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "what": "the far side: the room, mirrored; the clock runs the other way and the books read backwards"
+  },
+  {
+   "kind": "trick",
+   "name": "Spot_trick_3",
+   "position": [
+    4.0,
+    0.0,
+    2.2
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the reflection's door: the same door you came in by, and real"
   }
  ]
 }

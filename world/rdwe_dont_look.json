@@ -2,6 +2,32 @@
  "scene": "rdwe_dont_look",
  "colliders": [
   {
+   "s": "Bench_N",
+   "min": [
+    -1.5,
+    0.0,
+    -2.7
+   ],
+   "max": [
+    1.5,
+    0.45,
+    -2.3
+   ]
+  },
+  {
+   "s": "Bench_S",
+   "min": [
+    -1.5,
+    0.0,
+    2.3
+   ],
+   "max": [
+    1.5,
+    0.45,
+    2.7
+   ]
+  },
+  {
    "s": "Beyond_mirror",
    "min": [
     -7.55,
@@ -51,6 +77,32 @@
     -2.0,
     1.2,
     4.2
+   ]
+  },
+  {
+   "s": "Plinth_3",
+   "min": [
+    2.0,
+    0.0,
+    -4.4
+   ],
+   "max": [
+    2.8,
+    1.1,
+    -3.6
+   ]
+  },
+  {
+   "s": "Plinth_4",
+   "min": [
+    2.0,
+    0.0,
+    3.6
+   ],
+   "max": [
+    2.8,
+    1.1,
+    4.4
    ]
   },
   {
@@ -286,6 +338,38 @@
    "yaw_deg": 90.0,
    "scale": 1.0,
    "what": "it is closer every time you blink"
+  },
+  {
+   "kind": "statue",
+   "name": "Spot_statue_2",
+   "position": [
+    5.6,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "the door behind the statue: walk to it backwards, watching her"
+  },
+  {
+   "kind": "statue",
+   "name": "Spot_statue_3",
+   "position": [
+    -4.4,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "where she stands when you come in: hands over her face, three metres off"
   }
  ]
 }
