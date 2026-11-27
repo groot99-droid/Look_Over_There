@@ -14,7 +14,7 @@ Dressed and lit; how it is built, the light, the materials and the sources: `doc
 
 **Day** (`lightmap`; gain 0.6667, walls aimed at p50 0.5)
 
-| Material | m² | p50 | p90 | p99 | cap |
+| Material | m2 | p50 | p90 | p99 | cap |
 |---|---|---|---|---|---|
 | `M_D_ceil_L4` | 2573.5 | 0.017 | 0.021 | 0.040 |  |
 | `M_D_floor_L4` | 2508.5 | 0.184 | 0.298 | 0.696 |  |
@@ -37,7 +37,7 @@ Dressed and lit; how it is built, the light, the materials and the sources: `doc
 
 **Night** (`lightmap_night`; gain 3.3333, walls aimed at p50 0.15)
 
-| Material | m² | p50 | p90 | p99 | cap |
+| Material | m2 | p50 | p90 | p99 | cap |
 |---|---|---|---|---|---|
 | `M_D_ceil_L4` | 2573.5 | 0.008 | 0.015 | 0.027 |  |
 | `M_D_floor_L4` | 2508.5 | 0.075 | 0.176 | 0.388 |  |
