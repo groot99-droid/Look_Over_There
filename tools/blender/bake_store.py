@@ -11,7 +11,7 @@ Draco library), so the lightmap UV found for each Blender vertex is the TEXCOORD
 already splits its vertices, so no vertex needs two lightmap UVs. tools/store_lightmap_glb.py then adds TEXCOORD_1 as a new accessor next to
 the Draco data and the lightmap extras to the baked materials; every byte of the existing buffers, accessors and primitives stays as it was.
 The light is the floor's own: the GLB's glowing tubes (M_Fluorescent, at their exported emissive strength) and the store file's world
-(a flat grey, 0.0509 at strength 1). The store file has no lamp objects on B1 or L3.
+(a flat grey, 0.0509 at strength 1). The store file has no lamp objects on its floors (B1, L1, L2).
 
 Outputs (in --work, default <system temp>/farway_store_<scene>): <scene>_<n>.png (8-bit, sRGB-encoded, each map's white point at its 99.5th
 percentile texel), <scene>_uv1.bin and <scene>_bake.json (which primitive has which UV1, which material goes on which map, the scales),
@@ -60,23 +60,33 @@ GROUPS = {
            ["M_D_ceil_B1", "M_D_ceil_L1", "M_D_trim"],
            ["M_D_wall_B1", "M_D_wall_L1"],
            []],
-    # L3, the white plaster room: the floor (and the slab's underside, L2's ceiling, which faces out), the ceiling with its vents and lamp
-    # housings, the walls, and the small things (the stair doors, the power box, the conduit)
-    "L3": [["M_D_floor_L3", "M_D_floor_L4", "M_D_ceil_L2"],
-           ["M_D_ceil_L3", "M_D_ceil_L4", "M_Fixture_Housing", "M_X_steel", "M_X_dark"],
-           ["M_D_wall_L3", "M_U_wall_L4"],
-           []],
+    "L2": [["M_D_floor_L2", "M_D_floor_L3", "M_D_ceil_L1", "M_D_stains", "M_Door"],
+           ["M_D_ceil_L2", "M_D_ceil_L3", "M_D_trim"],
+           ["M_D_wall_L2", "M_D_wall_L3"],
+           []],                                     # the 150 door leaves, the frames, the housings, the dead panel, the rails
+    "L1": [["M_D_floor_L1", "M_D_floor_L2", "M_D_ceil_B1", "M_D_stains", "M_Door"],
+           ["M_D_ceil_L1", "M_D_ceil_L2", "M_D_trim"],
+           ["M_D_wall_L1", "M_D_wall_L2", "M_Wall_1E_SE", "M_Wall_1E_SW"],
+           []],                                     # the 126 door leaves, the frames, the housings, the dead panel, the rails
 }[SCENE]
-FLOOR_Y = {"B1": -3.0, "L1": 0.0, "L2": 3.2, "L3": 6.4, "L4": 9.6}[SCENE]     # the floor's height (game y = Blender z)
-# 4 px between islands on maps with thousands of small islands (B1: the trims and the props; L3: the props), 8 px elsewhere
-PAGE_MARGIN = {"B1": {1: 4, 3: 4}, "L3": {3: 4}}[SCENE]
+PAGE_MARGIN = {"B1": {1: 4, 3: 4}, "L1": {1: 4, 3: 4}, "L2": {1: 4, 3: 4}}[SCENE]   # the trim's and the props' thousands of small islands: 4 px between islands there, 8 px elsewhere
 EXTERIOR_SCALE = 0.12                               # faces that look out of the building (seen from nowhere inside) get this fraction of the density
 # Lamp parts: allowed to clip to white (they sit against the glowing tubes); every other material keeps its 99.5th percentile under the map's white.
 HOT = {"M_Fixture_Housing", "M_Fluorescent_Dead"}
 # Never baked: they stay as exported (the water keeps its see-through surface, glass stays glass, the lit tubes and the exit sign glow).
-# Glass (transmission or alpha blend), anything glowing, skinned or drawn in more than one place is left out on every floor as well.
+# Glass (transmission or alpha blend), anything glowing and any mesh that is skinned or drawn in more than one place are left out on every floor anyway.
+# On L2 the loose props (the textured furniture models) also stay on the page's lights: their lightmap UVs would put the GLB over its
+# size budget (L2's 150 door leaves alone carry 78 000 vertices of lightmap UV). They still cast light and shadow in the bake.
+PROPS_L2 = {"SchoolChair_01", "WetFloorSign_01", "cardboard_box_01", "classic_laptop", "classic_laptop_screen", "dustpan", "fire_hydrant",
+            "fire_hydrant_aged", "industrial_storage_cart", "korean_fire_extinguisher_01_body", "korean_public_payphone_01", "metal_office_desk",
+            "metal_trash_can", "metal_trash_can_rust", "metal_trash_can_rust.001", "plastic_broom", "plunger", "steel_frame_shelves_01", "wooden_bucket_01"}
+# L1 keeps the same rule (126 door leaves, 64 000 vertices of lightmap UV): its loose props, the same models plus a few, stay on the page's lights.
+PROPS_L1 = PROPS_L2 | {"SchoolDesk_01", "dartboard", "plastic_monobloc_chair_01", "lambert1"}     # lambert1: the wheelchair
 NEVER = {"B1": {"M_Water", "M_Fluorescent", "M_X_exit"},
-         "L3": {"M_Fluorescent", "M_X_exit", "security_camera_01_glass", "fire_alarm"}}[SCENE]
+         "L1": {"M_Fluorescent", "M_X_exit"} | PROPS_L1,
+         "L2": {"M_Fluorescent", "M_X_exit"} | PROPS_L2}[SCENE]
+# The plan view hides what starts above this height (Blender z, metres): the ceiling and what hangs from it.
+CEILING_CUT = {"B1": -0.75, "L1": 2.25, "L2": 5.45}[SCENE]
 
 
 # ------------------------------------------------------------------ the GLB, read and Draco-decoded
@@ -175,14 +185,32 @@ def read_accessor(j, BIN, i):
     return np.lib.stride_tricks.as_strided(raw, (a["count"], nc * dt.itemsize), (stride, 1)).copy().view(dt).reshape(a["count"], nc)
 
 
-def node_matrices(j):
-    """World matrix (glTF space) of every node."""
-    W = {}
+def door_poses(j):
+    """{node index: rotation} that closes every door leaf the way the page does when it loads the floor (index.html: the leaf's local
+    rotation becomes a yaw of closed_yaw_deg about +Y; the export may hold it open or ajar). Read from world/<scene>.json's doors."""
+    p = ROOT / "world" / f"{SCENE}.json"
+    if not p.exists():
+        return {}
+    names = {nd.get("name"): i for i, nd in enumerate(j["nodes"])}
+    out = {}
+    for d in json.loads(p.read_text()).get("doors", []):
+        i = names.get(d.get("name"))
+        if i is not None and "matrix" not in j["nodes"][i] and "closed_yaw_deg" in d:
+            a = math.radians(d["closed_yaw_deg"])
+            out[i] = [0.0, math.sin(a / 2), 0.0, math.cos(a / 2)]
+    return out
 
-    def local(nd):
+
+def node_matrices(j, rot=None):
+    """World matrix (glTF space) of every node; `rot` replaces some nodes' local rotation (the doors, closed)."""
+    W = {}
+    rot = rot or {}
+
+    def local(i):
+        nd = j["nodes"][i]
         if "matrix" in nd:
             return np.array(nd["matrix"], float).reshape(4, 4).T
-        t = nd.get("translation", [0, 0, 0]); r = nd.get("rotation", [0, 0, 0, 1]); s = nd.get("scale", [1, 1, 1])
+        t = nd.get("translation", [0, 0, 0]); r = rot.get(i, nd.get("rotation", [0, 0, 0, 1])); s = nd.get("scale", [1, 1, 1])
         x, y, z, w = r
         R = np.array([[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
                       [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
@@ -191,7 +219,7 @@ def node_matrices(j):
         return M
 
     def walk(i, P):
-        W[i] = P @ local(j["nodes"][i])
+        W[i] = P @ local(i)
         for c in j["nodes"][i].get("children", []):
             walk(c, W[i])
     for sc in j["scenes"]:
@@ -282,8 +310,10 @@ def make_material(j, mi, imgs):
 def build_scene():
     j, BIN = read_glb(GLB)
     lib = draco_lib()
-    W = node_matrices(j)
+    doors = door_poses(j)
+    W = node_matrices(j, doors)                      # the bake sees the doors shut, as the page shows them on arrival
     imgs = glb_images(j, BIN)
+    print(f"{len(doors)} door leaves closed for the bake")
     sc = bpy.context.scene                           # run with --factory-startup and no .blend: the empty start scene becomes the bake scene
     if bpy.data.filepath:
         raise RuntimeError("run the bake and the stills without a .blend (the store file is only opened by verify_world.py)")
@@ -677,10 +707,12 @@ VIEWS = {
                                                                                       # south end, eye height, facing north down its 40 m run
            ["2_wide", [30.0, 26.0, 40.0], [0.0, -3.0, 2.5], 50, True],               # the whole floor from above the south-east corner, ceiling hidden
            ["3_detail", [16.1, -1.4, -20.5], [11.12, -2.6, -21.12], 60, False]],     # the flooded north-east room: the chair and the blue ring in the water
-    "L3": [["1_arrival", [-14.6, 8.0, -14.6], [15.0, 7.3, 20.0], 75, False],          # beside the stair door from L2 (it lands you at -16.48, -14.28), eye height,
-                                                                                      # looking south-east across the room, the stair's box at the right
-           ["2_wide", [30.0, 35.4, 40.0], [0.0, 6.4, 2.5], 50, True],                # the whole room from above the south-east corner, ceiling hidden
-           ["3_detail", [2.6, 8.0, -17.6], [0.0, 7.0, -21.7], 60, False]],           # the power box on the north wall (the page adds its lever and lamp)
+    "L2": [["1_arrival", [-0.007, 4.8, 9.9], [-0.007, 4.5, 25.0], 75, False],         # where the stair from L1 lands (the manifest's arrival), eye height, looking south away from the stair door
+           ["2_wide", [30.0, 32.0, 40.0], [0.0, 3.2, 2.5], 50, True],                # the whole floor from above the south-east corner, ceiling hidden
+           ["3_detail", [8.6, 4.8, -2.04], [19.2, 4.3, -2.04], 60, False]],          # a corridor of the loop, looking east to a door
+    "L1": [["1_arrival", [-5.0, 1.6, -4.97], [0.0, 1.3, -13.63], 75, False],          # PlayerStart (world/L1.json), eye height, facing its longest open run (10.6 m)
+           ["2_wide", [30.0, 29.0, 42.0], [0.0, 0.0, 2.5], 50, True],                # the whole office maze from above the south-east corner, ceiling hidden
+           ["3_detail", [13.76, 1.6, 1.42], [15.06, 0.8, 3.67], 60, False]],         # the east offices: the metal desk with the laptop (props on the page's lights)
 }
 
 
@@ -712,7 +744,7 @@ def pool_view(prims):
     bm.free()
     _, x0, x1, y0, y1, z = best
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-    floor = FLOOR_Y
+    floor = -3.0
     if x1 - x0 >= y1 - y0:                           # Blender (x, y) is game (x, -z)
         eye = [x1 + 1.2, floor + 1.6, -cy]; at = [x0, z, -cy]
     else:
@@ -740,7 +772,7 @@ def stage_render():
             eye, at = pool_view(prims)
         for o, *_ in prims:                          # the ceiling and what hangs from it: hidden from the camera in the plan view only
             zmin = min((o.matrix_world @ Vector(c)).z for c in o.bound_box)
-            o.visible_camera = not (plan and zmin > FLOOR_Y + 2.25)
+            o.visible_camera = not (plan and zmin > CEILING_CUT)
         cam = bpy.data.objects.new(name, bpy.data.cameras.new(name)); sc.collection.objects.link(cam)
         cam.data.sensor_fit = "VERTICAL"; cam.data.angle = math.radians(fov); cam.data.clip_start = 0.05; cam.data.clip_end = 300
         e, t = g2b(eye), g2b(at)
