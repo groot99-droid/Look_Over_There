@@ -1,5 +1,5 @@
 // Right Door, Wrong Exit in a party room (session 11, slice 3): two players of one room enter the game separately, meet in one place, see each other, go on through
-// the rooms (each its own place), and leave without breaking the other's game; a round that ends meanwhile gives the one in the game the results on the way back. Uses the real server and two headless pages. The Intern is still solo only and must still refuse in a room.
+// the rooms (each its own place), and leave without breaking the other's game; a round that ends meanwhile gives the one in the game the results on the way back. Uses the real server and two headless pages. The Intern has its own: tools/intern_party_test.mjs.
 // Usage: node tools/games_party_test.mjs     (needs Playwright + Chromium; run from the repo root)
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
@@ -98,11 +98,7 @@ try {
   check("the server has Ann in the meadow and Bob still in the game", await serverPlace(aid, "meadow") && placeOf(bid) === "rdwe:hallway", `${placeOf(aid)} / ${placeOf(bid)}`);
   const sb2 = await gameState(b);
   check("Bob's game is still running", !!sb2 && sb2.peers === 0, JSON.stringify(sb2));
-  // the Intern is still solo only
-  await a.evaluate(() => window.__game.loadScene("L4")); await until(a, () => window.__game.S.id === "L4" && !window.__game.loading);
-  await a.evaluate(() => { const g = window.__game, dr = g.doors.find(d => d.d.name === "DoorLeaf_Gate_ITN"); g.teleport([dr.cx, g.S.floor, dr.cz]); g.openDoor(dr, true); });
-  const toast = await a.evaluate(() => document.getElementById("toast")?.textContent || "");
-  check("the Intern's gate still does not open in a room", /does not open in a room/.test(toast) && await a.evaluate(() => window.__game.S.id) === "L4", toast);
+  await a.evaluate(() => window.__game.loadScene("L4")); await until(a, () => window.__game.S.id === "L4" && !window.__game.loading);          // back up to the store for the finish (the Intern in a room has its own test: tools/intern_party_test.mjs)
   // Ann finishes the Original while Bob is in the game: the round ends without him, and he gets the results when he comes back (docs/ROUND.md section D)
   for (const p of room().players.values()) p.ps.immUntil = 1e15;          // the server's immunity: this part is about the results, not the monsters
   await a.evaluate(() => { const g = window.__game, sp = g.S.pw.spot; g.P.imm = 99; g.P.p.set(sp[0] + 1.2, g.S.floor + 0.02, sp[1]); g.P.v.set(0, 0, 0); });

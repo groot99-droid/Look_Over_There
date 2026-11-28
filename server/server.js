@@ -150,7 +150,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
   }
   // what the others in a presence scene are sent about a player: where they are and how they move, and nothing a floor's rules would own
   const presenceSnap = (p, m) => ({t: "s", id: p.id, scene: p.scene, x: p.st.x, y: p.st.y, z: p.st.z, yaw: p.st.yaw, crouch: p.st.crouch ? 1 : 0, moving: p.st.moving ? 1 : 0, run: p.st.run ? 1 : 0,
-    hp: Math.round(p.ps.hp.hp), ...(Number.isFinite(m.tod) && m.tod >= 0 && m.tod < 24 ? {tod: Math.round(m.tod * 100) / 100} : {})});
+    hp: Math.round(p.ps.hp.hp), ...(p.st.sub ? {sub: p.st.sub} : {}), ...(Number.isFinite(m.tod) && m.tod >= 0 && m.tod < 24 ? {tod: Math.round(m.tod * 100) / 100} : {})});
 
   // the waiting room: everyone readies, then a countdown, then the round starts for the whole room (a round runs until the room empties)
   const lobbyMsg = room => ({t: "lobby", phase: room.phase, countdownMs: room.timer ? countdownMs : null,
@@ -206,7 +206,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
           const was = me.scene; me.scene = scene;
           const f = k => Number.isFinite(m[k]) ? m[k] : 0, inMap = Math.abs(f("x")) <= reach && Math.abs(f("z")) <= reach && f("y") > -20 && f("y") < 30;          // a position off the map (or not a number) is ignored: the player stays where they were
           if (!inMap && me.st) { m = {...m, x: me.st.x, y: me.st.y, z: me.st.z}; }
-          me.st = {x: f("x"), y: f("y"), z: f("z"), yaw: f("yaw"), crouch: !!m.crouch, moving: !!m.moving, run: !!m.run, carry: !!m.carry, cloak: !!m.cloak, dead: !!m.dead, imm: !!m.imm};
+          me.st = {x: f("x"), y: f("y"), z: f("z"), yaw: f("yaw"), crouch: !!m.crouch, moving: !!m.moving, run: !!m.run, carry: !!m.carry, cloak: !!m.cloak, dead: !!m.dead, imm: !!m.imm, ...(there && typeof m.sub === "string" && /^\w{1,24}$/.test(m.sub) ? {sub: m.sub} : {})};          // sub: which room of a game's stage the spot is in (the Intern); a short name, relayed and not read
           if (there) broadcast(room, presenceSnap(me, m), me.id, scene);
           else broadcast(room, {...m, id: me.id, hp: Math.round(me.ps.hp.hp), cloak: PS.cloakOn(me.ps) ? 1 : 0, gun: me.ps.gun ? 1 : 0, dead: PS.isDown(me.ps) ? 1 : 0, imm: PS.isImmune(me.ps, clock()) ? 1 : 0}, me.id, scene);          // health, cloak, gun and being down are the server's word, not the client's
           if (was !== scene) {
@@ -228,7 +228,7 @@ export function createServer({port = 0, root = ROOT, countdownMs = 10000, modes 
           if (!to || to === me || !to.scene || !to.st) break;
           const may = registry.canReach(to.scene, me.flags, room.mode);          // a friend in a page scene (session 17): only if the links a room can follow let you in there too
           if (!may.ok) { send(me, {t: "goto", id: to.id, scene: to.scene, refused: "requires", missing: may.missing}); break; }
-          send(me, {t: "goto", id: to.id, scene: to.scene, x: to.st.x, y: to.st.y, z: to.st.z});
+          send(me, {t: "goto", id: to.id, scene: to.scene, x: to.st.x, y: to.st.y, z: to.st.z, ...(to.st.sub ? {sub: to.st.sub} : {})});
           break;
         }
         case "keypad": {                                              // read a note ("find") or type the code ("try") on the floor you are on

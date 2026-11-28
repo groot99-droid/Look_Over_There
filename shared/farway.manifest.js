@@ -52,7 +52,7 @@ export const FARWAY = {
      // its rooms: the seven the game had, then the Blender rooms (games/rdwe/blender_rooms.js, tools/blender/rdwe_links.py); each is a coop place `rdwe:<room>`
      rooms: ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery",
              "ames_room", "anamorphic_room", "attic", "bending_hall", "birthday_party", "changing_rooms", "crossroads", "dont_look", "door_hall", "elevator_lobby", "finale", "giant_chair", "green_grid", "kids_bedroom", "laundromat", "lights_out", "long_table", "map_room", "melting_library", "mirror_room", "moon_window", "motel_room", "office_night", "painted_door", "repeating_room", "shrink_hall", "stair_loop", "stretching_hall", "three_doors", "tilted_hall", "tiny_kitchen", "upside_room", "vending_room", "void_room", "waiting_room", "wrong_clock"]},
-    {id: "intern", name: "The Intern", status: "built", soloOnly: true, tone: "liminal", spine: ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"]},
+    {id: "intern", name: "The Intern", status: "built", coop: true, tone: "liminal", spine: ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"]},
     {
       // v0 is one scene: the parking lot with the table and chairs as the spawn, the store doors, and one sky mode. The other scenes are designed, not built (they have no files).
       id: "overworld", name: "Overworld", status: "built", tone: "dreamcore",
@@ -141,7 +141,7 @@ export const FARWAY = {
     stair("L3", "DoorLeaf_Stair_L2_L3_down", "L2", "DoorLeaf_Stair_L2_L3_up", [-16.478, 6.4, -14.278], [0.0, 1.0]),
     stair("L3", "DoorLeaf_Stair_L3_L4_up", "L4", "DoorLeaf_Stair_L3_L4_down", [16.0, 9.6, 7.2], [0.0, -1.0]),
     stair("L4", "DoorLeaf_Stair_L3_L4_down", "L3", "DoorLeaf_Stair_L3_L4_up", [16.0, 9.6, 8.0], [0.0, 1.0]),
-    gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4"),
+    gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4", false),          // a room can enter it (session 11, slice 4): coop, see docs/ROUND.md section D
 
     // Going back in: the stairs down from the 4th chamber of L4 to the first chamber of L3. One way (the chamber's own `up` door has no link). Arrival is on L3's floor (6.4).
     {id: "gbi.gbi_L4_4.stairs_down", status: "built", connector: "stair_door",

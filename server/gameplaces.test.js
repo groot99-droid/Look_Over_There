@@ -31,11 +31,13 @@ const kind = t => m => m.t === t;
 async function join(srv, room, name) { const c = client(srv.port); await c.open; c.send({t: "join", room, name, flags: ["original_complete"]}); const w = await c.next(kind("welcome")); return Object.assign(c, {id: w.id, welcome: w}); }
 const sees = async (srv, room, c, scene) => { const end = Date.now() + 2000; while (Date.now() < end) { if (srv.rooms.get(room).players.get(c.id).scene === scene) return true; await new Promise(r => setTimeout(r, 10)); } return false; };
 
-test("shipped: a place in Right Door, Wrong Exit is accepted, one in the Intern is refused (it is still solo only)", async () => {
+test("shipped: a place in either game is accepted, a stage the Intern does not have is refused", async () => {
   const srv = await createServer(), a = await join(srv, "G0", "Ann");
-  a.send({t: "s", scene: "intern:S3", x: 1, y: 0, z: 2, yaw: 0});
+  a.send({t: "s", scene: "intern:S9", x: 1, y: 0, z: 2, yaw: 0});
   await new Promise(r => setTimeout(r, 150));
   assert.equal(srv.rooms.get("G0").players.get(a.id).scene, null);
+  a.send({t: "s", scene: "intern:S3", x: 1, y: 0, z: 2, yaw: 0});
+  assert.ok(await sees(srv, "G0", a, "intern:S3"));
   a.send({t: "s", scene: "rdwe:teal", x: 1, y: 0, z: 2, yaw: 0});
   assert.ok(await sees(srv, "G0", a, "rdwe:teal"));
   await srv.close();
@@ -90,5 +92,25 @@ test("a player inside a game does not hold the Original's finish: the others fin
   a.send({t: "exit"});
   const res = await a.next(kind("results"));
   assert.deepEqual(res.rows.map(r => r.id), [a.id], "Ann is ranked, Bob is still inside the game");
+  await srv.close();
+});
+
+test("the room of a stage (sub) is relayed with a spot in a game, comes with a jump to a friend, and a bad one is dropped", async () => {
+  const srv = await createServer();
+  const a = await join(srv, "G5", "Ann"), b = await join(srv, "G5", "Bob");
+  b.send({t: "s", scene: "intern:S3", x: 0, y: 0, z: 0, yaw: 0}); assert.ok(await sees(srv, "G5", b, "intern:S3"));
+  a.send({t: "s", scene: "intern:S3", x: 1, y: 0, z: 2, yaw: 0.5, sub: "S3_H"});
+  const s = await b.next(m => m.t === "s" && m.id === a.id);
+  assert.deepEqual([s.scene, s.x, s.z, s.sub], ["intern:S3", 1, 2, "S3_H"]);
+  b.send({t: "goto", to: a.id});
+  assert.equal((await b.next(kind("goto"))).sub, "S3_H", "the friend's room comes with their place");
+  for (const bad of ["<script>", "x".repeat(25), 7, ""]) {
+    a.send({t: "s", scene: "intern:S3", x: 3, y: 0, z: 4, yaw: 0, sub: bad});
+    const t = await b.next(m => m.t === "s" && m.id === a.id && m.x === 3);
+    assert.equal(t.sub, undefined, `sub ${JSON.stringify(bad)} is not relayed`);
+  }
+  a.send({t: "s", scene: "L4", x: 1, y: 9.6, z: 2, yaw: 0, sub: "S3_H"});
+  assert.ok(await sees(srv, "G5", a, "L4"));
+  assert.equal(srv.rooms.get("G5").players.get(a.id).st.sub, undefined, "a floor has no sub");
   await srv.close();
 });
