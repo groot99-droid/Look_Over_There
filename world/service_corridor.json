@@ -1,0 +1,722 @@
+{
+ "scene": "service_corridor",
+ "colliders": [
+  {
+   "s": "Bin",
+   "min": [
+    -16.8,
+    0.0,
+    -2.4
+   ],
+   "max": [
+    -15.4,
+    1.3,
+    -1.5
+   ]
+  },
+  {
+   "s": "BinBay_Ceiling",
+   "min": [
+    -17.2,
+    3.0,
+    -2.6
+   ],
+   "max": [
+    -12.8,
+    3.2,
+    -1.0
+   ]
+  },
+  {
+   "s": "BinBay_Floor",
+   "min": [
+    -17.2,
+    -0.3,
+    -2.6
+   ],
+   "max": [
+    -12.8,
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "s": "BinBay_Wall_E_1",
+   "min": [
+    -13.0,
+    0.0,
+    -2.4
+   ],
+   "max": [
+    -12.8,
+    3.0,
+    -1.2
+   ]
+  },
+  {
+   "s": "BinBay_Wall_N_1",
+   "min": [
+    -17.2,
+    0.0,
+    -2.6
+   ],
+   "max": [
+    -12.8,
+    3.0,
+    -2.4
+   ]
+  },
+  {
+   "s": "BinBay_Wall_W_1",
+   "min": [
+    -17.2,
+    0.0,
+    -2.4
+   ],
+   "max": [
+    -17.0,
+    3.0,
+    -1.2
+   ]
+  },
+  {
+   "s": "Bin_2",
+   "min": [
+    -15.2,
+    0.0,
+    -2.4
+   ],
+   "max": [
+    -13.8,
+    1.3,
+    -1.5
+   ]
+  },
+  {
+   "s": "Corridor_Ceiling",
+   "min": [
+    -26.2,
+    3.0,
+    -1.2
+   ],
+   "max": [
+    20.2,
+    3.2,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Floor",
+   "min": [
+    -26.2,
+    -0.3,
+    -1.2
+   ],
+   "max": [
+    20.2,
+    0.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_E_1",
+   "min": [
+    20.0,
+    0.0,
+    -1.0
+   ],
+   "max": [
+    20.2,
+    3.0,
+    1.0
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_1",
+   "min": [
+    -26.2,
+    0.0,
+    -1.2
+   ],
+   "max": [
+    -17.0,
+    3.0,
+    -1.0
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_2",
+   "min": [
+    -13.0,
+    0.0,
+    -1.2
+   ],
+   "max": [
+    18.0,
+    3.0,
+    -1.0
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_3",
+   "min": [
+    20.0,
+    0.0,
+    -1.2
+   ],
+   "max": [
+    20.2,
+    3.0,
+    -1.0
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_1",
+   "min": [
+    -26.2,
+    0.0,
+    1.0
+   ],
+   "max": [
+    -22.47,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_2",
+   "min": [
+    -22.47,
+    2.16,
+    1.0
+   ],
+   "max": [
+    -21.53,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_3",
+   "min": [
+    -21.53,
+    0.0,
+    1.0
+   ],
+   "max": [
+    -8.47,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_4",
+   "min": [
+    -8.47,
+    2.16,
+    1.0
+   ],
+   "max": [
+    -7.53,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_5",
+   "min": [
+    -7.53,
+    0.0,
+    1.0
+   ],
+   "max": [
+    3.53,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_6",
+   "min": [
+    3.53,
+    2.16,
+    1.0
+   ],
+   "max": [
+    4.47,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_7",
+   "min": [
+    4.47,
+    0.0,
+    1.0
+   ],
+   "max": [
+    11.53,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_8",
+   "min": [
+    11.53,
+    2.16,
+    1.0
+   ],
+   "max": [
+    12.47,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_9",
+   "min": [
+    12.47,
+    0.0,
+    1.0
+   ],
+   "max": [
+    20.2,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Corridor_Wall_W_1",
+   "min": [
+    -26.2,
+    0.0,
+    -1.0
+   ],
+   "max": [
+    -26.0,
+    3.0,
+    1.0
+   ]
+  },
+  {
+   "s": "Fire_Door",
+   "min": [
+    -26.0,
+    0.0,
+    -0.6
+   ],
+   "max": [
+    -25.94,
+    2.1,
+    0.6
+   ]
+  },
+  {
+   "s": "FreightCar_Ceiling",
+   "min": [
+    17.7,
+    2.4,
+    -14.8
+   ],
+   "max": [
+    20.3,
+    2.6,
+    -12.0
+   ]
+  },
+  {
+   "s": "FreightCar_Floor",
+   "min": [
+    17.7,
+    -0.3,
+    -14.8
+   ],
+   "max": [
+    20.3,
+    0.0,
+    -12.0
+   ]
+  },
+  {
+   "s": "FreightCar_Wall_E_1",
+   "min": [
+    20.1,
+    0.0,
+    -14.6
+   ],
+   "max": [
+    20.3,
+    2.4,
+    -12.2
+   ]
+  },
+  {
+   "s": "FreightCar_Wall_N_1",
+   "min": [
+    17.7,
+    0.0,
+    -14.8
+   ],
+   "max": [
+    20.3,
+    2.4,
+    -14.6
+   ]
+  },
+  {
+   "s": "FreightCar_Wall_W_1",
+   "min": [
+    17.7,
+    0.0,
+    -14.6
+   ],
+   "max": [
+    17.9,
+    2.4,
+    -12.2
+   ]
+  },
+  {
+   "s": "Spur_Ceiling",
+   "min": [
+    17.8,
+    3.0,
+    -12.2
+   ],
+   "max": [
+    20.2,
+    3.2,
+    -0.8
+   ]
+  },
+  {
+   "s": "Spur_Floor",
+   "min": [
+    17.8,
+    -0.3,
+    -12.2
+   ],
+   "max": [
+    20.2,
+    0.0,
+    -0.8
+   ]
+  },
+  {
+   "s": "Spur_Wall_E_1",
+   "min": [
+    20.0,
+    0.0,
+    -12.0
+   ],
+   "max": [
+    20.2,
+    3.0,
+    -1.0
+   ]
+  },
+  {
+   "s": "Spur_Wall_N_1",
+   "min": [
+    17.8,
+    0.0,
+    -12.2
+   ],
+   "max": [
+    18.4,
+    3.0,
+    -12.0
+   ]
+  },
+  {
+   "s": "Spur_Wall_N_2",
+   "min": [
+    18.4,
+    2.2,
+    -12.2
+   ],
+   "max": [
+    19.6,
+    3.0,
+    -12.0
+   ]
+  },
+  {
+   "s": "Spur_Wall_N_3",
+   "min": [
+    19.6,
+    0.0,
+    -12.2
+   ],
+   "max": [
+    20.2,
+    3.0,
+    -12.0
+   ]
+  },
+  {
+   "s": "Spur_Wall_W_1",
+   "min": [
+    17.8,
+    0.0,
+    -12.0
+   ],
+   "max": [
+    18.0,
+    3.0,
+    -1.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_food_court",
+   "level": "service_corridor",
+   "hinge": [
+    12.47,
+    0.0,
+    1.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "staff door"
+  },
+  {
+   "name": "DoorLeaf_network_A",
+   "level": "service_corridor",
+   "hinge": [
+    18.4,
+    0.0,
+    -12.0
+   ],
+   "width": 0.6,
+   "height": 2.2,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "freight lift gate",
+   "needs": "keycard_tier_1"
+  },
+  {
+   "name": "DoorLeaf_network_B",
+   "level": "service_corridor",
+   "hinge": [
+    19.6,
+    0.0,
+    -12.0
+   ],
+   "width": 0.6,
+   "height": 2.2,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "freight lift gate",
+   "needs": "keycard_tier_1"
+  },
+  {
+   "name": "DoorLeaf_wing_books",
+   "level": "service_corridor",
+   "hinge": [
+    -7.53,
+    0.0,
+    1.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "staff door"
+  },
+  {
+   "name": "DoorLeaf_wing_cinema",
+   "level": "service_corridor",
+   "hinge": [
+    -21.53,
+    0.0,
+    1.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "staff door"
+  },
+  {
+   "name": "DoorLeaf_wing_entertainment",
+   "level": "service_corridor",
+   "hinge": [
+    4.47,
+    0.0,
+    1.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "staff door"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "service_corridor",
+   "level": "service_corridor",
+   "kind": "Spawn",
+   "position": [
+    -8.0,
+    0.0,
+    -0.2
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "food_court",
+   "at": [
+    12.0,
+    0.0,
+    0.5
+   ],
+   "arrive": [
+    12.0,
+    0.0,
+    -0.2
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "network",
+   "at": [
+    19.0,
+    0.0,
+    -11.4
+   ],
+   "arrive": [
+    19.0,
+    0.0,
+    -10.7
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "wing_books",
+   "at": [
+    -8.0,
+    0.0,
+    0.5
+   ],
+   "arrive": [
+    -8.0,
+    0.0,
+    -0.2
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "wing_cinema",
+   "at": [
+    -22.0,
+    0.0,
+    0.5
+   ],
+   "arrive": [
+    -22.0,
+    0.0,
+    -0.2
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "wing_entertainment",
+   "at": [
+    4.0,
+    0.0,
+    0.5
+   ],
+   "arrive": [
+    4.0,
+    0.0,
+    -0.2
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "keycard",
+   "name": "Spot_keycard_1",
+   "position": [
+    18.4,
+    0.0,
+    -11.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the freight lift's keycard reader",
+   "needs": "keycard_tier_1"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_1",
+   "position": [
+    -14.2,
+    0.0,
+    -1.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "dressing",
+   "what": "dumped by the bins, one arm off"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_2",
+   "position": [
+    -24.8,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "role": "monster",
+   "what": "at the far end by the fire door, facing down the corridor"
+  }
+ ]
+}
