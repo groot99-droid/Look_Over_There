@@ -2,6 +2,32 @@
  "scene": "rdwe_elevator_lobby",
  "colliders": [
   {
+   "s": "Bench_E",
+   "min": [
+    5.5,
+    0.0,
+    3.8
+   ],
+   "max": [
+    7.5,
+    0.45,
+    4.4
+   ]
+  },
+  {
+   "s": "Bench_W",
+   "min": [
+    -7.5,
+    0.0,
+    3.8
+   ],
+   "max": [
+    -5.5,
+    0.45,
+    4.4
+   ]
+  },
+  {
    "s": "Beyond_crossroads",
    "min": [
     -0.66,
@@ -67,6 +93,45 @@
    ]
   },
   {
+   "s": "Bin_1",
+   "min": [
+    -4.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -3.8,
+    0.7,
+    -4.6
+   ]
+  },
+  {
+   "s": "Bin_2",
+   "min": [
+    -0.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    0.2,
+    0.7,
+    -4.6
+   ]
+  },
+  {
+   "s": "Bin_3",
+   "min": [
+    3.8,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    4.2,
+    0.7,
+    -4.6
+   ]
+  },
+  {
    "s": "Call_Pillar",
    "min": [
     -0.4,
@@ -77,6 +142,32 @@
     0.4,
     1.3,
     1.2
+   ]
+  },
+  {
+   "s": "Planter_E",
+   "min": [
+    8.1,
+    0.0,
+    4.2
+   ],
+   "max": [
+    8.7,
+    1.0,
+    4.8
+   ]
+  },
+  {
+   "s": "Planter_W",
+   "min": [
+    -8.7,
+    0.0,
+    4.2
+   ],
+   "max": [
+    -8.1,
+    1.0,
+    4.8
    ]
   },
   {
@@ -476,6 +567,38 @@
    "yaw_deg": 180.0,
    "scale": 1.0,
    "what": "the call button has no numbers"
+  },
+  {
+   "kind": "buttons",
+   "name": "Spot_buttons_2",
+   "position": [
+    -6.0,
+    0.0,
+    -3.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "lift 1: the dial over it points past the last floor"
+  },
+  {
+   "kind": "buttons",
+   "name": "Spot_buttons_3",
+   "position": [
+    6.0,
+    0.0,
+    -3.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "lift 4: its dial has no numbers either"
   }
  ]
 }

@@ -1213,45 +1213,104 @@ def c_anamorphic_room():
                  trick=("view", (-4.0, 0.0, 4.0), (0.6, -0.8), "from here the shards make a doorway"))
 
 
+def _wing_mats():
+    """Flat greybox colours for the teal wing and the institution (rooms 16 to 34), added here so their boxes read in the greybox renders."""
+    for k, c in {"charcoal": (0.05, 0.05, 0.06), "felt": (0.10, 0.09, 0.10), "brass": (0.62, 0.46, 0.20), "glow": (1.0, 1.0, 0.95),
+                 "stud": (0.55, 0.42, 0.26), "leather": (0.80, 0.30, 0.06), "chair": (0.60, 0.20, 0.45), "plastic": (0.20, 0.55, 0.62),
+                 "enamel": (0.92, 0.92, 0.90), "bedspread": (0.85, 0.45, 0.25), "veneer": (0.55, 0.40, 0.24), "cabinet": (0.45, 0.47, 0.50),
+                 "terrazzo": (0.78, 0.74, 0.68), "plinth": (0.88, 0.86, 0.82), "screen": (0.10, 0.20, 0.30), "wax": (0.48, 0.10, 0.10),
+                 "red_lamp": (1.0, 0.1, 0.05), "planter": (0.30, 0.32, 0.30)}.items():
+        MATS.setdefault(k, c)
+    EMISSIVE.setdefault("glow", 3.0)
+    EMISSIVE.setdefault("red_lamp", 2.0)
+
+
+def _spot(S, kind, n, pos, face, what, **kw):
+    p = {"what": what}
+    p.update(kw)
+    S.spot(kind, n, pos, face=face, props=p)
+
+
 def c_void_room():
+    """Rooms 16 to 34 (the teal wing and the institution) are laid out in full here, round each room's trick: furniture blocks with their
+    colliders, and every Spot_ the trick needs, with a `what` for the page. Their door looks are pinned (they are the looks the set gave them),
+    so a door added elsewhere never renames one of these."""
+    _wing_mats()
+
     def keys(S):
         S.solid("Lone_Chair", (1.6, 0.0, 0.6), (2.2, 0.9, 1.2), "white")
+        S.solid("Side_Table", (2.32, 0.0, 0.7), (2.72, 0.62, 1.1), "wood")
+        S.solid("Coat_Stand", (-4.6, 0.0, 3.6), (-4.2, 1.8, 4.0), "wood")
+        S.decor("Rug", (0.9, 0.0, 0.0), (3.1, 0.01, 2.0), "felt")
+        S.decor("Door_Glow", (-3.6, 0.0, -5.0), (-2.4, 2.18, -4.98), "glow")
+        _spot(S, "dark", 2, (1.9, 0.0, 1.62), (0, -1), "the chair faces the lit door: sit, and its outline brightens; stand, and the black comes back")
+        _spot(S, "dark", 3, (-3.0, 0.0, -1.2), (0, -1), "halfway to the lit door: the teal room's doorway behind you is gone")
     return croom("rdwe_void_room", "The void: behind the black doorway", 10, 10, 4.0,
-                 [("teal", "S", 0.0, D(to="rdwe_teal (back through the black)")), ("lit", "N", -3.0, D(to="rdwe_lights_out",
-                                                                                                       look="the single lit door: a glowing outline, white"))],
+                 [("teal", "S", 0.0, D(to="rdwe_teal (back through the black)", look="studded teal paint door, glass knob")),
+                  ("lit", "N", -3.0, D(to="rdwe_lights_out", look="the single lit door: a glowing outline, white"))],
                  keys, "Environmental storytelling: pitch black behind the teal room's doorway, one chair, and a single door lit at its edges.",
-                 "teal", fmat="black", wmat="black", cmat="black",
+                 "teal", fmat="charcoal", wmat="charcoal", cmat="charcoal",
                  trick=("dark", (0.0, 0.0, 1.5), (0, -1), "no light: only the lit door's outline"))
 
 
 def c_lights_out():
+    _wing_mats()
+
     def keys(S):
         for k, (x, z) in enumerate(((-3.0, 2.0), (0.0, -2.0), (3.0, 2.0)), 1):
-            S.solid(f"Switch_Post_{k}", (x - 0.15, 0.0, z - 0.15), (x + 0.15, 1.2, z + 0.15), "sun")
+            S.solid(f"Switch_Post_{k}", (x - 0.15, 0.0, z - 0.15), (x + 0.15, 1.2, z + 0.15), "brass")
+        S.solid("Floor_Lamp", (-5.6, 0.0, -5.6), (-5.1, 1.75, -5.1), "brass")
+        S.solid("Armchair", (4.6, 0.0, -5.7), (5.6, 0.95, -4.7), "chair")
+        S.solid("Side_Table", (3.9, 0.0, -5.7), (4.4, 0.6, -5.2), "wood")
+        S.decor("Tube_Batten", (2.0, 3.06, 4.6), (4.0, 3.2, 4.8), "lamp", ("ceiling",))
+        S.decor("Red_Bulb", (-0.1, 2.05, -5.6), (0.1, 3.2, -5.4), "red_lamp")
+        S.decor("Light_Door", (-0.55, 0.0, -6.0), (0.55, 2.2, -5.99), "glow")
+        for k, (a, b) in enumerate((((-3.0, 2.0), (-5.35, -5.35)), ((0.0, -2.0), (3.0, 4.7)), ((3.0, 2.0), (0.0, -5.5))), 1):
+            S.decor(f"Cord_{k}", (min(a[0], b[0]) - 0.02, 0.0, min(a[1], b[1]) - 0.02), (max(a[0], b[0]) + 0.02, 0.02, max(a[1], b[1]) + 0.02), "black")
     S = croom("rdwe_lights_out", "Lights out: switches show different doors", 12, 12, 3.2,
-              [("void", "W", -3.0, D(to="rdwe_void_room")), ("three", "S", 3.0, D(to="rdwe_three_doors"))], keys,
+              [("void", "W", -3.0, D(to="rdwe_void_room", look="quilted brushed steel door, chrome lever")),
+               ("three", "S", 3.0, D(to="rdwe_three_doors", look="mirror-faced bottle green door, ring pull"))], keys,
               "Psychological puzzle: a dark room of three switches; each lights the room differently and shows a different door, and the door "
               "you take is the one lit when you reach it.", "teal", fmat="navy", wmat="violet")
+    whats = ("switch 1, the brass toggle: the standard lamp by the steel door comes on (lightmap); the void door is lit",
+             "switch 2, the cord pull: the tube over the green mirror door flickers on (lightmap_switch_2); the way to the three doors is lit",
+             "switch 3, the push button: the red bulb on the north wall, and a door of light on the bare wall (lightmap_switch_3); it is not a door")
     for k, (x, z) in enumerate(((-3.0, 2.6), (0.0, -1.4), (3.0, 2.6)), 1):
-        S.spot("switch", k, (x, 0.0, z), face=(0, -1), props={"what": "a light switch: it shows one door and hides another"})
+        _spot(S, "switch", k, (x, 0.0, z), (0, -1), whats[k - 1], light_set=["lightmap", "lightmap_switch_2", "lightmap_switch_3"][k - 1])
     S.need_spots = {"switch": 3}
+    _spot(S, "trick", 1, (0.0, 0.0, -4.2), (0, -1), "the door of light: switch 3 draws a door here on the bare north wall")
     return S
 
 
 def c_green_grid():
+    _wing_mats()
+
     def keys(S):
         for k in range(8):
             z = -13.0 + k * 3.6
-            S.solid(f"Stud_W_{k + 1}", (-3.0, 0.0, z - 0.15), (-2.7, 4.0, z + 0.15), "grid")
-            S.solid(f"Stud_E_{k + 1}", (2.7, 0.0, z - 0.15), (3.0, 4.0, z + 0.15), "grid")
+            S.solid(f"Stud_W_{k + 1}", (-3.0, 0.0, z - 0.15), (-2.7, 4.0, z + 0.15), "stud")
+            S.solid(f"Stud_E_{k + 1}", (2.7, 0.0, z - 0.15), (3.0, 4.0, z + 0.15), "stud")
+        S.solid("Half_Sofa", (-2.6, 0.0, 6.4), (-1.5, 0.78, 7.3), "leather")
+        S.decor("Wire_Sofa", (-1.5, 0.0, 6.4), (-0.3, 0.78, 7.3), "grid")
+        S.solid("Sawhorse", (1.4, 0.0, -5.4), (2.5, 0.75, -4.8), "stud")
+        S.solid("Timber_Stack", (1.6, 0.0, 9.2), (2.6, 0.5, 11.6), "stud")
+        S.decor("Wire_Door", (-2.0, 0.0, -9.0), (-0.9, 2.2, -8.95), "grid")
+        S.decor("Wire_Chair", (0.7, 0.0, 2.4), (1.3, 0.9, 3.0), "grid")
+        S.decor("Wire_Checker", (-2.6, 0.005, -12.4), (2.6, 0.012, -10.2), "grid")
+        S.decor("Paper_Back", (-2.6, 0.2, 14.9), (2.6, 3.8, 14.98), "teal_cream")
+        _spot(S, "grid", 2, (0.0, 0.0, -8.0), (0, -1), "the grid is drawing the next room here: the Ames room's checker floor, half done")
+        _spot(S, "grid", 3, (-0.9, 0.0, 6.9), (-1, 0), "the teal room's sofa, half built: leather to the middle, wireframe after")
     return croom("rdwe_green_grid", "Inside the wall: the green grid", 6, 30, 4.0,
-                 [("teal2", "S", 0.0, D(to="rdwe_teal2")), ("seam", "N", 0.0, D(to="rdwe_ames_room", look="a seam in the grid, pulled open like a door"))],
+                 [("teal2", "S", 0.0, D(to="rdwe_teal2", look="porthole birch door, glass knob")),
+                  ("seam", "N", 0.0, D(to="rdwe_ames_room", look="a seam in the grid, pulled open like a door"))],
                  keys, "Environmental storytelling: the space behind the teal room's wallpaper, a glowing green wireframe between studs; the "
                        "rooms are being built from here.", "teal", fmat="black", wmat="black", cmat="grid",
                  trick=("grid", (0.0, 0.0, 4.0), (0, -1), "the grid is still drawing the room you left"))
 
 
 def c_ames_room():
+    _wing_mats()
+
     def keys(S):
         for i in range(7):                                  # the back wall slants: deep (and tall) in the west corner, shallow and low in the east
             x0, x1 = -7.0 + 2.0 * i, -5.0 + 2.0 * i
@@ -1259,16 +1318,24 @@ def c_ames_room():
             if zi > -5.0 + 1e-6:
                 S.solid(f"Slant_{i + 1}", (x0, 0.0, -5.0), (x1, 4.5, zi), "checker")
         S.decor("Ceiling_Slope", (-7.0, 2.4, -5.0), (7.0, 4.5, -4.8), "ceiling", ("ceiling",))
+        S.solid("Viewer", (-0.2, 0.0, 3.4), (0.2, 1.3, 3.8), "brass")
+        S.solid("Chair_Deep", (-6.7, 0.0, -4.5), (-5.9, 0.95, -3.7), "chair")
+        S.solid("Chair_Shallow", (1.6, 0.0, -2.9), (2.4, 0.95, -2.1), "chair")
+        _spot(S, "view", 2, (-5.6, 0.0, -2.6), (0, -1), "the deep corner: stand here and, from the peephole, you are a giant's height")
+        _spot(S, "view", 3, (5.4, 0.0, -0.4), (0, -1), "the shallow corner by the small door: from the peephole you are a doll; here you fit the door")
     MATS.setdefault("checker", (0.85, 0.85, 0.85))
     return croom("rdwe_ames_room", "The Ames room: you shrink across it", 14, 10, 4.5,
-                 [("word", "S", -4.0, D(to="rdwe_anamorphic_room")), ("grid", "W", 0.0, D(to="rdwe_green_grid")),
-                  ("small", "E", -1.5, D(to="rdwe_shrink_hall", width=0.8, height=1.9))], keys,
+                 [("word", "S", -4.0, D(to="rdwe_anamorphic_room", look="six-panel mustard door, chrome lever")),
+                  ("grid", "W", 0.0, D(to="rdwe_green_grid", look="stable (split) teal paint door, no handle")),
+                  ("small", "E", -1.5, D(to="rdwe_shrink_hall", width=0.8, height=1.9, look="panelled cream gloss door, brass knob"))], keys,
                  "Perspective shifting: a trapezoid room that looks square from the peephole; walk to the short corner and you seem to grow until "
                  "you fit its small door.", "teal", fmat="checker", wmat="magenta",
                  trick=("view", (0.0, 0.0, 4.2), (0, -1), "the peephole: from here the room is square"))
 
 
 def c_shrink_hall():
+    _wing_mats()
+
     def keys(S):
         S.solid("Narrow_W_1", (-3.0, 0.0, 0.0), (-2.4, 3.6, 6.0), "pink")
         S.solid("Narrow_E_1", (2.4, 0.0, 0.0), (3.0, 3.6, 6.0), "pink")
@@ -1277,35 +1344,70 @@ def c_shrink_hall():
         S.solid("Narrow_W_3", (-3.0, 0.0, -12.0), (-1.0, 3.6, -6.0), "pink")
         S.solid("Narrow_E_3", (1.0, 0.0, -12.0), (3.0, 3.6, -6.0), "pink")
         S.decor("Ceiling_Low", (-1.0, 2.2, -12.0), (1.0, 3.6, -6.0), "ceiling", ("ceiling",))
+        S.decor("Ceiling_Mid_2", (-2.4, 3.2, 0.0), (2.4, 3.6, 6.0), "ceiling", ("ceiling",))
+        S.decor("Ceiling_Mid_3", (-1.8, 2.7, -6.0), (1.8, 3.6, 0.0), "ceiling", ("ceiling",))
+        for k, (x0, z0, z1, h) in enumerate(((-3.0, 8.0, 9.6, 0.85), (-2.4, 2.2, 3.4, 0.68), (-1.8, -3.4, -2.5, 0.47), (-1.0, -9.6, -9.0, 0.31)), 1):
+            sc = h / 0.85
+            S.solid(f"Console_{k}", (x0, 0.0, z0), (x0 + 0.4 * sc, h, z1), "wood")
+        _spot(S, "trick", 2, (0.0, 0.0, -9.4), (0, 1), "turn round at the small door: the big end looks 60 m away")
     return croom("rdwe_shrink_hall", "The shrinking hall: forced perspective", 6, 24, 3.6,
-                 [("ames", "S", 0.0, D(to="rdwe_ames_room")), ("small", "N", 0.0, D(to="rdwe_moon_window", width=0.8, height=1.8))], keys,
+                 [("ames", "S", 0.0, D(to="rdwe_ames_room", look="flush lilac door, push plate")),
+                  ("small", "N", 0.0, D(to="rdwe_moon_window", width=0.8, height=1.8, look="louvred orange vinyl door, no handle"))], keys,
                  "Distorted hall: 24 m that narrows from 6 m to 2 m and lowers to 2.2 m in steps, so from the big end the small door looks far "
                  "away and is not.", "teal", fmat="peach", wmat="pink",
                  trick=("trick", (0.0, 0.0, 8.0), (0, -1), "it looks 60 m long from here"))
 
 
 def c_moon_window():
+    _wing_mats()
+
     def keys(S):
         S.decor("Window_Night", (-3.0, 1.2, -6.0), (3.0, 3.2, -5.96), "navy")
-        S.decor("Moon", (-0.5, 2.0, -5.95), (0.5, 3.0, -5.9), "moon")
+        S.decor("Moon", (-0.45, 2.05, -5.85), (0.45, 2.95, -5.35), "moon")
         S.solid("Pedestal", (2.6, 0.0, 2.6), (3.4, 1.0, 3.4), "white")
+        S.solid("Window_Seat", (-3.0, 0.0, -6.0), (3.0, 0.45, -5.45), "wood")
+        S.solid("Telescope", (-4.0, 0.0, -4.6), (-3.3, 1.5, -3.9), "brass")
+        S.solid("Desk", (-5.0, 0.0, -2.6), (-4.3, 0.76, -0.6), "wood")
+        S.solid("Desk_Chair", (-4.15, 0.0, -1.9), (-3.65, 0.9, -1.4), "wood")
+        S.solid("Bookcase", (-4.6, 0.0, 5.6), (-1.6, 2.2, 6.0), "wood")
+        S.solid("Globe", (0.9, 0.0, 4.6), (1.5, 1.1, 5.2), "brass")
+        S.decor("Rug", (-2.2, 0.0, -2.6), (2.2, 0.01, 1.4), "lilac")
+        _spot(S, "moon", 2, (0.0, 0.0, -1.0), (0, -1), "hold the moon at arm's length: a ball; walk it to the window and it is the moon again")
     S = croom("rdwe_moon_window", "The moon in the window: pick it up", 10, 12, 3.6,
-              [("hall", "E", 0.0, D(to="rdwe_shrink_hall")), ("sill", "W", 2.0, D(to="rdwe_mirror_room"))], keys,
+              [("hall", "E", 0.0, D(to="rdwe_shrink_hall", look="half-glazed plum door, brass knob")),
+               ("sill", "W", 2.0, D(to="rdwe_mirror_room", look="ledged and braced mint paint door, ring pull"))], keys,
               "Object distortion (Super Liminal's trick): the moon in the window can be picked up; held close it is a ball, set on the pedestal "
               "it is the size of the room and the west door opens.", "teal", fmat="navy", wmat="lilac",
               trick=("moon", (0.0, 0.0, -4.0), (0, -1), "pick up the moon: its size is how far away you hold it"))
-    S.spot("switch", 1, (3.0, 0.0, 1.8), face=(0, 1), props={"what": "the pedestal: the moon goes here"})
+    S.spot("switch", 1, (3.0, 0.0, 1.8), face=(0, 1), props={"what": "the pedestal: the moon goes here; set it down and it fills the room, "
+                                                                     "and the west door opens"})
     return S
 
 
 def c_mirror_room():
+    _wing_mats()
+
     def keys(S):
         S.solid("Glass_N", (-0.05, 0.0, -5.0), (0.05, 3.4, -0.8), "glass")
         S.solid("Glass_S", (-0.05, 0.0, 0.8), (0.05, 3.4, 5.0), "glass")
-        S.solid("Sofa_W", (-6.5, 0.0, -4.6), (-3.5, 0.9, -3.6), "magenta")
-        S.solid("Sofa_E", (3.5, 0.0, -4.6), (6.5, 0.9, -3.6), "magenta")
+        for sd, sg in (("W", -1), ("E", 1)):                 # the room, then its reflection across x = 0, box for box
+            def mx(a, b):
+                return (min(sg * a, sg * b), max(sg * a, sg * b))
+            x0, x1 = mx(3.5, 6.5)
+            S.solid(f"Sofa_{sd}", (x0, 0.0, -4.6), (x1, 0.9, -3.6), "magenta")
+            x0, x1 = mx(4.4, 5.6)
+            S.solid(f"Coffee_Table_{sd}", (x0, 0.0, -2.8), (x1, 0.45, -2.0), "white")
+            x0, x1 = mx(6.8, 7.6)
+            S.solid(f"Armchair_{sd}", (x0, 0.0, -2.7), (x1, 0.95, -1.9), "magenta")
+            x0, x1 = mx(7.4, 7.9)
+            S.solid(f"Lamp_Table_{sd}", (x0, 0.0, -4.7), (x1, 0.65, -4.2), "white")
+            x0, x1 = mx(0.6, 2.6)
+            S.solid(f"Sideboard_{sd}", (x0, 0.0, 4.5), (x1, 0.9, 5.0), "white")
+        _spot(S, "trick", 2, (3.0, 0.0, 0.0), (-1, 0), "the far side: the room, mirrored; the clock runs the other way and the books read backwards")
+        _spot(S, "trick", 3, (4.0, 0.0, 2.2), (0, 1), "the reflection's door: the same door you came in by, and real")
     return croom("rdwe_mirror_room", "The mirror room: the reflection's door is real", 16, 10, 3.4,
-                 [("three", "S", -4.0, D(to="rdwe_three_doors")), ("moon", "W", 0.0, D(to="rdwe_moon_window")),
+                 [("three", "S", -4.0, D(to="rdwe_three_doors", look="round-topped cream gloss door, glass knob")),
+                  ("moon", "W", 0.0, D(to="rdwe_moon_window", look="studded lilac door, chrome lever")),
                   ("reflection", "S", 4.0, D(to="rdwe_dont_look", look="the door in the reflection: mirror-image of the way you came, real"))], keys,
                  "Psychological puzzle: the room is doubled across a glass line; the door on your side is the way back, the same door in the "
                  "reflection is the way on, and the gap in the mirror lets you through.", "teal", fmat="white", wmat="magenta",
@@ -1313,141 +1415,265 @@ def c_mirror_room():
 
 
 def c_dont_look():
+    _wing_mats()
+
     def keys(S):
         S.solid("Statue", (3.0, 0.0, -0.5), (4.0, 2.4, 0.5), "statue")
         S.solid("Plinth_1", (-3.0, 0.0, -4.2), (-2.0, 1.2, -3.2), "statue")
         S.solid("Plinth_2", (-3.0, 0.0, 3.2), (-2.0, 1.2, 4.2), "statue")
+        S.solid("Plinth_3", (2.0, 0.0, -4.4), (2.8, 1.1, -3.6), "statue")
+        S.solid("Plinth_4", (2.0, 0.0, 3.6), (2.8, 1.1, 4.4), "statue")
+        S.solid("Bench_N", (-1.5, 0.0, -2.7), (1.5, 0.45, -2.3), "wood")
+        S.solid("Bench_S", (-1.5, 0.0, 2.3), (1.5, 0.45, 2.7), "wood")
+        _spot(S, "statue", 2, (5.6, 0.0, 0.0), (1, 0), "the door behind the statue: walk to it backwards, watching her")
+        _spot(S, "statue", 3, (-4.4, 0.0, 0.0), (1, 0), "where she stands when you come in: hands over her face, three metres off")
     return croom("rdwe_dont_look", "Don't look away: the statue moves", 14, 10, 4.0,
-                 [("mirror", "W", 0.0, D(to="rdwe_mirror_room")), ("statue", "E", 0.0, D(to="rdwe_wrong_clock"))], keys,
+                 [("mirror", "W", 0.0, D(to="rdwe_mirror_room", look="quilted orange vinyl door, ring pull")),
+                  ("statue", "E", 0.0, D(to="rdwe_wrong_clock", look="mirror-faced plum door, glass knob"))], keys,
                  "Psychological puzzle: a gallery whose statue stands in front of the door and moves only when you are not looking; walk to the "
                  "door backwards.", "teal", fmat="marble_f", wmat="white",
                  trick=("statue", (0.0, 0.0, 0.0), (1, 0), "it is closer every time you blink"))
 
 
 def c_waiting_room():
+    _wing_mats()
+
     def keys(S):
         for k in range(3):
             z = -2.0 + k * 1.8
             S.solid(f"Seats_{k + 1}", (-4.0, 0.0, z), (2.0, 0.45, z + 0.5), "cyan")
         S.solid("Ticket_Machine", (5.6, 0.0, 3.4), (6.4, 1.4, 4.2), "red")
-        S.decor("Number_Display", (2.0, 2.2, -5.0), (4.0, 2.7, -4.96), "red")
+        S.decor("Number_Display", (2.0, 2.2, -5.0), (4.0, 2.7, -4.92), "red")
+        S.solid("Water_Cooler", (-6.6, 0.0, -4.6), (-6.2, 1.3, -4.2), "white")
+        S.solid("Plant", (6.1, 0.0, -4.7), (6.7, 1.4, -4.1), "plant")
+        S.solid("Magazine_Table", (3.2, 0.0, -0.4), (4.4, 0.42, 0.4), "wood")
+        S.solid("Counter", (-2.0, 0.0, 4.4), (2.0, 1.05, 5.0), "office")
+        S.solid("Coat_Stand", (6.3, 0.0, -1.8), (6.7, 1.8, -1.4), "steel")
+        _spot(S, "ticket", 2, (0.0, 0.0, -0.75), (0, -1), "sit: the display counts down while you sit, and stops when you stand")
+        _spot(S, "ticket", 3, (3.0, 0.0, -3.6), (0, -1), "the display over the door: NOW SERVING; the door opens on your number")
     return croom("rdwe_waiting_room", "The waiting room: take a number", 14, 10, 3.0,
-                 [("three", "W", 0.0, D(to="rdwe_three_doors")), ("number", "N", 3.0, D(to="rdwe_wrong_clock"))], keys,
+                 [("three", "W", 0.0, D(to="rdwe_three_doors", look="porthole mint paint door, push plate")),
+                  ("number", "N", 3.0, D(to="rdwe_wrong_clock", look="six-panel cream gloss door, no handle"))], keys,
                  "Psychological puzzle: rows of seats, a ticket machine and a number display; the door opens only when your number comes up, "
                  "and it counts down when you sit.", "teal", fmat="office", wmat="mint",
                  trick=("ticket", (5.0, 0.0, 2.6), (1, 0), "take a ticket: your number is the number of rooms left"))
 
 
 def c_wrong_clock():
+    _wing_mats()
+    CLOCKS = [("E", 5.0, 5.6, -4.8, -4.2, 2.4), ("E", 5.0, 5.7, -2.0, -1.0, 3.6), ("E", 5.0, 5.6, 1.2, 1.8, 2.3), ("E", 5.0, 5.6, 4.2, 4.8, 2.5),
+              ("N", -4.8, -4.2, -6.0, -5.45, 2.2), ("N", -2.8, -2.2, -6.0, -5.45, 2.6), ("N", -0.8, -0.2, -6.0, -5.45, 2.1), ("N", 1.0, 1.6, -6.0, -5.45, 2.45),
+              ("S", -5.5, -4.9, 5.45, 6.0, 2.3), ("S", -1.1, -0.5, 5.45, 6.0, 2.55), ("S", 0.9, 1.5, 5.45, 6.0, 2.2), ("S", 2.9, 3.5, 5.45, 6.0, 2.4),
+              ("W", -6.0, -5.45, -4.3, -3.7, 2.35), ("W", -6.0, -5.45, 3.7, 4.3, 2.5)]
+
     def keys(S):
-        for k in range(4):
-            z = -4.5 + k * 3.0
-            S.solid(f"Clock_{k + 1}", (5.0, 0.0, z - 0.3), (5.6, 2.4, z + 0.3), "wood")
+        for k, (sd, x0, x1, z0, z1, h) in enumerate(CLOCKS, 1):
+            S.solid(f"Clock_{k}", (x0, 0.0, z0), (x1, h, z1), "wood", (f"face:{sd}",))
+        S.solid("Watch_Table", (-0.6, 0.0, -0.6), (0.6, 0.8, 0.6), "wood")
+        _spot(S, "clock", 2, (0.0, 0.0, 1.2), (0, -1), "the teal room's wristwatch under a glass dome: its second hand ticks backward too")
     return croom("rdwe_wrong_clock", "The clock room: one runs backward", 12, 12, 4.5,
-                 [("gallery", "W", 0.0, D(to="rdwe_dont_look")), ("waiting", "S", -3.0, D(to="rdwe_waiting_room")),
-                  ("hands", "N", 3.0, D(to="rdwe_crossroads"))], keys,
+                 [("gallery", "W", 0.0, D(to="rdwe_dont_look", look="stable (split) lilac door, brass knob")),
+                  ("waiting", "S", -3.0, D(to="rdwe_waiting_room", look="panelled sky blue door, push plate")),
+                  ("hands", "N", 3.0, D(to="rdwe_crossroads", look="flush oak door, glass knob"))], keys,
                  "Psychological puzzle: a room of grandfather clocks; the one that runs backward is the teal room's watch, and stopping it "
                  "opens the north door.", "teal", fmat="wood", wmat="blood",
                  trick=("clock", (4.0, 0.0, -1.5), (1, 0), "the backward clock: stop it to open the north door"))
 
 
 def c_crossroads():
+    _wing_mats()
+
     def keys(S):
         for nm, x0, x1, z0, z1 in (("NW", -16.0, -4.0, -16.0, -4.0), ("NE", 4.0, 16.0, -16.0, -4.0), ("SW", -16.0, -4.0, 4.0, 16.0), ("SE", 4.0, 16.0, 4.0, 16.0)):
             S.solid(f"Block_{nm}", (x0, 0.0, z0), (x1, 4.0, z1), "acid")
         S.solid("Lamp_Post", (-0.15, 0.0, -0.15), (0.15, 2.6, 0.15), "steel")
         S.decor("Skylight", (-3.0, 3.98, -3.0), (3.0, 4.0, 3.0), "sky", ("ceiling",))
+        for sx in (-1, 1):
+            for sz in (-1, 1):
+                x0, x1 = sorted((sx * 3.4, sx * 4.0))
+                z0, z1 = sorted((sz * 3.4, sz * 4.0))
+                S.solid(f"Planter_{'N' if sz < 0 else 'S'}{'W' if sx < 0 else 'E'}", (x0, 0.0, z0), (x1, 0.9, z1), "planter")
+        for arm, sz in (("N", -1), ("S", 1)):
+            for side, x0, x1 in (("W", -4.0, -3.55), ("E", 3.55, 4.0)):
+                z0, z1 = sorted((sz * 9.0, sz * 11.0))
+                S.solid(f"Bench_{arm}{side}", (x0, 0.0, z0), (x1, 0.45, z1), "wood")
+        _spot(S, "trick", 2, (0.0, 0.0, -7.0), (0, -1), "look down any arm: the same benches, the same sign, the same door at the end, until you reach it")
     S = croom("rdwe_crossroads", "The crossroads: four corridors", 32, 32, 4.0,
-              [("west", "W", 0.0, D(to="rdwe_tilted_hall")), ("north", "N", 0.0, D(to="rdwe_wrong_clock")),
-               ("south", "S", 0.0, D(to="rdwe_trampoline (the padded vent)")), ("east", "E", 0.0, D(to="rdwe_elevator_lobby"))], keys,
+              [("west", "W", 0.0, D(to="rdwe_tilted_hall", look="louvred pink laminate door, chrome lever")),
+               ("north", "N", 0.0, D(to="rdwe_wrong_clock", look="half-glazed cherry red door, ring pull")),
+               ("south", "S", 0.0, D(to="rdwe_trampoline (the padded vent)", look="ledged and braced black lacquer door, glass knob")),
+               ("east", "E", 0.0, D(to="rdwe_elevator_lobby", look="round-topped sky blue door, chrome lever"))], keys,
               "Multi-choice navigation: four corridors meet under a painted skylight, each ending in a door to a different part of the house.",
               "inst", fmat="concrete", wmat="acid", trick=("trick", (2.0, 0.0, 2.0), (0, -1), "every arm looks like the one you came down"))
     S.corridor("arm_W", -15.0, -4.5, -3.5, 3.5)
     S.corridor("arm_E", 4.5, 15.0, -3.5, 3.5)
+    S.corridor("arm_N", -3.5, 3.5, -15.0, -4.5)
+    S.corridor("arm_S", -3.5, 3.5, 4.5, 15.0)
     return S
 
 
 def c_changing_rooms():
+    _wing_mats()
+
     def keys(S):
         S.solid("Lockers", (-6.0, 0.0, 4.4), (2.0, 2.0, 5.0), "locker")
         S.solid("Bench", (-3.0, 0.0, -0.2), (3.0, 0.45, 0.2), "wood")
+        S.solid("Bench_2", (-3.0, 0.0, -2.6), (1.0, 0.45, -2.2), "wood")
         S.zone("water", "puddles", (-7.0, 0.0, -5.0), (7.0, 0.03, -2.0))
+        for k, z in enumerate((-4.0, -2.5, -1.0), 1):
+            S.solid(f"Shower_Wall_{k}", (-7.0, 0.0, z - 0.05), (-5.8, 2.0, z + 0.05), "tile")
+        S.solid("Sinks", (6.4, 0.0, -4.6), (7.0, 0.85, -2.6), "white")
+        S.solid("Lockers_E1", (6.5, 0.0, -0.4), (7.0, 2.0, 1.3), "locker")
+        S.solid("Lockers_E2", (6.5, 0.0, 2.7), (7.0, 2.0, 4.6), "locker")
+        S.solid("Towel_Bin", (3.0, 0.0, 4.5), (3.6, 0.8, 5.0), "plastic")
+        _spot(S, "locker", 2, (-6.2, 0.0, -1.75), (1, 0), "a shower still running warm, though nobody is in it")
+        _spot(S, "locker", 3, (5.6, 0.0, 2.0), (1, 0), "locker 13, man-sized: it opens on a laundromat")
     return croom("rdwe_changing_rooms", "The changing rooms: a pool that is not there", 14, 10, 3.0,
-                 [("flooded", "N", -4.0, D(to="rdwe_flooded (the frame door)")), ("locker", "E", 2.0, D(to="rdwe_laundromat",
-                                                                                                       look="a locker door, man-sized, number 13"))],
+                 [("flooded", "N", -4.0, D(to="rdwe_flooded (the frame door)", look="studded oak door, no handle")),
+                  ("locker", "E", 2.0, D(to="rdwe_laundromat", look="a locker door, man-sized, number 13"))],
                  keys, "Environmental storytelling: wet changing rooms for a pool you never find, towels still damp, one locker big enough to "
                        "walk into.", "inst", fmat="tile", wmat="tile",
                  trick=("locker", (-1.0, 0.0, 3.4), (0, 1), "every locker holds the same towel, still warm"))
 
 
 def c_laundromat():
+    _wing_mats()
+
     def keys(S):
         for k in range(6):
             x = -7.4 + k * 1.3
             S.solid(f"Washer_{k + 1}", (x, 0.0, -4.0), (x + 1.0, 1.0, -3.2), "washer")
         S.solid("Folding_Table", (-2.0, 0.0, 0.6), (2.0, 0.9, 1.6), "white")
+        S.solid("Dryers", (-7.8, 0.0, 3.2), (-3.0, 2.0, 4.0), "washer")
+        S.solid("Chairs", (-1.0, 0.0, 3.5), (2.0, 0.45, 4.0), "plastic")
+        S.solid("Laundry_Cart", (2.6, 0.0, 1.8), (3.4, 0.9, 2.3), "steel")
+        S.solid("Change_Machine", (-8.0, 0.0, -3.6), (-7.6, 1.5, -2.8), "steel")
+        S.solid("Soap_Machine", (-8.0, 0.0, 2.0), (-7.6, 1.6, 2.8), "red")
+        S.decor("Giant_Washer", (2.2, 0.0, -4.0), (5.8, 3.0, -3.97), "enamel")
+        _spot(S, "trick", 2, (4.0, 0.0, -3.0), (0, -1), "the round door, 1.4 m across: the drum behind the glass is still turning")
     return croom("rdwe_laundromat", "The laundromat: the drum is a door", 16, 8, 3.2,
-                 [("lockers", "W", 0.0, D(to="rdwe_changing_rooms")), ("drum", "N", 4.0, D(to="rdwe_motel_room", width=1.4, height=1.6,
-                                                                                         look="a washing machine's round glass door, 1.4 m across"))],
+                 [("lockers", "W", 0.0, D(to="rdwe_changing_rooms", look="quilted pink laminate door, brass knob")),
+                  ("drum", "N", 4.0, D(to="rdwe_motel_room", width=1.4, height=1.8, look="a washing machine's round glass door, 1.4 m across"))],
                  keys, "Object distortion: a row of washers and one machine the size of a car; its round door is the way on, the drum still turning.",
                  "inst", fmat="vinyl", wmat="cyan",
                  trick=("trick", (4.0, 0.0, -1.6), (0, -1), "the big drum turns once every time you look away"))
 
 
 def c_motel_room():
+    _wing_mats()
+
     def keys(S):
-        S.solid("Bed", (-2.2, 0.0, 0.0), (0.4, 0.6, 2.4), "peach")
-        S.solid("TV_Stand", (1.8, 0.0, 0.6), (2.8, 1.0, 1.8), "black")
+        S.solid("Bed", (-3.0, 0.0, 0.0), (-0.9, 0.6, 1.6), "bedspread")
+        S.solid("Nightstand_N", (-3.0, 0.0, -0.6), (-2.55, 0.6, -0.1), "veneer")
+        S.solid("Nightstand_S", (-3.0, 0.0, 1.7), (-2.55, 0.6, 2.2), "veneer")
+        S.solid("TV_Stand", (2.45, 0.0, 0.2), (3.0, 0.8, 1.8), "veneer")
+        S.solid("Armchair", (2.1, 0.0, 3.5), (2.9, 0.9, 4.3), "peach")
+        S.solid("Table", (0.4, 0.0, 4.25), (1.2, 0.72, 4.95), "veneer")
+        S.solid("Chair", (-0.4, 0.0, 4.35), (0.1, 0.85, 4.85), "veneer")
+        S.solid("Luggage_Rack", (-2.6, 0.0, -5.0), (-1.6, 0.5, -4.55), "veneer")
+        _spot(S, "tv", 2, (2.6, 0.0, -4.6), (-0.6, 0.8), "the corner the TV films from, 2.5 m up: you on the bed, a second late", eye_height=2.5)
+        _spot(S, "tv", 3, (-0.55, 0.0, 0.8), (1, 0), "sit on the end of the bed and watch: on the screen you are still standing")
     return croom("rdwe_motel_room", "The motel room: the TV shows this room", 6, 10, 2.8,
-                 [("drum", "W", -2.0, D(to="rdwe_laundromat")), ("bathroom", "N", 1.5, D(to="rdwe_office_night"))], keys,
+                 [("drum", "W", -2.0, D(to="rdwe_laundromat", look="mirror-faced cherry red door, push plate")),
+                  ("bathroom", "N", 1.5, D(to="rdwe_office_night", look="porthole black lacquer door, no handle"))], keys,
                  "Environmental storytelling: a motel room whose TV shows this room from the corner, with you in it, a second late.", "inst",
                  fmat="carpet_tan", wmat="peach", trick=("tv", (0.8, 0.0, 1.2), (1, 0), "the TV: you, a second ago"))
 
 
 def c_office_night():
+    _wing_mats()
+
     def keys(S):
         for i in range(3):
             for j in range(2):
                 x0, z0 = -9.0 + i * 6.0, -6.0 + j * 7.0
                 S.solid(f"Partition_{i}_{j}", (x0, 0.0, z0), (x0 + 4.0, 1.4, z0 + 0.1), "office")
+                for side, (d0, d1), (c0, c1) in (("N", (z0 - 0.75, z0), (z0 - 1.05, z0 - 0.75)), ("S", (z0 + 0.1, z0 + 0.85), (z0 + 0.85, z0 + 1.15))):
+                    for q in range(2):
+                        xa = x0 + q * 2.0
+                        S.solid(f"Desk_{i}_{j}_{side}{q}", (xa, 0.0, d0), (xa + 2.0, 0.74, d1), "veneer")
+                        if (i, j, side, q) == (1, 0, "S", 1):
+                            S.solid("Chair_Out", (0.6, 0.0, -4.7), (1.2, 0.95, -4.1), "chair")
+                        else:
+                            S.solid(f"Chair_{i}_{j}_{side}{q}", (xa + 0.7, 0.0, c0), (xa + 1.3, 0.95, c1), "chair")
         S.decor("Monitor", (-0.2, 0.75, -5.6), (0.4, 1.1, -5.5), "cyan")
+        S.solid("Filing_1", (11.4, 0.0, -3.0), (12.0, 1.3, -1.0), "cabinet")
+        S.solid("Filing_2", (11.4, 0.0, -0.6), (12.0, 1.3, 1.4), "cabinet")
+        S.solid("Printer", (10.6, 0.0, 6.0), (12.0, 1.1, 7.0), "cabinet")
+        S.solid("Water_Cooler", (-11.6, 0.0, 3.0), (-11.2, 1.3, 3.4), "white")
+        S.solid("Plant_1", (-11.7, 0.0, 9.1), (-11.1, 1.5, 9.7), "plant")
+        S.solid("Plant_2", (11.1, 0.0, -9.7), (11.7, 1.5, -9.1), "plant")
+        _spot(S, "monitor", 2, (0.9, 0.0, -3.7), (0, -1), "the one chair not pushed in: someone was just here")
     return croom("rdwe_office_night", "The office at night: one monitor on", 24, 20, 3.0,
-                 [("stairs", "W", -6.0, D(to="rdwe_motel_room")), ("lift", "N", 6.0, D(to="rdwe_elevator_lobby"))], keys,
+                 [("stairs", "W", -6.0, D(to="rdwe_motel_room", look="six-panel sky blue door, brass knob")),
+                  ("lift", "N", 6.0, D(to="rdwe_elevator_lobby", look="stable (split) oak door, ring pull"))], keys,
                  "Environmental storytelling: an open-plan office after hours, every chair pushed in but one, and one monitor on with the "
                  "notebook's first entry typed out.", "inst", fmat="carpet_tan", wmat="office",
                  trick=("monitor", (0.0, 0.0, -4.6), (0, -1), "the lit monitor: the notebook's first entry"))
 
 
 def c_elevator_lobby():
+    _wing_mats()
+
     def keys(S):
         S.solid("Call_Pillar", (-0.4, 0.0, 0.4), (0.4, 1.3, 1.2), "steel")
+        S.solid("Bench_W", (-7.5, 0.0, 3.8), (-5.5, 0.45, 4.4), "wood")
+        S.solid("Bench_E", (5.5, 0.0, 3.8), (7.5, 0.45, 4.4), "wood")
+        S.solid("Planter_W", (-8.7, 0.0, 4.2), (-8.1, 1.0, 4.8), "planter")
+        S.solid("Planter_E", (8.1, 0.0, 4.2), (8.7, 1.0, 4.8), "planter")
+        for k, x in enumerate((-4.0, 0.0, 4.0), 1):
+            S.solid(f"Bin_{k}", (x - 0.2, 0.0, -5.0), (x + 0.2, 0.7, -4.6), "steel")
+        _spot(S, "buttons", 2, (-6.0, 0.0, -3.4), (0, -1), "lift 1: the dial over it points past the last floor")
+        _spot(S, "buttons", 3, (6.0, 0.0, -3.4), (0, -1), "lift 4: its dial has no numbers either")
     return croom("rdwe_elevator_lobby", "The elevator lobby: four lifts, four places", 18, 10, 3.6,
-                 [("crossroads", "S", 0.0, D(to="rdwe_crossroads")), ("lift_1", "N", -6.0, D(to="rdwe_office_night")),
-                  ("lift_2", "N", -2.0, D(to="rdwe_map_room")), ("lift_3", "N", 2.0, D(to="rdwe_repeating_room")),
-                  ("lift_4", "N", 6.0, D(to="rdwe_vending_room"))], keys,
+                 [("crossroads", "S", 0.0, D(to="rdwe_crossroads", look="panelled brushed steel door, glass knob")),
+                  ("lift_1", "N", -6.0, D(to="rdwe_office_night", look="flush bottle green door, chrome lever")),
+                  ("lift_2", "N", -2.0, D(to="rdwe_map_room", look="louvred birch door, ring pull")),
+                  ("lift_3", "N", 2.0, D(to="rdwe_repeating_room", look="half-glazed mustard door, glass knob")),
+                  ("lift_4", "N", 6.0, D(to="rdwe_vending_room", look="ledged and braced teal paint door, push plate"))], keys,
                  "Multi-choice navigation: four lift doors, no two alike, and a call button with no numbers; each lift opens somewhere else.",
                  "inst", fmat="marble_f", wmat="steel",
                  trick=("buttons", (0.0, 0.0, 2.2), (0, -1), "the call button has no numbers"))
 
 
 def c_map_room():
+    _wing_mats()
+
     def keys(S):
         S.solid("Map_Table", (-3.0, 0.0, -3.0), (3.0, 0.9, 3.0), "map")
+        S.solid("Shelves_W", (-6.0, 0.0, -4.0), (-5.6, 2.4, 4.0), "wood")
+        S.solid("Desk_E", (5.3, 0.0, -2.0), (6.0, 0.76, 0.0), "wood")
+        S.solid("Chair_E", (4.6, 0.0, -1.3), (5.1, 0.9, -0.7), "wood")
+        S.solid("Plan_Chest", (2.0, 0.0, 5.3), (4.2, 0.9, 6.0), "wood")
+        S.decor("Miniatures", (-2.8, 0.9, -2.8), (2.8, 1.05, 2.8), "white")
+        _spot(S, "map", 2, (-4.2, 0.0, 0.0), (1, 0), "the blank rooms: white blocks where the rooms you have not found will be")
+        _spot(S, "map", 3, (4.2, 0.0, 1.5), (-1, 0), "the string: red where you went through a door, none where the rooms only touch")
     return croom("rdwe_map_room", "The map room: the notebook on a table", 12, 12, 3.4,
-                 [("lift", "S", 0.0, D(to="rdwe_elevator_lobby")), ("door", "N", 0.0, D(to="rdwe_melting_library"))], keys,
+                 [("lift", "S", 0.0, D(to="rdwe_elevator_lobby", look="round-topped brushed steel door, no handle")),
+                  ("door", "N", 0.0, D(to="rdwe_melting_library", look="studded bottle green door, brass knob"))], keys,
                  "Environmental storytelling: a table-sized model of the rooms you have seen, joined by string not by space, the notebook "
                  "made real; the rooms you have not found are blank.", "inst", fmat="wood", wmat="map",
                  trick=("map", (0.0, 0.0, 4.0), (0, -1), "the map: a graph of connections, not of space"))
 
 
 def c_vending_room():
+    _wing_mats()
+
     def keys(S):
         S.solid("Machine_1", (-3.8, 0.0, -4.0), (-2.8, 1.9, -3.2), "red")
         S.solid("Machine_2", (-2.6, 0.0, -4.0), (-1.6, 1.9, -3.2), "cyan")
         S.solid("Machine_3", (2.6, 0.0, -4.0), (3.6, 1.9, -3.2), "acid")
+        S.solid("Machine_4", (3.2, 0.0, -2.0), (4.0, 1.9, -1.0), "sun")
+        S.solid("Machine_5", (3.2, 0.0, 0.2), (4.0, 1.8, 1.2), "cyan")
+        S.solid("Bench", (-3.6, 0.0, 3.6), (-1.6, 0.45, 4.0), "plastic")
+        S.solid("Bin", (2.6, 0.0, 3.5), (3.1, 0.75, 4.0), "steel")
+        S.decor("Exit_Sign", (-4.0, 2.25, -0.4), (-3.92, 2.5, 0.4), "acid")
+        _spot(S, "trick", 2, (-2.6, 0.0, 0.0), (-1, 0), "the EXIT door: lit, marked, and it never opens")
+        _spot(S, "trick", 3, (0.6, 0.0, -2.6), (0, -1), "the middle machine: press the button with no label and it swings open on the stockroom")
     return croom("rdwe_vending_room", "The vending room: the machine is the door", 8, 8, 3.0,
-                 [("lift", "S", 0.0, D(to="rdwe_elevator_lobby")), ("machine", "N", 0.6, D(to="rdwe_grocery (the stockroom)", width=1.0, height=1.9,
-                                                                                          look="a vending machine's glass front, lit, that swings open")),
+                 [("lift", "S", 0.0, D(to="rdwe_elevator_lobby", look="quilted birch door, push plate")),
+                  ("machine", "N", 0.6, D(to="rdwe_grocery (the stockroom)", width=1.0, height=1.9,
+                                          look="a vending machine's glass front, lit, that swings open")),
                   ("real", "W", 0.0, D(fake=True, look="a plain door marked EXIT that never opens"))], keys,
                  "Psychological puzzle: a room of vending machines and a door marked EXIT that never opens; the machine in the middle swings "
                  "open on the grocery's stockroom.", "inst", fmat="vinyl", wmat="navy",
@@ -1455,13 +1681,24 @@ def c_vending_room():
 
 
 def c_melting_library():
+    _wing_mats()
+
     def keys(S):
         for k, x in enumerate((-4.0, 4.0), 1):
             for j in range(3):
                 dx = (j * 0.35) * (1 if k == 1 else -1)
-                S.solid(f"Shelf_{k}_{j + 1}", (x - 0.4 + dx, j * 1.4, -4.0), (x + 0.4 + dx, (j + 1) * 1.4, 4.0), "book")
+                ys = (0.0, 1.8, 3.2, 4.6)                      # the lean starts above head height (the layout check's 1.8 m)
+                S.solid(f"Shelf_{k}_{j + 1}", (x - 0.4 + dx, ys[j], -4.0), (x + 0.4 + dx, ys[j + 1], 4.0), "book")
+        S.solid("Wall_Shelves_W", (-7.0, 0.0, -5.5), (-6.55, 3.2, 5.5), "book")
+        S.solid("Wall_Shelves_E", (6.55, 0.0, -5.5), (7.0, 3.2, 5.5), "book")
+        S.solid("Reading_Table", (-1.2, 0.0, -5.8), (1.2, 0.76, -5.0), "wood")
+        S.solid("Globe", (5.4, 0.0, 5.6), (6.0, 1.1, 6.2), "brass")
+        S.decor("Rug", (-2.6, 0.0, -4.4), (2.6, 0.01, 4.4), "wax")
+        _spot(S, "book", 2, (0.0, 0.0, -3.6), (0, -1), "the shelves meet overhead here, books dripping from the sag")
+        _spot(S, "book", 3, (3.0, 0.0, -4.6), (0, -1), "the arch: the way deeper, the one door that is not melting")
     return croom("rdwe_melting_library", "The melting library: shelves that sag", 14, 14, 5.0,
-                 [("map", "S", -3.0, D(to="rdwe_map_room")), ("arch", "N", 3.0, D(to="rdwe_repeating_room"))], keys,
+                 [("map", "S", -3.0, D(to="rdwe_map_room", look="mirror-faced mustard door, no handle")),
+                  ("arch", "N", 3.0, D(to="rdwe_repeating_room", look="porthole teal paint door, chrome lever"))], keys,
                  "Object distortion: two rows of shelves that lean and sag into each other like wax, the books sliding; the arch at the end is "
                  "the way deeper.", "inst", fmat="wood", wmat="blood",
                  trick=("book", (0.0, 0.0, 0.0), (0, -1), "every book has the same first line"))

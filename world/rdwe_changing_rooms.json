@@ -15,6 +15,19 @@
    ]
   },
   {
+   "s": "Bench_2",
+   "min": [
+    -3.0,
+    0.0,
+    -2.6
+   ],
+   "max": [
+    1.0,
+    0.45,
+    -2.2
+   ]
+  },
+  {
    "s": "Beyond_flooded",
    "min": [
     -4.68,
@@ -51,6 +64,32 @@
     2.0,
     2.0,
     5.0
+   ]
+  },
+  {
+   "s": "Lockers_E1",
+   "min": [
+    6.5,
+    0.0,
+    -0.4
+   ],
+   "max": [
+    7.0,
+    2.0,
+    1.3
+   ]
+  },
+  {
+   "s": "Lockers_E2",
+   "min": [
+    6.5,
+    0.0,
+    2.7
+   ],
+   "max": [
+    7.0,
+    2.0,
+    4.6
    ]
   },
   {
@@ -182,6 +221,71 @@
     3.0,
     5.0
    ]
+  },
+  {
+   "s": "Shower_Wall_1",
+   "min": [
+    -7.0,
+    0.0,
+    -4.05
+   ],
+   "max": [
+    -5.8,
+    2.0,
+    -3.95
+   ]
+  },
+  {
+   "s": "Shower_Wall_2",
+   "min": [
+    -7.0,
+    0.0,
+    -2.55
+   ],
+   "max": [
+    -5.8,
+    2.0,
+    -2.45
+   ]
+  },
+  {
+   "s": "Shower_Wall_3",
+   "min": [
+    -7.0,
+    0.0,
+    -1.05
+   ],
+   "max": [
+    -5.8,
+    2.0,
+    -0.95
+   ]
+  },
+  {
+   "s": "Sinks",
+   "min": [
+    6.4,
+    0.0,
+    -4.6
+   ],
+   "max": [
+    7.0,
+    0.85,
+    -2.6
+   ]
+  },
+  {
+   "s": "Towel_Bin",
+   "min": [
+    3.0,
+    0.0,
+    4.5
+   ],
+   "max": [
+    3.6,
+    0.8,
+    5.0
+   ]
   }
  ],
  "doors": [
@@ -288,6 +392,38 @@
    "yaw_deg": 0.0,
    "scale": 1.0,
    "what": "every locker holds the same towel, still warm"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_2",
+   "position": [
+    -6.2,
+    0.0,
+    -1.75
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a shower still running warm, though nobody is in it"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_3",
+   "position": [
+    5.6,
+    0.0,
+    2.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "locker 13, man-sized: it opens on a laundromat"
   }
  ]
 }
