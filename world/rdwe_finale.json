@@ -1,0 +1,1700 @@
+{
+ "scene": "rdwe_finale",
+ "colliders": [
+  {
+   "s": "Aisle_Shelf_1",
+   "min": [
+    9.0,
+    0.0,
+    3.0
+   ],
+   "max": [
+    21.0,
+    1.85,
+    3.8
+   ]
+  },
+  {
+   "s": "Aisle_Shelf_2",
+   "min": [
+    9.0,
+    0.0,
+    7.6
+   ],
+   "max": [
+    21.0,
+    1.85,
+    8.4
+   ]
+  },
+  {
+   "s": "Aisle_Shelf_3",
+   "min": [
+    9.0,
+    0.0,
+    12.2
+   ],
+   "max": [
+    21.0,
+    1.85,
+    13.0
+   ]
+  },
+  {
+   "s": "Aisle_Shelf_4",
+   "min": [
+    9.0,
+    0.0,
+    16.8
+   ],
+   "max": [
+    21.0,
+    1.85,
+    17.6
+   ]
+  },
+  {
+   "s": "Beyond_grocery",
+   "min": [
+    -1.45,
+    -0.05,
+    22.35
+   ],
+   "max": [
+    1.45,
+    2.55,
+    22.55
+   ]
+  },
+  {
+   "s": "Beyond_win",
+   "min": [
+    -1.25,
+    -0.05,
+    -22.55
+   ],
+   "max": [
+    1.25,
+    2.75,
+    -22.35
+   ]
+  },
+  {
+   "s": "Cubicle_0_0_A",
+   "min": [
+    -21.0,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    -18.0,
+    1.4,
+    -17.9
+   ]
+  },
+  {
+   "s": "Cubicle_0_0_B",
+   "min": [
+    -21.0,
+    0.0,
+    -17.9
+   ],
+   "max": [
+    -20.9,
+    1.4,
+    -15.0
+   ]
+  },
+  {
+   "s": "Cubicle_0_1_A",
+   "min": [
+    -21.0,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    -18.0,
+    1.4,
+    -9.9
+   ]
+  },
+  {
+   "s": "Cubicle_0_1_B",
+   "min": [
+    -21.0,
+    0.0,
+    -9.9
+   ],
+   "max": [
+    -20.9,
+    1.4,
+    -7.0
+   ]
+  },
+  {
+   "s": "Cubicle_1_0_A",
+   "min": [
+    -16.0,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    -13.0,
+    1.4,
+    -17.9
+   ]
+  },
+  {
+   "s": "Cubicle_1_0_B",
+   "min": [
+    -16.0,
+    0.0,
+    -17.9
+   ],
+   "max": [
+    -15.9,
+    1.4,
+    -15.0
+   ]
+  },
+  {
+   "s": "Cubicle_1_1_A",
+   "min": [
+    -16.0,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    -13.0,
+    1.4,
+    -9.9
+   ]
+  },
+  {
+   "s": "Cubicle_1_1_B",
+   "min": [
+    -16.0,
+    0.0,
+    -9.9
+   ],
+   "max": [
+    -15.9,
+    1.4,
+    -7.0
+   ]
+  },
+  {
+   "s": "Cubicle_2_0_A",
+   "min": [
+    -11.0,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    -8.0,
+    1.4,
+    -17.9
+   ]
+  },
+  {
+   "s": "Cubicle_2_0_B",
+   "min": [
+    -11.0,
+    0.0,
+    -17.9
+   ],
+   "max": [
+    -10.9,
+    1.4,
+    -15.0
+   ]
+  },
+  {
+   "s": "Cubicle_2_1_A",
+   "min": [
+    -11.0,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    -8.0,
+    1.4,
+    -9.9
+   ]
+  },
+  {
+   "s": "Cubicle_2_1_B",
+   "min": [
+    -11.0,
+    0.0,
+    -9.9
+   ],
+   "max": [
+    -10.9,
+    1.4,
+    -7.0
+   ]
+  },
+  {
+   "s": "Desk_0_0",
+   "min": [
+    -20.9,
+    0.0,
+    -17.9
+   ],
+   "max": [
+    -19.5,
+    0.75,
+    -17.2
+   ]
+  },
+  {
+   "s": "Desk_0_1",
+   "min": [
+    -20.9,
+    0.0,
+    -9.9
+   ],
+   "max": [
+    -19.5,
+    0.75,
+    -9.2
+   ]
+  },
+  {
+   "s": "Desk_1_0",
+   "min": [
+    -15.9,
+    0.0,
+    -17.9
+   ],
+   "max": [
+    -14.5,
+    0.75,
+    -17.2
+   ]
+  },
+  {
+   "s": "Desk_1_1",
+   "min": [
+    -15.9,
+    0.0,
+    -9.9
+   ],
+   "max": [
+    -14.5,
+    0.75,
+    -9.2
+   ]
+  },
+  {
+   "s": "Desk_2_0",
+   "min": [
+    -10.9,
+    0.0,
+    -17.9
+   ],
+   "max": [
+    -9.5,
+    0.75,
+    -17.2
+   ]
+  },
+  {
+   "s": "Desk_2_1",
+   "min": [
+    -10.9,
+    0.0,
+    -9.9
+   ],
+   "max": [
+    -9.5,
+    0.75,
+    -9.2
+   ]
+  },
+  {
+   "s": "Finale_Ceiling",
+   "min": [
+    -24.2,
+    4.5,
+    -22.2
+   ],
+   "max": [
+    24.2,
+    4.7,
+    22.2
+   ]
+  },
+  {
+   "s": "Finale_Floor",
+   "min": [
+    -24.2,
+    -0.3,
+    -22.2
+   ],
+   "max": [
+    24.2,
+    0.0,
+    22.2
+   ]
+  },
+  {
+   "s": "Finale_Wall_E_1",
+   "min": [
+    24.0,
+    0.0,
+    -22.0
+   ],
+   "max": [
+    24.2,
+    4.5,
+    22.0
+   ]
+  },
+  {
+   "s": "Finale_Wall_N_1",
+   "min": [
+    -24.2,
+    0.0,
+    -22.2
+   ],
+   "max": [
+    -1.02,
+    4.5,
+    -22.0
+   ]
+  },
+  {
+   "s": "Finale_Wall_N_2",
+   "min": [
+    -1.02,
+    2.64,
+    -22.2
+   ],
+   "max": [
+    1.02,
+    4.5,
+    -22.0
+   ]
+  },
+  {
+   "s": "Finale_Wall_N_3",
+   "min": [
+    1.02,
+    0.0,
+    -22.2
+   ],
+   "max": [
+    24.2,
+    4.5,
+    -22.0
+   ]
+  },
+  {
+   "s": "Finale_Wall_S_1",
+   "min": [
+    -24.2,
+    0.0,
+    22.0
+   ],
+   "max": [
+    -1.22,
+    4.5,
+    22.2
+   ]
+  },
+  {
+   "s": "Finale_Wall_S_2",
+   "min": [
+    -1.22,
+    2.44,
+    22.0
+   ],
+   "max": [
+    1.22,
+    4.5,
+    22.2
+   ]
+  },
+  {
+   "s": "Finale_Wall_S_3",
+   "min": [
+    1.22,
+    0.0,
+    22.0
+   ],
+   "max": [
+    24.2,
+    4.5,
+    22.2
+   ]
+  },
+  {
+   "s": "Finale_Wall_W_1",
+   "min": [
+    -24.2,
+    0.0,
+    -22.0
+   ],
+   "max": [
+    -24.0,
+    4.5,
+    22.0
+   ]
+  },
+  {
+   "s": "Hall_E_1",
+   "min": [
+    6.0,
+    0.0,
+    -22.0
+   ],
+   "max": [
+    6.1,
+    4.5,
+    -14.0
+   ]
+  },
+  {
+   "s": "Hall_E_2",
+   "min": [
+    6.0,
+    2.6,
+    -14.0
+   ],
+   "max": [
+    6.1,
+    4.5,
+    -11.6
+   ]
+  },
+  {
+   "s": "Hall_E_3",
+   "min": [
+    6.0,
+    0.0,
+    -11.6
+   ],
+   "max": [
+    6.1,
+    4.5,
+    -2.4
+   ]
+  },
+  {
+   "s": "Hall_E_4",
+   "min": [
+    6.0,
+    2.6,
+    -2.4
+   ],
+   "max": [
+    6.1,
+    4.5,
+    0.0
+   ]
+  },
+  {
+   "s": "Hall_E_5",
+   "min": [
+    6.0,
+    0.0,
+    0.0
+   ],
+   "max": [
+    6.1,
+    4.5,
+    8.0
+   ]
+  },
+  {
+   "s": "Hall_E_6",
+   "min": [
+    6.0,
+    2.6,
+    8.0
+   ],
+   "max": [
+    6.1,
+    4.5,
+    10.4
+   ]
+  },
+  {
+   "s": "Hall_E_7",
+   "min": [
+    6.0,
+    0.0,
+    10.4
+   ],
+   "max": [
+    6.1,
+    4.5,
+    14.0
+   ]
+  },
+  {
+   "s": "Hall_E_8",
+   "min": [
+    6.0,
+    2.6,
+    14.0
+   ],
+   "max": [
+    6.1,
+    4.5,
+    16.4
+   ]
+  },
+  {
+   "s": "Hall_E_9",
+   "min": [
+    6.0,
+    0.0,
+    16.4
+   ],
+   "max": [
+    6.1,
+    4.5,
+    22.0
+   ]
+  },
+  {
+   "s": "Hall_Fountain",
+   "min": [
+    -1.5,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    1.5,
+    0.9,
+    -4.0
+   ]
+  },
+  {
+   "s": "Hall_W_1",
+   "min": [
+    -6.1,
+    0.0,
+    -22.0
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    -14.0
+   ]
+  },
+  {
+   "s": "Hall_W_2",
+   "min": [
+    -6.1,
+    2.6,
+    -14.0
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    -11.6
+   ]
+  },
+  {
+   "s": "Hall_W_3",
+   "min": [
+    -6.1,
+    0.0,
+    -11.6
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    -2.4
+   ]
+  },
+  {
+   "s": "Hall_W_4",
+   "min": [
+    -6.1,
+    2.6,
+    -2.4
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    0.0
+   ]
+  },
+  {
+   "s": "Hall_W_5",
+   "min": [
+    -6.1,
+    0.0,
+    0.0
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    8.0
+   ]
+  },
+  {
+   "s": "Hall_W_6",
+   "min": [
+    -6.1,
+    2.6,
+    8.0
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    10.4
+   ]
+  },
+  {
+   "s": "Hall_W_7",
+   "min": [
+    -6.1,
+    0.0,
+    10.4
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    14.0
+   ]
+  },
+  {
+   "s": "Hall_W_8",
+   "min": [
+    -6.1,
+    2.6,
+    14.0
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    16.4
+   ]
+  },
+  {
+   "s": "Hall_W_9",
+   "min": [
+    -6.1,
+    0.0,
+    16.4
+   ],
+   "max": [
+    -6.0,
+    4.5,
+    22.0
+   ]
+  },
+  {
+   "s": "House_Bed",
+   "min": [
+    -20.0,
+    0.0,
+    4.0
+   ],
+   "max": [
+    -17.8,
+    0.6,
+    6.2
+   ]
+  },
+  {
+   "s": "House_Sofa",
+   "min": [
+    -10.0,
+    0.0,
+    17.0
+   ],
+   "max": [
+    -7.0,
+    0.9,
+    18.2
+   ]
+  },
+  {
+   "s": "House_Table",
+   "min": [
+    -14.0,
+    0.0,
+    10.0
+   ],
+   "max": [
+    -11.0,
+    0.8,
+    12.0
+   ]
+  },
+  {
+   "s": "House_Wardrobe",
+   "min": [
+    -24.0,
+    0.0,
+    12.0
+   ],
+   "max": [
+    -23.3,
+    2.2,
+    14.0
+   ]
+  },
+  {
+   "s": "Rack_1",
+   "min": [
+    9.0,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    21.0,
+    2.2,
+    -17.0
+   ]
+  },
+  {
+   "s": "Rack_2",
+   "min": [
+    9.0,
+    0.0,
+    -13.6
+   ],
+   "max": [
+    21.0,
+    2.2,
+    -12.6
+   ]
+  },
+  {
+   "s": "Rack_3",
+   "min": [
+    9.0,
+    0.0,
+    -9.2
+   ],
+   "max": [
+    21.0,
+    2.2,
+    -8.2
+   ]
+  },
+  {
+   "s": "Rack_4",
+   "min": [
+    9.0,
+    0.0,
+    -4.8
+   ],
+   "max": [
+    21.0,
+    2.2,
+    -3.8
+   ]
+  },
+  {
+   "s": "Wing_E_1",
+   "min": [
+    6.1,
+    0.0,
+    -0.1
+   ],
+   "max": [
+    13.85,
+    4.5,
+    0.1
+   ]
+  },
+  {
+   "s": "Wing_E_2",
+   "min": [
+    13.85,
+    2.6,
+    -0.1
+   ],
+   "max": [
+    16.25,
+    4.5,
+    0.1
+   ]
+  },
+  {
+   "s": "Wing_E_3",
+   "min": [
+    16.25,
+    0.0,
+    -0.1
+   ],
+   "max": [
+    24.0,
+    4.5,
+    0.1
+   ]
+  },
+  {
+   "s": "Wing_W_1",
+   "min": [
+    -24.0,
+    0.0,
+    -0.1
+   ],
+   "max": [
+    -16.25,
+    4.5,
+    0.1
+   ]
+  },
+  {
+   "s": "Wing_W_2",
+   "min": [
+    -16.25,
+    2.6,
+    -0.1
+   ],
+   "max": [
+    -13.85,
+    4.5,
+    0.1
+   ]
+  },
+  {
+   "s": "Wing_W_3",
+   "min": [
+    -13.85,
+    0.0,
+    -0.1
+   ],
+   "max": [
+    -6.1,
+    4.5,
+    0.1
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_grocery",
+   "level": "rdwe_finale",
+   "hinge": [
+    1.2,
+    0.0,
+    22.0
+   ],
+   "width": 2.4,
+   "height": 2.4,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "arrival_of": "rdwe_grocery.entrance",
+   "look": "the grocery's glass doors, from the other side, unchained"
+  },
+  {
+   "name": "DoorLeaf_win",
+   "level": "rdwe_finale",
+   "hinge": [
+    -1.0,
+    0.0,
+    -22.0
+   ],
+   "width": 2.0,
+   "height": 2.6,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "win",
+   "look": "a pair of tall blue doors with a green EXIT light, sealed until the cameras are off",
+   "opens_when": "every SecCam is off"
+  }
+ ],
+ "cameras": [
+  {
+   "id": "SecCam_01",
+   "level": "rdwe_finale",
+   "position": [
+    -23.6,
+    3.8,
+    -20.0
+   ],
+   "facing_deg": 45.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.137
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.291
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_02",
+   "level": "rdwe_finale",
+   "position": [
+    -23.6,
+    3.8,
+    0.0
+   ],
+   "facing_deg": 90.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.274
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.582
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_03",
+   "level": "rdwe_finale",
+   "position": [
+    -14.0,
+    3.8,
+    21.6
+   ],
+   "facing_deg": 180.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.411
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.873
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_04",
+   "level": "rdwe_finale",
+   "position": [
+    -6.4,
+    3.8,
+    -10.0
+   ],
+   "facing_deg": 90.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.548
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.164
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_05",
+   "level": "rdwe_finale",
+   "position": [
+    6.4,
+    3.8,
+    10.0
+   ],
+   "facing_deg": -90.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.685
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.455
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_06",
+   "level": "rdwe_finale",
+   "position": [
+    23.6,
+    3.8,
+    -20.0
+   ],
+   "facing_deg": -45.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.822
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.746
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_07",
+   "level": "rdwe_finale",
+   "position": [
+    23.6,
+    3.8,
+    -5.0
+   ],
+   "facing_deg": -90.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.959
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.037
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_08",
+   "level": "rdwe_finale",
+   "position": [
+    23.6,
+    3.8,
+    20.0
+   ],
+   "facing_deg": -135.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.096
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.328
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_09",
+   "level": "rdwe_finale",
+   "position": [
+    0.0,
+    3.8,
+    -21.6
+   ],
+   "facing_deg": 0.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.233
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.619
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  },
+  {
+   "id": "SecCam_10",
+   "level": "rdwe_finale",
+   "position": [
+    0.0,
+    3.8,
+    21.6
+   ],
+   "facing_deg": 180.0,
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.8,
+   "pan": {
+    "amplitude_deg": 45.0,
+    "cycles": 1,
+    "phase": 0.37
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.91
+   },
+   "zoom": {
+    "lens_wide_mm": 22,
+    "lens_tele_mm": 70,
+    "cycles": 2,
+    "phase": 0.2
+   },
+   "loop_seconds": 20,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40
+   ],
+   "what": "hide-and-seek camera: off when its wing's computer is hacked"
+  }
+ ],
+ "markers": [],
+ "links": [
+  {
+   "door": "grocery",
+   "at": [
+    0.0,
+    0.0,
+    21.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    20.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "win",
+   "at": [
+    0.0,
+    0.0,
+    -21.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -20.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "restricted",
+   "name": "Zone_restricted_servers",
+   "min": [
+    6.1,
+    0.0,
+    -22.0
+   ],
+   "max": [
+    24.0,
+    4.5,
+    -0.1
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "agent",
+   "name": "Spot_agent_1",
+   "position": [
+    -23.0,
+    0.0,
+    -10.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a vent the agents swarm out of, late"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_2",
+   "position": [
+    -23.0,
+    0.0,
+    19.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a vent the agents swarm out of, late"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_3",
+   "position": [
+    23.0,
+    0.0,
+    -12.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "what": "a vent the agents swarm out of, late"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_4",
+   "position": [
+    23.0,
+    0.0,
+    12.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "what": "a vent the agents swarm out of, late"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_5",
+   "position": [
+    -10.0,
+    0.0,
+    -21.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a vent the agents swarm out of, late"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_6",
+   "position": [
+    10.0,
+    0.0,
+    21.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "a vent the agents swarm out of, late"
+  },
+  {
+   "kind": "computer",
+   "name": "Spot_computer_1",
+   "position": [
+    -19.6,
+    0.0,
+    -16.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the offices' computer: hack it to turn off cameras",
+   "hack_s": 8
+  },
+  {
+   "kind": "computer",
+   "name": "Spot_computer_2",
+   "position": [
+    -12.5,
+    0.0,
+    12.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the house's computer, on the table: hack it to turn off cameras",
+   "hack_s": 8
+  },
+  {
+   "kind": "computer",
+   "name": "Spot_computer_3",
+   "position": [
+    15.0,
+    0.0,
+    -2.2
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the server room's console: hack it to turn off cameras",
+   "hack_s": 8
+  },
+  {
+   "kind": "computer",
+   "name": "Spot_computer_4",
+   "position": [
+    15.0,
+    0.0,
+    19.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the aisles' till: hack it to turn off cameras",
+   "hack_s": 8
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_1",
+   "position": [
+    -16.5,
+    0.0,
+    -16.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_10",
+   "position": [
+    8.0,
+    0.0,
+    6.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_11",
+   "position": [
+    22.5,
+    0.0,
+    15.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_12",
+   "position": [
+    -4.5,
+    0.0,
+    6.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_2",
+   "position": [
+    -11.5,
+    0.0,
+    -8.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_3",
+   "position": [
+    -21.0,
+    0.0,
+    2.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_4",
+   "position": [
+    -19.0,
+    0.0,
+    16.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_5",
+   "position": [
+    -8.5,
+    0.0,
+    15.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_6",
+   "position": [
+    -3.5,
+    0.0,
+    -19.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_7",
+   "position": [
+    3.5,
+    0.0,
+    19.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_8",
+   "position": [
+    8.0,
+    0.0,
+    -19.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_9",
+   "position": [
+    22.0,
+    0.0,
+    -3.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a hiding place"
+  },
+  {
+   "kind": "seeker",
+   "name": "Spot_seeker_1",
+   "position": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the seeker counts here (either side seeks, with friends)"
+  }
+ ]
+}

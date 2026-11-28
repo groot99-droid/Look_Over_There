@@ -1,0 +1,291 @@
+{
+ "scene": "rdwe_dont_look",
+ "colliders": [
+  {
+   "s": "Beyond_mirror",
+   "min": [
+    -7.55,
+    -0.05,
+    -0.68
+   ],
+   "max": [
+    -7.35,
+    2.45,
+    0.68
+   ]
+  },
+  {
+   "s": "Beyond_statue",
+   "min": [
+    7.35,
+    -0.05,
+    -0.75
+   ],
+   "max": [
+    7.55,
+    2.31,
+    0.75
+   ]
+  },
+  {
+   "s": "Plinth_1",
+   "min": [
+    -3.0,
+    0.0,
+    -4.2
+   ],
+   "max": [
+    -2.0,
+    1.2,
+    -3.2
+   ]
+  },
+  {
+   "s": "Plinth_2",
+   "min": [
+    -3.0,
+    0.0,
+    3.2
+   ],
+   "max": [
+    -2.0,
+    1.2,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -7.2,
+    4.0,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    4.2,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -7.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    7.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    7.2,
+    4.0,
+    -0.52
+   ]
+  },
+  {
+   "s": "Room_Wall_E_2",
+   "min": [
+    7.0,
+    2.2,
+    -0.52
+   ],
+   "max": [
+    7.2,
+    4.0,
+    0.52
+   ]
+  },
+  {
+   "s": "Room_Wall_E_3",
+   "min": [
+    7.0,
+    0.0,
+    0.52
+   ],
+   "max": [
+    7.2,
+    4.0,
+    5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    4.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -7.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    7.2,
+    4.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -7.0,
+    4.0,
+    -0.45
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -7.2,
+    2.34,
+    -0.45
+   ],
+   "max": [
+    -7.0,
+    4.0,
+    0.45
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -7.2,
+    0.0,
+    0.45
+   ],
+   "max": [
+    -7.0,
+    4.0,
+    5.0
+   ]
+  },
+  {
+   "s": "Statue",
+   "min": [
+    3.0,
+    0.0,
+    -0.5
+   ],
+   "max": [
+    4.0,
+    2.4,
+    0.5
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_mirror",
+   "level": "rdwe_dont_look",
+   "hinge": [
+    -7.0,
+    0.0,
+    0.43
+   ],
+   "width": 0.86,
+   "height": 2.3,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "mirror",
+   "look": "quilted orange vinyl door, ring pull"
+  },
+  {
+   "name": "DoorLeaf_statue",
+   "level": "rdwe_dont_look",
+   "hinge": [
+    7.0,
+    0.0,
+    -0.5
+   ],
+   "width": 1.0,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "statue",
+   "look": "mirror-faced plum door, glass knob"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "mirror",
+   "at": [
+    -6.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -5.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "statue",
+   "at": [
+    6.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    5.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "statue",
+   "name": "Spot_statue_1",
+   "position": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "it is closer every time you blink"
+  }
+ ]
+}

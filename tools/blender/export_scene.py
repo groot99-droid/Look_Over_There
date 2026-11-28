@@ -59,6 +59,29 @@ def camera(scene, name, position, face, props):
             "loop_seconds": g("loop_seconds", 20.0), "aspect": "16:9", "view_range_m": [0.03, 80]}
 
 
+CAM_DEFAULTS = {"style": "security_camera_01", "mount_height_above_floor": 2.8, "pan": {"amplitude_deg": 45.0, "cycles": 1, "phase": 0.0},
+                "tilt": {"base_deg": -18.0, "wobble_deg": 4.0, "cycles": 2, "phase": 0.5},
+                "zoom": {"lens_wide_mm": 22, "lens_tele_mm": 70, "cycles": 2, "phase": 0.2}, "loop_seconds": 20, "aspect": "16:9",
+                "view_range_m": [0.03, 40]}
+
+
+def camera_doc(scene, name, position, face, props=None):
+    """One SecCam_<nn> as the page reads cameras (world/L1.json's shape: id, level, position, facing_deg, pan, tilt, zoom, loop_seconds).
+    face: the way it looks, game (x, z); facing_deg is three's rotation.y of it. Each camera's sweep starts at its own phase. The empty's
+    custom properties are added as they are (a nested pan/tilt/zoom is not read from them). Pure Python: build scripts use it for --preview."""
+    c = {"id": name, "level": scene, "position": [round(v, 3) + 0.0 for v in position],
+         "facing_deg": round(math.degrees(math.atan2(face[0], face[1])), 1) + 0.0}
+    c.update(json.loads(json.dumps(CAM_DEFAULTS)))
+    digits = "".join(ch for ch in name if ch.isdigit())
+    k = int(digits) if digits else 0
+    c["pan"]["phase"] = round((k * 0.137) % 1.0, 3)
+    c["tilt"]["phase"] = round((k * 0.291) % 1.0, 3)
+    for kk, v in (props or {}).items():
+        if kk not in c and isinstance(v, (int, float, str)):
+            c[kk] = v
+    return c
+
+
 def collect(scene):
     import bpy
     from mathutils import Vector

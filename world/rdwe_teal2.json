@@ -1,0 +1,340 @@
+{
+ "scene": "rdwe_teal2",
+ "colliders": [
+  {
+   "s": "Beyond_arch",
+   "min": [
+    0.5,
+    -0.05,
+    -11.55
+   ],
+   "max": [
+    2.3,
+    3.55,
+    -11.35
+   ]
+  },
+  {
+   "s": "Beyond_grid",
+   "min": [
+    4.35,
+    -0.05,
+    2.32
+   ],
+   "max": [
+    4.55,
+    2.19,
+    3.68
+   ]
+  },
+  {
+   "s": "Plant_Tall",
+   "min": [
+    3.0,
+    0.0,
+    -11.0
+   ],
+   "max": [
+    3.8,
+    3.2,
+    -10.2
+   ]
+  },
+  {
+   "s": "Sofa",
+   "min": [
+    -4.0,
+    0.0,
+    -2.2
+   ],
+   "max": [
+    -3.0,
+    0.85,
+    2.2
+   ]
+  },
+  {
+   "s": "Sofa_Back",
+   "min": [
+    -4.0,
+    0.85,
+    -2.2
+   ],
+   "max": [
+    -3.65,
+    1.5,
+    2.2
+   ]
+  },
+  {
+   "s": "Teal2_Ceiling",
+   "min": [
+    -4.2,
+    5.5,
+    -11.2
+   ],
+   "max": [
+    4.2,
+    5.7,
+    11.2
+   ]
+  },
+  {
+   "s": "Teal2_Floor",
+   "min": [
+    -4.2,
+    -0.3,
+    -11.2
+   ],
+   "max": [
+    4.2,
+    0.0,
+    11.2
+   ]
+  },
+  {
+   "s": "Teal2_Wall_E_1",
+   "min": [
+    4.0,
+    0.0,
+    -11.0
+   ],
+   "max": [
+    4.2,
+    5.5,
+    2.55
+   ]
+  },
+  {
+   "s": "Teal2_Wall_E_2",
+   "min": [
+    4.0,
+    2.08,
+    2.55
+   ],
+   "max": [
+    4.2,
+    5.5,
+    3.45
+   ]
+  },
+  {
+   "s": "Teal2_Wall_E_3",
+   "min": [
+    4.0,
+    0.0,
+    3.45
+   ],
+   "max": [
+    4.2,
+    5.5,
+    11.0
+   ]
+  },
+  {
+   "s": "Teal2_Wall_N_1",
+   "min": [
+    -4.2,
+    0.0,
+    -11.2
+   ],
+   "max": [
+    0.73,
+    5.5,
+    -11.0
+   ]
+  },
+  {
+   "s": "Teal2_Wall_N_2",
+   "min": [
+    0.73,
+    3.44,
+    -11.2
+   ],
+   "max": [
+    2.07,
+    5.5,
+    -11.0
+   ]
+  },
+  {
+   "s": "Teal2_Wall_N_3",
+   "min": [
+    2.07,
+    0.0,
+    -11.2
+   ],
+   "max": [
+    4.2,
+    5.5,
+    -11.0
+   ]
+  },
+  {
+   "s": "Teal2_Wall_S_1",
+   "min": [
+    -4.2,
+    0.0,
+    11.0
+   ],
+   "max": [
+    4.2,
+    5.5,
+    11.2
+   ]
+  },
+  {
+   "s": "Teal2_Wall_W_1",
+   "min": [
+    -4.2,
+    0.0,
+    -11.0
+   ],
+   "max": [
+    -4.0,
+    5.5,
+    11.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_arch",
+   "level": "rdwe_teal2",
+   "hinge": [
+    0.75,
+    0.0,
+    -11.0
+   ],
+   "width": 1.3,
+   "height": 3.4,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "exit": "arch",
+   "look": "the tall arch: round-topped, no leaf, it grows and snaps back"
+  },
+  {
+   "name": "DoorLeaf_grid",
+   "level": "rdwe_teal2",
+   "hinge": [
+    4.0,
+    0.0,
+    2.57
+   ],
+   "width": 0.86,
+   "height": 2.04,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "grid",
+   "look": "a door under peeled wallpaper: the glowing green grid shows through"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "arch",
+   "at": [
+    1.4,
+    0.0,
+    -10.25
+   ],
+   "arrive": [
+    1.4,
+    0.0,
+    -9.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "grid",
+   "at": [
+    3.25,
+    0.0,
+    3.0
+   ],
+   "arrive": [
+    2.1,
+    0.0,
+    3.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "sleep",
+   "at": [
+    -2.4,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -1.8,
+    0.0,
+    1.0
+   ],
+   "face": [
+    0.6,
+    -0.8
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "grid",
+   "name": "Spot_grid_1",
+   "position": [
+    3.0,
+    0.0,
+    -6.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "wallpaper peeled back: the green grid under it"
+  },
+  {
+   "kind": "grid",
+   "name": "Spot_grid_2",
+   "position": [
+    3.0,
+    0.0,
+    6.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "wallpaper peeled back: the green grid under it"
+  },
+  {
+   "kind": "grid",
+   "name": "Spot_grid_3",
+   "position": [
+    3.0,
+    0.0,
+    -1.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "wallpaper peeled back: the green grid under it"
+  }
+ ]
+}

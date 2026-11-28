@@ -1,0 +1,346 @@
+{
+ "scene": "rdwe_vending_room",
+ "colliders": [
+  {
+   "s": "Beyond_lift",
+   "min": [
+    -0.68,
+    -0.05,
+    4.35
+   ],
+   "max": [
+    0.68,
+    2.55,
+    4.55
+   ]
+  },
+  {
+   "s": "Beyond_machine",
+   "min": [
+    -0.15,
+    -0.05,
+    -4.55
+   ],
+   "max": [
+    1.35,
+    2.05,
+    -4.35
+   ]
+  },
+  {
+   "s": "Beyond_real",
+   "min": [
+    -4.55,
+    -0.05,
+    -0.81
+   ],
+   "max": [
+    -4.35,
+    2.25,
+    0.81
+   ]
+  },
+  {
+   "s": "Machine_1",
+   "min": [
+    -3.8,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -2.8,
+    1.9,
+    -3.2
+   ]
+  },
+  {
+   "s": "Machine_2",
+   "min": [
+    -2.6,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -1.6,
+    1.9,
+    -3.2
+   ]
+  },
+  {
+   "s": "Machine_3",
+   "min": [
+    2.6,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    3.6,
+    1.9,
+    -3.2
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -4.2,
+    3.0,
+    -4.2
+   ],
+   "max": [
+    4.2,
+    3.2,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -4.2,
+    -0.3,
+    -4.2
+   ],
+   "max": [
+    4.2,
+    0.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    4.0,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    4.2,
+    3.0,
+    4.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -4.2,
+    0.0,
+    -4.2
+   ],
+   "max": [
+    0.08,
+    3.0,
+    -4.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    0.08,
+    1.94,
+    -4.2
+   ],
+   "max": [
+    1.12,
+    3.0,
+    -4.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    1.12,
+    0.0,
+    -4.2
+   ],
+   "max": [
+    4.2,
+    3.0,
+    -4.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -4.2,
+    0.0,
+    4.0
+   ],
+   "max": [
+    -0.45,
+    3.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    -0.45,
+    2.44,
+    4.0
+   ],
+   "max": [
+    0.45,
+    3.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    0.45,
+    0.0,
+    4.0
+   ],
+   "max": [
+    4.2,
+    3.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -4.2,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -4.0,
+    3.0,
+    -0.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -4.2,
+    2.14,
+    -0.58
+   ],
+   "max": [
+    -4.0,
+    3.0,
+    0.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -4.2,
+    0.0,
+    0.58
+   ],
+   "max": [
+    -4.0,
+    3.0,
+    4.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_lift",
+   "level": "rdwe_vending_room",
+   "hinge": [
+    0.43,
+    0.0,
+    4.0
+   ],
+   "width": 0.86,
+   "height": 2.4,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lift",
+   "look": "quilted birch door, push plate"
+  },
+  {
+   "name": "DoorLeaf_machine",
+   "level": "rdwe_vending_room",
+   "hinge": [
+    0.1,
+    0.0,
+    -4.0
+   ],
+   "width": 1.0,
+   "height": 1.9,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "machine",
+   "look": "a vending machine's glass front, lit, that swings open"
+  },
+  {
+   "name": "DoorLeaf_real",
+   "level": "rdwe_vending_room",
+   "hinge": [
+    -4.0,
+    0.0,
+    0.56
+   ],
+   "width": 1.12,
+   "height": 2.1,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "a plain door marked EXIT that never opens"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "lift",
+   "at": [
+    0.0,
+    0.0,
+    3.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    2.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "machine",
+   "at": [
+    0.6,
+    0.0,
+    -3.25
+   ],
+   "arrive": [
+    0.6,
+    0.0,
+    -2.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "trick",
+   "name": "Spot_trick_1",
+   "position": [
+    0.6,
+    0.0,
+    -1.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the EXIT door is the only one that is not a door"
+  }
+ ]
+}

@@ -1,0 +1,265 @@
+{
+ "scene": "rdwe_birthday_party",
+ "colliders": [
+  {
+   "s": "Beyond_attic",
+   "min": [
+    3.25,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    4.75,
+    2.25,
+    -5.35
+   ]
+  },
+  {
+   "s": "Beyond_table",
+   "min": [
+    -7.55,
+    -0.05,
+    -0.78
+   ],
+   "max": [
+    -7.35,
+    2.45,
+    0.78
+   ]
+  },
+  {
+   "s": "Party_Table",
+   "min": [
+    -3.0,
+    0.0,
+    -0.8
+   ],
+   "max": [
+    3.0,
+    0.8,
+    0.8
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -7.2,
+    3.2,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    3.4,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -7.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    7.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    7.2,
+    3.2,
+    5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    3.48,
+    3.2,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    3.48,
+    2.14,
+    -5.2
+   ],
+   "max": [
+    4.52,
+    3.2,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    4.52,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    3.2,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -7.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    7.2,
+    3.2,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -7.0,
+    3.2,
+    -0.55
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -7.2,
+    2.34,
+    -0.55
+   ],
+   "max": [
+    -7.0,
+    3.2,
+    0.55
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -7.2,
+    0.0,
+    0.55
+   ],
+   "max": [
+    -7.0,
+    3.2,
+    5.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_attic",
+   "level": "rdwe_birthday_party",
+   "hinge": [
+    3.5,
+    0.0,
+    -5.0
+   ],
+   "width": 1.0,
+   "height": 2.1,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "attic",
+   "look": "studded birch door, ring pull"
+  },
+  {
+   "name": "DoorLeaf_table",
+   "level": "rdwe_birthday_party",
+   "hinge": [
+    -7.0,
+    0.0,
+    0.53
+   ],
+   "width": 1.06,
+   "height": 2.3,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "table",
+   "look": "round-topped bottle green door, chrome lever"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "attic",
+   "at": [
+    4.0,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    4.0,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "table",
+   "at": [
+    -6.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -5.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "cake",
+   "name": "Spot_cake_1",
+   "position": [
+    0.0,
+    0.0,
+    2.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the cake: the candles light when you look away"
+  }
+ ]
+}

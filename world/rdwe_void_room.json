@@ -1,0 +1,265 @@
+{
+ "scene": "rdwe_void_room",
+ "colliders": [
+  {
+   "s": "Beyond_lit",
+   "min": [
+    -3.78,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    -2.22,
+    2.25,
+    -5.35
+   ]
+  },
+  {
+   "s": "Beyond_teal",
+   "min": [
+    -0.75,
+    -0.05,
+    5.35
+   ],
+   "max": [
+    0.75,
+    2.25,
+    5.55
+   ]
+  },
+  {
+   "s": "Lone_Chair",
+   "min": [
+    1.6,
+    0.0,
+    0.6
+   ],
+   "max": [
+    2.2,
+    0.9,
+    1.2
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -5.2,
+    4.0,
+    -5.2
+   ],
+   "max": [
+    5.2,
+    4.2,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -5.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    5.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    5.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    5.2,
+    4.0,
+    5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -5.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    -3.55,
+    4.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    -3.55,
+    2.14,
+    -5.2
+   ],
+   "max": [
+    -2.45,
+    4.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    -2.45,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    5.2,
+    4.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -5.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    -0.52,
+    4.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    -0.52,
+    2.14,
+    5.0
+   ],
+   "max": [
+    0.52,
+    4.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    0.52,
+    0.0,
+    5.0
+   ],
+   "max": [
+    5.2,
+    4.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -5.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -5.0,
+    4.0,
+    5.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_lit",
+   "level": "rdwe_void_room",
+   "hinge": [
+    -3.53,
+    0.0,
+    -5.0
+   ],
+   "width": 1.06,
+   "height": 2.1,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lit",
+   "look": "the single lit door: a glowing outline, white"
+  },
+  {
+   "name": "DoorLeaf_teal",
+   "level": "rdwe_void_room",
+   "hinge": [
+    0.5,
+    0.0,
+    5.0
+   ],
+   "width": 1.0,
+   "height": 2.1,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "teal",
+   "look": "studded teal paint door, glass knob"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "lit",
+   "at": [
+    -3.0,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    -3.0,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "teal",
+   "at": [
+    0.0,
+    0.0,
+    4.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    3.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "dark",
+   "name": "Spot_dark_1",
+   "position": [
+    0.0,
+    0.0,
+    1.5
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "no light: only the lit door's outline"
+  }
+ ]
+}

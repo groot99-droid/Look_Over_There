@@ -1,0 +1,904 @@
+{
+ "scene": "rdwe_door_hall",
+ "colliders": [
+  {
+   "s": "Bench",
+   "min": [
+    -0.5,
+    0.0,
+    -2.0
+   ],
+   "max": [
+    0.5,
+    0.45,
+    2.0
+   ]
+  },
+  {
+   "s": "Beyond_d3",
+   "min": [
+    -3.55,
+    -0.05,
+    -14.81
+   ],
+   "max": [
+    -3.35,
+    2.25,
+    -13.19
+   ]
+  },
+  {
+   "s": "Beyond_d6",
+   "min": [
+    3.35,
+    -0.05,
+    -4.66
+   ],
+   "max": [
+    3.55,
+    2.19,
+    -3.34
+   ]
+  },
+  {
+   "s": "Beyond_d9",
+   "min": [
+    -3.55,
+    -0.05,
+    9.25
+   ],
+   "max": [
+    -3.35,
+    2.19,
+    10.75
+   ]
+  },
+  {
+   "s": "Beyond_hallway",
+   "min": [
+    -0.72,
+    -0.05,
+    22.35
+   ],
+   "max": [
+    0.72,
+    2.45,
+    22.55
+   ]
+  },
+  {
+   "s": "Beyond_wrong_1",
+   "min": [
+    -3.55,
+    -0.05,
+    -18.78
+   ],
+   "max": [
+    -3.35,
+    2.31,
+    -17.22
+   ]
+  },
+  {
+   "s": "Beyond_wrong_2",
+   "min": [
+    -3.55,
+    -0.05,
+    -9.75
+   ],
+   "max": [
+    -3.35,
+    2.39,
+    -8.25
+   ]
+  },
+  {
+   "s": "Beyond_wrong_3",
+   "min": [
+    -3.55,
+    -0.05,
+    -4.75
+   ],
+   "max": [
+    -3.35,
+    2.39,
+    -3.25
+   ]
+  },
+  {
+   "s": "Beyond_wrong_4",
+   "min": [
+    -3.55,
+    -0.05,
+    0.19
+   ],
+   "max": [
+    -3.35,
+    2.55,
+    1.81
+   ]
+  },
+  {
+   "s": "Beyond_wrong_5",
+   "min": [
+    -3.55,
+    -0.05,
+    15.3
+   ],
+   "max": [
+    -3.35,
+    2.39,
+    16.7
+   ]
+  },
+  {
+   "s": "Beyond_wrong_6",
+   "min": [
+    3.35,
+    -0.05,
+    -18.72
+   ],
+   "max": [
+    3.55,
+    2.25,
+    -17.28
+   ]
+  },
+  {
+   "s": "Beyond_wrong_7",
+   "min": [
+    3.35,
+    -0.05,
+    -9.75
+   ],
+   "max": [
+    3.55,
+    2.55,
+    -8.25
+   ]
+  },
+  {
+   "s": "Beyond_wrong_8",
+   "min": [
+    3.35,
+    -0.05,
+    5.25
+   ],
+   "max": [
+    3.55,
+    2.39,
+    6.75
+   ]
+  },
+  {
+   "s": "Beyond_wrong_9",
+   "min": [
+    3.35,
+    -0.05,
+    15.28
+   ],
+   "max": [
+    3.55,
+    2.31,
+    16.72
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -3.2,
+    3.4,
+    -22.2
+   ],
+   "max": [
+    3.2,
+    3.6,
+    22.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -3.2,
+    -0.3,
+    -22.2
+   ],
+   "max": [
+    3.2,
+    0.0,
+    22.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    3.0,
+    0.0,
+    -22.0
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -18.49
+   ]
+  },
+  {
+   "s": "Room_Wall_E_10",
+   "min": [
+    3.0,
+    2.2,
+    15.51
+   ],
+   "max": [
+    3.2,
+    3.4,
+    16.49
+   ]
+  },
+  {
+   "s": "Room_Wall_E_11",
+   "min": [
+    3.0,
+    0.0,
+    16.49
+   ],
+   "max": [
+    3.2,
+    3.4,
+    22.0
+   ]
+  },
+  {
+   "s": "Room_Wall_E_2",
+   "min": [
+    3.0,
+    2.14,
+    -18.49
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -17.51
+   ]
+  },
+  {
+   "s": "Room_Wall_E_3",
+   "min": [
+    3.0,
+    0.0,
+    -17.51
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -9.52
+   ]
+  },
+  {
+   "s": "Room_Wall_E_4",
+   "min": [
+    3.0,
+    2.44,
+    -9.52
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -8.48
+   ]
+  },
+  {
+   "s": "Room_Wall_E_5",
+   "min": [
+    3.0,
+    0.0,
+    -8.48
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -4.43
+   ]
+  },
+  {
+   "s": "Room_Wall_E_6",
+   "min": [
+    3.0,
+    2.08,
+    -4.43
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -3.57
+   ]
+  },
+  {
+   "s": "Room_Wall_E_7",
+   "min": [
+    3.0,
+    0.0,
+    -3.57
+   ],
+   "max": [
+    3.2,
+    3.4,
+    5.48
+   ]
+  },
+  {
+   "s": "Room_Wall_E_8",
+   "min": [
+    3.0,
+    2.28,
+    5.48
+   ],
+   "max": [
+    3.2,
+    3.4,
+    6.52
+   ]
+  },
+  {
+   "s": "Room_Wall_E_9",
+   "min": [
+    3.0,
+    0.0,
+    6.52
+   ],
+   "max": [
+    3.2,
+    3.4,
+    15.51
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -3.2,
+    0.0,
+    -22.2
+   ],
+   "max": [
+    3.2,
+    3.4,
+    -22.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -3.2,
+    0.0,
+    22.0
+   ],
+   "max": [
+    -0.49,
+    3.4,
+    22.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    -0.49,
+    2.34,
+    22.0
+   ],
+   "max": [
+    0.49,
+    3.4,
+    22.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    0.49,
+    0.0,
+    22.0
+   ],
+   "max": [
+    3.2,
+    3.4,
+    22.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -3.2,
+    0.0,
+    -22.0
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -18.55
+   ]
+  },
+  {
+   "s": "Room_Wall_W_10",
+   "min": [
+    -3.2,
+    2.44,
+    0.42
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    1.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_11",
+   "min": [
+    -3.2,
+    0.0,
+    1.58
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    9.48
+   ]
+  },
+  {
+   "s": "Room_Wall_W_12",
+   "min": [
+    -3.2,
+    2.08,
+    9.48
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    10.52
+   ]
+  },
+  {
+   "s": "Room_Wall_W_13",
+   "min": [
+    -3.2,
+    0.0,
+    10.52
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    15.53
+   ]
+  },
+  {
+   "s": "Room_Wall_W_14",
+   "min": [
+    -3.2,
+    2.28,
+    15.53
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    16.47
+   ]
+  },
+  {
+   "s": "Room_Wall_W_15",
+   "min": [
+    -3.2,
+    0.0,
+    16.47
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    22.0
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -3.2,
+    2.2,
+    -18.55
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -17.45
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -3.2,
+    0.0,
+    -17.45
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -14.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_4",
+   "min": [
+    -3.2,
+    2.14,
+    -14.58
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -13.42
+   ]
+  },
+  {
+   "s": "Room_Wall_W_5",
+   "min": [
+    -3.2,
+    0.0,
+    -13.42
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -9.52
+   ]
+  },
+  {
+   "s": "Room_Wall_W_6",
+   "min": [
+    -3.2,
+    2.28,
+    -9.52
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -8.48
+   ]
+  },
+  {
+   "s": "Room_Wall_W_7",
+   "min": [
+    -3.2,
+    0.0,
+    -8.48
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -4.52
+   ]
+  },
+  {
+   "s": "Room_Wall_W_8",
+   "min": [
+    -3.2,
+    2.28,
+    -4.52
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    -3.48
+   ]
+  },
+  {
+   "s": "Room_Wall_W_9",
+   "min": [
+    -3.2,
+    0.0,
+    -3.48
+   ],
+   "max": [
+    -3.0,
+    3.4,
+    0.42
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_d3",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    -3.0,
+    0.0,
+    -13.44
+   ],
+   "width": 1.12,
+   "height": 2.1,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "d3",
+   "look": "half-glazed lilac door, glass knob"
+  },
+  {
+   "name": "DoorLeaf_d6",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    3.0,
+    0.0,
+    -4.41
+   ],
+   "width": 0.82,
+   "height": 2.04,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "d6",
+   "look": "stable (split) mint paint door, glass knob"
+  },
+  {
+   "name": "DoorLeaf_d9",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    -3.0,
+    0.0,
+    10.5
+   ],
+   "width": 1.0,
+   "height": 2.04,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "d9",
+   "look": "quilted cream gloss door, push plate"
+  },
+  {
+   "name": "DoorLeaf_hallway",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    0.47,
+    0.0,
+    22.0
+   ],
+   "width": 0.94,
+   "height": 2.3,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "hallway",
+   "look": "flush mint paint door, chrome lever"
+  },
+  {
+   "name": "DoorLeaf_wrong_1",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    -3.0,
+    0.0,
+    -17.47
+   ],
+   "width": 1.06,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "louvred cream gloss door, ring pull"
+  },
+  {
+   "name": "DoorLeaf_wrong_2",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    -3.0,
+    0.0,
+    -8.5
+   ],
+   "width": 1.0,
+   "height": 2.24,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "ledged and braced orange vinyl door, chrome lever"
+  },
+  {
+   "name": "DoorLeaf_wrong_3",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    -3.0,
+    0.0,
+    -3.5
+   ],
+   "width": 1.0,
+   "height": 2.24,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "round-topped plum door, ring pull"
+  },
+  {
+   "name": "DoorLeaf_wrong_4",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    -3.0,
+    0.0,
+    1.56
+   ],
+   "width": 1.12,
+   "height": 2.4,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "studded mint paint door, brass knob"
+  },
+  {
+   "name": "DoorLeaf_wrong_5",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    -3.0,
+    0.0,
+    16.45
+   ],
+   "width": 0.9,
+   "height": 2.24,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "mirror-faced lilac door, no handle"
+  },
+  {
+   "name": "DoorLeaf_wrong_6",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    3.0,
+    0.0,
+    -18.47
+   ],
+   "width": 0.94,
+   "height": 2.1,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "porthole orange vinyl door, brass knob"
+  },
+  {
+   "name": "DoorLeaf_wrong_7",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    3.0,
+    0.0,
+    -9.5
+   ],
+   "width": 1.0,
+   "height": 2.4,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "six-panel plum door, push plate"
+  },
+  {
+   "name": "DoorLeaf_wrong_8",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    3.0,
+    0.0,
+    5.5
+   ],
+   "width": 1.0,
+   "height": 2.24,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "panelled cherry red door, chrome lever"
+  },
+  {
+   "name": "DoorLeaf_wrong_9",
+   "level": "rdwe_door_hall",
+   "hinge": [
+    3.0,
+    0.0,
+    15.53
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "flush black lacquer door, ring pull"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "d3",
+   "at": [
+    -2.25,
+    0.0,
+    -14.0
+   ],
+   "arrive": [
+    -1.1,
+    0.0,
+    -14.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "d6",
+   "at": [
+    2.25,
+    0.0,
+    -4.0
+   ],
+   "arrive": [
+    1.1,
+    0.0,
+    -4.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "d9",
+   "at": [
+    -2.25,
+    0.0,
+    10.0
+   ],
+   "arrive": [
+    -1.1,
+    0.0,
+    10.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "hallway",
+   "at": [
+    0.0,
+    0.0,
+    21.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    20.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "trick",
+   "name": "Spot_trick_1",
+   "position": [
+    0.0,
+    0.0,
+    5.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "twelve doors, no two alike: three open"
+  }
+ ]
+}
