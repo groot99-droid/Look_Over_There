@@ -108,6 +108,31 @@ The area `gbi` holds the chambers. A chamber is a scene with a `chamber: {floor,
 
 The link on `DoorLeaf_Gate_RDW` in `world/L4.json` had no `scene`, and `enterGame` returned with `loadScene(l.scene || S.id)`. After the passage `S.id` is `T`, which has no scene file, so the way back from Right Door, Wrong Exit stayed stuck on the passage (reproduced in `tools/gates_test.mjs`; the Intern's gate was fine because its link has `scene`). Now the link has `"scene": "L4"` and `enterGame` returns to the manifest's `returnTo`. The "That door does not open in a room" toast reads the gate's `soloOnly` flag.
 
+## The Blender areas (built, 2026-11-28)
+
+The hotel, the mall's wings and rooms, the grocery's back, the Overworld's scenes, Secret Operations, the museum's side wing and the 15 new Going back in chambers
+came from the Blender session's PRs #78 to #133. Their scenes and links are not written here by hand: `tools/blender/wire_scenes.py` makes `shared/farway.scenes.js`
+from each greybox builder's `SCENES` and `PAIRS` (`tools/blender/build_<area>_greybox.py`) and the scenes' `world/<scene>.json` (each door's `at`, `arrive` and
+`face`), plus its `JOINS` table for the ways onto the older scenes. `farway.manifest.js` spreads `BLENDER_SCENES.<area>` into each area and `BLENDER_LINKS` at the end
+of its links. After a builder or a scene file changes, run `python3 tools/blender/wire_scenes.py`; `--check` says whether the file is current.
+
+On the page a Blender scene's ways out are data: F near a door's `at` follows the manifest's built link from it, and a `walk` link follows as you step onto it (after
+you have stepped away from where you arrived). A manifest link may name its own F spot (`from.at`) on a scene whose file has no links (the mall's entrance, the
+grocery's main floor, the laboratory, the museum's hall, hotel floor 3's room 301). `tools/walkable_test.mjs` loads every scene and follows every link.
+
+What the owner chose (2026-11-28):
+- **The apartment tower's door opens the hotel's lobby** ("Lobby only"). Your apartment is room 301 on floor 3; its door leads back to that corridor.
+- **Secret Operations is open for now** ("Open for now"): the lab's B2 door and the grocery's freight lift need no keycard yet.
+- **Everything is wired in one go**, the chambers and Right Door, Wrong Exit's Blender rooms included.
+
+And earlier (2026-11-27), carried out here: the parking lot is the Overworld's own scene (#133), the balloon house and its gate are gone, the meadow house is the
+way into Right Door, Wrong Exit and a room can follow it, and the town's towers stand on the horizon (`world/city_skyline.glb`).
+
+Choices taken from the PRs' own proposals, open to the owner: Going back in starts in `gbi_L4_1` and runs one way down; `gbi_L4_3`'s sky hall arrives just inside
+the store's sealed glass doors; B1's way on to `gbi_B1_2` is an F spot by its north wall (the proposed sky hall is not placed yet); `gbi_B1_4`'s way out stays
+planned; the hotel's maze is a fixed chain 01 to 07 and its pools' underwater route stays planned until swimming exists. The hotel's room doors (but 301) do not
+open yet, the kit's elevator car is not drawn moving, and the Overworld's table and bus station sets are still the page's own.
+
 ## Commands
 
 ```
