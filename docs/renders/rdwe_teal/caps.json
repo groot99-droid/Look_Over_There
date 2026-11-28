@@ -1,0 +1,27 @@
+{
+ "gain": 4.273,
+ "wall_materials": [
+  "Wall_Teal"
+ ],
+ "wall_p50_before": 0.068,
+ "target_wall_p50": 0.3,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Carpet_Fleck": 1.058,
+  "Ceiling_Teal": 3.003,
+  "Dome": 0.571,
+  "Iron": 4.273,
+  "Leaf_Glass": 4.273,
+  "Leaf_Stone": 4.273,
+  "Leather": 3.415,
+  "Leather_Seam": 1.909,
+  "Plant_Leaf": 2.787,
+  "Sill": 0.772,
+  "Sofa_Foot": 4.273,
+  "Soil": 4.273,
+  "Stone_Planter": 4.273,
+  "Trim_Teal": 1.32,
+  "Wall_Teal": 4.273
+ }
+}

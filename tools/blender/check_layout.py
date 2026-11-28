@@ -94,7 +94,7 @@ def points_of(world, constants):
     return pts
 
 
-def check(parts, world, constants=None, tol=TOL):
+def check(parts, world, constants=None, tol=TOL, points3=()):
     """parts: [{name, min:[x,y,z], max:[x,y,z]}] in game coordinates. Returns [(ok, rule, text)]."""
     res = []
     colliders = world.get("colliders", [])
@@ -162,7 +162,12 @@ def check(parts, world, constants=None, tol=TOL):
                 res.append((False, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): blocked by " + ", ".join(hit) + " (a door, and no clear walk-up spot in front of it)"))
             continue
         res.append((not hit, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): " + ("clear within %.2f m" % CLEAR_R if not hit else "blocked by " + ", ".join(hit))))
-    if not pts:
+    # points with a height (--links: every link's F spot and arrival): blocked only by what stands in the body's height above them
+    for label, x, y, z in points3:
+        hit = [n for n, b in [("collider " + c["s"], c) for c in colliders] + [("art " + p["name"], p) for p in solid]
+               if _in_plan(b, x, z, CLEAR_R) and b["min"][1] < y + 1.6 and b["max"][1] > y + 0.3]
+        res.append((not hit, "CLEAR", f"{label} ({x:.2f}, {y:.2f}, {z:.2f}): " + ("clear within %.2f m" % CLEAR_R if not hit else "blocked by " + ", ".join(hit))))
+    if not pts and not points3:
         res.append((False, "CLEAR", "no arrival points or markers found to check"))
     return res
 
@@ -203,8 +208,11 @@ def main(argv):
         parts = json.loads(Path(arg("--boxes")).read_text())
     else:
         parts = blender_parts(arg("--collection", "Art"))
+    pts3 = []
+    if "--links" in argv:                                       # opt-in: the layout file's own links (every F spot and arrival), at their height
+        pts3 = [(f"link {l['door']}.{k}", *l[k]) for l in world.get("links", []) for k in ("at", "arrive")]
     print(f"layout check: scene {scene}, {len(parts)} visible meshes, {len(world['colliders'])} colliders")
-    return 1 if report(check(parts, world, constants)) else 0
+    return 1 if report(check(parts, world, constants, points3=pts3)) else 0
 
 
 if __name__ == "__main__":

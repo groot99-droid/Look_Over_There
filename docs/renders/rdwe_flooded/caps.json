@@ -1,0 +1,30 @@
+{
+ "gain": 0.271,
+ "wall_materials": [
+  "Tile_Wall"
+ ],
+ "wall_p50_before": 1.108,
+ "target_wall_p50": 0.3,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Cardboard": 0.271,
+  "Cardboard_Light": 0.271,
+  "Ceiling_White": 0.271,
+  "Chrome": 0.271,
+  "Drip_Blue": 0.271,
+  "Frame_Back": 0.271,
+  "Frame_Wood": 0.271,
+  "Grate_Steel": 0.271,
+  "Leaf_Canvas": 0.271,
+  "Leaf_TealPaint": 0.271,
+  "Panel_Rim": 0.271,
+  "Photo_Wet": 0.271,
+  "Rail_Steel": 0.271,
+  "Sky_Paint": 0.271,
+  "Tactile": 0.271,
+  "Tile_Floor": 0.271,
+  "Tile_Wall": 0.271,
+  "Wet_Paper": 0.271
+ }
+}

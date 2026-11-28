@@ -1,0 +1,41 @@
+{
+ "gain": 0.137,
+ "wall_materials": [
+  "Store_Wall"
+ ],
+ "wall_p50_before": 2.183,
+ "target_wall_p50": 0.3,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Acoustic": 0.137,
+  "Alu": 0.137,
+  "Brass": 0.137,
+  "Bronze": 0.137,
+  "Card_Flat": 0.137,
+  "Cart_Red": 0.137,
+  "Chrome": 0.137,
+  "Endcap_Cyan": 0.137,
+  "Endcap_Lime": 0.137,
+  "Endcap_Pink": 0.137,
+  "Flap_Rubber": 0.137,
+  "Gondola": 0.137,
+  "Gondola_Back": 0.137,
+  "Iron": 0.137,
+  "Kick": 0.137,
+  "Laurel": 0.137,
+  "Leaf_Glass": 0.137,
+  "Plastic_White": 0.137,
+  "Post_Cream": 0.137,
+  "Rubber_Black": 0.137,
+  "Steel_Door": 0.137,
+  "Store_Wall": 0.137,
+  "Strip_Housing": 0.137,
+  "Tape_Yellow": 0.137,
+  "Tin": 0.137,
+  "Tin_Band": 0.137,
+  "Tin_Red": 0.137,
+  "Vinyl_Floor": 0.137,
+  "Wheel": 0.137
+ }
+}

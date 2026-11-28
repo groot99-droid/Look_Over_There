@@ -1,0 +1,24 @@
+{
+ "gain": 7.5,
+ "wall_materials": [
+  "Wall_Teal"
+ ],
+ "wall_p50_before": 0.04,
+ "target_wall_p50": 0.3,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Carpet_Fleck": 1.212,
+  "Ceiling_Teal": 7.5,
+  "Dome": 0.844,
+  "Leather": 5.449,
+  "Paper_Back": 1.148,
+  "Paper_Teal": 7.5,
+  "Plant_Leaf": 5.906,
+  "Sofa_Foot": 7.5,
+  "Soil": 7.5,
+  "Terracotta": 3.244,
+  "Trim_Teal": 1.336,
+  "Wall_Teal": 7.5
+ }
+}

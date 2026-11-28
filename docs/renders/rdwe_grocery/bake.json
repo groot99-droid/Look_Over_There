@@ -1,0 +1,109 @@
+{
+ "0": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 21.2,
+  "scale": 4.5681,
+  "knee": 3.5223,
+  "raw_p50_p90_p99_p995_max": [
+   2.317,
+   4.124,
+   4.692,
+   4.826,
+   6.684
+  ],
+  "p50_p90_p99_p995_max": [
+   2.317,
+   4.062,
+   4.48,
+   4.568,
+   5.5
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 89,
+  "materials": [
+   "Acoustic",
+   "Store_Wall",
+   "Vinyl_Floor"
+  ]
+ },
+ "1": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 33.8,
+  "scale": 6.0147,
+  "knee": 3.072,
+  "raw_p50_p90_p99_p995_max": [
+   1.819,
+   3.736,
+   10.863,
+   11.215,
+   14.875
+  ],
+  "p50_p90_p99_p995_max": [
+   1.819,
+   3.652,
+   5.967,
+   6.015,
+   6.386
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 109,
+  "materials": [
+   "Alu",
+   "Brass",
+   "Bronze",
+   "Card_Flat",
+   "Cart_Red",
+   "Chrome",
+   "Endcap_Cyan",
+   "Endcap_Lime",
+   "Endcap_Pink",
+   "Flap_Rubber",
+   "Iron",
+   "Laurel",
+   "Leaf_Glass",
+   "Plastic_White",
+   "Post_Cream",
+   "Rubber_Black",
+   "Steel_Door",
+   "Strip_Housing",
+   "Tape_Yellow",
+   "Tin",
+   "Tin_Band",
+   "Tin_Red",
+   "Wheel"
+  ]
+ },
+ "2": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 11.5,
+  "scale": 4.1423,
+  "knee": 2.5101,
+  "raw_p50_p90_p99_p995_max": [
+   1.257,
+   3.219,
+   5.098,
+   5.391,
+   8.034
+  ],
+  "p50_p90_p99_p995_max": [
+   1.257,
+   3.106,
+   4.044,
+   4.142,
+   4.749
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 28,
+  "materials": [
+   "Gondola",
+   "Gondola_Back",
+   "Kick"
+  ]
+ }
+}
