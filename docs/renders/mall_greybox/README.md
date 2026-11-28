@@ -102,6 +102,17 @@ Choices the table left open:
 7. Mannequins: 49 spots, each marked dressing, npc or monster. Too many or too few, and is the mix right?
 8. At night the mall locks you in. Should the service corridor's freight lift (the hidden network, keycard_tier_1) be a way out, or locked too?
 
+## Added with the dressing (claude/blender-mall-shops)
+
+Dressing the four shops you can enter asked for solid furniture the greybox did not have, so `build_mall_greybox.py` gained these colliders (no collider, door, link, marker, spot or step moved; `world/<scene>.json` was rewritten from the model, and the gates still pass). The plans and stills above are the greybox's own and do not show them; the dressed scenes' plans are with their stills (`docs/renders/mall_shops/README.md`).
+
+| Scene | New colliders | Why |
+|---|---|---|
+| `bookstore` | `Kids_Bins`, `Kids_Table` (the children's corner, west front), `Reading_Chair`, `Reading_Chair_2`, `Reading_Table` (east front) | the brief's children's corner and reading chairs. The `front_aisle` gate rect now ends at z 4.3 (it ran to 6.9 over the corners) and a `desk_door` rect keeps the way to the INFORMATION door 1.65 m wide |
+| `bookstore_desk` | `Stock_Rack` (the back stock room's shelving, east wall) | the brief's back stock room |
+| `cinema_lobby` | `Drinks_Fridge` (behind the concession's east end), `Understair_Cupboard` (under the balcony, x 9.5 to 12) | the brief's drinks fridge; the cupboard closes the open space under the balcony stair, which the dressing makes visible |
+| `food_court` | `Bin` to `Bin_4` (0.6 m square, 1.1 m high, two by the west wall and two by the east stalls) | the brief's bins |
+
 ## Not done here
 
 - `entrance` is untouched: its north, west and east walls (shared/city.js MALL; its test holds world/entrance.json to it) still have no openings, and its FOOD COURT shutter is still down. The coordinator cuts them with the links, at the places listed above.
