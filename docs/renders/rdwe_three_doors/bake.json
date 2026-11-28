@@ -1,0 +1,67 @@
+{
+ "0": {
+  "map": 0,
+  "size": 1536,
+  "gain": 1.4453,
+  "C": 1.12,
+  "px_per_m": 68.4,
+  "p50_p90_p99_p995_max": [
+   1.0033,
+   1.5184,
+   1.7684,
+   2.2849,
+   10.1099
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 40,
+  "materials": [
+   "Ceil_White",
+   "Floor_Marble",
+   "Wall_Gallery"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "size": 2048,
+  "gain": 1.4453,
+  "C": 1.12,
+  "px_per_m": 103.9,
+  "p50_p90_p99_p995_max": [
+   0.803,
+   1.4013,
+   5.7688,
+   7.3826,
+   18.793
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 100,
+  "materials": [
+   "Brass",
+   "Chrome",
+   "Floor_Paint_Cyan",
+   "Floor_Paint_Red",
+   "Floor_Paint_Yellow",
+   "Iron",
+   "Leaf_BlackLacquer",
+   "Leaf_BrushedSteel",
+   "Leaf_Glass",
+   "Leaf_Mustard",
+   "Leaf_Plant",
+   "Leaf_TealPaint",
+   "Marble_Prop",
+   "Note_Card",
+   "Paint_Cyan",
+   "Paint_Red",
+   "Paint_White",
+   "Paint_Yellow",
+   "Plastic_Black",
+   "Pot_Clay",
+   "Soil",
+   "Trim_White",
+   "Velvet_Green",
+   "Walnut"
+  ]
+ }
+}

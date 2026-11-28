@@ -810,29 +810,84 @@ def D(**kw):
     return kw
 
 
+def _furn(S, name, x0, x1, z0, z1, y0, y1, mat="furniture"):
+    """A furniture block of the rooms 1-15 layouts (tools/blender/build_rdwe_rooms1.py dresses every box tagged `f` as a prop)."""
+    return S.solid(name, (x0, y0, z0), (x1, y1, z1), mat, ("f",))
+
+
+def _filled_flight(S, name, lane0, lane1, start, direction, y_start, y_end, n, tread, mat="stair"):
+    """flight() along z, with a fill under each step down to the floor, so the flight is a solid mass (nothing to walk under)."""
+    flight(S, name, lane0, lane1, start, direction, "z", y_start, y_end, n, tread, mat=mat)
+    rise = (y_end - y_start) / n
+    for i in range(1, n):
+        a, b = start + direction * i * tread, start + direction * (i + 1) * tread
+        S.solid(f"Fill_{name}_{i:02d}", (lane0, y_start, min(a, b)), (lane1, y_start + rise * i, max(a, b)), mat)
+
+
 def c_long_table():
+    MATS.setdefault("velvet", (0.55, 0.04, 0.12))
+
     def keys(S):
-        S.solid("Table", (-1.0, 0.0, -14.0), (1.0, 0.8, 14.0), "maple")
+        # the table in four leaves, each a little wider toward the far (north) end; the chairs grow toward it, on both sides
+        segs = [(7.0, 14.0, 0.9), (0.0, 7.0, 1.0), (-7.0, 0.0, 1.1), (-14.0, -7.0, 1.2)]
+        for k, (z0, z1, hw) in enumerate(segs, 1):
+            _furn(S, f"Table_{k}", -hw, hw, z0, z1, 0.0, 0.8, "maple")
+
+        def hw_at(za, zb):
+            return max(hw for z0, z1, hw in segs if z0 < zb and z1 > za)
         for k in range(7):
             z = -12.0 + k * 4.0
-            s = 0.55 + 0.25 * (6 - k) / 6 * 3                     # the chairs grow toward the far end, so it looks the same from either end
-            S.solid(f"Chair_W_{k + 1}", (-1.2 - s, 0.0, z - s / 2), (-1.2, s, z + s / 2), "maple")
-        S.solid("Far_Chair", (-0.8, 0.0, -16.6), (0.8, 3.2, -15.0), "maple")
+            s = round(0.55 + 0.75 * (6 - k) / 6, 2)         # 1.3 m at the far end, 0.55 m at the near end
+            h = round(s * 1.75, 3)
+            inner = hw_at(z - s / 2, z + s / 2) + 0.15
+            _furn(S, f"Chair_W_{k + 1}", -inner - s, -inner, z - s / 2, z + s / 2, 0.0, h, "velvet")
+            _furn(S, f"Chair_E_{k + 1}", inner, inner + s, z - s / 2, z + s / 2, 0.0, h, "velvet")
+        _furn(S, "Far_Chair_Seat", -0.9, 0.9, -16.5, -14.9, 0.0, 1.25, "velvet")
+        _furn(S, "Far_Chair_Back", -0.9, 0.9, -16.95, -16.5, 0.0, 3.1, "velvet")
+        _furn(S, "Sideboard_W", -4.0, -3.5, 9.6, 13.6, 0.0, 0.9, "maple")
+        _furn(S, "Sideboard_E", 3.5, 4.0, 10.2, 14.2, 0.0, 0.9, "maple")
+        S.decor("Runner", (-0.35, 0.8, -13.9), (0.35, 0.812, 13.9), "white")
+        for k in range(5):
+            z = -11.0 + k * 5.5
+            S.decor(f"Chandelier_{k + 1}", (-0.45, 2.35, z - 0.45), (0.45, 3.2, z + 0.45), "lamp")
+        S.spot("far", 1, (2.0, 0.0, -14.4), face=(-1, 0), props={"what": "the giant last chair: nothing behind it, nothing under it"})
+        S.label("table 28 m", 0.0, 0.0, kind="note")
     return croom("rdwe_long_table", "The long table: the same length from both ends", 8, 34, 3.2,
                  [("dining", "S", 0.0, D(to="rdwe_dining")), ("kitchen", "W", -10.0, D(to="rdwe_tiny_kitchen")),
                   ("party", "E", 8.0, D(to="rdwe_birthday_party"))], keys,
                  "Object distortion: a 28 m dining table whose chairs grow toward the far end, so it looks the same length whichever end you "
                  "stand at; the giant last chair hides nothing.", "house", fmat="shag", wmat="cream",
-                 trick=("trick", (2.6, 0.0, 0.0), (-1, 0), "walk the length: the far end never gets closer until you stop looking"))
+                 trick=("trick", (2.6, 0.0, 0.0), (-1, 0), "walk the length: the far end never gets closer until you stop looking"),
+                 still=((0.0, 0.0, 15.6), (0.0, -1.0), 0))
 
 
 def c_tiny_kitchen():
     def keys(S):
-        S.solid("Counter_Big", (-1.0, 0.0, -4.0), (5.0, 0.95, -3.4), "white")
-        S.solid("Counter_Small", (-5.0, 0.0, -4.0), (-1.0, 0.5, -3.6), "white")
+        # the east half, full size
+        _furn(S, "Counter_N", -1.0, 3.9, -4.0, -3.4, 0.0, 0.92, "white")
+        _furn(S, "Fridge", 4.0, 4.9, -4.0, -3.25, 0.0, 1.95, "steel")
+        _furn(S, "Counter_S", 1.0, 4.9, 3.4, 4.0, 0.0, 0.92, "white")
+        _furn(S, "Table", 1.0, 2.4, -0.6, 0.8, 0.0, 0.76, "wood")
+        _furn(S, "Chair_1", 0.4, 0.9, -0.2, 0.3, 0.0, 0.95, "mint")
+        _furn(S, "Chair_2", 1.45, 1.95, 0.9, 1.4, 0.0, 0.95, "mint")
+        # the west half, built at half scale: counters to the knee, a doll's-house fridge, table and chairs; the ceiling drops to 2 m
+        _furn(S, "Counter_Small", -4.4, -1.2, -4.0, -3.65, 0.0, 0.48, "white")
+        _furn(S, "Fridge_Small", -4.95, -4.5, -4.0, -3.6, 0.0, 1.0, "steel")
+        _furn(S, "Sink_Small", -4.4, -1.6, 3.6, 4.0, 0.0, 0.48, "white")
+        _furn(S, "Table_Small", -3.6, -2.9, 2.5, 3.2, 0.0, 0.38, "wood")
+        _furn(S, "Chair_Small_1", -3.9, -3.65, 2.7, 2.95, 0.0, 0.5, "mint")
+        _furn(S, "Chair_Small_2", -2.85, -2.6, 2.8, 3.05, 0.0, 0.5, "mint")
         S.decor("Ceiling_Drop", (-5.0, 2.0, -4.0), (-1.0, 3.0, 4.0), "ceiling", ("ceiling",))
+        S.decor("Cabinets_N", (-1.0, 1.5, -4.0), (3.9, 2.3, -3.65), "white")
+        S.decor("Cabinets_Small", (-4.4, 0.75, -4.0), (-1.2, 1.15, -3.8), "white")
+        S.decor("Window_S", (1.6, 1.25, 3.97), (3.6, 2.35, 4.0), "window")
+        S.decor("Window_Small", (-3.6, 0.7, 3.97), (-2.4, 1.3, 4.0), "window")
+        S.decor("Pendant", (1.4, 2.2, -0.1), (2.0, 3.0, 0.5), "lamp")
+        S.spot("seam", 1, (-0.6, 0.0, -1.6), face=(-1, 0), props={"what": "the seam on the floor where the kitchen halves in size"})
+        S.label("half scale", -3.0, 0.0, kind="note")
+        S.label("full size", 2.0, -2.0, kind="note")
     return croom("rdwe_tiny_kitchen", "The tiny kitchen: the far half is shrunk", 10, 8, 3.0,
-                 [("table", "E", 0.0, D(to="rdwe_long_table")), ("back", "W", 2.0, D(to="rdwe_giant_chair", width=0.8, height=1.7))], keys,
+                 [("table", "E", 0.0, D(to="rdwe_long_table")), ("back", "W", 2.0, D(to="rdwe_giant_chair", width=0.8, height=1.76))], keys,
                  "Object distortion: a kitchen whose west half is built at half scale, counters to the knee and a 1.7 m back door; walk in and you "
                  "feel you have grown.", "house", fmat="tile", wmat="mint",
                  trick=("trick", (-3.0, 0.0, 1.0), (-1, 0), "the half-scale end: everything here is the size of a doll's house"))
@@ -840,10 +895,22 @@ def c_tiny_kitchen():
 
 def c_birthday_party():
     def keys(S):
-        S.solid("Party_Table", (-3.0, 0.0, -0.8), (3.0, 0.8, 0.8), "pink")
-        S.decor("Cake", (-0.4, 0.8, -0.4), (0.4, 1.3, 0.4), "white")
-        for k in range(8):
-            S.decor(f"Balloon_{k + 1}", (-5.0 + k * 1.4, 2.4, -3.0 + (k % 3)), (-4.6 + k * 1.4, 2.9, -2.6 + (k % 3)), ["pink", "cyan", "acid", "violet"][k % 4])
+        _furn(S, "Party_Table", -3.0, 3.0, -0.8, 0.8, 0.0, 0.76, "pink")
+        for k, x in enumerate((-2.25, -0.75, 0.75, 2.25), 1):
+            _furn(S, f"Chair_N_{k}", x - 0.25, x + 0.25, -1.45, -0.95, 0.0, 0.95, "white")
+            _furn(S, f"Chair_S_{k}", x - 0.25, x + 0.25, 0.95, 1.45, 0.0, 0.95, "white")
+        _furn(S, "Chair_W", -3.65, -3.15, -0.25, 0.25, 0.0, 0.95, "white")
+        _furn(S, "Chair_E", 3.15, 3.65, -0.25, 0.25, 0.0, 0.95, "white")
+        _furn(S, "Gift_Pile", 4.6, 6.4, 2.6, 4.4, 0.0, 0.8, "cyan")
+        _furn(S, "Punch_Table", -5.0, -2.0, 4.4, 4.95, 0.0, 0.8, "white")
+        _furn(S, "Piano", 6.3, 6.95, -2.0, -0.4, 0.0, 1.3, "black")
+        S.decor("Cake", (-0.4, 0.76, -0.4), (0.4, 1.3, 0.4), "white")
+        for k in range(14):
+            x, z = -6.0 + (k * 0.93) % 12.0, -4.0 + (k * 2.7) % 8.0
+            S.decor(f"Balloon_{k + 1}", (x - 0.2, 2.6, z - 0.2), (x + 0.2, 3.15, z + 0.2), ["pink", "cyan", "acid", "violet"][k % 4])
+        S.decor("Banner", (-4.0, 2.2, -4.98), (4.0, 2.8, -4.94), "sun")
+        S.spot("cards", 1, (1.5, 0.0, -2.2), face=(0, 1), props={"what": "the name cards: one for everyone you have met in the rooms, and one for you"})
+        S.label("party table", 0.0, -0.2, kind="note")
     return croom("rdwe_birthday_party", "The birthday party: nobody came", 14, 10, 3.2,
                  [("table", "W", 0.0, D(to="rdwe_long_table")), ("attic", "N", 4.0, D(to="rdwe_attic"))], keys,
                  "Environmental storytelling: a party laid for guests who never came, the cake uncut, the balloons at the ceiling, name cards "
@@ -853,10 +920,23 @@ def c_birthday_party():
 
 def c_attic():
     def keys(S):
-        for k, (x, z) in enumerate(((-4.0, -2.0), (-5.0, 2.6), (3.4, -2.6), (4.2, 2.0)), 1):
-            S.solid(f"Photo_Boxes_{k}", (x - 0.6, 0.0, z - 0.5), (x + 0.6, 0.9, z + 0.5), "cardboard")
+        # the eaves: knee walls under the roof's slope along both long walls, open at the stair door
+        S.solid("Eave_N", (-6.0, 0.0, -4.0), (6.0, 1.1, -3.2), "wood")
+        S.solid("Eave_S_1", (-6.0, 0.0, 3.2), (-4.0, 1.1, 4.0), "wood")
+        S.solid("Eave_S_2", (-2.0, 0.0, 3.2), (6.0, 1.1, 4.0), "wood")
+        for k, (x, z, w, d, h) in enumerate(((-4.4, -2.5, 1.2, 1.0, 0.9), (-5.2, 2.4, 1.0, 1.0, 1.2), (3.4, -2.6, 1.2, 1.0, 0.7),
+                                             (4.4, 2.3, 1.2, 1.0, 1.0), (-1.6, -2.7, 0.8, 0.8, 0.5), (2.2, 2.6, 1.0, 0.9, 0.6)), 1):
+            _furn(S, f"Photo_Boxes_{k}", x - w / 2, x + w / 2, z - d / 2, z + d / 2, 0.0, h, "cardboard")
+        _furn(S, "Trunk", 0.8, 2.2, -3.1, -2.4, 0.0, 0.62, "wood")
+        _furn(S, "Dress_Form", 4.9, 5.4, -0.5, 0.0, 0.0, 1.6, "white")
+        _furn(S, "Rocking_Horse", -5.8, -4.8, -0.6, 0.1, 0.0, 0.95, "red")
+        _furn(S, "Mirror", 5.6, 5.95, 1.0, 2.0, 0.0, 1.85, "glass")
         S.decor("Hatch", (-0.6, 0.0, -0.6), (0.6, 0.02, 0.6), "black")
+        S.decor("Bulb", (-0.1, 2.0, -0.1), (0.1, 2.6, 0.1), "lamp")
+        S.decor("Gable_Window", (5.97, 1.2, -0.9), (6.0, 2.3, 0.9), "window")
         S.link("hatch", (0.0, 0.0, 1.0), (1.2, 0.0, 1.2), (0, 1), "rdwe_kids_bedroom (down through the hatch)")
+        S.spot("photo", 2, (3.4, 0.0, -1.6), face=(0, -1), props={"what": "another box: the photographs are of the room you are standing in"})
+        S.label("eaves", 0.0, -3.6, kind="note")
     return croom("rdwe_attic", "The attic: the dining room's photographs", 12, 8, 2.6,
                  [("party", "S", -3.0, D(to="rdwe_birthday_party"))], keys,
                  "Environmental storytelling: under the roof, boxes of the dining room's photographs, every one of you; a hatch in the floor drops "
@@ -866,10 +946,19 @@ def c_attic():
 
 def c_kids_bedroom():
     def keys(S):
-        S.solid("Bed", (-3.6, 0.0, -3.6), (-1.6, 0.5, -1.0), "cyan")
-        S.solid("Toy_Chest", (2.0, 0.0, 2.6), (3.4, 0.6, 3.6), "sun")
+        _furn(S, "Bed", -3.8, -1.8, -4.0, -1.0, 0.0, 0.6, "cyan")
+        _furn(S, "Toy_Chest", 2.0, 3.4, 2.6, 3.6, 0.0, 0.6, "sun")
+        _furn(S, "Desk", 1.4, 3.0, -4.0, -3.4, 0.0, 0.75, "white")
+        _furn(S, "Desk_Chair", 2.0, 2.5, -3.2, -2.7, 0.0, 0.85, "red")
+        _furn(S, "Bookshelf", -4.0, -3.65, 0.8, 2.4, 0.0, 1.6, "white")
+        _furn(S, "Nightstand", -1.7, -1.2, -4.0, -3.5, 0.0, 0.55, "white")
         S.decor("Ceiling_Hatch", (-0.6, 2.75, -0.6), (0.6, 2.8, 0.6), "black")
+        S.decor("Glow_Stars", (-3.8, 2.79, -3.8), (3.8, 2.8, 3.8), "acid", ("ceiling",))
+        S.decor("Rug", (-1.4, 0.0, -0.4), (1.6, 0.012, 2.2), "lilac")
+        S.decor("Notes", (-3.4, 0.0, -0.95), (-2.0, 0.006, -0.55), "white")
         S.link("hatch", (0.0, 0.0, 0.0), (0.6, 0.0, 0.8), (0, 1), "arrival from rdwe_attic's hatch (and back up it)")
+        S.spot("stars", 1, (0.8, 0.0, -1.8), face=(0, -1), props={"what": "the glow stars: they make the same shape as the hallway's doors"})
+        S.label("bed", -2.8, -2.6, kind="note")
     return croom("rdwe_kids_bedroom", "The kid's bedroom: someone waited here", 8, 8, 2.8,
                  [("closet", "E", -2.0, D(to="rdwe_hallway (a side door)"))], keys,
                  "Environmental storytelling: a 90s child's bedroom, glow stars, a toy chest, notes under the bed counting days; the closet opens "
@@ -879,10 +968,22 @@ def c_kids_bedroom():
 
 def c_giant_chair():
     def keys(S):
-        S.solid("Chair_Back", (-7.8, 0.0, -7.0), (-1.0, 7.0, -5.6), "orange")
-        flight(S, "cushions", 1.0, 5.0, 1.0, -1, "z", 0.0, 3.0, 12, 0.5, mat="orange")
-        S.solid("Ledge", (1.0, 2.7, -7.0), (5.0, 3.0, -5.0), "orange")
-        S.solid("Chair_Arm", (-1.0, 0.0, -5.6), (0.6, 2.6, 2.0), "orange")
+        # the armchair, 8.8 m wide and 7 m tall, against the north wall
+        _furn(S, "Chair_Back", -7.8, 1.0, -7.0, -5.4, 0.0, 7.0, "orange")
+        _furn(S, "Chair_Arm_W", -7.8, -6.2, -5.4, 0.4, 0.0, 4.4, "orange")
+        _furn(S, "Chair_Arm_E", -0.6, 1.0, -5.4, 0.4, 0.0, 4.4, "orange")
+        _furn(S, "Chair_Seat", -6.2, -0.6, -5.4, 0.4, 0.0, 3.0, "orange")
+        # the way up: a stair of giant books beside it (12 steps), to a footstool ledge under the door 3 m up the wall
+        _filled_flight(S, "cushions", 1.2, 5.0, 1.0, -1, 0.0, 3.0, 12, 0.5, mat="book")
+        _furn(S, "Ledge", 1.2, 5.0, -7.0, -5.0, 0.0, 3.0, "wood")
+        _furn(S, "Lamp_Base", 5.7, 7.1, -6.7, -5.3, 0.0, 0.3, "steel")
+        _furn(S, "Lamp_Pole", 6.2, 6.6, -6.2, -5.8, 0.3, 5.5, "steel")
+        _furn(S, "Remote", 3.0, 5.5, 3.0, 3.8, 0.0, 0.35, "black")
+        _furn(S, "Mug", -3.4, -2.0, 3.0, 4.4, 0.0, 1.6, "white")
+        S.decor("Lamp_Shade", (5.2, 5.4, -7.0), (7.6, 7.0, -4.9), "lamp")
+        S.decor("Window_W", (-8.0, 2.0, -2.0), (-7.97, 6.2, 3.0), "window")
+        S.decor("Rug", (-6.0, 0.0, 0.8), (6.0, 0.015, 6.4), "pink")
+        S.label("the book stair", 3.1, -2.0, kind="note")
     return croom("rdwe_giant_chair", "The giant armchair: climb it", 16, 14, 8.0,
                  [("kitchen", "S", -5.0, D(to="rdwe_tiny_kitchen")), ("high", "N", 3.0, D(to="rdwe_upside_room", y=3.0, at_in=0.6, arr_in=1.4))],
                  keys, "Object distortion: an armchair 7 m tall in a living room; climb its cushions (12 steps) to the door 3 m up the wall.",
@@ -892,10 +993,18 @@ def c_giant_chair():
 
 def c_upside_room():
     def keys(S):
-        S.decor("Ceiling_Table", (-1.2, 2.6, -0.8), (1.2, 3.2, 0.8), "wood", ("ceiling",))
-        for k, (x, z) in enumerate(((-2.0, 0.0), (2.0, 0.0)), 1):
-            S.decor(f"Ceiling_Chair_{k}", (x - 0.3, 2.8, z - 0.3), (x + 0.3, 3.4, z + 0.3), "wood", ("ceiling",))
-        S.solid("Chandelier_Up", (-0.25, 0.0, -0.25), (0.25, 1.6, 0.25), "sun")
+        # the chandelier stands up from the floor; everything else hangs from the ceiling (decor: you walk under it, the page may flip it)
+        _furn(S, "Chandelier_Up", -0.3, 0.3, -0.3, 0.3, 0.0, 1.7, "sun")
+        S.decor("Ceiling_Table", (-1.2, 2.6, -0.8), (1.2, 3.4, 0.8), "wood", ("ceiling",))
+        for k, (x, z) in enumerate(((-1.6, 0.0), (1.6, 0.0), (0.0, -1.2), (0.0, 1.2)), 1):
+            S.decor(f"Ceiling_Chair_{k}", (x - 0.25, 2.45, z - 0.25), (x + 0.25, 3.4, z + 0.25), "wood", ("ceiling",))
+        S.decor("Ceiling_Sofa", (-2.0, 2.55, -5.0), (2.0, 3.4, -4.1), "orange", ("ceiling",))
+        S.decor("Ceiling_Lamp", (3.3, 1.95, -3.7), (3.7, 3.4, -3.3), "sun", ("ceiling",))
+        S.decor("Ceiling_Shelf", (-5.0, 2.0, 2.0), (-4.6, 3.4, 4.0), "wood", ("ceiling",))
+        S.decor("Ceiling_Rug", (-2.4, 3.39, -1.8), (2.4, 3.4, 1.8), "pink", ("ceiling",))
+        S.decor("Floor_Rose", (-0.8, 0.0, -0.8), (0.8, 0.02, 0.8), "white")
+        S.spot("chandelier", 1, (0.0, 0.0, -1.6), face=(0, 1), props={"what": "the chandelier stands on the floor, lit, pointing up"})
+        S.label("chandelier (up)", 0.0, 0.6, kind="note")
     return croom("rdwe_upside_room", "The upside-down room", 10, 10, 3.4,
                  [("chair", "W", 0.0, D(to="rdwe_giant_chair")), ("hall", "E", 0.0, D(to="rdwe_hallway (a side door)"))], keys,
                  "Perspective shifting: the furniture hangs from the ceiling and the chandelier stands up from the floor, so for a second you are on "
@@ -917,7 +1026,15 @@ def c_door_hall():
                 doors.append((kind, side, float(z), D(to={"d3": "rdwe_stretching_hall", "d9": "rdwe_painted_door", "d6": "rdwe_three_doors"}[kind])))
 
     def keys(S):
-        S.solid("Bench", (-0.5, 0.0, -2.0), (0.5, 0.45, 2.0), "wood")
+        _furn(S, "Bench", -0.5, 0.5, -2.0, 2.0, 0.0, 0.45, "wood")
+        _furn(S, "Bench_2", -0.5, 0.5, 10.4, 13.4, 0.0, 0.45, "wood")
+        for nm, x0, x1, z0, z1 in (("W_1", -3.0, -2.55, -12.2, -10.8), ("W_2", -3.0, -2.55, 4.8, 6.2), ("E_1", 2.55, 3.0, 0.3, 1.7),
+                                   ("E_2", 2.55, 3.0, 10.4, 11.8)):
+            _furn(S, f"Console_{nm}", x0, x1, z0, z1, 0.0, 0.85, "wood")
+        _furn(S, "Plant_W", -2.95, -2.45, 13.0, 13.5, 0.0, 1.2, "plant")
+        _furn(S, "Plant_E", 2.45, 2.95, -14.0, -13.5, 0.0, 1.2, "plant")
+        S.decor("Runner", (-1.0, 0.0, -21.6), (1.0, 0.01, 21.6), "blood")
+        S.spot("notebook", 1, (0.0, 0.0, -6.5), face=(0, -1), props={"what": "the notebook marks only the doors you tried"})
     return croom("rdwe_door_hall", "The hall of doors: twelve, and three open", 6, 44, 3.4, doors, keys,
                  "Multi-choice navigation: a hall of twelve doors, no two alike; nine never open, three lead on, and the notebook only marks "
                  "the ones you tried.", "halls", fmat="carpet_tan", wmat="plaid",
@@ -926,10 +1043,12 @@ def c_door_hall():
 
 def c_stretching_hall():
     def keys(S):
-        for k in range(6):
-            z = -18.0 + k * 7.0
-            S.solid(f"Fin_W_{k + 1}", (-2.0, 0.0, z - 0.2), (-1.6, 3.0, z + 0.2), "white")
-            S.solid(f"Fin_E_{k + 1}", (1.6, 0.0, z - 0.2), (2.0, 3.0, z + 0.2), "white")
+        for k in range(19):
+            z = -21.6 + k * 2.4
+            S.solid(f"Fin_W_{k + 1}", (-2.0, 0.0, z - 0.15), (-1.65, 3.0, z + 0.15), "white")
+            S.solid(f"Fin_E_{k + 1}", (1.65, 0.0, z - 0.15), (2.0, 3.0, z + 0.15), "white")
+        S.decor("Floor_Line", (-0.06, 0.0, -22.6), (0.06, 0.006, 22.6), "lamp")
+        S.spot("far", 1, (0.0, 0.0, -18.0), face=(0, 1), props={"what": "look back: the door you came in by is as far as the one ahead"})
     return croom("rdwe_stretching_hall", "The stretching hall: longer when you run", 4, 46, 3.0,
                  [("doors", "S", 0.0, D(to="rdwe_door_hall")), ("far", "N", 0.0, D(to="rdwe_bending_hall"))], keys,
                  "Distorted hall: 46 m of white fins that gets longer the faster you go and shorter if you walk backwards.", "halls",
@@ -939,6 +1058,18 @@ def c_stretching_hall():
 def c_bending_hall():
     def keys(S):
         S.solid("Core", (-6.0, 0.0, -6.0), (6.0, 3.0, 6.0), "violet")
+        for nm, x0, x1, z0, z1 in (("W_1", -10.0, -9.85, -4.0, -2.4), ("W_2", -10.0, -9.85, 2.4, 4.0), ("E_1", 9.85, 10.0, -4.0, -2.4),
+                                   ("E_2", 9.85, 10.0, 2.4, 4.0), ("N_1", -4.0, -2.4, -10.0, -9.85), ("N_2", 2.4, 4.0, -10.0, -9.85),
+                                   ("S_1", -4.0, -2.4, 9.85, 10.0), ("S_2", 2.4, 4.0, 9.85, 10.0)):
+            _furn(S, f"Radiator_{nm}", x0, x1, z0, z1, 0.0, 0.62, "white")
+        for nm, x, z in (("NW", -9.3, -9.3), ("NE", 9.3, -9.3), ("SW", -9.3, 9.3), ("SE", 9.3, 9.3)):
+            _furn(S, f"Plant_{nm}", x - 0.3, x + 0.3, z - 0.3, z + 0.3, 0.0, 1.3, "plant")
+        S.decor("Runner_S", (-8.6, 0.0, 7.3), (8.6, 0.01, 8.7), "blood")
+        S.decor("Runner_N", (-8.6, 0.0, -8.7), (8.6, 0.01, -7.3), "blood")
+        S.decor("Runner_W", (-8.7, 0.0, -7.3), (-7.3, 0.01, 7.3), "blood")
+        S.decor("Runner_E", (7.3, 0.0, -7.3), (8.7, 0.01, 7.3), "blood")
+        S.spot("plaque", 1, (8.0, 0.0, 0.0), face=(1, 0), props={"what": "the lap plaque: it reads one higher each time you pass"})
+        S.corridor("west", -9.8, -6.1, -5.5, 5.5)
     return croom("rdwe_bending_hall", "The bending hall: four right turns", 20, 20, 3.0,
                  [("start", "S", -8.0, D(to="rdwe_stretching_hall")), ("lap", "N", 8.0, D(to="rdwe_stair_loop", props={"shows": "on the third lap only"}))],
                  keys, "Distorted hall: a corridor that turns right four times round a solid core and comes back to itself; its one door is "
@@ -957,38 +1088,62 @@ def c_stair_loop():
           exitdoor(S, "top", "N", -2.0, R, y=3.0, to="this room again: you arrive at the foot of the stairs", at_in=0.6, arr_in=1.4),
           exitdoor(S, "landing", "E", -3.0, R, y=3.0, to="rdwe_tilted_hall", at_in=0.6, arr_in=1.4)]
     shell(S, "Stairs", -X, X, -Z, Z, h=H, holes=holes_of(hl), fmat="concrete", wmat="mint")
-    flight(S, "up", -3.6, -1.2, 4.0, -1, "z", 0.0, 3.0, 12, 0.4, mat="stair")
+    _filled_flight(S, "up", -3.6, -1.2, 4.0, -1, 0.0, 3.0, 12, 0.4, mat="stair")
     S.solid("Landing", (-X, 2.7, -Z), (X, 3.0, -0.8), "stair")
     S.solid("Under_Landing", (-X, 0.0, -Z), (-1.2, 2.7, -0.8), "mint")
+    S.solid("Stair_Wall_W", (-X, 0.0, -0.8), (-3.6, 3.0, 4.0), "mint")
+    S.solid("Landing_Rail", (-1.2, 3.0, -0.88), (X, 4.0, -0.8), "steel", ("f",))
+    S.solid("Plant", (2.8, 0.0, 6.0), (3.6, 1.2, 6.8), "plant", ("f",))
+    S.solid("Cupboard", (2.6, 0.0, -0.8), (X, 2.1, 0.0), "white", ("f",))
+    S.decor("Handrail", (-1.3, 0.9, -0.8), (-1.2, 4.0, 4.0), "steel")
+    S.decor("Window_E", (3.97, 3.6, -6.4), (4.0, 5.6, -4.6), "window")
+    S.decor("Pendant", (0.6, 4.6, 2.6), (1.4, 6.4, 3.4), "lamp")
     for e in S.empties:                                    # the top door brings you back to the foot of the stairs
         if e["name"] == "Arrive_top":
             e["pos"], e["face"] = [-2.4, 0.0, 5.7], (0, -1)
     S.spot("trick", 1, (2.0, 0.0, 1.0), face=(0, -1), props={"what": "the stairs climb four flights and arrive where they began"})
+    S.spot("count", 1, (1.0, 3.0, -3.0), face=(0, 1), props={"what": "the step count painted on the landing: 12, then 13, then 12 again"})
     S.need_spots = {"trick": 1}
     S.label("STAIR LOOP", 2.0, 3.0)
     S.label("landing y 3", 1.0, -4.0, y=3.0)
-    S.corridor("foot", 0.0, 3.6, -0.6, 5.0)
+    S.corridor("foot", 0.0, 2.4, 0.6, 5.0)
     auto_lights(S, -X, X, -Z, Z, H - 0.4, step=6.0)
     S.still = ((2.0, 0.0, 5.6), (-0.4, -1.0), 10)
     return S
 
 
 def c_tilted_hall():
+    MATS.setdefault("wallpaper", (0.75, 0.45, 0.35))
+    T6 = 26.0 / 6
+
     def keys(S):
-        flight(S, "tilt", -3.0, 3.0, 11.0, -1, "z", 0.0, 0.9, 6, 26.0 / 6, mat="carpet_tan")
+        # six long terraces, each 0.25 up; the walls close in and the ceiling comes down a step at each one
+        _filled_flight(S, "tilt", -3.0, 3.0, 11.0, -1, 0.0, 1.5, 6, T6, mat="carpet_tan")
         for k in range(6):
-            S.decor(f"Ceiling_Step_{k + 1}", (-3.0, 3.6 - 0.25 * k, 11.0 - (k + 1) * 26.0 / 6), (3.0, 4.0, 11.0 - k * 26.0 / 6), "ceiling", ("ceiling",))
+            z0, z1 = 11.0 - (k + 1) * T6, 11.0 - k * T6
+            y = 0.25 * (k + 1)
+            w = 0.25 * (k + 1)
+            S.solid(f"Narrow_W_{k + 1}", (-3.0, y, z0), (-3.0 + w, 4.0, z1), "wallpaper")
+            S.solid(f"Narrow_E_{k + 1}", (3.0 - w, y, z0), (3.0, 4.0, z1), "wallpaper")
+            S.decor(f"Ceiling_Step_{k + 1}", (-3.0 + w, 4.0 - 0.1 * (k + 1), z0), (3.0 - w, 4.0, z1), "ceiling", ("ceiling",))
+        S.spot("end", 1, (0.0, 1.5, -12.5), face=(0, 1), props={"what": "turn round: the door you came in by is twice the size of this one"})
+        S.solid("Beyond_end_Foot", (-0.68, 0.0, -15.55), (0.68, 1.45, -15.35), "void")   # the black past the raised door, down to the floor
     return croom("rdwe_tilted_hall", "The squashing hall: the floor rises, the ceiling falls", 6, 30, 4.0,
-                 [("stairs", "S", 0.0, D(to="rdwe_stair_loop")), ("end", "N", 0.0, D(to="rdwe_crossroads", y=0.9))], keys,
+                 [("stairs", "S", 0.0, D(to="rdwe_stair_loop")), ("end", "N", 0.0, D(to="rdwe_crossroads", y=1.5, width=0.86, height=1.8))], keys,
                  "Distorted hall: the floor steps up and the ceiling steps down until the far door is half the height it looked from the start.",
                  "halls", fmat="carpet_tan", wmat="peach", trick=("trick", (0.0, 0.0, 13.0), (0, -1), "it looks level from here"))
 
 
 def c_three_doors():
     def keys(S):
-        S.solid("Plinth", (-0.5, 0.0, 0.5), (0.5, 1.0, 1.5), "white")
+        _furn(S, "Plinth", -0.5, 0.5, 0.5, 1.5, 0.0, 1.0, "white")
+        _furn(S, "Bench_W", -5.5, -4.6, 0.6, 2.8, 0.0, 0.45, "wood")
+        _furn(S, "Bench_E", 4.6, 5.5, 0.6, 2.8, 0.0, 0.45, "wood")
+        _furn(S, "Plant_NW", -5.8, -5.2, -4.8, -4.2, 0.0, 1.3, "plant")
+        _furn(S, "Plant_NE", 5.2, 5.8, -4.8, -4.2, 0.0, 1.3, "plant")
         for k, x in enumerate((-4.0, 0.0, 4.0), 1):
-            S.decor(f"Sign_{k}", (x - 0.6, 2.5, -5.0), (x + 0.6, 2.9, -4.96), ["red", "sun", "cyan"][k - 1])
+            S.decor(f"Sign_{k}", (x - 0.6, 2.6, -5.0), (x + 0.6, 3.0, -4.96), ["red", "sun", "cyan"][k - 1])
+            S.decor(f"Line_{k}", (x * 0.5 - 0.08, 0.0, -4.2), (x * 0.5 + 0.08, 0.006, 0.2), ["red", "sun", "cyan"][k - 1])
     return croom("rdwe_three_doors", "Three doors: pick one", 12, 10, 3.4,
                  [("back", "S", 0.0, D(to="rdwe_door_hall")), ("left", "N", -4.0, D(to="rdwe_mirror_room")),
                   ("middle", "N", 0.0, D(to="rdwe_waiting_room")), ("right", "N", 4.0, D(to="rdwe_lights_out"))], keys,
@@ -999,7 +1154,12 @@ def c_three_doors():
 
 def c_painted_door():
     def keys(S):
-        S.solid("Pillar", (1.0, 0.0, -2.0), (1.6, 3.4, -1.4), "white")
+        _furn(S, "Pillar", 1.0, 1.6, -2.0, -1.4, 0.0, 3.4, "white")
+        _furn(S, "Pillar_2", -1.6, -1.0, -2.0, -1.4, 0.0, 3.4, "white")
+        _furn(S, "Bench", -0.6, 0.6, 1.5, 3.0, 0.0, 0.45, "wood")
+        S.decor("Mark", (-0.3, 0.0, 5.7), (0.3, 0.006, 6.3), "sun")
+        S.decor("Painted_Door", (-1.6, 0.0, -12.0), (1.6, 3.0, -9.0), "white")
+        S.spot("painting", 1, (0.0, 0.0, -6.0), face=(0, -1), props={"what": "close to, the door is paint on the floor and the wall, stretched"})
     return croom("rdwe_painted_door", "The painted door: real from one spot", 6, 24, 3.4,
                  [("doors", "S", 0.0, D(to="rdwe_door_hall")), ("painted", "N", 0.0, D(to="rdwe_anamorphic_room",
                                                                                          look="a door painted on the end wall, real from the mark"))],
@@ -1007,12 +1167,45 @@ def c_painted_door():
                  "halls", fmat="white", wmat="teal_cream", trick=("view", (0.0, 0.0, 6.0), (0, -1), "the floor mark: from here the painting is a door"))
 
 
+ANAMORPHIC_EYE = (-4.0, EYE, 4.0)            # Spot_view_1, at eye height: the one place the shards line up
+
+
+def anamorphic_shards():
+    """The shards of rdwe_anamorphic_room: the outline of the north door (x 3, 2.2 m tall, on the wall at z -7) cut into short pieces, each slid
+    along its line of sight from ANAMORPHIC_EYE to a different depth (and scaled with it), so they line up into the door from that spot only.
+    [(p0, p1, thickness)] in game coordinates."""
+    rnd = random.Random(4417)
+    ex, ey, ez = ANAMORPHIC_EYE
+    x0, x1, y0, y1, zw = 2.45, 3.55, 0.05, 2.3, -6.98
+    pts = [(x0, y0), (x0, y1), (x1, y1), (x1, y0)]
+    out = []
+    for i in range(3):                                     # the left side, the top, the right side (the threshold is the floor)
+        (ua, va), (ub, vb) = pts[i], pts[i + 1]
+        n = 7 if i != 1 else 4
+        for j in range(n):
+            a, b = j / n + 0.012, (j + 1) / n - 0.012
+            t = rnd.uniform(0.32, 0.82)
+            p0 = (ua + (ub - ua) * a, va + (vb - va) * a, zw)
+            p1 = (ua + (ub - ua) * b, va + (vb - va) * b, zw)
+            q0 = tuple(e + (p - e) * t for e, p in zip((ex, ey, ez), p0))
+            q1 = tuple(e + (p - e) * t for e, p in zip((ex, ey, ez), p1))
+            out.append((q0, q1, round(0.09 * t, 4)))
+    return out
+
+
 def c_anamorphic_room():
     def keys(S):
-        for k, (x, y, z) in enumerate(((-2.0, 2.6, -2.0), (2.6, 2.2, -4.0), (3.2, 0.4, 0.5), (-3.4, 1.4, 2.0), (0.8, 3.2, -5.0)), 1):
-            S.decor(f"Floating_Piece_{k}", (x - 0.4, y, z - 0.1), (x + 0.4, y + 0.4, z + 0.1), "acid")
-        S.solid("Crate_1", (-5.0, 0.0, -5.0), (-3.8, 1.2, -3.8), "wood")
-        S.solid("Crate_2", (4.0, 0.0, 3.6), (5.2, 0.8, 4.8), "wood")
+        for k, (q0, q1, th) in enumerate(anamorphic_shards(), 1):
+            mn = [min(q0[i], q1[i]) - th for i in range(3)]
+            mx = [max(q0[i], q1[i]) + th for i in range(3)]
+            S.decor(f"Shard_{k}", mn, mx, "acid")
+        _furn(S, "Crate_1", -5.0, -3.8, -5.0, -3.8, 0.0, 1.2, "wood")
+        _furn(S, "Crate_2", 4.0, 5.2, 3.6, 4.8, 0.0, 0.8, "wood")
+        _furn(S, "Crate_3", 5.0, 6.2, -5.5, -4.3, 0.0, 1.0, "wood")
+        _furn(S, "Crate_4", -6.4, -5.4, -2.6, -1.6, 0.0, 0.7, "wood")
+        _furn(S, "Tripod", -4.25, -3.75, 4.9, 5.4, 0.0, 1.4, "steel")
+        S.decor("Footprints", (-4.3, 0.0, 3.7), (-3.7, 0.006, 4.3), "sun")
+        S.spot("word", 1, (3.0, 0.0, -5.4), face=(0, -1), props={"what": "the north door: only there once the shards have drawn it"})
     return croom("rdwe_anamorphic_room", "The anamorphic room: pieces that line up", 14, 14, 4.0,
                  [("painted", "W", 0.0, D(to="rdwe_painted_door")), ("word", "N", 3.0, D(to="rdwe_ames_room", props={"shows": "from Spot_view_1 only"}))],
                  keys, "Perspective shifting: floating shards scattered through the room line up into the outline of a door from one spot, and "
