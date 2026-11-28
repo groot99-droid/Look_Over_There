@@ -4,13 +4,13 @@
   "p1_p10_p50_p90": [
    0.0,
    0.044,
-   0.998,
-   0.999
+   1.0,
+   1.0
   ],
   "samples": 256,
   "distance_m": 1.5,
   "device": "GPU",
-  "seconds": 14,
+  "seconds": 15,
   "materials": [
    "Grass",
    "Path",
@@ -25,14 +25,14 @@
   "size": 2048,
   "p1_p10_p50_p90": [
    0.0,
-   0.036,
-   0.56,
-   0.996
+   0.033,
+   0.562,
+   0.998
   ],
   "samples": 256,
   "distance_m": 0.8,
   "device": "GPU",
-  "seconds": 25,
+  "seconds": 26,
   "materials": [
    "Steel",
    "Plastic_White",
@@ -49,6 +49,6 @@
    "Window",
    "Awning_E"
   ],
-  "px_per_m": 19.1
+  "px_per_m": 19.0
  }
 }
