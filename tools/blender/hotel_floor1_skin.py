@@ -7,8 +7,8 @@ Used by tools/blender/build_hotel_floor1.py (in Blender) and testable without Bl
 The layout is the greybox's, unchanged: every collider, door, link, marker and spot comes from tools/blender/build_hotel_greybox.py's model
 (build_hotel_greybox.build(scene)). This file adds only what the art needs:
 
-- AIR: the boxes of open space a walker (or the camera) is in: the corridor, the door openings, the alcoves and closets, the lift car behind its
-  opening, the stairwell above its steps; in a room, the room's parts.
+- AIR: the boxes of open space a walker (or the camera) is in: the corridor, the door openings, the alcoves and closets, the lift's opening,
+  the stairwell above its steps; in a room, the room's parts.
 - skin(): every face of a collider that looks into the air, cut where another box meets it, so the exported shell is only what can be seen: the
   walls' backs, the slabs' undersides and the faces pressed against another box are never drawn. A door opening needs no hole cutting: there is no
   collider behind it, so nothing is drawn there. Each quad gets a material from where it looks (corridor, alcove, door reveal, stairwell...).
@@ -32,6 +32,10 @@ CHAIR = 0.9              # the corridor's chair rail: the wall's lower and upper
 SCONCE_XS = (-18.0, -14.0, -10.0, -6.0, -2.0, 2.0, 6.0, 10.0, 14.0, 18.0)   # 2 m either side of every door (DOOR_XS = 0, +-8, +-16), both walls
 SCONCE_Y = 2.0           # the shade's middle; every part of a sconce is above 1.8 m (the layout check's head height)
 DEAD_SCONCES = {"floor_1_lower": [("S", 14.0), ("N", -10.0)], "floor_1_upper": [("N", -14.0)]}
+# the connector kit's colliders in the layout (build_hotel_greybox._f1: the elevator's car and landing, `_F1`): the kit's own art covers them (the
+# page draws world/kit/elevator.glb), so they are never part of this scene's skin
+KIT = ("Car_", "Landing_Floor_", "Landing_Head_", "Landing_Jamb_")
+STAIR_W = GB.KIT_STAIR_W  # the stair doors' openings (the kit's 1.1 m)
 
 
 def model(scene):
@@ -84,10 +88,9 @@ def air_corridor(M):
         zi0, zi1 = sorted((sg * (Z + T), sg * (Z + T + 1.0)))
         air.append(box(kind, (a - 0.6, 0, zi0), (a + 0.6, 2.4, zi1)))
     names = {b["name"] for b in M.boxes}
-    if "LiftCar_Floor" in names:
-        air.append(box("lifthole", (-X - T, 0, -0.6), (-X, 2.2, 0.6)))
-        air.append(box("lift", (-22.4, 0, -1.1), (-X - T, 2.4, 1.1)))
-    air.append(box("doorhole", (X, 0, -GB.DOOR_W / 2), (X + T, GB.DOOR_H, GB.DOOR_W / 2)))       # the door at the east end
+    # the lift (lower level): the opening in the west wall is the kit's elevator's: its landing lines the opening's reveals and soffit and lays its
+    # sill across the wall's thickness, so no face of this scene is drawn in there (no air) and the two never fight
+    air.append(box("doorhole", (X, 0, -STAIR_W / 2), (X + T, GB.DOOR_H, STAIR_W / 2)))       # the stair door at the east end
     steps = sorted((b for b in M.boxes if b["name"].startswith("Step_")), key=lambda b: b["min"][0])
     if steps:                                            # the lower level's stairwell: the air above each step, and the landing
         top = 6.0
@@ -96,7 +99,7 @@ def air_corridor(M):
             air.append(box("stair", (s["min"][0], s["max"][1], -1.0), (s["max"][0], top, 1.0)))
         land = next(b for b in M.boxes if b["name"] == "Landing_Top")
         air.append(box("stair", (land["min"][0], land["max"][1], -1.0), (land["max"][0], top, 1.0)))
-        air.append(box("stairhole", (land["max"][0], land["max"][1], -GB.DOOR_W / 2), (land["max"][0] + T, land["max"][1] + GB.DOOR_H, GB.DOOR_W / 2)))
+        air.append(box("stairhole", (land["max"][0], land["max"][1], -STAIR_W / 2), (land["max"][0] + T, land["max"][1] + GB.DOOR_H, STAIR_W / 2)))
     elif "StairLanding_Floor" in names:                  # the upper level: the top landing behind the stair door
         air.append(box("stair", (X + T, 0, -1.0), (21.6, GB.CORR_H, 1.0)))
     return air
@@ -236,6 +239,12 @@ def area(q):
     return (q["b"][1] - q["b"][0]) * (q["c"][1] - q["c"][0])
 
 
+def y0_of(q):
+    """The quad's lowest height: its y range is `b` on an x-facing face (bi = y) and `c` on a z-facing one (ci = y). The finish split used to
+    read c[0] everywhere, so the corridor's end walls (x-facing) all got the lower finish (found by the floor 2 job)."""
+    return q["b"][0] if q["bi"] == 1 else q["c"][0]
+
+
 # ---------------------------------------------------------------- materials of the skin
 def corridor_material(q):
     a, s, reg, cn = q["axis"], q["side"], q["region"], q["coll"]
@@ -260,10 +269,10 @@ def corridor_material(q):
             return "Carpet_Runner" if reg == "corridor" else "Carpet_Field"
         return "Ceiling_Popcorn"
     if reg == "alcove":
-        return "Wall_Upper" if q["c"][0] >= CHAIR - 1e-6 else "Wall_Lower"
+        return "Wall_Upper" if y0_of(q) >= CHAIR - 1e-6 else "Wall_Lower"
     if reg == "closet":
         return "Closet_Paint"
-    return "Wall_Upper" if q["c"][0] >= CHAIR - 1e-6 else "Wall_Lower"
+    return "Wall_Upper" if y0_of(q) >= CHAIR - 1e-6 else "Wall_Lower"
 
 
 def room_material(q):
@@ -328,7 +337,7 @@ def scene_skin(scene, standin=False):
     M = model(scene)
     cols = colliders(M)
     if scene in CORRIDORS:
-        return skin(cols, air_corridor(M), cutouts(scene), splits_y=(CHAIR,)), M
+        return skin(cols, air_corridor(M), cutouts(scene), splits_y=(CHAIR,), skip=FURNITURE + KIT), M
     if standin:
         allc = cols + room_standin_colliders(scene)
         q = skin(allc, air_room(scene, True), room_cutouts(scene))

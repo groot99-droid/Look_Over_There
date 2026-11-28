@@ -945,9 +945,45 @@ def _f1(sid):
             [("closet", "N", -12.0), ("alcove", "S", -4.0), ("alcove", "N", 12.0), ("closet", "S", 4.0)]
     rooms = floor_rooms(101 if lower else 111, ["motel_a", "motel_b"])
     if lower:
-        return corridor_floor(sid, "Floor 1, lower: the motel", rooms, "carpet_red", ("lift", "atrium (floor 1 gallery)"),
-                              ("up", "stairs_up", "floor_1_upper"), feats, "the neighbour hunts")
-    return corridor_floor(sid, "Floor 1, upper: the motel", rooms, "carpet_red", None, ("down", "stairs_down", "floor_1_lower"), feats, "the neighbour hunts")
+        S = corridor_floor(sid, "Floor 1, lower: the motel", rooms, "carpet_red", ("lift", "atrium (floor 1 gallery)"),
+                           ("up", "stairs_up", "floor_1_upper"), feats, "the neighbour hunts")
+    else:
+        S = corridor_floor(sid, "Floor 1, upper: the motel", rooms, "carpet_red", None, ("down", "stairs_down", "floor_1_lower"), feats, "the neighbour hunts")
+    # Dressed (tools/blender/build_hotel_floor1.py) with the connector kit (blender/kit/README.md), as tools/blender/kit_place.py places it, the
+    # same way as _f3:
+    # - lower: the elevator at (-20, 0, 0), yaw 90: the kit's car (parked here; the page moves it) and landing replace the LiftCar shell and the
+    #   plain lift door; the door record keeps the id `lift` (the link's), the kit's own Link_/Arrive_/Marker_ are left out (the greybox's stay);
+    # - the stair door at every stair door, yaw -90: lower `stairwell` (20, 0, 0) and `stairs_up` (26.6, 3.2, 0), upper `stairs_down` (20, 0, 0).
+    #   The corridor, the top landing and the upper landing are the landings, so only the kit's door record is used (no `stair_door_landing`
+    #   node, no colliders), and each opening widens from 0.94 m to the kit's 1.1 m. The door ids stay the greybox's, so every link still meets.
+    drop = ("LiftCar_", "Corridor_Wall_E_", "Stairwell_Wall_E_")
+    gone = {b["name"] for b in S.boxes if b["name"].startswith(drop)} | {"DoorLeaf_lift", "DoorLeaf_stairwell", "DoorLeaf_stairs_up", "DoorLeaf_stairs_down"}
+    S.boxes = [b for b in S.boxes if b["name"] not in gone]
+    S.doors = [d for d in S.doors if d["name"] not in gone]
+    S._names -= gone
+    S.labels = [lb for lb in S.labels if not lb["text"].startswith("lift car")]
+    sw, sh = KIT_STAIR_W, DOOR_H
+    x0, x1, sx1 = -CORR_X, CORR_X, 26.6
+    wall(S, "Corridor_Wall_E", "z", x1, x1 + T, -CORR_Z, CORR_Z, 0.0, CORR_H, [(-sw / 2, sw / 2, 0.0, sh)])
+    if lower:
+        wall(S, "Stairwell_Wall_E", "z", sx1, sx1 + T, -1.0, 1.0, 0.0, 6.0, [(-sw / 2, sw / 2, 3.2, 3.2 + sh)])
+        kit_layout(S, "elevator", "F1", (x0, 0.0, 0.0), 90.0, doors={"lift": "lift"}, zones=False, markers=False, mat="lift")
+        kit_layout(S, "stair_door", "F1", (x1, 0.0, 0.0), -90.0, cols=lambda n: False, doors={"stair": "stairwell"}, spots=False, zones=False, markers=False)
+        kit_layout(S, "stair_door", "F1_top", (sx1, 3.2, 0.0), -90.0, cols=lambda n: False, doors={"stair": "stairs_up"}, spots=False, zones=False, markers=False)
+        S.label("elevator (kit)", -21.3, 1.8, kind="note")
+        # the kit's call-button spot stands 0.22 m from the north wall here (the corridor is 2.2 m wide; the kit's landing was drawn for the
+        # atrium's wider galleries), inside a walker's 0.28 m: it moves 8 cm toward the corridor's middle, still beside the button (as on floor 3)
+        for e in S.empties:
+            if e["name"] == "Spot_call_1_F1":
+                e["pos"][2] = round(e["pos"][2] + 0.08, 3)
+        # the kit landing's frame stands 6 cm proud of the west wall, so the clear corridor starts 8 cm in from it
+        S.corridors[0]["min"][0] = x0 + 0.08
+    else:
+        kit_layout(S, "stair_door", "F1U", (x1, 0.0, 0.0), -90.0, cols=lambda n: False, doors={"stair": "stairs_down"}, spots=False, zones=False, markers=False)
+    return S
+
+
+KIT_STAIR_W = 1.1           # the connector kit's stair-door opening (blender/kit/README.md); the greybox's own doors are DOOR_W
 
 
 def _f2(sid):

@@ -297,7 +297,7 @@
    "max": [
     20.2,
     2.8,
-    -0.47
+    -0.55
    ]
   },
   {
@@ -305,12 +305,12 @@
    "min": [
     20.0,
     2.16,
-    -0.47
+    -0.55
    ],
    "max": [
     20.2,
     2.8,
-    0.47
+    0.55
    ]
   },
   {
@@ -318,7 +318,7 @@
    "min": [
     20.0,
     0.0,
-    0.47
+    0.55
    ],
    "max": [
     20.2,
@@ -1020,16 +1020,17 @@
    "name": "DoorLeaf_stairs_down",
    "level": "floor_1_upper",
    "hinge": [
-    20.0,
+    20.1,
     0.0,
-    -0.47
+    0.52
    ],
-   "width": 0.94,
-   "height": 2.16,
-   "closed_yaw_deg": -90.0,
-   "swing_deg": 95.0,
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -90.0,
    "state": "closed",
-   "kind": "stair door"
+   "kind": "stair door",
+   "from": "store DoorLeaf_Stair_L1_L2_up"
   }
  ],
  "cameras": [],

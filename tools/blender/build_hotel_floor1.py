@@ -20,8 +20,14 @@ that faces nothing.
 
 The door leaves are reused meshes: the twenty room doors of both levels are one mesh (`Leaf_Room`), the closets another, the fire doors a third; each
 leaf is its own node with its origin at the hinge, so the page swings it by name. The brass numbers are small child nodes of their leaf. One leaf of
-each kind is baked (`BAKE_LEAF`); the others show the same lightmap, which fits because every door has a sconce 2 m to either side. The lift's
-door is left to the connector kit: DoorLeaf_lift is an empty (the layout keeps its entry) in a clean opening with a steel frame.
+each kind is baked (`BAKE_LEAF`); the others show the same lightmap, which fits because every door has a sconce 2 m to either side.
+
+The connector kit (blender/kit/README.md) is in the greybox's model (build_hotel_greybox._f1, kit_layout): on the lower level the kit's elevator at
+(-20, 0, 0), yaw 90 (its car and landing colliders, its door record `lift`, its two spots), and the kit's stair door at every stair door, yaw -90
+(only its door record: 1.1 m openings, a 1.04 m by 2.12 m leaf). The layout objects are made from the model as before. place_kit() then places
+the pieces with tools/blender/kit_place.py, checks that every layout object it brings lands where the model has it, and keeps the elevator's art
+and lamps as bake and still stand-ins (Bake_Standins, never in this GLB: the page draws world/kit/elevator.glb). The stair leaves are this
+scene's own (`Leaf_Fire`, at the kit's size and hinge). DoorLeaf_lift stays an empty (the layout keeps its entry).
 
 Light: the corridors are baked at night (sconces and exit signs on); the rooms are baked with their lamps on and the door open onto a stand-in of the
 corridor (the same sconces 2 m either side), so a room fits whichever door it sits behind, on either side, on either level.
@@ -1003,7 +1009,7 @@ def build_corridor(M):
             part(f"ChairRail_{side}_{i}", "Trim_Wood", lambda bm: w.box(bm, a0, a1, SK.CHAIR - 0.03, SK.CHAIR + 0.035, 0.0, 0.022))
     for side in ("E", "W"):
         w = corridor_wall(side)
-        gap = 0.47 + 0.07 if side == "E" else 0.6 + 0.08
+        gap = SK.STAIR_W / 2 + 0.07 if side == "E" else 0.6 + 0.08
         if side == "W" and not lower:
             gap = 0.0
         for i, (a0, a1) in enumerate([(-Z, -gap), (gap, Z)] if gap else [(-Z, Z)]):
@@ -1024,7 +1030,7 @@ def build_corridor(M):
             alcove_dress(side, a)
     # the east end: the stair door's casing, a STAIRS plaque, the EXIT sign
     we = corridor_wall("E")
-    door_casing(we, 0.0, GB.DOOR_W / 2, GB.DOOR_H, "stairdoor", "Jamb_Steel", 0.06, 0.015)
+    door_casing(we, 0.0, SK.STAIR_W / 2, GB.DOOR_H, "stairdoor", "Jamb_Steel", 0.06, 0.015)
     exit_sign(we, 0.0, 2.27, "corridor")
     wn = corridor_wall("N")
     part("Plaque_stairs", "Plastic_White", lambda bm: wn.box(bm, 19.28, 19.72, 1.45, 1.6, 0.0, 0.008))
@@ -1061,7 +1067,6 @@ def build_corridor(M):
     if lower:
         ws = corridor_wall("S")
         sign_plate(ws, -17.35, 1.5, 0.72, 0.16, "101 - 110  >", "dir")
-        lift_opening()
         stairwell_lower(M)
     else:
         sign_plate(corridor_wall("N"), 17.35, 1.5, 0.72, 0.16, "<  111 - 120", "dir")
@@ -1211,18 +1216,75 @@ def extinguisher(w, x0, x1, y0, y1, depth):
     part("Ext_Label_t", "Plastic_White", lambda bm: wall_text(bm, w, "FIRE", a, y1 + 0.095, 0.006, 0.055, 0.002, 1.1))
 
 
-def lift_opening():
-    """The elevator's stop on the lower level: a clean opening in the west wall with a brushed-steel frame, the call buttons and a floor indicator.
-    The connector kit's elevator doors go in the opening (DoorLeaf_lift); behind it the greybox's placeholder car is lined plain."""
-    w = corridor_wall("W")
-    part("Lift_Frame_L", "Steel", lambda bm: w.box(bm, -0.68, -0.6, 0.0, 2.28, 0.0, 0.025))
-    part("Lift_Frame_R", "Steel", lambda bm: w.box(bm, 0.6, 0.68, 0.0, 2.28, 0.0, 0.025))
-    part("Lift_Frame_Head", "Steel", lambda bm: w.box(bm, -0.68, 0.68, 2.2, 2.28, 0.0, 0.025))
-    part("Lift_Indicator", "Plastic_Black", lambda bm: w.box(bm, -0.22, 0.22, 2.36, 2.48, 0.0, 0.02))
-    part("Lift_Indicator_t", "Emergency_Emit", lambda bm: wall_text(bm, w, "1", 0.0, 2.42, 0.02, 0.07, 0.002))
-    part("Lift_Call", "Steel", lambda bm: w.box(bm, 0.8, 0.92, 1.0, 1.26, 0.0, 0.008))
-    for k, yy in enumerate((1.17, 1.09)):
-        part(f"Lift_Button_{k}", "Plastic_White", lambda bm: cyl(bm, w.pt(0.86, yy, 0.008), w.pt(0.86, yy, 0.016), 0.018, seg=14))
+# the connector kit (blender/kit/README.md), as build_hotel_greybox._f1 puts it in the model: (piece, suffix, at, yaw, art, {kit door: scene door})
+KIT = {
+    "floor_1_lower": [("elevator", "F1", (-20.0, 0.0, 0.0), 90.0, True, {"lift": "lift"}),
+                      ("stair_door", "F1", (20.0, 0.0, 0.0), -90.0, False, {"stair": "stairwell"}),
+                      ("stair_door", "F1_top", (26.6, 3.2, 0.0), -90.0, False, {"stair": "stairs_up"})],
+    "floor_1_upper": [("stair_door", "F1U", (20.0, 0.0, 0.0), -90.0, False, {"stair": "stairs_down"})],
+}
+KIT_PREFIX = ("COL_", "DoorLeaf_", "Link_", "Arrive_", "Spot_", "Zone_", "Marker_")
+KIT_LIGHTS_DROP = ("Corridor_Lamp",)    # the elevator kit's stand-in corridor light: this scene has its own corridor
+KIT_MOVED = {"Spot_call_1_F1"}          # the kit spot the greybox moves 8 cm off the north wall (build_hotel_greybox._f1)
+
+
+def place_kit(M):
+    """Each kit piece through tools/blender/kit_place.py: every layout object it brings that the model has (a kit door renamed to the scene's
+    door id) must land where the model put it (the model's own objects are already in Layout, from layout_from_model and build_leaves); then
+    the kit's copies are removed, and its art (when used) stays in Bake_Standins with its lamps in Lights: in the bake and the stills, never in
+    this scene's GLB."""
+    import kit_place
+    want = {"COL_" + b["name"]: b for b in M.boxes if b["col"]}
+    want.update({e["name"]: e for e in M.empties})
+    want.update({d["name"]: d for d in M.doors})
+    checked, dropped = 0, []
+    for piece, suffix, at, yaw, art, doors in KIT.get(SCENE, []):
+        made = kit_place.place(piece, suffix=suffix, at=at, yaw_deg=yaw, art=art, collection=BAKE_STANDIN)
+        ren = {f"DoorLeaf_{k}_{suffix}": f"DoorLeaf_{v}" for k, v in doors.items()}
+        for nm in made:
+            ob = bpy.data.objects[nm]
+            if nm.startswith(KIT_PREFIX):
+                base = nm.split(".")[0]                  # the model's own object has the name already, so Blender numbered the kit's
+                key = ren.get(base, base)
+                ref = want.get(key)
+                if ref is None:
+                    dropped.append(nm)                     # the kit's own links, markers, landing and hallway: the model leaves them out
+                elif key not in KIT_MOVED:
+                    if "hinge" in ref:
+                        assert (ob.matrix_world.translation - B(ref["hinge"])).length < 1e-4, (nm, tuple(ob.matrix_world.translation), ref["hinge"])
+                        assert abs(float(ob["closed_yaw_deg"]) - ref["props"]["closed_yaw_deg"]) < 0.05, (nm, ob["closed_yaw_deg"])
+                    elif "pos" in ref:
+                        assert (ob.matrix_world.translation - B(ref["pos"])).length < 1e-4, (nm, ref["pos"])
+                    else:
+                        g = [ob.matrix_world @ Vector(c) for c in ob.bound_box]
+                        mn = (min(p.x for p in g), min(p.z for p in g), min(-p.y for p in g))
+                        mx = (max(p.x for p in g), max(p.z for p in g), max(-p.y for p in g))
+                        assert all(abs(mn[i] - ref["min"][i]) < 1e-3 and abs(mx[i] - ref["max"][i]) < 1e-3 for i in range(3)), (nm, mn, mx, ref)
+                    checked += 1
+                bpy.data.objects.remove(ob)
+            elif ob.type != "MESH":
+                bpy.data.objects.remove(ob)
+        if art:
+            kit_lights(piece, at, yaw)
+    print(f"KIT {SCENE}: {checked} layout objects from kit_place.py land on the model's; left out {len(dropped)}; stand-ins {len(BAKE_STANDIN.objects)}")
+
+
+def kit_lights(piece, at, yaw):
+    """The kit piece's own lamps (its Lights collection: the car's bulb, the call button's and indicators' glow), moved and turned as kit_place
+    moves its art, into this scene's Lights."""
+    path = ROOT / f"blender/kit/{piece}.blend"
+    with bpy.data.libraries.load(str(path), link=False) as (src, dst):
+        dst.collections = [c for c in src.collections if c == "Lights"]
+    m = Matrix.Translation(Vector((at[0], -at[2], at[1]))) @ Matrix.Rotation(math.radians(yaw), 4, "Z")
+    for coll in dst.collections:
+        for ob in list(coll.objects):
+            if ob.name.startswith(KIT_LIGHTS_DROP):
+                bpy.data.objects.remove(ob)
+                continue
+            ob.name = f"Kit_{piece}_{ob.name}"
+            ob.matrix_world = m @ ob.matrix_basis.copy()          # appended, in no scene yet: its matrix_world is not evaluated
+            LIGHTS.objects.link(ob)
+        bpy.data.collections.remove(coll)
 
 
 def stairwell_lower(M):
@@ -1253,9 +1315,10 @@ def stairwell_lower(M):
     light("L_stair_top", "POINT", wn.pt(25.8, 5.42, 0.12), STAIR_W, size=0.06)
     we = Wall("x", 26.6, -1)
     exit_sign(we, 0.0, 5.42, "stairs")
-    part("Casing_stairs_up_Head", "Jamb_Steel", lambda bm: we.box(bm, -0.53, 0.53, 3.2 + GB.DOOR_H, 3.2 + GB.DOOR_H + 0.06, 0.0, 0.015))
-    part("Casing_stairs_up_L", "Jamb_Steel", lambda bm: we.box(bm, -0.47 - 0.06, -0.47, 3.2, 3.2 + GB.DOOR_H + 0.06, 0.0, 0.015))
-    part("Casing_stairs_up_R", "Jamb_Steel", lambda bm: we.box(bm, 0.47, 0.47 + 0.06, 3.2, 3.2 + GB.DOOR_H + 0.06, 0.0, 0.015))
+    hw = SK.STAIR_W / 2                                                            # the kit's 1.1 m opening
+    part("Casing_stairs_up_Head", "Jamb_Steel", lambda bm: we.box(bm, -hw - 0.06, hw + 0.06, 3.2 + GB.DOOR_H, 3.2 + GB.DOOR_H + 0.06, 0.0, 0.015))
+    part("Casing_stairs_up_L", "Jamb_Steel", lambda bm: we.box(bm, -hw - 0.06, -hw, 3.2, 3.2 + GB.DOOR_H + 0.06, 0.0, 0.015))
+    part("Casing_stairs_up_R", "Jamb_Steel", lambda bm: we.box(bm, hw, hw + 0.06, 3.2, 3.2 + GB.DOOR_H + 0.06, 0.0, 0.015))
     ws = Wall("z", 1.0, -1)
     part("Sign_floor", "Plastic_White", lambda bm: ws.box(bm, 20.45, 20.95, 1.4, 1.7, 0.0, 0.008))
     part("Sign_floor_t", "Plastic_Black", lambda bm: wall_text(bm, ws, "1", 20.7, 1.56, 0.008, 0.2, 0.003))
@@ -1542,6 +1605,7 @@ def build_all():
     if KIND == "corridor":
         build_leaves(M)
         build_corridor(M)
+        place_kit(M)
         corridor_standins()
     else:
         room_build()
@@ -1657,7 +1721,7 @@ NO_CULL = ("Recess_", "Ice_", "Ext_", "Win_")
 
 
 def arch_cols():
-    return [c for c in SK.colliders(SK.model(SCENE)) if not c["name"].startswith(SK.FURNITURE)]
+    return [c for c in SK.colliders(SK.model(SCENE)) if not c["name"].startswith(SK.FURNITURE + SK.KIT)]
 
 
 def cull_flush(bm, cols):
@@ -1832,9 +1896,10 @@ def rect_uv(objs, S):
         for li in p.loop_indices:
             v = o.matrix_world @ o.data.vertices[o.data.loops[li].vertex_index].co
             a, b = (v - v0).dot(e1) / (w * w), (v - v0).dot(e2) / (h * h)
+            # a rotated rectangle lies on its side: its e2 side (ph pixels) runs along u, its e1 side (pw) along t, as layout() reserved it
+            # (the old code wrote b * pw, a * ph here, so a tall face ran past its row into the next one; found by the floor 2 job)
             u, t = (b * ph, a * pw) if rot else (a * pw, b * ph)
-            if rot:
-                u, t = b * pw, a * ph
+            assert -1e-3 <= u <= (ph if rot else pw) + 1e-3 and -1e-3 <= t <= (pw if rot else ph) + 1e-3, (o.name, u, t, rot)
             uv[li].uv = ((x0 + u) / S, (y0 + t) / S)
     print(f"  rect pack: {len(rects)} faces at {D:.1f} px/m on {S}")
     return S, D
@@ -2272,7 +2337,7 @@ def stage_render():
         arch.hide_render = False
         for o in arch.objects:
             o.hide_render = o.name.startswith(("Corridor_Ceiling", "Corridor_Floor", "Alcove_Floor", "Alcove_Ceiling", "Room_Ceiling", "Room_Floor",
-                                               "Stairwell_Ceiling", "Stairwell_Floor", "LiftCar_Ceiling", "LiftCar_Floor", "Step_", "Landing_Top",
+                                               "Stairwell_Ceiling", "Stairwell_Floor", "Car_Ceiling", "Car_Floor", "Landing_Floor_", "Step_", "Landing_Top",
                                                "StairLanding_Ceiling", "StairLanding_Floor", "Bed", "Nightstand", "Dresser"))
         world = sc.world
         bg = world.node_tree.nodes["Background"]
