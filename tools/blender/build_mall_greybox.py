@@ -429,8 +429,8 @@ def _books_end(S):
 def _cinema_end(S):
     """wing_cinema's east end: the marquee over the cinema's doors."""
     S.decor("Marquee", (WX - 1.2, 3.2, -4.0), (WX, 4.2, 4.0), "sign")
-    S.solid("Poster_Case", (WX - 0.15, 0.6, -5.8), (WX, 2.4, -4.6), "glass")
-    S.solid("Poster_Case", (WX - 0.15, 0.6, 4.6), (WX, 2.4, 5.8), "glass")
+    S.solid("Poster_Case", (WX - 0.15, 0.0, -5.8), (WX, 2.4, -4.6), "glass")      # from the floor: the dressed wing's layout check needs a standing
+    S.solid("Poster_Case", (WX - 0.15, 0.0, 4.6), (WX, 2.4, 5.8), "glass")        # collider under the cases' art (lead's ruling)
 
 
 def _ent_end(S):
