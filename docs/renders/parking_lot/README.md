@@ -59,7 +59,10 @@ and the three window meshes on its footprint) and stands them, as they are, in a
   lit windows still emissive; unbaked.
 - **Exterior.glb** (`split_exterior.py --city`): `City_concrete` keeps only the city's ground slab, and the three window meshes only the
   street blocks' windows (36,264 -> 5,064, 10,968 -> 2,208, 5,076 -> 1,236 triangles); spliced in uncompressed, every other node unchanged.
-  `L4.json` and `gbi_L4_4.json` lose the 26 towers' boxes.
+  `L4.json` and `gbi_L4_4.json` lose the 26 towers' boxes, and the city set's six invisible enclosure walls (`Site_ITN_City`, 1 m thick and
+  80 m high round x 60 to 180, z -10 to 125): they walled in the towers, and the west one (x 60 to 61) ran along the lot's east strip,
+  across the market's join at (61, 9.6, 76). None of them bounds the Intern street itself (its own blocks, x 88 to 152, do), so none is
+  kept. What stays of the city in those files: the street's blocks and walks, and its ground slab (top at 9.58, under the lot's lawn).
 
 **What changes in the Intern's own street:** its 8 trees (`City_tree_small_02`, one mesh) keep a fifth of their leaf cards, each grown 2.2
 times about its middle (42,080 -> 8,527 leaf triangles a tree), which brings `Exterior.glb` from 427,468 to 114,932 triangles, under the
@@ -173,8 +176,6 @@ were dimmed to 0.92 so their whites stay under 1 (0.08 % of their texels reach 1
 
 ## Open
 
-- The city's invisible walls (`Site_ITN_City`, x 60 to 61 and round the street, 80 m) stay in `L4.json` as the street's; with the towers
-  gone they stand alone on the lot's east strip in the Original.
 - The skyline is forced perspective at 312 to 330 m (the sky box bounds it): from high up it reads as a model. If the sky box ever leaves
   L4, the same file can go out to a kilometre at full size.
 - `L4.json` keeps part 1's walk-through cars: the lot's new solids (cars, trees, arches, bins, rack, signpost) are walk-through in the

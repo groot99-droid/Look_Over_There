@@ -18,7 +18,8 @@ script list with a user folder in it) and the sites' `origin` (a repository owne
 
 world/L4.json and world/gbi_L4_4.json (the store's floor and its Going back in chamber, which draw the lot too) lose the gate's stairwell
 (Gate_RDW, 19 boxes) and the house's two props (Extra_Props_LOT west of x -100); the holes the stairwell left in the ground and the grass are
-filled; the south hedge is cut where the lot's art cuts it (the road's gap, x -34 to -26, and the stile's, x 29 to 31). Their doors and markers
+filled; the south hedge is cut where the lot's art cuts it (the road's gap, x -34 to -26, and the stile's, x 29 to 31); and the city set's six
+invisible enclosure walls go (the west one ran along the lot's east strip, across the market's join). Their doors and markers
 are left as they are: DoorLeaf_Gate_RDW and the marker Entrance_RDW_House_1 go when the coordinator drops the gate from the manifest (and from
 shared/manifest.test.js, which names it).
 """
@@ -238,6 +239,13 @@ def split_layout(doc):
     if gate or house:
         cols[:] = [c for c in cols if c not in gate and c not in house]
         notes.append(f"dropped {len(gate)} Gate_RDW and {len(house)} Extra_Props_LOT boxes")
+    # the city set's invisible enclosure (Site_ITN_City walls 1 m thick and 80 m high round x 60 to 180, z -10 to 125, the west one along the
+    # lot's east strip, across the market's join at (61, 9.6, 76)): it walled in the towers, which are a skyline now; the Intern street is
+    # bounded by its own blocks (x 88 to 152), so none of the six is kept
+    walls = [c for c in cols if c["s"] == "Site_ITN_City" and c["max"][1] > 20.0 and min(c["max"][0] - c["min"][0], c["max"][2] - c["min"][2]) <= 1.0]
+    if walls:
+        cols[:] = [c for c in cols if c not in walls]
+        notes.append(f"dropped the city's {len(walls)} invisible enclosure walls")
     x0, x1, z0, z1 = GATE_HOLE
     for s, y0 in (("Ground_LOT_Exterior", 8.6), ("Ground_LOT_Exterior_grass", 9.0)):
         fill = {"s": s, "min": [x0, y0, z0], "max": [x1, 9.6, z1]}
