@@ -1,0 +1,82 @@
+{
+ "scene": "hidden_entry",
+ "samples": 512,
+ "map_0": {
+  "set": "normal",
+  "page": 0,
+  "size": 1024,
+  "px_per_m": 37.0,
+  "gain": 0.44037,
+  "C": 1.2,
+  "wall_median_L": 1.07732,
+  "raw_p50_p90_p99": [
+   0.9197,
+   1.8641,
+   2.4291
+  ]
+ },
+ "map_1": {
+  "set": "normal",
+  "page": 1,
+  "size": 1024,
+  "px_per_m": 49.9,
+  "gain": 0.44037,
+  "C": 1.2,
+  "wall_median_L": 1.07732,
+  "raw_p50_p90_p99": [
+   0.2645,
+   1.457,
+   2.9982
+  ]
+ },
+ "map_2": {
+  "set": "alarm",
+  "page": 0,
+  "size": 1024,
+  "px_per_m": 37.0,
+  "gain": 5.34908,
+  "C": 1.2,
+  "wall_median_L": 0.06205,
+  "raw_p50_p90_p99": [
+   0.0589,
+   0.1984,
+   2.5905
+  ]
+ },
+ "map_3": {
+  "set": "alarm",
+  "page": 1,
+  "size": 1024,
+  "px_per_m": 49.9,
+  "gain": 5.34908,
+  "C": 1.2,
+  "wall_median_L": 0.06205,
+  "raw_p50_p90_p99": [
+   0.0179,
+   0.1331,
+   1.1296
+  ]
+ },
+ "page_0_materials": [
+  "Ceiling_Concrete",
+  "Floor_Concrete",
+  "Wall_Service"
+ ],
+ "page_1_materials": [
+  "Cardboard",
+  "Clock_Face",
+  "Door_Frame",
+  "Door_Steel",
+  "Notice",
+  "Paint_Grey",
+  "Plastic_Black",
+  "Sign_Plate",
+  "Skirting",
+  "Steel",
+  "Steel_Dark",
+  "Stripe_Red",
+  "Wood_Crate"
+ ],
+ "seconds": 34,
+ "device": "GPU"
+}

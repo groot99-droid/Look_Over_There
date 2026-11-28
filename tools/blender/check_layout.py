@@ -12,7 +12,7 @@ Rules (a collider is a box {s, min, max}; "solid art" is every visible mesh whos
              (every 10 cm, both faces included) lies within 5 cm of the world box of some solid mesh.
   2. STRAY   no solid art taller than 0.2 m above the floor, reaching below head height, stands where no collider does: its floor plan lies within a
              collider that stands (starts near the floor and rises above 0.2 m), widened by 5 cm. A mesh named decor_* is exempt: it is passable.
-  3. CLEAR   the arrival points, door spots and markers (every `arrive` and `at` in the scene's constants, every marker of the collision file) are clear:
+  3. CLEAR   the arrival points, door spots and markers (every `arrive` and `at` in the scene's constants, every marker and link of the collision file) are clear:
              no standing collider and no solid art within the walker's radius (0.28 m).
 `python tools/blender/check_layout_test.py` tests the rules without Blender.
 """
@@ -75,6 +75,9 @@ def points_of(world, constants):
     for i, m in enumerate(m for m in world.get("markers", []) if "position" in m):
         if m.get("kind") == "Entrance" and m.get("width"):
             pts[i] = pts[i] + ("door",)              # a door in a wall's face (the street's doors): see the CLEAR rule
+    for lk in world.get("links", []):                  # a Blender-first scene's links (export_scene.py): where you press F and where you arrive
+        pts.append((f"link {lk['door']}.at", lk["at"][0], lk["at"][2]))
+        pts.append((f"link {lk['door']}.arrive", lk["arrive"][0], lk["arrive"][2]))
 
     def walk(o, path):
         if isinstance(o, dict):

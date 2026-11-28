@@ -1,0 +1,21 @@
+{
+ "normal": {
+  "gain": 1.6814,
+  "walls_p50_before": 0.113,
+  "target": 0.19,
+  "factor": {}
+ },
+ "alarm": {
+  "gain": 3.2979,
+  "walls_p50_before": 0.047,
+  "target": 0.155,
+  "factor": {
+   "Lamp_Housing": 0.7105,
+   "Paint_Orange": 0.7949,
+   "Paint_Yellow": 0.8111,
+   "Cam_Body": 0.3591,
+   "Sign_Plate": 0.3008,
+   "Stripe_Pink": 0.4497
+  }
+ }
+}
