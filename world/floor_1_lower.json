@@ -1,0 +1,1505 @@
+{
+ "scene": "floor_1_lower",
+ "colliders": [
+  {
+   "s": "Alcove_Back",
+   "min": [
+    -12.8,
+    0.0,
+    -2.5
+   ],
+   "max": [
+    -11.2,
+    2.6,
+    -2.3
+   ]
+  },
+  {
+   "s": "Alcove_Back_2",
+   "min": [
+    -4.8,
+    0.0,
+    2.3
+   ],
+   "max": [
+    -3.2,
+    2.6,
+    2.5
+   ]
+  },
+  {
+   "s": "Alcove_Back_3",
+   "min": [
+    11.2,
+    0.0,
+    2.3
+   ],
+   "max": [
+    12.8,
+    2.6,
+    2.5
+   ]
+  },
+  {
+   "s": "Alcove_Back_4",
+   "min": [
+    3.2,
+    0.0,
+    -2.5
+   ],
+   "max": [
+    4.8,
+    2.6,
+    -2.3
+   ]
+  },
+  {
+   "s": "Alcove_Ceiling",
+   "min": [
+    -12.8,
+    2.4,
+    -2.3
+   ],
+   "max": [
+    -11.2,
+    2.6,
+    -1.3
+   ]
+  },
+  {
+   "s": "Alcove_Ceiling_2",
+   "min": [
+    -4.8,
+    2.4,
+    1.3
+   ],
+   "max": [
+    -3.2,
+    2.6,
+    2.3
+   ]
+  },
+  {
+   "s": "Alcove_Ceiling_3",
+   "min": [
+    11.2,
+    2.4,
+    1.3
+   ],
+   "max": [
+    12.8,
+    2.6,
+    2.3
+   ]
+  },
+  {
+   "s": "Alcove_Ceiling_4",
+   "min": [
+    3.2,
+    2.4,
+    -2.3
+   ],
+   "max": [
+    4.8,
+    2.6,
+    -1.3
+   ]
+  },
+  {
+   "s": "Alcove_Floor",
+   "min": [
+    -12.8,
+    -0.3,
+    -2.5
+   ],
+   "max": [
+    -11.2,
+    0.0,
+    -1.1
+   ]
+  },
+  {
+   "s": "Alcove_Floor_2",
+   "min": [
+    -4.8,
+    -0.3,
+    1.1
+   ],
+   "max": [
+    -3.2,
+    0.0,
+    2.5
+   ]
+  },
+  {
+   "s": "Alcove_Floor_3",
+   "min": [
+    11.2,
+    -0.3,
+    1.1
+   ],
+   "max": [
+    12.8,
+    0.0,
+    2.5
+   ]
+  },
+  {
+   "s": "Alcove_Floor_4",
+   "min": [
+    3.2,
+    -0.3,
+    -2.5
+   ],
+   "max": [
+    4.8,
+    0.0,
+    -1.1
+   ]
+  },
+  {
+   "s": "Alcove_Side",
+   "min": [
+    -12.8,
+    0.0,
+    -2.3
+   ],
+   "max": [
+    -12.6,
+    2.6,
+    -1.3
+   ]
+  },
+  {
+   "s": "Alcove_Side_2",
+   "min": [
+    -11.4,
+    0.0,
+    -2.3
+   ],
+   "max": [
+    -11.2,
+    2.6,
+    -1.3
+   ]
+  },
+  {
+   "s": "Alcove_Side_3",
+   "min": [
+    -4.8,
+    0.0,
+    1.3
+   ],
+   "max": [
+    -4.6,
+    2.6,
+    2.3
+   ]
+  },
+  {
+   "s": "Alcove_Side_4",
+   "min": [
+    -3.4,
+    0.0,
+    1.3
+   ],
+   "max": [
+    -3.2,
+    2.6,
+    2.3
+   ]
+  },
+  {
+   "s": "Alcove_Side_5",
+   "min": [
+    11.2,
+    0.0,
+    1.3
+   ],
+   "max": [
+    11.4,
+    2.6,
+    2.3
+   ]
+  },
+  {
+   "s": "Alcove_Side_6",
+   "min": [
+    12.6,
+    0.0,
+    1.3
+   ],
+   "max": [
+    12.8,
+    2.6,
+    2.3
+   ]
+  },
+  {
+   "s": "Alcove_Side_7",
+   "min": [
+    3.2,
+    0.0,
+    -2.3
+   ],
+   "max": [
+    3.4,
+    2.6,
+    -1.3
+   ]
+  },
+  {
+   "s": "Alcove_Side_8",
+   "min": [
+    4.6,
+    0.0,
+    -2.3
+   ],
+   "max": [
+    4.8,
+    2.6,
+    -1.3
+   ]
+  },
+  {
+   "s": "Corridor_Ceiling",
+   "min": [
+    -20.2,
+    2.8,
+    -1.3
+   ],
+   "max": [
+    20.2,
+    3.0,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Floor",
+   "min": [
+    -20.2,
+    -0.3,
+    -1.3
+   ],
+   "max": [
+    20.2,
+    0.0,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_E_1",
+   "min": [
+    20.0,
+    0.0,
+    -1.1
+   ],
+   "max": [
+    20.2,
+    2.8,
+    -0.47
+   ]
+  },
+  {
+   "s": "Corridor_Wall_E_2",
+   "min": [
+    20.0,
+    2.16,
+    -0.47
+   ],
+   "max": [
+    20.2,
+    2.8,
+    0.47
+   ]
+  },
+  {
+   "s": "Corridor_Wall_E_3",
+   "min": [
+    20.0,
+    0.0,
+    0.47
+   ],
+   "max": [
+    20.2,
+    2.8,
+    1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_1",
+   "min": [
+    -20.2,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    -16.47,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_10",
+   "min": [
+    3.6,
+    2.16,
+    -1.3
+   ],
+   "max": [
+    4.4,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_11",
+   "min": [
+    4.4,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    7.53,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_12",
+   "min": [
+    7.53,
+    2.16,
+    -1.3
+   ],
+   "max": [
+    8.47,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_13",
+   "min": [
+    8.47,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    15.53,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_14",
+   "min": [
+    15.53,
+    2.16,
+    -1.3
+   ],
+   "max": [
+    16.47,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_15",
+   "min": [
+    16.47,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    20.2,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_2",
+   "min": [
+    -16.47,
+    2.16,
+    -1.3
+   ],
+   "max": [
+    -15.53,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_3",
+   "min": [
+    -15.53,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    -12.6,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_4",
+   "min": [
+    -12.6,
+    2.4,
+    -1.3
+   ],
+   "max": [
+    -11.4,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_5",
+   "min": [
+    -11.4,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    -8.47,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_6",
+   "min": [
+    -8.47,
+    2.16,
+    -1.3
+   ],
+   "max": [
+    -7.53,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_7",
+   "min": [
+    -7.53,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    -0.47,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_8",
+   "min": [
+    -0.47,
+    2.16,
+    -1.3
+   ],
+   "max": [
+    0.47,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_N_9",
+   "min": [
+    0.47,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    3.6,
+    2.8,
+    -1.1
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_1",
+   "min": [
+    -20.2,
+    0.0,
+    1.1
+   ],
+   "max": [
+    -16.47,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_10",
+   "min": [
+    7.53,
+    2.16,
+    1.1
+   ],
+   "max": [
+    8.47,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_11",
+   "min": [
+    8.47,
+    0.0,
+    1.1
+   ],
+   "max": [
+    11.4,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_12",
+   "min": [
+    11.4,
+    2.4,
+    1.1
+   ],
+   "max": [
+    12.6,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_13",
+   "min": [
+    12.6,
+    0.0,
+    1.1
+   ],
+   "max": [
+    15.53,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_14",
+   "min": [
+    15.53,
+    2.16,
+    1.1
+   ],
+   "max": [
+    16.47,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_15",
+   "min": [
+    16.47,
+    0.0,
+    1.1
+   ],
+   "max": [
+    20.2,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_2",
+   "min": [
+    -16.47,
+    2.16,
+    1.1
+   ],
+   "max": [
+    -15.53,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_3",
+   "min": [
+    -15.53,
+    0.0,
+    1.1
+   ],
+   "max": [
+    -8.47,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_4",
+   "min": [
+    -8.47,
+    2.16,
+    1.1
+   ],
+   "max": [
+    -7.53,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_5",
+   "min": [
+    -7.53,
+    0.0,
+    1.1
+   ],
+   "max": [
+    -4.4,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_6",
+   "min": [
+    -4.4,
+    2.16,
+    1.1
+   ],
+   "max": [
+    -3.6,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_7",
+   "min": [
+    -3.6,
+    0.0,
+    1.1
+   ],
+   "max": [
+    -0.47,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_8",
+   "min": [
+    -0.47,
+    2.16,
+    1.1
+   ],
+   "max": [
+    0.47,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_S_9",
+   "min": [
+    0.47,
+    0.0,
+    1.1
+   ],
+   "max": [
+    7.53,
+    2.8,
+    1.3
+   ]
+  },
+  {
+   "s": "Corridor_Wall_W_1",
+   "min": [
+    -20.2,
+    0.0,
+    -1.1
+   ],
+   "max": [
+    -20.0,
+    2.8,
+    -0.6
+   ]
+  },
+  {
+   "s": "Corridor_Wall_W_2",
+   "min": [
+    -20.2,
+    2.2,
+    -0.6
+   ],
+   "max": [
+    -20.0,
+    2.8,
+    0.6
+   ]
+  },
+  {
+   "s": "Corridor_Wall_W_3",
+   "min": [
+    -20.2,
+    0.0,
+    0.6
+   ],
+   "max": [
+    -20.0,
+    2.8,
+    1.1
+   ]
+  },
+  {
+   "s": "Landing_Top",
+   "min": [
+    25.04,
+    2.9,
+    -1.0
+   ],
+   "max": [
+    26.6,
+    3.2,
+    1.0
+   ]
+  },
+  {
+   "s": "LiftCar_Ceiling",
+   "min": [
+    -22.6,
+    2.4,
+    -1.3
+   ],
+   "max": [
+    -20.0,
+    2.6,
+    1.3
+   ]
+  },
+  {
+   "s": "LiftCar_Floor",
+   "min": [
+    -22.6,
+    -0.3,
+    -1.3
+   ],
+   "max": [
+    -20.0,
+    0.0,
+    1.3
+   ]
+  },
+  {
+   "s": "LiftCar_Wall_N_1",
+   "min": [
+    -22.6,
+    0.0,
+    -1.3
+   ],
+   "max": [
+    -20.0,
+    2.4,
+    -1.1
+   ]
+  },
+  {
+   "s": "LiftCar_Wall_S_1",
+   "min": [
+    -22.6,
+    0.0,
+    1.1
+   ],
+   "max": [
+    -20.0,
+    2.4,
+    1.3
+   ]
+  },
+  {
+   "s": "LiftCar_Wall_W_1",
+   "min": [
+    -22.6,
+    0.0,
+    -1.1
+   ],
+   "max": [
+    -22.4,
+    2.4,
+    1.1
+   ]
+  },
+  {
+   "s": "Stairwell_Ceiling",
+   "min": [
+    20.0,
+    6.0,
+    -1.2
+   ],
+   "max": [
+    26.8,
+    6.2,
+    1.2
+   ]
+  },
+  {
+   "s": "Stairwell_Floor",
+   "min": [
+    20.0,
+    -0.3,
+    -1.2
+   ],
+   "max": [
+    26.8,
+    0.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Stairwell_Wall_E_1",
+   "min": [
+    26.6,
+    0.0,
+    -1.0
+   ],
+   "max": [
+    26.8,
+    6.0,
+    -0.47
+   ]
+  },
+  {
+   "s": "Stairwell_Wall_E_2",
+   "min": [
+    26.6,
+    0.0,
+    -0.47
+   ],
+   "max": [
+    26.8,
+    3.2,
+    0.47
+   ]
+  },
+  {
+   "s": "Stairwell_Wall_E_3",
+   "min": [
+    26.6,
+    5.36,
+    -0.47
+   ],
+   "max": [
+    26.8,
+    6.0,
+    0.47
+   ]
+  },
+  {
+   "s": "Stairwell_Wall_E_4",
+   "min": [
+    26.6,
+    0.0,
+    0.47
+   ],
+   "max": [
+    26.8,
+    6.0,
+    1.0
+   ]
+  },
+  {
+   "s": "Stairwell_Wall_N",
+   "min": [
+    20.0,
+    0.0,
+    -1.2
+   ],
+   "max": [
+    26.8,
+    6.0,
+    -1.0
+   ]
+  },
+  {
+   "s": "Stairwell_Wall_S",
+   "min": [
+    20.0,
+    0.0,
+    1.0
+   ],
+   "max": [
+    26.8,
+    6.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Stairwell_Wall_W_up",
+   "min": [
+    20.0,
+    2.8,
+    -1.0
+   ],
+   "max": [
+    20.2,
+    6.0,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_00",
+   "min": [
+    21.4,
+    0.0,
+    -1.0
+   ],
+   "max": [
+    21.68,
+    0.246,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_01",
+   "min": [
+    21.68,
+    0.246,
+    -1.0
+   ],
+   "max": [
+    21.96,
+    0.492,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_02",
+   "min": [
+    21.96,
+    0.492,
+    -1.0
+   ],
+   "max": [
+    22.24,
+    0.738,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_03",
+   "min": [
+    22.24,
+    0.738,
+    -1.0
+   ],
+   "max": [
+    22.52,
+    0.985,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_04",
+   "min": [
+    22.52,
+    0.985,
+    -1.0
+   ],
+   "max": [
+    22.8,
+    1.231,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_05",
+   "min": [
+    22.8,
+    1.231,
+    -1.0
+   ],
+   "max": [
+    23.08,
+    1.477,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_06",
+   "min": [
+    23.08,
+    1.477,
+    -1.0
+   ],
+   "max": [
+    23.36,
+    1.723,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_07",
+   "min": [
+    23.36,
+    1.723,
+    -1.0
+   ],
+   "max": [
+    23.64,
+    1.969,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_08",
+   "min": [
+    23.64,
+    1.969,
+    -1.0
+   ],
+   "max": [
+    23.92,
+    2.215,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_09",
+   "min": [
+    23.92,
+    2.215,
+    -1.0
+   ],
+   "max": [
+    24.2,
+    2.462,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_10",
+   "min": [
+    24.2,
+    2.462,
+    -1.0
+   ],
+   "max": [
+    24.48,
+    2.708,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_11",
+   "min": [
+    24.48,
+    2.708,
+    -1.0
+   ],
+   "max": [
+    24.76,
+    2.954,
+    1.0
+   ]
+  },
+  {
+   "s": "Step_floor_1_lower_up_12",
+   "min": [
+    24.76,
+    2.954,
+    -1.0
+   ],
+   "max": [
+    25.04,
+    3.2,
+    1.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_closet_2",
+   "level": "floor_1_lower",
+   "hinge": [
+    -3.6,
+    0.0,
+    1.1
+   ],
+   "width": 0.8,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "closet"
+  },
+  {
+   "name": "DoorLeaf_closet_4",
+   "level": "floor_1_lower",
+   "hinge": [
+    3.6,
+    0.0,
+    -1.1
+   ],
+   "width": 0.8,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "closet"
+  },
+  {
+   "name": "DoorLeaf_lift",
+   "level": "floor_1_lower",
+   "hinge": [
+    -20.0,
+    0.0,
+    -0.6
+   ],
+   "width": 1.2,
+   "height": 2.2,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "elevator"
+  },
+  {
+   "name": "DoorLeaf_room_101",
+   "level": "floor_1_lower",
+   "hinge": [
+    -16.47,
+    0.0,
+    -1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "101",
+   "room_layout": "motel_a",
+   "room_x": -16.0,
+   "room_z": -1.1,
+   "room_yaw_deg": 0.0
+  },
+  {
+   "name": "DoorLeaf_room_102",
+   "level": "floor_1_lower",
+   "hinge": [
+    -8.47,
+    0.0,
+    -1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "102",
+   "room_layout": "motel_b",
+   "room_x": -8.0,
+   "room_z": -1.1,
+   "room_yaw_deg": 0.0
+  },
+  {
+   "name": "DoorLeaf_room_103",
+   "level": "floor_1_lower",
+   "hinge": [
+    -0.47,
+    0.0,
+    -1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "103",
+   "room_layout": "motel_a",
+   "room_x": 0.0,
+   "room_z": -1.1,
+   "room_yaw_deg": 0.0
+  },
+  {
+   "name": "DoorLeaf_room_104",
+   "level": "floor_1_lower",
+   "hinge": [
+    7.53,
+    0.0,
+    -1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "104",
+   "room_layout": "motel_b",
+   "room_x": 8.0,
+   "room_z": -1.1,
+   "room_yaw_deg": 0.0
+  },
+  {
+   "name": "DoorLeaf_room_105",
+   "level": "floor_1_lower",
+   "hinge": [
+    15.53,
+    0.0,
+    -1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "105",
+   "room_layout": "motel_a",
+   "room_x": 16.0,
+   "room_z": -1.1,
+   "room_yaw_deg": 0.0
+  },
+  {
+   "name": "DoorLeaf_room_106",
+   "level": "floor_1_lower",
+   "hinge": [
+    -15.53,
+    0.0,
+    1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "106",
+   "room_layout": "motel_b",
+   "room_x": -16.0,
+   "room_z": 1.1,
+   "room_yaw_deg": 180.0
+  },
+  {
+   "name": "DoorLeaf_room_107",
+   "level": "floor_1_lower",
+   "hinge": [
+    -7.53,
+    0.0,
+    1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "107",
+   "room_layout": "motel_a",
+   "room_x": -8.0,
+   "room_z": 1.1,
+   "room_yaw_deg": 180.0
+  },
+  {
+   "name": "DoorLeaf_room_108",
+   "level": "floor_1_lower",
+   "hinge": [
+    0.47,
+    0.0,
+    1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "108",
+   "room_layout": "motel_b",
+   "room_x": 0.0,
+   "room_z": 1.1,
+   "room_yaw_deg": 180.0
+  },
+  {
+   "name": "DoorLeaf_room_109",
+   "level": "floor_1_lower",
+   "hinge": [
+    8.47,
+    0.0,
+    1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "109",
+   "room_layout": "motel_a",
+   "room_x": 8.0,
+   "room_z": 1.1,
+   "room_yaw_deg": 180.0
+  },
+  {
+   "name": "DoorLeaf_room_110",
+   "level": "floor_1_lower",
+   "hinge": [
+    16.47,
+    0.0,
+    1.3
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "room": "110",
+   "room_layout": "motel_b",
+   "room_x": 16.0,
+   "room_z": 1.1,
+   "room_yaw_deg": 180.0
+  },
+  {
+   "name": "DoorLeaf_stairs_up",
+   "level": "floor_1_lower",
+   "hinge": [
+    26.6,
+    3.2,
+    -0.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_stairwell",
+   "level": "floor_1_lower",
+   "hinge": [
+    20.0,
+    0.0,
+    -0.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": 95.0,
+   "state": "closed"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "floor_1_lower",
+   "level": "floor_1_lower",
+   "kind": "Spawn",
+   "position": [
+    -18.8,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "lift",
+   "at": [
+    -19.4,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -18.8,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "stairs_up",
+   "at": [
+    26.0,
+    3.2,
+    0.0
+   ],
+   "arrive": [
+    25.5,
+    3.2,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "hide",
+   "name": "Spot_hide_1",
+   "position": [
+    -12.0,
+    0.0,
+    -1.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "where": "alcove"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_2",
+   "position": [
+    -4.0,
+    0.0,
+    1.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "where": "closet"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_3",
+   "position": [
+    12.0,
+    0.0,
+    1.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "where": "alcove"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_4",
+   "position": [
+    4.0,
+    0.0,
+    -1.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "where": "closet"
+  }
+ ]
+}
