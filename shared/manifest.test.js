@@ -16,8 +16,10 @@ const bad = (mutate, expect) => { const d = clone(FARWAY); mutate(d); const e = 
 
 // ---- the values that used to be written out by hand in six files. If one of these changes, a rule of the game changed: say so on purpose.
 test("the registry gives the same floors, scenes, puzzles, loot and room size the code used to hard-code", () => {
-  assert.deepEqual(REGISTRY.floors, {B1: -3.0, L1: 0, L2: 3.2, L3: 6.4, L4: 9.6, gbi_L4_4: 9.6, gbi_L3_1: 6.4});          // session 16: the two chambers are scenes a room's server runs
-  assert.deepEqual(Object.keys(REGISTRY.floors), ["B1", "L1", "L2", "L3", "L4", "gbi_L4_4", "gbi_L3_1"]);
+  const chambers = ["gbi_L4_1", "gbi_L4_2", "gbi_L4_3", "gbi_L4_4", "gbi_L3_1", "gbi_L3_2", "gbi_L3_3", "gbi_L3_4", "gbi_L2_1", "gbi_L2_2", "gbi_L2_3", "gbi_L2_4", "gbi_L1_1", "gbi_L1_2", "gbi_L1_3", "gbi_L1_4", "gbi_B1_1", "gbi_B1_2", "gbi_B1_3", "gbi_B1_4"];          // the run's 20 chambers, top down (#123, #130): each a scene a room's server runs, at its floor's height
+  const storey = {L4: 9.6, L3: 6.4, L2: 3.2, L1: 0, B1: -3.0};
+  assert.deepEqual(REGISTRY.floors, {B1: -3.0, L1: 0, L2: 3.2, L3: 6.4, L4: 9.6, ...Object.fromEntries(chambers.map(c => [c, storey[c.split("_")[1]]]))});
+  assert.deepEqual(Object.keys(REGISTRY.floors), ["B1", "L1", "L2", "L3", "L4", ...chambers]);
   assert.deepEqual(Object.keys(REGISTRY.pageScenes).slice(0, 5), ["B1", "L1", "L2", "L3", "L4"], "order matters: the page seeds spots by scene index");
   const lot = ["world/L4.glb", "world/parking_lot.glb", "world/city_skyline.glb"];          // #133: the lot is its own GLB, drawn by the store's top floor, its chamber and the Overworld
   const hand = Object.fromEntries(Object.entries(REGISTRY.pageScenes).filter(([id]) => !Object.values(BLENDER_SCENES).flat().some(s => s.id === id)));
@@ -26,6 +28,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
     L3: {glbs: ["world/L3.glb"], floor: 6.4}, L4: {glbs: [...lot, "world/Exterior.glb"], floor: 9.6},
     parking_lot: {glbs: lot, floor: 9.6, backdrop: {day: "world/backdrops/overworld_clear_day.webp", night: "world/backdrops/overworld_night.webp"}},          // the Overworld (session 6): a page scene, not a room's floor (see `floors` above)
     gbi_L4_4: {glbs: [...lot, "world/Exterior.glb"], floor: 9.6}, gbi_L3_1: {glbs: ["world/L3.glb"], floor: 6.4},          // Going back in chambers (session 8): page scenes too
+    gbi_L2_1: {glbs: ["world/L2.glb"], floor: 3.2}, gbi_L1_1: {glbs: ["world/L1.glb"], floor: 0}, gbi_B1_1: {glbs: ["world/B1.glb"], floor: -3.0},          // #123: the store's own floors as chamber 1
     street: {glbs: ["world/street.glb"], floor: 0}, apartment: {glbs: ["world/apartment.glb"], floor: 0}, main_floor: {glbs: ["world/main_floor.glb"], floor: 0}, entrance: {glbs: ["world/entrance.glb"], floor: 0}, galleries: {glbs: ["world/galleries.glb"], floor: 0}, factory_floor: {glbs: ["world/factory_floor.glb"], floor: 0}, laboratory: {glbs: ["world/laboratory.glb"], floor: 0}, forest: {glbs: ["world/forest.glb"], floor: 0}, meadow: {glbs: ["world/meadow.glb"], floor: 0},                                                       // the City (session 9): Hallam Row, blockout geometry built in index.html
   });
   // the Blender areas' scenes (shared/farway.scenes.js): each is on the page with its own GLB (or the kit's sky hall) at its floor
@@ -34,7 +37,7 @@ test("the registry gives the same floors, scenes, puzzles, loot and room size th
   assert.deepEqual(REGISTRY.scenesWith("switches"), ["L1"]);
   assert.deepEqual(REGISTRY.scenesWith("keypad"), ["L2"]);
   assert.deepEqual(REGISTRY.powerSources, ["L3", "L4"]);
-  assert.deepEqual(REGISTRY.loot, {B1: {lockers: 8, packs: 6}, L1: {lockers: 0, packs: 3}, L2: {lockers: 0, packs: 3}, L3: {lockers: 0, packs: 4}, L4: {lockers: 0, packs: 3}, gbi_L4_4: {lockers: 0, packs: 3}, gbi_L3_1: {lockers: 0, packs: 3}});          // the chambers (session 8) carry ammo packs
+  assert.deepEqual(REGISTRY.loot, {B1: {lockers: 8, packs: 6}, L1: {lockers: 0, packs: 3}, L2: {lockers: 0, packs: 3}, L3: {lockers: 0, packs: 4}, L4: {lockers: 0, packs: 3}, ...Object.fromEntries(chambers.map(c => [c, {lockers: 0, packs: 3}]))});          // the chambers (session 8) carry ammo packs
   assert.equal(REGISTRY.maxPlayers("original"), 10);
 });
 
@@ -50,9 +53,10 @@ test("every door link in world/*.json is in the manifest, with the same arrival,
   for (const [scene, doc] of Object.entries(docs)) for (const d of doc.doors) if (d.link) { n++; assert.ok(REGISTRY.linkFrom(scene, d.name), `${scene}/${d.name}`); }
   assert.equal(built.length, n, "same count");
   assert.equal(n, 9);          // #133: the balloon house's gate is gone
-  const gdocs = Object.fromEntries(["gbi_L4_4", "gbi_L3_1"].map(id => [id, JSON.parse(fs.readFileSync(path.join(ROOT, `world/${id}.json`), "utf8"))]));          // the chambers' files: one link, from gbi_L4_4 down
+  // the chambers made from the store's floors (tools/make_chambers.mjs): their stair doors carry the run's links, one each but B1's (its way on is an F spot the manifest names)
+  const gdocs = Object.fromEntries(["gbi_L4_4", "gbi_L3_1", "gbi_L2_1", "gbi_L1_1", "gbi_B1_1"].map(id => [id, JSON.parse(fs.readFileSync(path.join(ROOT, `world/${id}.json`), "utf8"))]));
   assert.deepEqual(checkManifest(FARWAY, {worldDocs: gdocs}).errors, []);
-  assert.equal(Object.values(gdocs).flatMap(d => d.doors).filter(d => d.link).length, REGISTRY.links.filter(l => l.status === "built" && l.from.area === "gbi").length);
+  assert.equal(Object.values(gdocs).flatMap(d => d.doors).filter(d => d.link).length, REGISTRY.links.filter(l => l.status === "built" && l.from.area === "gbi" && l.connector === "stair_door").length);
 });
 
 test("a drifted door link is caught", () => {
@@ -156,7 +160,7 @@ test("an addon adds scenes, links and a mode without touching the base", () => {
   const m = mergeAddon(base, addon());
   assert.equal(JSON.stringify(base), frozen, "the base is unchanged");
   const r = buildRegistry(m);
-  assert.deepEqual(Object.keys(r.floors), ["B1", "L1", "L2", "L3", "L4", "gbi_L4_4", "gbi_L3_1", "shed_inside"]);
+  assert.deepEqual(Object.keys(r.floors), [...Object.keys(REGISTRY.floors), "shed_inside"]);
   assert.deepEqual(r.scenesWith("keypad"), ["L2", "shed_inside"]);
   assert.equal(r.maxPlayers("shed"), 4);
   assert.deepEqual(r.pageScenes.shed_inside, {glbs: ["addons/shed/shed.glb"], floor: 0});
@@ -179,7 +183,14 @@ test("an addon cannot reuse ids, redefine a base mode, or add a link between bas
 test("the chambers: wave numbers follow the run (4th chamber of L4 is wave 4, 1st of L3 is wave 5), and the start is a built chamber", () => {
   const c = REGISTRY.chamber("gbi_L4_4"), n = REGISTRY.chamber("gbi_L3_1");
   assert.equal(c.wave.no, 4); assert.equal(n.wave.no, 5); assert.equal(c.next, "gbi_L3_1"); assert.equal(c.stairsDown, "DoorLeaf_Stair_L3_L4_down");
-  assert.equal(REGISTRY.modes.going_back_in.startChamber, "gbi_L4_4");
+  assert.equal(REGISTRY.modes.going_back_in.startChamber, "gbi_L4_1", "#123: the run starts in the showroom");
+  assert.deepEqual(REGISTRY.chambers.map(id => REGISTRY.chamber(id).wave.no), Array.from({length: 20}, (_, i) => i + 1), "20 chambers, one wave each, in the run's order");
+  // the run is one chain: from each chamber but the last, a built link a room can follow leads to the next (the way back up is closed behind you)
+  for (const [i, id] of REGISTRY.chambers.slice(0, -1).entries()) {
+    const out = REGISTRY.linksFrom(id).filter(l => l.status === "built" && l.to.scene && l.to.scene.startsWith("gbi_"));
+    assert.deepEqual(out.map(l => l.to.scene), [REGISTRY.chambers[i + 1]], id); assert.ok(!out[0].soloOnly, id);
+  }
+  assert.equal(REGISTRY.linksFrom("gbi_B1_4").filter(l => l.status === "built").length, 0, "the run's end: its way out is still planned");
   assert.equal(REGISTRY.chamber("L3"), null, "an Original floor is not a chamber");
   assert.equal(REGISTRY.modes.going_back_in.status, "built", "session 16: a room can run the mode");
   for (const id of REGISTRY.chambers) assert.equal(REGISTRY.floors[id], REGISTRY.chamber(id).floorY, "every chamber is a scene the server runs, at its floor's height");
@@ -196,7 +207,7 @@ test("a bad chamber is caught", () => {
   bad(d => { d.areas.find(a => a.id === "city").scenes[0].backdrop = {day: "../x.webp"}; }, /backdrop needs a day picture/);
   bad(d => { d.areas.find(a => a.id === "city").scenes[0].backdrop = {day: "world/x.webp", dusk: "world/y.webp"}; }, /backdrop needs a day picture/);
   bad(d => { d.areas.find(a => a.id === "city").scenes.find(x => x.id === "bus_stop").backdrop = {day: "world/x.webp"}; }, /a backdrop needs a scene the page loads/);
-  bad(d => { const sc = d.areas.find(a => a.id === "gbi").scenes; sc[1].chamber.floor = sc[0].chamber.floor; sc[1].chamber.index = sc[0].chamber.index; }, /chamber 4 of L4 is already gbi_L4_4/);   // one chamber per floor and index
+  bad(d => { const sc = d.areas.find(a => a.id === "gbi").scenes; sc[1].chamber.floor = sc[0].chamber.floor; sc[1].chamber.index = sc[0].chamber.index; }, /chamber 1 of L4 is already gbi_L4_1/);   // one chamber per floor and index
   bad(d => { d.areas.find(a => a.id === "gbi").scenes[0].chamber.next = "nope"; }, /is not a chamber/);
   bad(d => { delete d.areas.find(a => a.id === "gbi").scenes[0].chamber.wave; }, /chamber needs a floor/);
 });

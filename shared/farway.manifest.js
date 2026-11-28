@@ -33,7 +33,7 @@ export const FARWAY = {
     going_back_in: {
       // built (session 16): a room runs it on the server, starting everyone in `startChamber`; its scenes are the chambers of the `gbi` area, not `floors` (those say which storeys the run
       // goes down). Solo play still enters it from the Overworld's options screen (session 8). No finish yet: the run has no end until all 20 chambers exist.
-      status: "built", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20, startChamber: "gbi_L4_4",
+      status: "built", area: "lot", floors: ["L4", "L3", "L2", "L1", "B1"], players: {min: 1, max: 10}, chambersPerFloor: 4, waves: 20, startChamber: "gbi_L4_1",          // #123: the run starts in the showroom, the first of L4's chambers
     },
   },
 
@@ -69,8 +69,17 @@ export const FARWAY = {
       // B1's 4th is wave 20, the run's end, with no stairs.
       id: "gbi", name: "Going back in", status: "built", tone: "backrooms",
       scenes: [
+        // the run, top down (#123, #130): the Blender chambers are in farway.scenes.js; chamber 4 of L4 and chamber 1 of the other floors are the store's own floors
+        ...BLENDER_SCENES.gbi.filter(c => c.chamber.floor === "L4"),
         {id: "gbi_L4_4", floorY: 9.6, multiplayer: true, files: ["world/L4.glb", "world/parking_lot.glb", "world/city_skyline.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
-        {id: "gbi_L3_1", floorY: 6.4, multiplayer: true, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
+        {id: "gbi_L3_1", floorY: 6.4, multiplayer: true, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L2_L3_down", next: "gbi_L3_2"}},
+        ...BLENDER_SCENES.gbi.filter(c => c.chamber.floor === "L3"),
+        {id: "gbi_L2_1", floorY: 3.2, multiplayer: true, files: ["world/L2.glb", "world/gbi_L2_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L2", index: 1, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L1_L2_down", next: "gbi_L2_2"}},
+        ...BLENDER_SCENES.gbi.filter(c => c.chamber.floor === "L2"),
+        {id: "gbi_L1_1", floorY: 0, multiplayer: true, files: ["world/L1.glb", "world/gbi_L1_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L1", index: 1, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_B1_L1_down", next: "gbi_L1_2"}},
+        ...BLENDER_SCENES.gbi.filter(c => c.chamber.floor === "L1"),
+        {id: "gbi_B1_1", floorY: -3.0, multiplayer: true, files: ["world/B1.glb", "world/gbi_B1_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "B1", index: 1, wave: {monsters: 3, kind: "creature"}, stairsDown: "sky_hall_north", next: "gbi_B1_2"}},
+        ...BLENDER_SCENES.gbi.filter(c => c.chamber.floor === "B1"),
       ],
     },
     {

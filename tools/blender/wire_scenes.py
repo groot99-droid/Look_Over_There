@@ -41,6 +41,25 @@ SOLO_SCENES = {"entrance", "main_floor", "laboratory", "galleries"}
 # Blender scenes with no greybox builder: (area, scene, floorY, presence)
 EXTRA_SCENES = [("museum", "galleries_wing", 0.0, False)]          # #81: the museum's side wing, off the hall's two doorways (a guard's shift is solo)
 
+# Going back in (#123, #130): the 15 new chambers, run by a room's server as floors with a wave each. The run is one chain, down and never back up:
+# L4_1 > L4_2 > L4_3 > L4_4 > L3_1 > ... > B1_4. Chambers 1 of L2, L1 and B1 are the store's own floors (tools/make_chambers.mjs makes their files, as it made L3_1's);
+# their links are the stair doors in those files, made from the manifest's links here.
+GBI_FLOOR_Y = {"L4": 9.6, "L3": 6.4, "L2": 3.2, "L1": 0.0, "B1": -3.0}
+GBI_WAVE = {"gbi_B1_4": 4}          # wave 20, the run's end, has four monsters (README); every other chamber three, as the first two
+GBI_STORE_NEXT = {}          # filled by collect(): the store chambers' way on and next, for the manifest's hand-written entries (printed by --store)
+GBI_JOINS = [
+    # (from scene, door, F spot or None, connector, to scene, to door or None, arrive, face): the README's "links that leave this set", the proposals taken
+    ("gbi_L4_3", "exit_to_L4_4", None, "sky_hall", "gbi_L4_4", None, [0.0, 9.6, 25.6], [0.0, -1.0]),          # just inside the store's sealed glass doors
+    ("gbi_L3_1", "DoorLeaf_Stair_L2_L3_down", None, "stair_door", "gbi_L3_2", "stair_from_L3_1", None, None),
+    ("gbi_L3_4", "stair_down", None, "stairs", "gbi_L2_1", None, [-16.478, 6.4, -14.278], [0.0, 1.0]),        # L2's real stairwell, where the store's L3 stairs down arrive
+    ("gbi_L2_1", "DoorLeaf_Stair_L1_L2_down", None, "stair_door", "gbi_L2_2", "stair_from_L2_1", None, None),
+    ("gbi_L2_4", "stair_down", None, "stairs", "gbi_L1_1", None, [-0.007, 3.2, 9.708], [0.0, -1.0]),
+    ("gbi_L1_1", "DoorLeaf_Stair_B1_L1_down", None, "stair_door", "gbi_L1_2", "stair_from_L1_1", None, None),
+    ("gbi_L1_4", "stair_down", None, "stairs", "gbi_B1_1", None, [0.009, 0.0, -1.599], [0.0, -1.0]),
+    # B1 has no second door (open question 3): the proposal's painted-sky hall on B1's north wall, an F spot by it until the kit's hall is placed there
+    ("gbi_B1_1", "sky_hall_north", [0.0, -3.0, -21.0], "sky_hall", "gbi_B1_2", "from_B1_1", None, None),
+]
+
 # the joins onto the older scenes: (id, from, to, connector, extra). `from.at` is the F spot on a scene whose world file has no links.
 JOINS = [
     # the hotel: the apartment tower's door opens the lobby (the owner, 2026-11-28: "Lobby only"); the lobby's front doors lead back out
@@ -139,6 +158,34 @@ def collect():
                 elif note:
                     l["note"] = note
                 links.append(l)
+    gb = builder("gbi")
+    out = []
+    for sid in gb.SCENES:
+        _, fl, ix = sid.split("_")
+        out.append({"id": sid, "floorY": GBI_FLOOR_Y[fl], "multiplayer": True, "files": [f"world/{sid}.glb", f"world/{sid}.json"], "loot": {"lockers": 0, "packs": 3},
+                    "chamber": {"floor": fl, "index": int(ix), "wave": {"monsters": GBI_WAVE.get(sid, 3), "kind": "creature"}}})
+    scenes["gbi"] = sorted(out, key=lambda c: (list(GBI_FLOOR_Y).index(c["chamber"]["floor"]), c["chamber"]["index"]))
+    # each chamber names the next one and its way on (`next`, `stairsDown`, as gbi_L4_4 does): the run's order, top down
+    run = [f"gbi_{fl}_{i}" for fl in GBI_FLOOR_Y for i in range(1, 5)]
+    ways = {p[0][0]: p[0][1] for p in gb.PAIRS} | {a: da for a, da, *_ in GBI_JOINS}
+    for c in scenes["gbi"]:
+        k = run.index(c["id"])
+        if k + 1 < len(run) and c["id"] in ways:
+            c["chamber"].update({"stairsDown": ways[c["id"]], "next": run[k + 1]})
+    GBI_STORE_NEXT.update({a: (da, run[run.index(a) + 1]) for a, da, *_ in GBI_JOINS if a in ("gbi_L3_1", "gbi_L2_1", "gbi_L1_1", "gbi_B1_1")})
+    for p in gb.PAIRS:                      # one way: the run goes on, never back
+        (a, da), (bb, db) = p[0], p[1]
+        arr = link_of(bb, db)
+        links.append({"id": f"gbi.{a}.{da}", "status": "built", "connector": {"door": "doors", "painted-sky hall": "sky_hall"}.get(p[2], p[2]),
+                      "from": {"area": "gbi", "scene": a, "door": da}, "to": {"area": "gbi", "scene": bb, "arrive": [num(v) for v in arr["arrive"]], "face": [num(v) for v in arr["face"]]}})
+    for a, da, at, conn, bb, db, arrive, face in GBI_JOINS:
+        if arrive is None:
+            arr = link_of(bb, db); arrive, face = arr["arrive"], arr["face"]
+        fr = {"area": "gbi", "scene": a, "door": da, **({"at": at} if at else {})}
+        to = {"area": "gbi", "scene": bb, **({"door": "DoorLeaf_" + db} if conn == "stair_door" else {}), "arrive": [num(v) for v in arrive], "face": [num(v) for v in face]}
+        links.append({"id": f"gbi.{a}.{da}", "status": "built", "connector": conn, "from": fr, "to": to})
+    links.append({"id": "gbi.gbi_B1_4.exit_to_overworld", "status": "planned", "connector": "sky_hall", "from": {"area": "gbi", "scene": "gbi_B1_4", "door": "exit_to_overworld"},
+                  "to": {"area": "overworld", "scene": "parking_lot"}, "note": "The run's end: out to the Overworld's results screen (open question 5)."})
     for area, sid, fy, pres in EXTRA_SCENES:
         scenes.setdefault(area, []).append({"id": sid, "floorY": fy, "files": [f"world/{sid}.glb", f"world/{sid}.json"], **({"presence": True} if pres else {})})
         if not pres:
@@ -169,7 +216,9 @@ def render(scenes, links):
     j = lambda v: json.dumps(v, separators=(", ", ": ")).replace('"area": ', "area: ").replace('"scene": ', "scene: ").replace('"door": ', "door: ") \
         .replace('"arrive": ', "arrive: ").replace('"face": ', "face: ").replace('"at": ', "at: ").replace('"id": ', "id: ").replace('"status": ', "status: ") \
         .replace('"connector": ', "connector: ").replace('"from": ', "from: ").replace('"to": ', "to: ").replace('"note": ', "note: ").replace('"soloOnly": ', "soloOnly: ") \
-        .replace('"floorY": ', "floorY: ").replace('"files": ', "files: ").replace('"presence": ', "presence: ")
+        .replace('"floorY": ', "floorY: ").replace('"files": ', "files: ").replace('"presence": ', "presence: ").replace('"multiplayer": ', "multiplayer: ") \
+        .replace('"loot": ', "loot: ").replace('"lockers": ', "lockers: ").replace('"packs": ', "packs: ").replace('"chamber": ', "chamber: ").replace('"floor": ', "floor: ") \
+        .replace('"index": ', "index: ").replace('"wave": ', "wave: ").replace('"monsters": ', "monsters: ").replace('"kind": ', "kind: ").replace('"stairsDown": ', "stairsDown: ").replace('"next": ', "next: ")
     lines = ["// Made by tools/blender/wire_scenes.py from the Blender areas' greybox builders (their SCENES and PAIRS) and world/<scene>.json. Do not edit:",
              "// change the builder or JOINS in that script and run it (`--check` tells whether this file is current). shared/farway.manifest.js uses it.", "",
              "export const BLENDER_SCENES = {"]
