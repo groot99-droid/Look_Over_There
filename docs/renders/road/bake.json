@@ -1,0 +1,51 @@
+{
+ "samples": 512,
+ "ao_distance_m": 2.5,
+ "pages": [
+  {
+   "page": 0,
+   "size": 2048,
+   "px_per_m": 9.8,
+   "ao_p1_p10_p50_p90": [
+    0.023,
+    0.634,
+    0.934,
+    1.0
+   ],
+   "materials": [
+    "Asphalt",
+    "Grass"
+   ]
+  },
+  {
+   "page": 1,
+   "size": 2048,
+   "px_per_m": 11.1,
+   "ao_p1_p10_p50_p90": [
+    0.003,
+    0.031,
+    0.792,
+    1.0
+   ],
+   "materials": [
+    "Bark",
+    "Concrete",
+    "Deck",
+    "Fake_Door",
+    "Hedge",
+    "Leaf_Lilac",
+    "Leaf_Pink",
+    "Line_Yellow",
+    "More_To_Come",
+    "Paint_White",
+    "Plaster_Blue",
+    "Plaster_Pink",
+    "Sign_Forest",
+    "Sign_Lot",
+    "Steel"
+   ]
+  }
+ ],
+ "seconds": 129,
+ "device": "GPU"
+}
