@@ -109,25 +109,29 @@ try {
   const taken = await page.evaluate(() => ({left: window.__game.BAR.cage.packs.filter(p => p.visible).length, rounds: window.__game.LT.rounds}));
   check("its two packs are taken one at a time", taken.left === 0 && taken.rounds > 0, JSON.stringify(taken));
 
-  // the chained door: the third floor chamber (the fourth floor one has no door that is safe to chain)
-  check("the start chamber has no chained door", await page.evaluate(() => window.__game.BAR.st.door === null));
-  await page.evaluate(() => window.__game.loadScene("gbi_L3_1")); await settled("gbi_L3_1"); await page.evaluate(() => { window.__game.P.imm = 1e9; });
-  const door = await page.evaluate(() => { const g = window.__game, d = g.BAR.st && g.BAR.st.door; return d && {name: d.d.name, chained: d.chained, box: d.box.chained, target: d.target, behind: g.BAR.behind.length}; });
-  check("the third floor chamber's stairwell door is chained, with a pack behind it", door && door.chained && door.box && door.target === 0 && door.behind === 1, JSON.stringify(door));
-  const atDoor = () => page.evaluate(() => { const g = window.__game, d = g.BAR.st.door || g.doors.find(x => x.d.name === "DoorLeaf_Stair_L2_L3_down"), nx = d.dir[1], nz = -d.dir[0];
+  // the chained door: since #123 L3's stairwell door is its chamber's way on (never chained), so the first chamber of the run that gets a chained door
+  let chained = null;
+  for (const id of REGISTRY.chambers) {
+    await page.evaluate(id => window.__game.loadScene(id), id); await settled(id); await page.evaluate(() => { window.__game.P.imm = 1e9; });
+    chained = await page.evaluate(() => { const g = window.__game, d = g.BAR.st && g.BAR.st.door; if (!d) return null; window.__chainedDoor = d.d.name; return {name: d.d.name, chained: d.chained, box: d.box.chained, target: d.target, behind: g.BAR.behind.length, link: !!d.link}; });
+    if (chained) { chained.scene = id; break; }
+  }
+  const door = chained;
+  check("a chamber of the run has a chained door, with a pack behind it, and it is never a way on", door && door.chained && door.box && door.target === 0 && door.behind === 1 && !door.link, JSON.stringify(door));
+  const atDoor = () => page.evaluate(() => { const g = window.__game, d = g.BAR.st.door || g.doors.find(x => x.d.name === window.__chainedDoor), nx = d.dir[1], nz = -d.dir[0];
     for (const k of [1.2, -1.2]) { const x = d.cx + nx * k, z = d.cz + nz * k, c = g.nearestWalk(g.S.nav, x, z); if (c >= 0 && g.mainRegion().includes(c)) { g.P.p.set(x, g.S.floor + 0.02, z); g.P.v.set(0, 0, 0); g.P.yaw = Math.atan2(nx * Math.sign(k), nz * Math.sign(k)); g.P.pitch = 0; return true; } }
     return false; });
   check("stand at the door", await atDoor());
   await page.evaluate(() => window.__game.doAction()); await frames(2);
-  check("the action button does not open it", await page.evaluate(() => window.__game.doors.find(x => x.d.name === "DoorLeaf_Stair_L2_L3_down").target === 0));
-  await page.evaluate(() => { const g = window.__game, d = g.doors.find(x => x.d.name === "DoorLeaf_Stair_L2_L3_down"); g.openDoor(d); });
-  check("a monster cannot open it either", await page.evaluate(() => window.__game.doors.find(x => x.d.name === "DoorLeaf_Stair_L2_L3_down").target === 0));
+  check("the action button does not open it", await page.evaluate(() => window.__game.doors.find(x => x.d.name === window.__chainedDoor).target === 0));
+  await page.evaluate(() => { const g = window.__game, d = g.doors.find(x => x.d.name === window.__chainedDoor); g.openDoor(d); });
+  check("a monster cannot open it either", await page.evaluate(() => window.__game.doors.find(x => x.d.name === window.__chainedDoor).target === 0));
   await page.evaluate(() => window.__game.monsters.forEach(m => m.pos.set(m.pos.x + 900, m.fy, m.pos.z + 900)));
   await page.evaluate(() => window.__game.setHeld("shear")); await setShear({cuts: 2}); await atDoor(); await cut(); s = await st();
-  const freed = await page.evaluate(() => { const g = window.__game, d = g.doors.find(x => x.d.name === "DoorLeaf_Stair_L2_L3_down"); return {chained: !!d.chained, box: !!d.box.chained, bar: g.BAR.st.door}; });
+  const freed = await page.evaluate(() => { const g = window.__game, d = g.doors.find(x => x.d.name === window.__chainedDoor); return {chained: !!d.chained, box: !!d.box.chained, bar: g.BAR.st.door}; });
   check("a fresh cut frees it and uses a cut", !freed.chained && !freed.box && freed.bar === null && s.cuts === 1, JSON.stringify({freed, s}));
   await page.evaluate(() => window.__game.doAction()); await frames(2);
-  check("now it opens", await page.evaluate(() => window.__game.doors.find(x => x.d.name === "DoorLeaf_Stair_L2_L3_down").target === 1));
+  check("now it opens", await page.evaluate(() => window.__game.doors.find(x => x.d.name === window.__chainedDoor).target === 1));
   const behind = await page.evaluate(() => { const g = window.__game, b = g.BAR.behind[0]; g.P.p.set(b.home[0], g.S.floor + 0.02, b.home[1]); g.P.v.set(0, 0, 0); g.LT.rounds = 0; g.tryBarricade(); return {taken: b.taken, rounds: g.LT.rounds}; });
   check("the pack behind it can be taken", behind.taken && behind.rounds > 0, JSON.stringify(behind));
 
