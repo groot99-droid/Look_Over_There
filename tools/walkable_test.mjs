@@ -1,6 +1,6 @@
 // The Blender areas are walkable (shared/farway.scenes.js, made by tools/blender/wire_scenes.py): every scene they add loads on the page with its model and its
 // colliders and no page error, and every built link between them is followed. For each link: stand at its F spot (the scene file's `at`, or the link's own `from.at`),
-// press F (or, for a `walk` link, step onto it), and arrive in the scene it names, where it says, facing the way it says. A planned link says it is shut.
+// press F (or, for a `walk` link, step onto it; for a store floor's stairwell door, open it and walk in), and arrive in the scene it names, where it says, facing the way it says. A planned link says it is shut.
 // Also the joins onto the older scenes: the apartment tower's door into the hotel's lobby, your apartment as room 301 on floor 3, the mall's wings off its entrance,
 // the grocery's aisles off its main floor, the lab's B2 door into Secret Operations, the museum's side wing, and the lot's walks to the Overworld's scenes.
 // Needs Playwright + Chromium and internet for three.js from unpkg. Usage: node tools/walkable_test.mjs [area ...]   (no area: all of them)
@@ -47,6 +47,16 @@ try {
       // the lot's signpost is the page's own code (F at FOREST_ROAD_LOT), not a scene link
       const code = l.from.scene === "parking_lot" && l.from.door === "forest_road";
       const spot = code ? [FOREST_ROAD_LOT.at[0], 9.6, FOREST_ROAD_LOT.at[1]] : atOf(l);
+      if (!spot && l.connector === "stair_door" && l.status === "built") {          // a stairwell door in a floor of the store: open it and walk into the stairwell, as a player does
+        await noon(); await page.evaluate(id => window.__game.loadScene(id, null), l.from.scene); await settled(page, l.from.scene); await noon();
+        const has = await page.evaluate(n => { const g = window.__game, dr = g.doors.find(d => d.d.name === n); if (!dr) return false; g.P.p.set(dr.cx, g.S.floor + 0.02, dr.cz + 1.2); g.P.v.set(0, 0, 0); g.openDoor(dr, true); return true; }, l.from.door);
+        if (!has) { check(`${l.id}: its stairwell door is in ${l.from.scene}`, false); continue; }
+        await wait(page, n => { const dr = window.__game.doors.find(d => d.d.name === n); return dr && dr.hallN && dr.p >= 0.6; }, l.from.door);
+        await page.evaluate(n => { const g = window.__game, dr = g.doors.find(d => d.d.name === n); g.P.p.set(dr.hallC[0] + dr.hallN[0] * 0.3, g.S.floor + 0.02, dr.hallC[1] + dr.hallN[1] * 0.3); g.P.v.set(0, 0, 0); }, l.from.door);
+        const ok = await settled(page, l.to.scene), w = await where(page);
+        check(`${l.id}: through its stairwell door to ${l.to.scene}, at its arrival`, ok && Math.hypot(w.p[0] - l.to.arrive[0], w.p[2] - l.to.arrive[2]) < 0.6, JSON.stringify(w));
+        continue;
+      }
       if (!spot) { check(`${l.id}: has an F spot`, false); continue; }
       await noon(); await page.evaluate(id => window.__game.loadScene(id, null), l.from.scene); await settled(page, l.from.scene); await noon();
       if (l.connector !== "walk" || code) await at(page, [spot[0], spot[1], spot[2]]);          // a walk link is stepped onto below, from away (standing on it would fire it now)
