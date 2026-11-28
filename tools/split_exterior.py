@@ -97,6 +97,14 @@ def split_glb(doc, binary, dry=False):
             keep_roots.append(r)
     if not dropped:
         return None, []
+    return compact(doc, binary, keep_roots), dropped
+
+
+def compact(doc, binary, keep_roots):
+    """Keep the given root nodes and what they use; drop every node, mesh, material, texture, image, sampler, accessor and buffer view
+    nothing uses, and rebuild the binary chunk from the buffer views that stay, byte for byte. Returns the new binary chunk."""
+    nodes = doc["nodes"]
+    scene = doc["scenes"][doc.get("scene", 0)]
     # the nodes that stay: the kept roots and their children
     keep_nodes, todo = [], list(keep_roots)
     while todo:
@@ -201,7 +209,7 @@ def split_glb(doc, binary, dry=False):
     doc["extensionsUsed"] = [e for e in doc.get("extensionsUsed", []) if f'"{e}"' in text]
     if "extensionsRequired" in doc:
         doc["extensionsRequired"] = [e for e in doc["extensionsRequired"] if e in doc["extensionsUsed"]]
-    return bytes(out), dropped
+    return bytes(out)
 
 
 def scrub_extras(doc):
@@ -247,8 +255,65 @@ def split_layout(doc):
     return notes
 
 
+STREET = (88.0, 152.0, 24.0, 112.0)                  # tools/blender/build_city_skyline.py: the blocks that line the Intern's street stay
+
+
+def is_tower(c):
+    """One of the city set's 26 towers (build_city_skyline.py's rule): a Site_ITN_City box over 20 m, not a wall, not a street block."""
+    if c["s"] != "Site_ITN_City" or c["max"][1] < 20.0 or min(c["max"][0] - c["min"][0], c["max"][2] - c["min"][2]) < 2.0:
+        return False
+    cx, cz = (c["min"][0] + c["max"][0]) / 2, (c["min"][2] + c["max"][2]) / 2
+    return not (STREET[0] <= cx <= STREET[1] and STREET[2] <= cz <= STREET[3])
+
+
+def splice(doc, binary, src_path):
+    """Give each node of doc named as a mesh node of src that node's mesh from src (its primitives' accessors and buffer views appended, its
+    materials matched by name to doc's); every node that shared the old mesh gets the new one. Returns the new binary and what changed."""
+    src, sbin = read_glb(src_path)
+    out, notes = bytearray(binary), []
+    mat_ix = {m["name"]: i for i, m in enumerate(doc["materials"])}
+    for sn in src["nodes"]:
+        if "mesh" not in sn:
+            continue
+        targets = [n for n in doc["nodes"] if n.get("name") == sn["name"] and "mesh" in n]
+        if not targets:
+            raise SystemExit(f"{src_path.name}: no node {sn['name']} in Exterior.glb")
+        old = targets[0]["mesh"]
+        prims = []
+        for p in src["meshes"][sn["mesh"]]["primitives"]:
+            def take(ai):
+                a = dict(src["accessors"][ai])
+                v = src["bufferViews"][a["bufferView"]]
+                s0 = v.get("byteOffset", 0)
+                out.extend(b"\x00" * (-len(out) % 4))
+                nv = {k: v[k] for k in v if k not in ("buffer", "byteOffset")}
+                nv.update({"buffer": 0, "byteOffset": len(out)})
+                out.extend(sbin[s0:s0 + v["byteLength"]])
+                doc["bufferViews"].append(nv)
+                a["bufferView"] = len(doc["bufferViews"]) - 1
+                doc["accessors"].append(a)
+                return len(doc["accessors"]) - 1
+            np_ = {"attributes": {k: take(v) for k, v in p["attributes"].items()}, "mode": p.get("mode", 4)}
+            if "indices" in p:
+                np_["indices"] = take(p["indices"])
+            mname = src["materials"][p["material"]]["name"]
+            np_["material"] = mat_ix[mname]
+            prims.append(np_)
+        doc["meshes"].append({"name": doc["meshes"][old].get("name", sn["name"]), "primitives": prims})
+        new = len(doc["meshes"]) - 1
+        users = [n for n in doc["nodes"] if n.get("mesh") == old]
+        for n in users:
+            n["mesh"] = new
+        tris = sum(src["accessors"][p["indices"]]["count"] // 3 for p in src["meshes"][sn["mesh"]]["primitives"] if "indices" in p)
+        notes.append(f"{sn['name']} ({len(users)} node(s)): {tris} triangles")
+    doc["buffers"] = [{"byteLength": len(out)}]
+    return bytes(out), notes
+
+
 def main(argv):
     dry = "--dry" in argv
+    if "--city" in argv:
+        return city(Path(argv[argv.index("--city") + 1]), dry)
     doc, binary = read_glb(GLB)
     before = len(binary)
     out, dropped = split_glb(doc, binary, dry)
@@ -267,6 +332,31 @@ def main(argv):
         n = split_layout(d)
         print(f"{f.relative_to(ROOT)}: " + ("; ".join(n) if n else "already split"))
         if n and not dry:
+            f.write_text(json.dumps(d, separators=(",", ":")))
+
+
+def city(work, dry):
+    """The towers' move (the owner, 2026-11-27: "The towers should be on the horizon relative to the bus stop"): Exterior.glb takes
+    build_city_skyline.py's city meshes without the towers (city_rest.glb) and the Intern street's lighter tree (city_tree.glb); L4.json and
+    gbi_L4_4.json lose the towers' boxes. The towers themselves are world/city_skyline.glb now."""
+    doc, binary = read_glb(GLB)
+    before = len(binary)
+    notes = []
+    for f in ("city_rest.glb", "city_tree.glb"):
+        binary, n = splice(doc, binary, work / f)
+        notes += n
+    scene = doc["scenes"][doc.get("scene", 0)]
+    binary = compact(doc, binary, list(scene["nodes"]))
+    print("world/Exterior.glb: " + "; ".join(notes) + f"; binary {before} -> {len(binary)} bytes")
+    if not dry:
+        write_glb(GLB, doc, binary)
+        print(f"  wrote {GLB.relative_to(ROOT)} ({GLB.stat().st_size} bytes)")
+    for f in LAYOUTS:
+        d = json.loads(f.read_text())
+        t = [c for c in d["colliders"] if is_tower(c)]
+        d["colliders"] = [c for c in d["colliders"] if not is_tower(c)]
+        print(f"{f.relative_to(ROOT)}: dropped {len(t)} towers' boxes" if t else f"{f.relative_to(ROOT)}: no towers left")
+        if t and not dry:
             f.write_text(json.dumps(d, separators=(",", ":")))
 
 

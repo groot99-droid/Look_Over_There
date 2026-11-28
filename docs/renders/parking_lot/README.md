@@ -14,9 +14,12 @@ road, with its own GLB, and dressed in their look. The Right Door, Wrong Exit ho
 | `blender/textures/overworld_lot/` | asphalt, grass, hedge, paving (made by the build, after the road's and the bus station's), the boards' lettering, and `store_signs.png`: the store's own four sign pictures (its logo, PARKING, STOP, the cart sign), copied out of the old `Exterior.glb` |
 | `tools/blender/build_overworld_lot.py` | the build: textures, art, layout check, bake, export, stills, before/after, owner sheet |
 | `tools/blender/build_overworld_greybox.py` | the layout model gains `parking_lot()`; the lot's four joins become PAIRS; `--check` gains the lot's gate |
-| `tools/split_exterior.py` | the store's outside after the ruling (below) |
+| `tools/split_exterior.py` | the store's outside after the rulings (below); `--city` splices the city without its towers |
+| `world/city_skyline.glb` | the Intern city's 26 towers as a skyline on the horizon from the bus stop (4.47 MB, 44,112 triangles, no colliders) |
+| `tools/blender/build_city_skyline.py` | moves the towers into the skyline and thins the Intern street's tree; `skyline_towers.json` says where each tower went |
 | `1_arrival.jpg`, `2_wide.jpg`, `3_detail.jpg`, `4_plan.jpg` | the stills (Cycles, 96 samples, the store of `L4.glb` and the two sets in place, the Overworld's clear-day sky) |
 | `before_after_arrival.jpg`, `before_after_west.jpg` | the same view before (L4.glb + the old Exterior.glb, as the page draws the lot today) and after |
+| `skyline_bus.jpg`, `skyline_doors.jpg` | the skyline from the bus station's platform and from the store's doors: the Overworld (left) and L4 (right) |
 | `bake.json`, `brightness.txt`, `CHECKS.txt` | the bake's report, the brightness table, every gate's output |
 
 ## The decisions
@@ -38,11 +41,30 @@ Option (a), retiring Exterior, would have taken the Intern's gate out of the Ori
 scene (its own AO bake), and the house is gone. The city and the Intern's street that stay in Exterior are unbaked, as on main; #132's
 tools could bake them again on the split file.
 
-**The far city: left to the Overworld skies.** The Overworld's lot draws no city. The Intern's city set did not stand far off: five of its
-towers stood on the lot's asphalt (one 91 m tall between the planter rows, one 18 m east of the table), one cut through the store's east
-end, and its west wall (x 60 to 61, 80 m tall) ran down the lot's east edge exactly where the market joins it (x 61, z 76). The Overworld's
-four skies (`world/backdrops/overworld_*.webp`, #117) already carry the town past the south hedge, the hills and the far store, seen from
-this lot's spawn. The city stays in `Exterior.glb` for `L4` and `gbi_L4_4` only, where the Original still walks to the Intern's gate.
+**The city's towers: a skyline on the horizon from the bus stop** (the owner, 2026-11-27: "The towers should be on the horizon relative to
+the bus stop"; this replaces the first take, which left the far city to the skies). The Intern city set's 26 towers stood round the
+Intern's street: five on the lot's asphalt (one 91 m tall between the planter rows), one through the store's east end, the rest out east.
+`tools/blender/build_city_skyline.py` takes each tower's own faces (its concrete box and its windows, found as the islands of `City_concrete`
+and the three window meshes on its footprint) and stands them, as they are, in a skyline:
+
+- **Which way:** the way the bus goes to Hallam Row. The bus station's bay and shelter open south, and the only town the Overworld shows is
+  past the back hedge, bearing 188 degrees from the lot (the skies of #117 and the lot backdrop of #91 paint it there). So the skyline is
+  south, a little west, centred on bearing 188 from the bus station, 40 degrees wide: the city behind the town, where the bus goes.
+- **How far and how big:** two rows on an arc 312 m and 330 m from the bus station (x -205 to 23, z 314 to 386), the tallest in the middle
+  of the back row, each tower scaled to 0.35 (the tallest is 32 m now) with its foot 1.5 m under the lawn. From the lot that reads as the
+  real towers at about a kilometre. It cannot go further: `L4` and `gbi_L4_4` still draw the store model's sky box (z up to 390), and the
+  same skyline must show from them. Nothing of it stands on the asphalt, the store or a join; no colliders (nobody walks out there).
+- **Its own file, `world/city_skyline.glb`, shared:** the coordinator adds it to the lot, `L4` and `gbi_L4_4`. One file serves all three,
+  the lot's GLB and bake stay as they are, and the skyline can be moved or swapped on its own. The city's own flat-colour materials, the
+  lit windows still emissive; unbaked.
+- **Exterior.glb** (`split_exterior.py --city`): `City_concrete` keeps only the city's ground slab, and the three window meshes only the
+  street blocks' windows (36,264 -> 5,064, 10,968 -> 2,208, 5,076 -> 1,236 triangles); spliced in uncompressed, every other node unchanged.
+  `L4.json` and `gbi_L4_4.json` lose the 26 towers' boxes.
+
+**What changes in the Intern's own street:** its 8 trees (`City_tree_small_02`, one mesh) keep a fifth of their leaf cards, each grown 2.2
+times about its middle (42,080 -> 8,527 leaf triangles a tree), which brings `Exterior.glb` from 427,468 to 114,932 triangles, under the
+300k budget. Nothing else of the street changes: its blocks, its gate, `Road_ITN` and the sky box are as they were. In `L4` and `gbi_L4_4`
+the store's east end (x 17.4 to 26.3, z 4.9 to 27.4), where a tower's box and concrete stood inside the store, is open floor now.
 
 ## What is there
 
@@ -123,9 +145,8 @@ were dimmed to 0.92 so their whites stay under 1 (0.08 % of their texels reach 1
   corridors (the aisles, the edge joins, the road's gap either side of the signpost, the stile, the way from the table to the doors).
 - `node tools/worlddoc.mjs check`: `parking_lot.json`, `L4.json`, `gbi_L4_4.json` OK, **0 errors** (warnings: the lot is over 60 m, its
   market, playground and hills doors are new to the manifest).
-- `glb_inspect --budget tris=300000,mb=8`: `parking_lot.glb` pass (114,712 triangles, 5.48 MB). The split `Exterior.glb` is 1.53 MB and
-  427,468 triangles, over the triangle budget as main's was (1,443,500): its 8 city trees are 42,886 triangles each, and only the removal
-  was asked of its geometry.
+- `glb_inspect --budget tris=300000,mb=8`: `parking_lot.glb` pass (114,712 triangles, 5.48 MB); `city_skyline.glb` pass (44,112, 4.47 MB);
+  `Exterior.glb` pass (114,932, 2.06 MB; main's was 1,443,500).
 - `node --test shared/*.test.js`: 297 of 297 pass; `node tools/manifest.mjs check`: 0 errors, 0 warnings.
 - Privacy grep (user names, absolute paths, session ids, e-mails, the render host) over every committed file of this work, the `.blend`
   decompressed, and the owner sheet: 0 hits. No `sl_group` in either GLB. The stills carry no comment or APP1 segment.
@@ -133,10 +154,10 @@ were dimmed to 0.92 so their whites stay under 1 (0.08 % of their texels reach 1
 ## For the coordinator to wire (not done here: `index.html`, `shared/` and the tests are untouched)
 
 1. `shared/farway.manifest.js`, the Overworld's scene: `{id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/parking_lot.glb",
-   "world/parking_lot.json"], presence: true, backdrop: {day: "world/backdrops/overworld_clear_day.webp", ...}}`. The backdrop is needed now:
-   the sky box stays in `Exterior.glb`, which the lot no longer loads.
-2. `L4` and `gbi_L4_4`: `files: ["world/L4.glb", "world/parking_lot.glb", "world/Exterior.glb", ...]` (the lot, then the Intern's street
-   and city).
+   "world/city_skyline.glb", "world/parking_lot.json"], presence: true, backdrop: {day: "world/backdrops/overworld_clear_day.webp", ...}}`.
+   The backdrop is needed now: the sky box stays in `Exterior.glb`, which the lot no longer loads.
+2. `L4` and `gbi_L4_4`: `files: ["world/L4.glb", "world/parking_lot.glb", "world/city_skyline.glb", "world/Exterior.glb", ...]` (the lot,
+   the skyline, then the Intern's street and the sky box).
 3. Drop the gate `gate("DoorLeaf_Gate_RDW", "rdwe", ...)`, and with it, from `world/L4.json` and `world/gbi_L4_4.json`, the door
    `DoorLeaf_Gate_RDW` and the marker `Entrance_RDW_House_1` (their colliders are gone already). **`shared/manifest.test.js` pins the gate and
    must be updated with it**: the gates loop and `soloOnly` asserts (lines 63 to 69), the door-link count (line 47, 10 -> 9), and the
@@ -152,9 +173,10 @@ were dimmed to 0.92 so their whites stay under 1 (0.08 % of their texels reach 1
 
 ## Open
 
-- In `L4` and `gbi_L4_4` the Intern's city still stands on the lot (five towers on the asphalt, one through the store's east end), as it
-  always has; some of the lot's cars stand inside them there, as part 1's did. Taking those towers out of the Original too is a ruling of its
-  own (and `L4.json`'s colliders with them).
+- The city's invisible walls (`Site_ITN_City`, x 60 to 61 and round the street, 80 m) stay in `L4.json` as the street's; with the towers
+  gone they stand alone on the lot's east strip in the Original.
+- The skyline is forced perspective at 312 to 330 m (the sky box bounds it): from high up it reads as a model. If the sky box ever leaves
+  L4, the same file can go out to a kilometre at full size.
 - `L4.json` keeps part 1's walk-through cars: the lot's new solids (cars, trees, arches, bins, rack, signpost) are walk-through in the
   Original until the coordinator copies their colliders from `parking_lot.json`, if wanted.
 - `tools/blender/overworld_greybox_sheets.py` has not been rerun with the lot in the model.
@@ -171,6 +193,8 @@ From the repo root (Blender 5.2, Python with numpy and Pillow; `<work>/ctx` may 
 `Exterior.glb` as `Exterior_before.glb`, for the stills and the before/after only):
 
     python tools/split_exterior.py
+    blender -b --factory-startup --python tools/blender/build_city_skyline.py -- --source <fa23443's Exterior.glb> --layout <fa23443's L4.json> --work <work>
+    cp <work>/city/city_skyline_raw.glb world/city_skyline.glb && python tools/split_exterior.py --city <work>/city
     python tools/blender/build_overworld_lot.py --stage textures
     blender -b --factory-startup --python tools/blender/build_overworld_lot.py -- --stage art,bake,export,render --samples 256 --work <work>
     python tools/blender/pack_scene.py parking_lot --work <work>/parking_lot

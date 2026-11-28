@@ -223,26 +223,30 @@ def stage_sheet():
         except OSError:
             continue
     W, H = 960, 540
-    rows = [("arrival", "From the table, where the walk out of the store arrives (-8, 9.6, 43.6), facing the store"),
-            ("west", "West across the lot, toward where the Right Door, Wrong Exit house stood (x -120)"),
-            ("south", "From the store's doors, south over the lot to the road's gap and the hills' stile")]
+    rows = [("bus", ("after", "l4"), ("THE OVERWORLD", "L4 (THE ORIGINAL)"),
+             "From the bus station (-46, 9.75, 47), toward Hallam Row: the city's towers on the horizon, south past the back hedge"),
+            ("doors", ("after", "l4"), ("THE OVERWORLD", "L4 (THE ORIGINAL)"),
+             "From the store's doors (0, 9.6, 29.5), out over the lot to the skyline (gbi_L4_4 sees the same through the glass)"),
+            ("arrival", ("before", "after"), ("BEFORE", "AFTER"), "From the table, where the walk out of the store arrives (-8, 9.6, 43.6)"),
+            ("west", ("before", "after"), ("BEFORE", "AFTER"), "West across the lot, toward where the Right Door, Wrong Exit house stood (x -120)")]
     sheet = Image.new("RGB", (2 * W + 60, 120 + len(rows) * (H + 70) + H + 200), (246, 244, 240))
     d = ImageDraw.Draw(sheet)
-    d.text((20, 20), "parking_lot: the lot made an Overworld scene; the house, its balloons and its gate gone", font=font, fill=(30, 30, 34))
-    d.text((20, 66), "Left: before (world/L4.glb + the old world/Exterior.glb, as the page draws the lot today).  Right: after (world/L4.glb + "
-           "world/parking_lot.glb, the table and the bus station in place, the clear-day sky).", font=small, fill=(60, 60, 66))
+    d.text((20, 20), "parking_lot: the Overworld's lot; the house gone; the city's towers on the horizon from the bus stop", font=font,
+           fill=(30, 30, 34))
+    d.text((20, 66), "Overworld: L4.glb + parking_lot.glb + city_skyline.glb + the two sets, clear-day sky.  L4: the same with the split "
+           "Exterior.glb, at its own dusk.  Before: L4.glb + the old Exterior.glb.", font=small, fill=(60, 60, 66))
     y = 120
-    for key, cap in rows:
+    for key, sides, labels, cap in rows:
         d.text((20, y), cap, font=small, fill=(30, 30, 34))
-        for k, side in enumerate(("before", "after")):
+        for k, (side, lab) in enumerate(zip(sides, labels)):
             p = cmp_dir / f"{side}_{key}.jpg"
             if p.exists():
                 sheet.paste(Image.open(p).convert("RGB").resize((W, H), Image.LANCZOS), (20 + k * (W + 20), y + 34))
-            d.text((30 + k * (W + 20), y + 42), side.upper(), font=font, fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
+            d.text((30 + k * (W + 20), y + 42), lab, font=font, fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
         y += H + 70
-    d.text((20, y), "After, from above the south-east corner (left), and the plan (right: the lot's GLB with the store and the two sets; the "
-           "arches east and west, the road's gap and the stile in the south hedge)", font=small, fill=(30, 30, 34))
-    for k, nm in enumerate(("after_wide.jpg", "after_plan.jpg")):
+    d.text((20, y), "The Overworld from high over the store's back, out to the skyline (left), and the plan of the lot (right: the store, "
+           "the two sets, the arches east and west, the road's gap and the stile)", font=small, fill=(30, 30, 34))
+    for k, nm in enumerate(("after_overview.jpg", "after_plan.jpg")):
         p = cmp_dir / nm
         if p.exists():
             im = Image.open(p).convert("RGB")
@@ -1048,7 +1052,7 @@ def setup_world(sky=True):
         env.image = bpy.data.images.load(str(pic))
         tc = nt.nodes.new("ShaderNodeTexCoord")
         mp = nt.nodes.new("ShaderNodeMapping")
-        mp.inputs["Rotation"].default_value = (0, 0, math.radians(90))     # the picture's middle column to Blender +Y (game north)
+        mp.inputs["Rotation"].default_value = (0, 0, math.radians(-90))    # the picture's middle column to Blender +Y (game north)
         nt.links.new(tc.outputs["Generated"], mp.inputs["Vector"])
         nt.links.new(mp.outputs["Vector"], env.inputs["Vector"])
         nt.links.new(env.outputs["Color"], bg.inputs["Color"])
@@ -1537,6 +1541,9 @@ VIEWS = {   # the same views for the stills and the before/after pairs: (camera,
     "south": ((0.0, Y + E, 30.5), (0.0, Y + 0.9, 98.0), 62.0),
     "wide": ((78.0, Y + 42.0, 132.0), (-6.0, Y, 44.0), 55.0),
     "detail": ((-21.5, Y + 1.6, 85.0), (-30.0, Y + 1.0, 97.5), 58.0),
+    "bus": ((-46.0, Y + 0.15 + E, 47.4), (-88.0, Y + 8.0, 343.0), 55.0),          # on the bus station's platform, toward the skyline
+    "doors": ((0.0, Y + E, 29.5), (-62.0, Y + 9.0, 360.0), 62.0),
+    "overview": ((60.0, Y + 70.0, -70.0), (-55.0, Y, 250.0), 55.0),             # high over the store's back, out to the skyline
 }
 PLAN = ((0.0, Y + 150.0, 39.0), 150.0)                 # over the lot's middle, 150 m across
 
@@ -1588,6 +1595,7 @@ def stage_render():
             bpy.data.collections[c].hide_viewport = True
     bpy.data.collections["Art"].hide_render = False
     add_context()
+    import_glb(ROOT / "world/city_skyline.glb", "Context")
     setup_world()
     add_sun()
     render_settings(arg("--render-samples", 96, int))
@@ -1628,17 +1636,19 @@ def stage_compare():
             setup_world(sky=False)
         elif side == "l4":
             import_glb(ROOT / "world/parking_lot.glb", "Context")
+            import_glb(ROOT / "world/city_skyline.glb", "Context")
             import_glb(ROOT / "world/Exterior.glb", "Context")
             setup_world(sky=False)
         else:
             import_glb(ROOT / "world/parking_lot.glb", "Context")
+            import_glb(ROOT / "world/city_skyline.glb", "Context")
             for sid, (_sc, (x, y, z), _yaw) in G.ATTACH.items():
                 import_glb(ctx_dir() / f"{sid}.glb", "Context", (x, y, z))
             setup_world()
         add_sun()
         render_settings(arg("--render-samples", 64, int))
-        for key in ("arrival", "west", "south", "wide"):
-            if which in ("all", key) and (side != "l4" or key in ("west", "wide")):
+        for key in ("arrival", "west", "south", "wide", "bus", "doors", "overview"):
+            if which in ("all", key) and (side != "l4" or key in ("west", "wide", "bus", "doors")) and                     (side == "after" or key not in ("bus", "doors", "overview")) or (side == "l4" and key in ("bus", "doors")):
                 p, t, f = VIEWS[key]
                 shoot(f"{side}_{key}", look_cam(key, p, t, f), out / f"{side}_{key}.jpg", 1600, 900, 400_000)
         if side == "after" and which in ("all", "plan"):

@@ -12,6 +12,19 @@ CHECK_LAYOUT parking_lot exit 0
   AO map 1 baked {'size': 2048, 'p1_p10_p50_p90': [0.0, 0.012, 0.407, 1.0], 'samples': 256, 'distance_m': 0.8, 'device': 'GPU', 'seconds': 61, 'materials': ['Timber', 'Steel', 'Pylon_Blue', 'Bin_Green', 'Car_Plum', 'Tyre', 'Car_Mi
 PASS  COVER lines (one per collider of the lot's own but the edge walls, each covered by art within 5 cm): 126
 
+blender (on the render box): tools/blender/build_city_skyline.py -- --source <fa23443's Exterior.glb> --layout <fa23443's L4.json>
+TOWERS 26
+CITY City_concrete: 312 faces were towers', 12 stay
+CITY City_glassdark: 31200 faces were towers', 5064 stay
+CITY City_glasslit: 8760 faces were towers', 2208 stay
+CITY City_glasslit2: 3840 faces were towers', 1236 stay
+EXPORTED city_skyline_raw.glb 4691376
+EXPORTED city_rest.glb 601244
+TREE leaves: 22079 cards, 42080 triangles -> 8527
+EXPORTED city_tree.glb 957184
+CITY_SKYLINE ALL DONE
+26 towers moved; bearings from the bus station 168.0 to 209.5 degrees, 312.0 to 330.0 m; heights now 14.0 to 32.3 m
+
 python tools/blender/build_overworld_greybox.py --check .
 GATE links: 5 pair inside the set (10 sides), 5 that leave it; 15 links in the files, every one accounted for
   off this set: bus_station.bus_stop (bus) -> street (city, built)  [reused: overworld.bus>city and city.bus>overworld (built); only their lot-side points move]
@@ -42,24 +55,24 @@ node tools/worlddoc.mjs check world/parking_lot.json world/L4.json world/gbi_L4_
   warning: link market: the manifest has no link from this door yet: a new link to add
   warning: link playground: the manifest has no link from this door yet: a new link to add
 OK world/parking_lot.json: 186 colliders, 0 doors, 2 markers, 6 links, 0 zones, 2 spots, 0 errors, 5 warnings
-OK world/L4.json: 217 colliders, 3 doors, 3 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
-OK world/gbi_L4_4.json: 218 colliders, 3 doors, 3 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
+OK world/L4.json: 191 colliders, 3 doors, 3 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
+OK world/gbi_L4_4.json: 192 colliders, 3 doors, 3 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
 
 glb_inspect.py --budget tris=300000,mb=8
 parking_lot: triangles  114712 drawn, in 43 mesh(es), 43 instance(s)
-parking_lot: materials  43: Asphalt, Bark, Bin_Green, Car_Coral, Car_Cover, Car_Cream, Car_Glass, Car_Light, Car_Mint, Car_Periwinkle, Car_Pink, Car_Plum, Car_Silver, Car_Teal, Car_Yellow, Cart_Blue, Cart_Wire, Flower_Lilac, Flower_Pink, Flower_Stem, Flower_White, Flower_Yellow, Grass, Grass_Far, Hedge, Kerb, Lamp_Emit, Leaf_Lilac, Leaf_Mint, Leaf_Pink, Paint_White, Paint_Yellow, Paving, Plastic_Coral, Plastic_White, Pylon_Blue, Shrub, Signs, Soil, Steel, Store_Signs, Timber, Tyre
-parking_lot: textures   7, images: 1024x1024, 1024x1024, 512x512, 512x512, 1024x1024, 1024x512
 parking_lot: bbox       800.0 x 14.06 x 800.0 (x, y up, z), min [-400.0, 8.6, -400.0]
 parking_lot: requires   EXT_texture_webp
 parking_lot: pass       tris: 114712 triangles, budget 300000
 parking_lot: pass       mb: 5.48 MB, budget 8
-Exterior: triangles  427468 drawn, in 37 mesh(es), 60 instance(s)
-Exterior: materials  42: LowPolyProp_SR_Awning, PhotorealArch_SR_BrickL.001, PhotorealArch_SR_BrickR.001, LowPolyProp_SR_Car1.001, LowPolyProp_SR_Car2.001, LowPolyProp_SR_NewsBox, PhotorealArch_SR_Road.001, PhotorealArch_SR_Sidewalk.001, LowPolyProp_SR_Sign, PhotorealArch_SR_Tower.001, LowPolyProp_SR_TrafficLight, M_City_asphalt, M_City_brick, M_City_brick2, M_City_concrete, M_City_glassdark, M_City_glasslit, M_City_glasslit2, M_City_lamp, M_City_metal, metal_trash_can, metal_trash_can_rust, metal_trash_can_rust.001, M_City_neon_b, M_City_neon_g, M_City_neon_r, M_City_paint, M_City_red, M_City_stone, tree_small_02_branches, tree_small_02_leaves, tree_small_02_trunk, M_City_walk, M_City_white, M_Door, M_X_orange, M_X_white, M_X_dark, M_Gate_AlcoveLit, M_Gate_Alcove, M_U_asphalt, M_U_sky
-Exterior: textures   23, images: 512x512, 512x512, 128x128, 128x128, 128x128, 128x128, 128x128, 128x128, 128x128, 256x256, 128x128, 128x128, 256x256, 128x128, 128x128, 256x256, 128x128, 2048x1024
+city_skyline: triangles  44112 drawn, in 4 mesh(es), 4 instance(s)
+city_skyline: bbox       230.5177 x 32.5481 x 66.0229 (x, y up, z), min [-205.1224, 8.1, 313.9814]
+city_skyline: pass       tris: 44112 triangles, budget 300000
+city_skyline: pass       mb: 4.47 MB, budget 8
+Exterior: triangles  114932 drawn, in 37 mesh(es), 60 instance(s)
 Exterior: bbox       720.0005 x 720.0 x 720.0003 (x, y up, z), min [-360.0004, -350.4, -330.0]
 Exterior: requires   KHR_draco_mesh_compression, KHR_texture_transform
-Exterior: OVER       tris: 427468 triangles, budget 300000
-Exterior: pass       mb: 1.53 MB, budget 8
+Exterior: pass       tris: 114932 triangles, budget 300000
+Exterior: pass       mb: 2.06 MB, budget 8
 
 brightness (AO-only: base colour x AO texel, linear, under a white ambient of 1; the page's sun adds on top)
 material                m2           map       k    p50    p90    p99     >=1
@@ -103,4 +116,4 @@ node tools/manifest.mjs check
 OK: 17 areas, 32 built and 15 planned links, 23 world files compared, 0 errors, 0 warnings
 
 privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over this work's files, the .blend decompressed, and the owner sheet
-privacy grep: 28 files, 0 with hits
+privacy grep: 33 files, 0 with hits
