@@ -46,7 +46,10 @@ export const FARWAY = {
         {id: "L4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/L4.json"], multiplayer: true, powerSource: true, loot: {lockers: 0, packs: 3}},
       ],
     },
-    {id: "rdwe", name: "Right Door, Wrong Exit", status: "built", coop: true, tone: "dreamcore", rooms: ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"]},
+    {id: "rdwe", name: "Right Door, Wrong Exit", status: "built", coop: true, tone: "dreamcore",
+     // its rooms: the seven the game had, then the Blender rooms (games/rdwe/blender_rooms.js, tools/blender/rdwe_links.py); each is a coop place `rdwe:<room>`
+     rooms: ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery",
+             "ames_room", "anamorphic_room", "attic", "bending_hall", "birthday_party", "changing_rooms", "crossroads", "dont_look", "door_hall", "elevator_lobby", "finale", "giant_chair", "green_grid", "kids_bedroom", "laundromat", "lights_out", "long_table", "map_room", "melting_library", "mirror_room", "moon_window", "motel_room", "office_night", "painted_door", "repeating_room", "shrink_hall", "stair_loop", "stretching_hall", "three_doors", "tilted_hall", "tiny_kitchen", "upside_room", "vending_room", "void_room", "waiting_room", "wrong_clock"]},
     {id: "intern", name: "The Intern", status: "built", soloOnly: true, tone: "liminal", spine: ["S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"]},
     {
       // v0 is one scene: the parking lot with the table and chairs as the spawn, the store doors, and one sky mode. The other scenes are designed, not built (they have no files).
