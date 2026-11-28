@@ -1,5 +1,5 @@
 // The laboratory (slice 17): at 214 Hallam Row between 08:00 and 16:00 the shift starts in the lab. Each procedure card names three stations in order; F at each in turn
-// does the card, F at a wrong station spoils it. After 4 hours: $3 a card done, $1 off a card spoiled. The B2 door is sealed.
+// does the card, F at a wrong station spoils it. After 4 hours: $3 a card done, $1 off a card spoiled. The B2 door opens into Secret Operations (open for now).
 // Needs Playwright + Chromium and internet for three.js from unpkg. Usage: node tools/lab_test.mjs [screenshot dir]
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
@@ -44,9 +44,10 @@ try {
   const c1 = cardOf(1), wrong = LAB.stations.map(s => s.id).find(id => id !== c1[0]);
   await use(wrong); l = await lb();
   check("a wrong station spoils the card, says which one it wanted, and the next card comes up", l.b.spoiled === 1 && l.b.card === 2 && new RegExp(`wanted the ${labelOf(c1[0])}`).test(await toast()), JSON.stringify(l.b));
-  // the sealed door
+  // the B2 door: open for now (the owner, 2026-11-28: Secret Operations is behind it, no keycard yet); the walk through it is tools/walkable_test.mjs's
   await stand(LAB.b2.x, LAB.b2.z + 0.8, 0); await frames(1);
-  check("the B2 door is sealed", /B2 · AUTHORISED STAFF ONLY\. The door is sealed\./.test(await prompt()), await prompt());
+  const b2 = await page.evaluate(() => window.__game.sceneLinkPrompt());
+  check("the B2 door opens into Secret Operations", /Press F/.test(b2) && !/sealed/.test(await prompt()), b2);
   await shot("b2");
 
   // the end of the shift
