@@ -55,6 +55,9 @@ def _stands(p):
 def points_of(world, constants):
     """(label, x, z) of every arrival point, door spot and marker the scene names."""
     pts = [(f"marker {m['name']}", m["position"][0], m["position"][2]) for m in world.get("markers", []) if "position" in m]
+    for i, m in enumerate(m for m in world.get("markers", []) if "position" in m):
+        if m.get("kind") == "Entrance" and m.get("width"):
+            pts[i] = pts[i] + ("door",)              # a door in a wall's face (the street's doors): see the CLEAR rule
 
     def walk(o, path):
         if isinstance(o, dict):
@@ -119,8 +122,22 @@ def check(parts, world, constants=None, tol=TOL):
     # 3. the arrival points, door spots and markers are clear
     blockers = [("collider " + c["s"], c) for c in stand] + [("art " + p["name"], p) for p in solid if _stands(p)]
     pts = points_of(world, constants)
-    for label, x, z in pts:
+    for label, x, z, *door in pts:
         hit = [n for n, b in blockers if _in_plan(b, x, z, CLEAR_R)]
+        if hit and door:
+            # An Entrance marker with a width stands in the face of the wall it opens (world/street.json: x = +-8, the buildings' street fronts), so its own
+            # spot always touches that wall. It is clear when it lies on the face of every collider that blocks it, and the walker's spot in front of it
+            # (one radius and 3 cm out, on the open side) is clear of colliders and solid art.
+            on_face = all(abs(x - c["min"][0]) < 0.01 or abs(x - c["max"][0]) < 0.01 or abs(z - c["min"][2]) < 0.01 or abs(z - c["max"][2]) < 0.01
+                          for n, c in blockers if n.startswith("collider ") and _in_plan(c, x, z, CLEAR_R))
+            r = CLEAR_R + 0.03
+            for dx, dz in ((r, 0), (-r, 0), (0, r), (0, -r)):
+                if on_face and not any(_in_plan(b, x + dx, z + dz, CLEAR_R) for n, b in blockers):
+                    res.append((True, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): a door in a wall's face; its walk-up spot ({x + dx:.2f}, {z + dz:.2f}) is clear within {CLEAR_R:.2f} m"))
+                    break
+            else:
+                res.append((False, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): blocked by " + ", ".join(hit) + " (a door, and no clear walk-up spot in front of it)"))
+            continue
         res.append((not hit, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): " + ("clear within %.2f m" % CLEAR_R if not hit else "blocked by " + ", ".join(hit))))
     if not pts:
         res.append((False, "CLEAR", "no arrival points or markers found to check"))
