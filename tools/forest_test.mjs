@@ -43,7 +43,7 @@ try {
   await at(page, 0, 0, FOREST.gap.z - 1);
   check("walking through the gap takes you into the meadow", await settled(page, "meadow"));
   w = await where(page); check("you come out of the trees on the meadow's path", near(w.p, MEADOW.arrive), JSON.stringify(w));
-  check("the shed and the house are the owner's models", await wait(page, () => !!window.__game.FST.shed && !!window.__game.FST.house, null, 30000));
+  check("the shed and the house are the owner's models", await wait(page, () => !!window.__game.FST.shed && !!window.__game.FST.house, null, 90000));          // the meadow's own model (#90) makes the scene slower to fill under software rendering
   const heights = await page.evaluate(() => { const f = window.__game.FST; return {shed: +f.heightOf(f.shed).toFixed(2), house: +f.heightOf(f.house).toFixed(2)}; });
   check("they stand at their sizes (shed about 6.2 m, house about 7.5 m)", Math.abs(heights.shed - MEADOW.shed.height) < 0.2 && Math.abs(heights.house - MEADOW.house.height) < 0.2, JSON.stringify(heights));
 
