@@ -16,9 +16,9 @@ are drawn afterwards by tools/blender/overworld_greybox_sheets.py from this same
 Coordinates are GAME coordinates (metres, y up, north = -z); Blender (x, y, z) is game (x, -z, y). Every scene has its own frame with its floor
 at y = 0. Two of them are sets that stay part of the lot (docs/BLENDER_AREAS.md: "It can stay part of the lot"): `table_and_chairs` and
 `bus_station` are built in their own frame as their own collection and file, and ATTACH says where each goes in parking_lot's frame (floor
-y 9.6, yaw 0). The lot itself is part 1's (tools/make_parking_lot.mjs over the store's Exterior model, world/parking_lot.json, shared/city.js
-BUS_LOT, shared/forest.js FOREST_ROAD_LOT, index.html's table); it is read here, never written. Its side of each link is listed in OUTSIDE for
-the coordinator.
+y 9.6, yaw 0). The lot itself, `parking_lot`, is a scene of this set since 2026-11-27 (part 1's lot made an Overworld scene, the house and the
+city gone): it keeps part 1's frame (floor y 9.6, the store of world/L4.glb at its north side), and its four joins are PAIRS; its dressed
+build is tools/blender/build_overworld_lot.py.
 
 Repetition reuses one mesh: every box is the same unit cube per material, scaled (colliders and art share it). Each COL_<name> box has its art
 twin <name>, except the few colliders that are only ground or edge (`Ground_` slabs under a set, the hills' collision columns under the hills'
@@ -865,21 +865,222 @@ def endless_hills():
     return S
 
 
+# ---------------------------------------------------------------- parking_lot: part 1's lot, made the Overworld's own scene (the owner, 2026-11-27)
+# "The parking lot was supposed to be part of the overworld and that house with balloons was supposed to go since it's been replaced."
+# The lot keeps part 1's frame (its floor at y 9.6, where the store of world/L4.glb stands) and its playable layout: the asphalt, the rows of
+# bays, the planter hedges, the south hedge, the cars, the posts, the pylon, the benches and the cart corral, where they were. Gone: the
+# Right Door, Wrong Exit house to the west with its balloons, and its gate (world/L4.json's Gate_RDW stairwell), and the Intern's city set
+# that stood on and east of the lot (the Overworld's skies carry the town instead). The store's own colliders are copied from world/L4.json
+# (its art is world/L4.glb's), so the lot's GLB holds the lot only. Its four walk links are the greybox's lot sides (OUTSIDE until now).
+LOT_STORE = ("Floor_L4_L3_Room", "Ceiling_L4_Store", "Wall_L4_Store_N", "Wall_L4_Store_E", "Wall_L4_Store_S", "Wall_L4_Store_W",
+             "Walls_L4_Store_partitions", "Checkout_L4_Store_-11", "Checkout_L4_Store_-6", "Checkout_L4_Store_6", "Checkout_L4_Store_11",
+             "Extra_Props_L4", "StairDoor_L3_L4_upper", "Canopy_L4_Store_posts", "Bollards_L4_Store")
+LOT_BLOCK = ((-2.7, 9.6, 27.0), (2.7, 13.0, 27.5))         # tools/make_parking_lot.mjs: the glass doors are solid from the lot
+LOT_STORE_BOX = (-26.3, 26.28, -22.35, 27.35)               # the store's footprint (Floor_L4_L3_Room): L4.glb's floor, not the lot's
+LOT_APRON_Z = -26.2                                         # the paved apron round the store reaches z -26.2 (part 1's sidewalk)
+LOT_NEAR, LOT_FAR = 20.0, 400.0                             # the lawn the bake sees, and part 1's grass out to 400 m
+LOT_ROW_HEDGES = [(-60.0, -44.0), (-34.0, -18.0), (-8.0, 8.0), (18.0, 34.0), (44.0, 60.0)]      # part 1's planter hedges (z 54.5 to 56.5)
+LOT_HEDGE_S = (98.0, 99.5, 12.2)                            # part 1's back hedge (z 98 to 99.5, 2.6 m)
+LOT_ROAD_GAP = (-34.0, -26.0)                               # the greybox: a gap cut in the south hedge for the road, by the old signpost
+LOT_STILE_GAP = (29.0, 31.0)                                # the hills' stile at x 30 (the old signpost's mirror image)
+LOT_ARCH_Z = (72.9, 79.1)                                   # the posts of the arches at the asphalt's east and west edges (6 m apart, as the gaps)
+# the bays: part 1's lines run x -54 to 54, one every 2.7 m, in four rows (z ranges); its cars stand in them
+LOT_BAY_X0, LOT_BAY_W, LOT_BAY_N = -54.0, 2.7, 40
+LOT_ROWS = {"A": (34.6, 39.6), "B": (47.4, 52.4), "C": (58.6, 63.6), "D": (71.4, 76.4)}
+LOT_CROSSWALK = (-3.9, 3.9, 34.8, 39.8)
+# part 1's cars (world/Exterior.glb's Set_car_*), (x, z, colour, yaw sign, height); the yaw is squared to the bays (it was within 3.4 degrees)
+LOT_CARS = [
+    (-50.08, 37.05, "black", 1, 1.44), (3.97, 37.14, "black", 1, 1.44), (36.38, 37.19, "black", 1, 1.44), (-25.71, 49.68, "black", -1, 1.44),
+    (1.31, 49.53, "black", -1, 1.44), (36.32, 49.75, "black", -1, 1.44), (-47.12, 61.45, "black", 1, 1.44), (-25.79, 61.3, "black", 1, 1.44),
+    (-22.87, 61.45, "black", 1, 1.44), (-6.61, 37.21, "green", 1, 1.48), (6.74, 37.32, "green", 1, 1.48), (55.29, 37.28, "green", 1, 1.48),
+    (-4.07, 49.67, "green", -1, 1.48), (-52.65, 61.24, "green", 1, 1.48), (28.28, 61.11, "green", 1, 1.48), (-17.55, 73.76, "green", -1, 1.48),
+    (-4.01, 73.73, "green", -1, 1.48), (3.93, 73.91, "green", -1, 1.48), (-39.18, 37.43, "navy", 1, 1.48), (-33.89, 37.19, "navy", 1, 1.48),
+    (17.45, 37.1, "navy", 1, 1.48), (47.34, 61.22, "navy", 1, 1.48), (12.13, 73.5, "navy", -1, 1.48), (36.59, 73.72, "navy", -1, 1.48),
+    (-20.26, 37.42, "red", 1, 1.43), (39.25, 37.2, "red", 1, 1.43), (41.81, 37.07, "red", 1, 1.43), (49.89, 61.14, "red", 1, 1.43),
+    (-36.49, 73.53, "red", -1, 1.43), (-28.44, 73.54, "red", -1, 1.43), (-52.68, 37.26, "silver", 1, 1.52), (-47.36, 37.37, "silver", 1, 1.52),
+    (-17.53, 37.22, "silver", 1, 1.52), (-28.24, 49.63, "silver", -1, 1.52), (-20.25, 49.51, "silver", -1, 1.52), (-6.87, 49.7, "silver", -1, 1.52),
+    (9.55, 49.73, "silver", -1, 1.52), (17.66, 61.46, "silver", 1, 1.52), (-1.45, 49.55, "teal", -1, 1.48), (6.8, 49.89, "teal", -1, 1.48),
+    (44.54, 49.94, "teal", -1, 1.48), (-31.1, 61.38, "teal", 1, 1.48), (25.63, 61.12, "teal", 1, 1.48), (-47.11, 73.8, "teal", -1, 1.48),
+    (-9.5, 37.22, "van", 1, 1.7), (49.84, 37.36, "van", 1, 1.7), (-31.11, 49.88, "van", -1, 1.7), (-12.19, 49.54, "van", -1, 1.7),
+    (-49.94, 61.54, "van", 1, 1.7), (20.21, 61.5, "van", 1, 1.7), (52.54, 61.47, "van", 1, 1.7), (-14.9, 49.5, "white", -1, 1.45),
+    (12.29, 49.67, "white", -1, 1.45), (14.89, 49.75, "white", -1, 1.45), (39.08, 49.78, "white", -1, 1.45), (-36.59, 61.27, "white", 1, 1.45),
+    (22.91, 73.95, "white", -1, 1.45), (49.82, 73.72, "white", -1, 1.45), (-52.58, 49.95, "yellow", -1, 1.45), (20.3, 49.49, "yellow", -1, 1.45),
+    (-39.1, 61.27, "yellow", 1, 1.45), (-20.23, 61.14, "yellow", 1, 1.45), (39.22, 61.46, "yellow", 1, 1.45), (-39.2, 73.59, "yellow", -1, 1.45),
+    (40.5, 44.2, "covered", 0, 1.41),              # part 1 had it at z 43, through the parking post at (40, 41.5): moved 1.2 m south
+]
+# where the two sets that stay part of the lot stand (their Ground_lot in the lot's frame): nothing of the lot's own stands there
+LOT_SET_FOOT = {"table_and_chairs": (-12.0, -4.0, 37.0, 45.5), "bus_station": (-54.0, -38.0, 43.0, 53.0)}
+# the trees in the two beds either side of the store (part 1 had a small tree and shrubs there): (x, z)
+LOT_BED_TREES = [(-41.2, 19.6), (-34.9, -9.9), (-46.8, -1.1), (-52.0, 10.0), (-55.0, -14.0), (34.5, 6.2), (50.8, 19.0), (47.3, -6.4),
+                 (56.0, 4.0), (40.0, -15.0)]
+LOT_BEDS = [(-58.5, -31.0, -20.0, 23.5), (31.0, 58.5, -20.0, 23.5)]
+
+
+def lot_cars():
+    """The cars that stay: part 1's, less the two that stood where the table now stands, between it and the store, and the two where the
+    bus station stands. Each as (name, x, z, colour, yaw sign, height)."""
+    out = []
+    for x, z, col, yaw, h in LOT_CARS:
+        if any(fx0 - 1.2 < x < fx1 + 1.2 and fz0 - 2.6 < z < fz1 + 2.6 for fx0, fx1, fz0, fz1 in LOT_SET_FOOT.values()):
+            continue
+        out.append((f"Car_{len(out) + 1:02d}", x, z, col, yaw, h))
+    return out
+
+
+def lot_store_colliders():
+    """The store's colliders, from world/L4.json (part 1's export of the store; parking_lot.json carried them too), each once."""
+    doc = json.loads((ROOT / "world/L4.json").read_text())
+    seen, out = set(), []
+    for c in doc["colliders"]:
+        key = (c["s"], tuple(c["min"]), tuple(c["max"]))
+        if c["s"] in LOT_STORE and key not in seen:
+            seen.add(key)
+            out.append(c)
+    return out
+
+
+def parking_lot():
+    Y = LOT_Y
+    S = Scene("parking_lot", "The parking lot: the Overworld's hub, in front of the store", "the lot 124 m by 70 m of asphalt in four rows of bays "
+              "(x -62 to 62, z 27.75 to 98) before the store, the paved apron round the store, lawns out to 400 m", levels=(Y,),
+              mood="dreamcore, the first place outside")
+    # the store (world/L4.glb's art): its colliders as part 1 had them, and the block across its glass doors
+    for c in lot_store_colliders():
+        S.solid(c["s"], c["min"], c["max"], "store", ("store",), art=False)
+    S.solid("Block_store_doors", *LOT_BLOCK, "glass", ("store",), art=False)
+    # the ground: the asphalt, the apron round the store (the store's own floor is L4.glb's), the road's head through the south hedge, lawns
+    x0, x1, z0, z1 = LOT["asphalt"]
+    sx0, sx1, sz0, sz1 = LOT_STORE_BOX
+    S.solid("Ground_asphalt", (x0, Y - 0.5, z0), (x1, Y, z1), "asphalt")
+    # either side of the store the apron rings a bed of lawn (part 1 had a small tree and shrubs there)
+    for side, (ax0, ax1), (bx0, bx1, bz0, bz1) in (("W", (x0, sx0), LOT_BEDS[0]), ("E", (sx1, x1), LOT_BEDS[1])):
+        S.solid(f"Ground_apron_{side}_1", (ax0, Y - 1.0, LOT_APRON_Z), (ax1, Y, bz0), "paving")
+        S.solid(f"Ground_apron_{side}_2", (ax0, Y - 1.0, bz1), (ax1, Y, z0), "paving")
+        S.solid(f"Ground_apron_{side}_3", (ax0, Y - 1.0, bz0), (bx0, Y, bz1), "paving")
+        S.solid(f"Ground_apron_{side}_4", (bx1, Y - 1.0, bz0), (ax1, Y, bz1), "paving")
+        S.solid(f"Ground_bed_{side}", (bx0, Y - 1.0, bz0), (bx1, Y, bz1), "grass")
+    S.solid("Ground_apron_N", (sx0, Y - 1.0, LOT_APRON_Z), (sx1, Y, sz0), "paving")
+    S.solid("Ground_apron_S", (sx0, Y - 0.5, sz1), (sx1, Y, z0), "paving")
+    hz0, hz1, hy = LOT_HEDGE_S
+    rx0, rx1 = LOT_ROAD_GAP
+    S.solid("Ground_road_head", (rx0, Y - 0.5, z1), (rx1, Y, z1 + 8.0), "asphalt")
+    n, f = LOT_NEAR, LOT_FAR
+    S.solid("Ground_lawn_W", (x0 - n, Y - 1.0, LOT_APRON_Z - n), (x0, Y, z1 + n), "grass")
+    S.solid("Ground_lawn_E", (x1, Y - 1.0, LOT_APRON_Z - n), (x1 + n, Y, z1 + n), "grass")
+    S.solid("Ground_lawn_N", (x0, Y - 1.0, LOT_APRON_Z - n), (x1, Y, LOT_APRON_Z), "grass")
+    S.solid("Ground_lawn_S_1", (x0, Y - 1.0, z1), (rx0, Y, z1 + n), "grass")
+    S.solid("Ground_lawn_S_2", (rx0, Y - 1.0, z1 + 8.0), (rx1, Y, z1 + n), "grass")
+    S.solid("Ground_lawn_S_3", (rx1, Y - 1.0, z1), (x1, Y, z1 + n), "grass")
+    S.solid("Ground_far_W", (-f, Y - 1.0, -f), (x0 - n, Y, f), "grass", ("far",))
+    S.solid("Ground_far_E", (x1 + n, Y - 1.0, -f), (f, Y, f), "grass", ("far",))
+    S.solid("Ground_far_N", (x0 - n, Y - 1.0, -f), (x1 + n, Y, LOT_APRON_Z - n), "grass", ("far",))
+    S.solid("Ground_far_S", (x0 - n, Y - 1.0, z1 + n), (x1 + n, Y, f), "grass", ("far",))
+    for side, a, b in (("N", (-f, Y, -f - 0.2), (f, Y + 3.0, -f)), ("S", (-f, Y, f), (f, Y + 3.0, f + 0.2)),
+                       ("W", (-f - 0.2, Y, -f), (-f, Y + 3.0, f)), ("E", (f, Y, -f), (f + 0.2, Y + 3.0, f))):
+        S.edge(side, a, b)
+    # hedges: part 1's planter row (1.1 m on a kerb) and its back hedge (2.6 m), now with the road's gap and the stile's
+    for k, (a, b) in enumerate(LOT_ROW_HEDGES, 1):
+        S.solid(f"Hedge_row_{k}", (a, Y + 0.1, 54.5), (b, Y + 1.2, 56.5), "hedge")
+    sx = LOT_STILE_GAP
+    for k, (a, b) in enumerate(((x0 - 1.0, rx0), (rx1, sx[0]), (sx[1], x1 + 1.0)), 1):
+        S.solid(f"Hedge_S_{k}", (a, Y, hz0), (b, hy, hz1), "hedge")
+    # the old signpost (shared/forest.js FOREST_ROAD_LOT.post: index.html draws it today, a 0.2 m post 2.2 m high) at the road's head
+    px, pz = LOT["forest_post"]
+    S.solid("Signpost_road", (px - 0.1, Y, pz - 0.1), (px + 0.1, Y + 2.2, pz + 0.1), "timber")
+    S.decor("Signpost_road_Board", (px - 1.0, Y + 1.7, pz - 0.2), (px + 1.0, Y + 2.15, pz - 0.12), "sign")      # on the post's lot side
+    S.decor("Stile_Step", (sx[0] + 0.15, Y, hz0 + 0.4), (sx[1] - 0.15, Y + 0.25, hz0 + 1.0), "timber")
+    S.decor("Stile_Board", (sx[0] - 0.5, Y + 1.7, hz0 - 0.06), (sx[1] + 0.5, Y + 2.15, hz0), "sign")
+    # the arches over the two edge joins (the market east, the playground west): a post either side of the way, a beam and boards overhead
+    for side, xc in (("E", x1 + 0.6), ("W", x0 - 0.6)):
+        for k, zc in enumerate(LOT_ARCH_Z, 1):
+            S.solid(f"Arch_{side}_post_{k}", (xc - 0.08, Y, zc - 0.08), (xc + 0.08, Y + 2.95, zc + 0.08), "steel")
+        S.decor(f"Arch_{side}_beam", (xc - 0.08, Y + 2.75, LOT_ARCH_Z[0] - 0.08), (xc + 0.08, Y + 2.9, LOT_ARCH_Z[1] + 0.08), "steel")
+    # part 1's street furniture, where it stood
+    for x in (-40.0, -14.0, 14.0, 40.0):
+        S.solid(f"Post_park_{'W' if x < 0 else 'E'}{abs(int(x))}", (x - 0.04, Y, 41.46), (x + 0.04, Y + 2.45, 41.54), "steel")
+    S.solid("Post_stop_1", (39.96, Y, 89.96), (40.04, Y + 2.37, 90.04), "steel")
+    S.solid("Post_stop_2", (-40.04, Y, 41.21), (-39.96, Y + 2.37, 41.29), "steel")
+    S.solid("Post_cart", (-33.84, Y, 34.96), (-33.76, Y + 1.8, 35.04), "steel")
+    S.solid("Pylon_base", (-43.0, Y, 90.8), (-41.0, Y + 0.8, 92.2), "plastic_blue")
+    S.solid("Pylon_pole", (-42.5, Y + 0.8, 91.0), (-41.5, Y + 12.0, 92.0), "plastic_blue")
+    for nm, a, b in (("N", (-35.0, Y, 31.8), (-32.6, Y + 0.9, 31.9)), ("S", (-35.0, Y, 34.2), (-32.6, Y + 0.9, 34.3)),
+                     ("W", (-35.05, Y, 31.9), (-34.95, Y + 0.9, 34.2))):
+        S.solid(f"Corral_{nm}", a, b, "steel")
+    for nm, xa in (("W", -13.0), ("E", 11.0)):
+        bench(S, nm, xa, xa + 2.0, 31.35, 31.85)
+        S.boxes[-1]["min"][1] += Y
+        S.boxes[-1]["max"][1] += Y
+    for nm, x in (("W", -14.0), ("E", 14.0)):
+        S.solid(f"Bin_{nm}", (x - 0.3, Y, 31.35), (x + 0.3, Y + 0.9, 31.95), "plastic_green")
+    S.solid("Rack", (20.0, Y, 31.55), (22.8, Y + 1.0, 31.75), "steel")
+    # the cars, in their bays (solid now: part 1's could be walked through); the box is the body, up to the bonnet: the cabin stands on it
+    for nm, x, z, col, yaw, h in lot_cars():
+        hx, hz = (1.1, 2.5) if col != "covered" else (0.95, 2.25)
+        hb = h if col == "covered" else 1.0 if col == "van" else 0.9
+        S.solid(nm, (x - hx, Y, z - hz), (x + hx, Y + hb, z + hz), "plastic_white", (f"car:{col}", f"yaw:{yaw}"))
+    # the beds either side of the store: lawn and pastel trees (each trunk solid)
+    for k, (x, z) in enumerate(LOT_BED_TREES, 1):
+        S.solid(f"Tree_{k:02d}", (x - 0.2, Y, z - 0.2), (x + 0.2, Y + 2.6, z + 0.2), "bark")
+        S.decor(f"Tree_{k:02d}_Crown", (x - 2.0, Y + 2.4, z - 2.0), (x + 2.0, Y + 6.0, z + 2.0), "pastel_leaf", ("ceiling",))
+    # the paint: the bays' lines, the crossing to the doors, the store's yellow no-parking lines
+    for row, (ra, rb) in LOT_ROWS.items():
+        for k in range(LOT_BAY_N + 1):
+            x = LOT_BAY_X0 + LOT_BAY_W * k
+            if row == "A" and LOT_CROSSWALK[0] - 0.5 < x < LOT_CROSSWALK[1] + 0.5:
+                continue
+            if any(fx0 - 0.2 < x < fx1 + 0.2 and fz0 < rb and fz1 > ra for fx0, fx1, fz0, fz1 in LOT_SET_FOOT.values()):
+                continue
+            S.decor(f"Line_{row}_{k:02d}", (x - 0.06, Y, ra), (x + 0.06, Y + 0.004, rb), "line")
+    # the way in and the joins: the lot's side of the greybox's four walk links (their numbers are the greybox's OUTSIDE notes until now)
+    S.link("market", (61.0, Y, 76.0), (59.6, Y, 76.0), (-1, 0), "market (its west gap), the lot's east edge")
+    S.link("playground", (-61.0, Y, 76.0), (-59.6, Y, 76.0), (1, 0), "playground (its east gap), the lot's west edge")
+    S.link("forest_road", (LOT["forest_at"][0], Y, LOT["forest_at"][1]), (LOT["forest_at"][0], Y, 93.0), (0, -1), "road (its lot end), through the gap")
+    S.link("hills", (30.0, Y, 95.6), (30.0, Y, 93.0), (0, -1), "endless_hills (its signpost), over the stile")
+    # the manifest's two other doors of the lot, where they are today: the store's glass doors (whose way back, lot.L4.front_doors>overworld,
+    # arrives at the table) and the bus stop (shared/city.js BUS_LOT; city.bus>overworld arrives at (-41, 9.6, 43)); the bus station set
+    # moves the bus stop's points to its platform when the coordinator places it (the greybox's OUTSIDE note)
+    S.link("store_doors", (0.0, Y, 28.6), (LOT["spawn"][0], Y, LOT["spawn"][1]), (0, -1), "the store (lot area), the options screen")
+    S.link("bus_stop", (LOT["bus_at"][0], Y, LOT["bus_at"][1]), (-41.0, Y, 43.0), (0, -1), "Hallam Row (city.street), by bus")
+    S.marker("Spawn_table", (LOT["spawn"][0], Y, LOT["spawn"][1]))
+    S.marker("Store_doors", (0.0, Y, 28.5), kind="Entrance")
+    keeper(S, 1, (-48.0, Y, 97.4), (0, 1), "watches")
+    keeper(S, 2, (48.0, Y, 97.4), (0, 1), "ignores")
+    # corridors the gate keeps clear: the aisles, the edges to the joins, the gaps, the way from the table to the doors
+    S.corridor("aisle_CD", -54.0, 54.0, 64.2, 70.8, y=Y)
+    S.corridor("aisle_south", -60.0, 60.0, 77.0, 88.0, y=Y)
+    S.corridor("edge_E", 57.0, 62.0, 73.2, 78.8, y=Y)
+    S.corridor("edge_W", -62.0, -57.0, 73.2, 78.8, y=Y)
+    S.corridor("road_gap_W", rx0, px - 0.12, 96.0, 101.0, y=Y)
+    S.corridor("road_gap_E", px + 0.12, rx1, 96.0, 101.0, y=Y)
+    S.corridor("stile", sx[0], sx[1], 96.0, 100.0, y=Y)
+    S.corridor("row_A_opening", -12.0, -4.6, 34.8, 39.6, y=Y)
+    S.corridor("crossing", -2.6, 2.6, 35.0, 47.0, y=Y)
+    S.label("PARKING LOT", 0.0, 66.0)
+    S.label("the store (world/L4.glb)", 0.0, 0.0, kind="note")
+    S.plan_rect = (-72.0, 72.0, -30.0, 108.0)
+    S.still = ((LOT["spawn"][0], Y, LOT["spawn"][1]), (0.0, -1.0), 0)
+    return S
+
+
 # ---------------------------------------------------------------- the scenes and how they join
 SCENES = {"table_and_chairs": table_and_chairs, "market": market, "playground": playground, "tree_house": tree_house,
-          "bus_station": bus_station, "road": road, "endless_hills": endless_hills}
+          "bus_station": bus_station, "road": road, "endless_hills": endless_hills, "parking_lot": parking_lot}
 
 # Every link between two scenes of this set: (scene, door) <-> (scene, door). Pressing F at one side's Link_ (or walking through a walk gap)
 # puts you on the other side's Arrive_.
 PAIRS = [
     (("playground", "tree_house"), ("tree_house", "playground"), "walk", "the path west out of the playground, through the gap in its hedge"),
+    # the lot's four joins (parking_lot is a scene of this set since 2026-11-27; these were OUTSIDE before, at the same points)
+    (("market", "lot"), ("parking_lot", "market"), "walk", "new: overworld.lot>market and overworld.market>lot; the lot's east edge (x 62, z 76)"),
+    (("playground", "lot"), ("parking_lot", "playground"), "walk",
+     "new: overworld.lot>playground and overworld.playground>lot; the lot's west edge (x -62, z 76)"),
+    (("road", "lot"), ("parking_lot", "forest_road"), "walk",
+     "reused: overworld.lot>forest (the lot's door forest_road, now to the road's start) and forest.road>lot's arrival; the gap in the south hedge"),
+    (("endless_hills", "lot"), ("parking_lot", "hills"), "walk", "new: overworld.lot>hills and overworld.hills>lot; the stile at x 30"),
 ]
-
-
-def _lot(x, z, fx, fz, ax=None, az=None):
-    ax = x + 1.4 * fx if ax is None else ax
-    az = z + 1.4 * fz if az is None else az
-    return f"F at ({x:g}, 9.6, {z:g}), arrive at ({ax:g}, 9.6, {az:g}) facing ({fx:g}, {fz:g})"
+# the lot's side of each join, as the greybox README's link table gives it: (F, arrival, facing), in parking_lot's frame
+LOT_JOINS = {"market": ((61.0, 9.6, 76.0), (59.6, 9.6, 76.0), (-1.0, 0.0)), "playground": ((-61.0, 9.6, 76.0), (-59.6, 9.6, 76.0), (1.0, 0.0)),
+             "forest_road": ((-30.0, 9.6, 95.6), (-30.0, 9.6, 93.0), (0.0, -1.0)), "hills": ((30.0, 9.6, 95.6), (30.0, 9.6, 93.0), (0.0, -1.0))}
 
 
 def _att(sid, door, kind):
@@ -893,18 +1094,13 @@ def _att(sid, door, kind):
 # Links that leave this set: the other side is part 1's (the parking lot, the street, the forest; the coordinator wires them and cuts the lot's
 # hedge gaps) or a reserved addon. (scene, door): (connector, link ids, where the other side is)
 OUTSIDE = {
-    ("market", "lot"): ("walk", "new: overworld.lot>market and overworld.market>lot",
-                        "parking_lot's east edge, where the asphalt meets the grass (x 62, z 76): " + _lot(61.0, 76.0, -1, 0)),
-    ("playground", "lot"): ("walk", "new: overworld.lot>playground and overworld.playground>lot",
-                            "parking_lot's west edge, where the asphalt meets the grass (x -62, z 76): " + _lot(-61.0, 76.0, 1, 0)),
-    ("road", "lot"): ("walk", "reused: overworld.lot>forest (the lot's door forest_road, now to the road's start) and forest.road>lot's arrival",
-                      "parking_lot's south hedge at the old signpost (shared/forest.js FOREST_ROAD_LOT, F at (-30, 95.6)): "
-                      + _lot(-30.0, 95.6, 0, -1, -30.0, 93.0) + "; a gap is cut in the hedge (x -34 to -26) for the road"),
+    ("parking_lot", "store_doors"): ("doors", "built: lot.L4.front_doors>overworld (in, to the table); planned: overworld.store_doors>lot",
+                                     "L4 (the store's glass doors; the options screen)"),
+    ("parking_lot", "bus_stop"): ("bus", "built: overworld.bus>city and city.bus>overworld",
+                                  "street (city, built): the lot's side is today's BUS_LOT until the bus station set's points replace it"),
     ("road", "forest"): ("walk", "reused: overworld.road>forest (planned); forest.road>lot comes back to the road's end",
                          "forest (dreamcore_forest, built): you arrive at (0, 0, 6) facing north (0, -1), as today. The forest's signpost "
                          "back (door road_back, F at (2.6, 0, 8.4)) arrives at the road's forest end, (0, 0, -476) facing (0, 1)"),
-    ("endless_hills", "lot"): ("walk", "new: overworld.lot>hills and overworld.hills>lot",
-                               "parking_lot's south hedge, a stile at x 30 (the old signpost's mirror image): " + _lot(30.0, 95.6, 0, -1, 30.0, 93.0)),
     ("tree_house", "addon"): ("gate", "reused: overworld.treehouse>addon (planned) to future_addon_treehouse (reserved)",
                               "the tree house addon, not built: the trunk door stays locked; coming back you stand in front of it, facing out"),
     ("bus_station", "bus_stop"): ("bus", "reused: overworld.bus>city and city.bus>overworld (built); only their lot-side points move",
@@ -1027,6 +1223,39 @@ def _inside(c, rect, e=0.005):
     return c["min"][0] < x1 - e and c["max"][0] > x0 + e and c["min"][2] < z1 - e and c["max"][2] > z0 + e
 
 
+def check_lot(docs):
+    """parking_lot: its four joins at the greybox README's points, the store's colliders as part 1 had them, the spawn, nothing left of the
+    Right Door, Wrong Exit house, its gate or the Intern's city, and the two sets' places clear. Returns the failures."""
+    bad, d = [], docs["parking_lot"]
+    links = {l["door"]: l for l in d.get("links", [])}
+    for door, (at, arr, face) in LOT_JOINS.items():
+        l = links.get(door)
+        if l is None or max(abs(a - b) for a, b in zip(l["at"] + l["arrive"] + l["face"], list(at) + list(arr) + list(face))) > 0.0015:
+            bad.append(f"lot join {door}: {l and (l['at'], l['arrive'], l['face'])}, the README says {at}, {arr}, {face}")
+    want = sorted((tuple(c["min"]), tuple(c["max"])) for c in lot_store_colliders()) + [LOT_BLOCK]
+    have = [(tuple(c["min"]), tuple(c["max"])) for c in d["colliders"] if c["s"].startswith(LOT_STORE + ("Block_store_doors",))]
+    if sorted(have) != sorted(want):
+        bad.append(f"lot store: {len(have)} store colliders, world/L4.json has {len(want) - 1} and the doors' block")
+    sp = [m for m in d.get("markers", []) if m["kind"] == "Spawn"]
+    if len(sp) != 1 or sp[0]["position"] != [LOT["spawn"][0], LOT_Y, LOT["spawn"][1]]:
+        bad.append(f"lot spawn: {sp}")
+    gone = [c["s"] for c in d["colliders"] if c["s"].startswith(("Gate_RDW", "Gate_ITN", "Site_ITN", "Extra_Props_LOT", "RDW"))]
+    plot = [c["s"] for c in d["colliders"] if c["max"][1] > LOT_Y + 0.05 and c["max"][0] > -160.0 and c["min"][0] < -80.0
+            and c["max"][2] > 20.0 and c["min"][2] < 100.0 and not c["s"].startswith("Edge_")]
+    if gone or plot:
+        bad.append(f"lot: part 1's house, gate or city left: {gone + plot}")
+    stand = [c for c in d["colliders"] if c["max"][1] > LOT_Y + 0.2 and c["min"][1] < LOT_Y + 0.5]
+    for sid, (x0, x1, z0, z1) in LOT_SET_FOOT.items():
+        hit = [c["s"] for c in stand if _inside(c, (x0, x1, z0, z1))]
+        if hit:
+            bad.append(f"lot: {sid}'s place is not clear: {hit}")
+    ncar = sum(1 for c in d["colliders"] if c["s"].startswith("Car_"))
+    print(f"GATE lot: the joins market, playground, forest_road and hills at the README's points; {len(have) - 1} store colliders from world/L4.json "
+          f"and the doors' block; the spawn at {tuple(sp[0]['position']) if sp else None}; no house, gate or city collider, nothing standing on "
+          f"the house's plot; the table's and the bus station's places clear; {ncar} cars")
+    return bad
+
+
 def check(base, ids=None, glb_dir=None):
     """Links pair, every scene is reached, steps keep to the rise, corridors are wide and clear, each playground piece has its clear ground,
     the moving parts are separate objects on their pivots, and the hills tile's edges match. Reads <base>/world/<scene>.json (and the
@@ -1063,7 +1292,8 @@ def check(base, ids=None, glb_dir=None):
     for (a, _), (b, _), _, _ in PAIRS:
         graph[a].add(b)
         graph[b].add(a)
-    roots = [s for (s, dd), (k, lid, note) in OUTSIDE.items() if note.startswith("parking_lot")] + [s for s in SCENES if s in ATTACH]
+    roots = ([s for (s, dd), (k, lid, note) in OUTSIDE.items() if note.startswith("parking_lot")] + [s for s in SCENES if s in ATTACH]
+             + [s for s in ("parking_lot",) if s in SCENES])
     seen, todo = set(), list(roots)
     while todo:
         s = todo.pop()
@@ -1073,6 +1303,8 @@ def check(base, ids=None, glb_dir=None):
     if set(SCENES) - seen:
         bad.append(f"not reachable from parking_lot: {sorted(set(SCENES) - seen)}")
     print(f"GATE navigable: {len(seen)} of {len(SCENES)} scenes reachable from parking_lot (table_and_chairs and bus_station stand in it)")
+    if "parking_lot" in docs:
+        bad += check_lot(docs)
     # steps: every Step_<flight>_<nn> collider, in order, keeps to MAX_RISE, from the ground it starts on to the floor it reaches; every kerb too
     nsteps, worst = 0, 0.0
     for sid in ids:
