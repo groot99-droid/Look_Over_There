@@ -1,0 +1,21 @@
+{
+ "gain": 0.3021,
+ "target_p99": 0.98,
+ "target_p90": 0.9,
+ "factor": {
+  "Leaf_Room": 0.3021,
+  "Brass": 0.3021,
+  "Decal_Floor": 0.3021,
+  "Grille": 0.3021,
+  "Plastic_Black": 0.3021,
+  "Plastic_White": 0.3021,
+  "Steel": 0.3021,
+  "Tile_Black": 0.3021,
+  "Trim_White": 0.3021,
+  "Threshold": 0.3021,
+  "Tile_Band": 0.3021,
+  "Tile_Ceiling": 0.3021,
+  "Tile_Floor_Pool": 0.3021,
+  "Tile_Wall": 0.3021
+ }
+}

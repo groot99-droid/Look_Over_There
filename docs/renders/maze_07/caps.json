@@ -1,0 +1,25 @@
+{
+ "gain": 1.4394,
+ "target_p99": 0.98,
+ "target_p90": 0.9,
+ "factor": {
+  "Leaf_Room": 1.4394,
+  "Brass": 1.4394,
+  "Decal_Ceiling": 1.4394,
+  "Decal_Floor": 1.4394,
+  "Leaf_Fire": 1.4394,
+  "Leaf_Glass": 1.4394,
+  "Plastic_Black": 1.4394,
+  "Plastic_White": 1.4394,
+  "Red_Paint": 1.4394,
+  "Skirt_Steel": 1.4394,
+  "Steel": 1.4394,
+  "Step_Concrete": 1.4394,
+  "Block_Lower": 1.4394,
+  "Block_Upper": 1.4394,
+  "Jamb_Steel": 1.4394,
+  "Stair_Ceiling": 1.4394,
+  "Stair_Concrete": 1.4394,
+  "Threshold": 1.4394
+ }
+}
