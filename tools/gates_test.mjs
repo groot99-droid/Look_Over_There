@@ -45,7 +45,7 @@ try {
   const L4 = await (await fetch(`http://localhost:${srv.port}/world/L4.json`)).json();
   const linkOf = name => L4.doors.find(d => d.name === name).link;
   const cases = [
-    ["Right Door, Wrong Exit (cancelled)", "DoorLeaf_Gate_RDW", p => p.evaluate(async () => (await import("./games/rdwe/walk.js")).cancel())],
+    // Right Door, Wrong Exit's gate on L4's lot went with the balloon house (#133): its way in is the meadow house's door, which tools/forest_test.mjs walks through and back
     ["The Intern (intern-ending)", "DoorLeaf_Gate_ITN", p => p.evaluate(() => { const fr = document.querySelector("#gamemount iframe"); fr.contentWindow.eval("parent.postMessage({type: \"intern-ending\"}, \"*\")"); })],   // posted from inside the game window, as the game does
   ];
   const only = process.argv.find(a => a.startsWith("--only="))?.slice(7);        // --only=ITN or --only=RDW
@@ -59,7 +59,8 @@ try {
   }
   // neither gate is solo only since session 11 (tools/games_party_test.mjs, tools/intern_party_test.mjs): in a room the Intern's door opens onto the passage, with no refusal
   const gates = Object.fromEntries(REGISTRY.links.filter(l => l.connector === "gate" && l.status === "built").map(l => [l.from.door, l]));
-  check("the manifest marks neither game gate soloOnly", gates.DoorLeaf_Gate_ITN.soloOnly === false && gates.DoorLeaf_Gate_RDW.soloOnly === false);
+  const house = REGISTRY.linkFrom("meadow", "house_door");
+  check("the manifest marks neither the Intern's gate nor Right Door, Wrong Exit's way in (the meadow house since #133) soloOnly", gates.DoorLeaf_Gate_ITN.soloOnly === false && !gates.DoorLeaf_Gate_RDW && house.to.area === "rdwe" && !house.soloOnly);
   const room = await (await browser.newContext({viewport: {width: 320, height: 200}})).newPage();
   await room.goto(`http://localhost:${srv.port}/?room=GATES&name=Ann&char=0&auto=1&ready=1`);
   await room.waitForFunction(() => window.__game && !document.getElementById("load") && window.__game.net.phase === "playing", null, {timeout: 240000});

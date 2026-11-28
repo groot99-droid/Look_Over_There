@@ -42,8 +42,9 @@ try {
   check("the results screen is gone, the HUD is back, and there are no monsters", at.results === "none" && !at.fin && at.monsters === 0);
   const solid = await p.evaluate(() => { const g = window.__game, c = (x, z) => !!g.collide({x, y: 9.62, z}); return {table: c(-8, 41), chair: c(-6.65, 41), doors: c(0, 27.2), open: c(-8, 43.6)}; });
   check("the table, a chair and the store doors are solid; your spawn is clear", solid.table && solid.chair && solid.doors && !solid.open, JSON.stringify(solid));
-  const sky = await p.evaluate(() => { let v = null; window.__game.S.root.traverse(o => { if (o.name === "Sky_LOT_Exterior") v = o.material.emissiveIntensity; }); return v; });
-  check("the Overworld has its clear sky, brighter than the store's", sky > skyL4, `${skyL4} -> ${sky}`);
+  // since #133 the lot is its own scene (world/parking_lot.glb) under the Overworld's sky backdrop; the store's sky box (Exterior.glb) is not drawn there
+  const sky = await p.evaluate(() => { const g = window.__game; let box = false; g.S.root.traverse(o => { if (o.name === "Sky_LOT_Exterior") box = true; }); return {backdrop: !!g.S.backdrop, box}; });
+  check("the Overworld has its own sky: the backdrop, not the store's sky box", sky.backdrop && !sky.box, JSON.stringify(sky));
 
   // walk to the doors: the options screen opens; Going back in is shown and can be chosen (session 8; tools/gbi_test.mjs drives it)
   await p.evaluate(() => { const g = window.__game; g.P.p.set(0, 9.62, 33); g.P.v.set(0, 0, 0); g.P.yaw = 0; g.P.pitch = 0; g.keys.KeyW = true; });

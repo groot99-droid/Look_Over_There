@@ -1,0 +1,71 @@
+{
+ "0": {
+  "size": 2048,
+  "px_per_m": 70.6,
+  "scale": 0.3579,
+  "knee": 0.1515,
+  "raw_p50_p90_p99_p995_max": [
+   0.084,
+   0.316,
+   1.657,
+   2.399,
+   13.895
+  ],
+  "p50_p90_p99_p995_max": [
+   0.084,
+   0.247,
+   0.349,
+   0.358,
+   0.375
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 72,
+  "materials": [
+   "Door_Jamb",
+   "Stair_Ceiling",
+   "Stair_Dado",
+   "Stair_Edge",
+   "Stair_Floor",
+   "Stair_Paint"
+  ]
+ },
+ "1": {
+  "size": 1024,
+  "px_per_m": 15.1,
+  "scale": 0.2101,
+  "knee": 0.0847,
+  "raw_p50_p90_p99_p995_max": [
+   0.026,
+   0.211,
+   4.125,
+   9.205,
+   273.879
+  ],
+  "p50_p90_p99_p995_max": [
+   0.026,
+   0.148,
+   0.208,
+   0.21,
+   0.212
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 19,
+  "materials": [
+   "Brass",
+   "Decal_Floor",
+   "Iron_Black",
+   "Lamp_Dead",
+   "Leaf_Glass",
+   "Leaf_Stair",
+   "Nosing_Yellow",
+   "Plastic_White",
+   "Rail_Steel",
+   "Red_Paint",
+   "Sign_Green",
+   "Stair_Step",
+   "Stencil_Paint"
+  ]
+ }
+}

@@ -1,0 +1,90 @@
+{
+ "scene": "registrar_hall",
+ "samples": 512,
+ "map_0": {
+  "set": "normal",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 24.5,
+  "gain": 0.3752,
+  "C": 1.2,
+  "wall_median_L": 1.26445,
+  "raw_p50_p90_p99": [
+   1.5303,
+   3.4182,
+   4.5715
+  ]
+ },
+ "map_1": {
+  "set": "normal",
+  "page": 1,
+  "size": 2048,
+  "px_per_m": 26.3,
+  "gain": 0.3752,
+  "C": 1.2,
+  "wall_median_L": 1.26445,
+  "raw_p50_p90_p99": [
+   0.7282,
+   4.8413,
+   6.9879
+  ]
+ },
+ "map_2": {
+  "set": "alarm",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 24.5,
+  "gain": 5.31275,
+  "C": 1.2,
+  "wall_median_L": 0.06248,
+  "raw_p50_p90_p99": [
+   0.0842,
+   0.1959,
+   0.7116
+  ]
+ },
+ "map_3": {
+  "set": "alarm",
+  "page": 1,
+  "size": 2048,
+  "px_per_m": 26.3,
+  "gain": 5.31275,
+  "C": 1.2,
+  "wall_median_L": 0.06248,
+  "raw_p50_p90_p99": [
+   0.0351,
+   0.2071,
+   0.766
+  ]
+ },
+ "page_0_materials": [
+  "Ceiling_Panel",
+  "Ceiling_Server",
+  "Floor_Server",
+  "Panel_A",
+  "Panel_B",
+  "Pit_Concrete",
+  "Wall_Green"
+ ],
+ "page_1_materials": [
+  "Beam_Steel",
+  "Breaker_Paint",
+  "Cable",
+  "Cam_Body",
+  "Door_Frame",
+  "Door_Steel",
+  "Lamp_Housing",
+  "Paint_Dark",
+  "Paint_Orange",
+  "Paint_Yellow",
+  "Plastic_Black",
+  "Server_Body",
+  "Sign_Plate",
+  "Skirting",
+  "Steel",
+  "Steel_Dark",
+  "Stripe_Pink"
+ ],
+ "seconds": 177,
+ "device": "GPU"
+}

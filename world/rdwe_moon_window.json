@@ -1,0 +1,375 @@
+{
+ "scene": "rdwe_moon_window",
+ "colliders": [
+  {
+   "s": "Beyond_hall",
+   "min": [
+    5.35,
+    -0.05,
+    -0.68
+   ],
+   "max": [
+    5.55,
+    2.25,
+    0.68
+   ]
+  },
+  {
+   "s": "Beyond_sill",
+   "min": [
+    -5.55,
+    -0.05,
+    1.32
+   ],
+   "max": [
+    -5.35,
+    2.19,
+    2.68
+   ]
+  },
+  {
+   "s": "Bookcase",
+   "min": [
+    -4.6,
+    0.0,
+    5.6
+   ],
+   "max": [
+    -1.6,
+    2.2,
+    6.0
+   ]
+  },
+  {
+   "s": "Desk",
+   "min": [
+    -5.0,
+    0.0,
+    -2.6
+   ],
+   "max": [
+    -4.3,
+    0.76,
+    -0.6
+   ]
+  },
+  {
+   "s": "Desk_Chair",
+   "min": [
+    -4.15,
+    0.0,
+    -1.9
+   ],
+   "max": [
+    -3.65,
+    0.9,
+    -1.4
+   ]
+  },
+  {
+   "s": "Globe",
+   "min": [
+    0.9,
+    0.0,
+    4.6
+   ],
+   "max": [
+    1.5,
+    1.1,
+    5.2
+   ]
+  },
+  {
+   "s": "Pedestal",
+   "min": [
+    2.6,
+    0.0,
+    2.6
+   ],
+   "max": [
+    3.4,
+    1.0,
+    3.4
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -5.2,
+    3.6,
+    -6.2
+   ],
+   "max": [
+    5.2,
+    3.8,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -5.2,
+    -0.3,
+    -6.2
+   ],
+   "max": [
+    5.2,
+    0.0,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    5.0,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    5.2,
+    3.6,
+    -0.45
+   ]
+  },
+  {
+   "s": "Room_Wall_E_2",
+   "min": [
+    5.0,
+    2.14,
+    -0.45
+   ],
+   "max": [
+    5.2,
+    3.6,
+    0.45
+   ]
+  },
+  {
+   "s": "Room_Wall_E_3",
+   "min": [
+    5.0,
+    0.0,
+    0.45
+   ],
+   "max": [
+    5.2,
+    3.6,
+    6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -5.2,
+    0.0,
+    -6.2
+   ],
+   "max": [
+    5.2,
+    3.6,
+    -6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -5.2,
+    0.0,
+    6.0
+   ],
+   "max": [
+    5.2,
+    3.6,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -5.2,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    -5.0,
+    3.6,
+    1.55
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -5.2,
+    2.08,
+    1.55
+   ],
+   "max": [
+    -5.0,
+    3.6,
+    2.45
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -5.2,
+    0.0,
+    2.45
+   ],
+   "max": [
+    -5.0,
+    3.6,
+    6.0
+   ]
+  },
+  {
+   "s": "Telescope",
+   "min": [
+    -4.0,
+    0.0,
+    -4.6
+   ],
+   "max": [
+    -3.3,
+    1.5,
+    -3.9
+   ]
+  },
+  {
+   "s": "Window_Seat",
+   "min": [
+    -3.0,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    3.0,
+    0.45,
+    -5.45
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_hall",
+   "level": "rdwe_moon_window",
+   "hinge": [
+    5.0,
+    0.0,
+    -0.43
+   ],
+   "width": 0.86,
+   "height": 2.1,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "hall",
+   "look": "half-glazed plum door, brass knob"
+  },
+  {
+   "name": "DoorLeaf_sill",
+   "level": "rdwe_moon_window",
+   "hinge": [
+    -5.0,
+    0.0,
+    2.43
+   ],
+   "width": 0.86,
+   "height": 2.04,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "sill",
+   "look": "ledged and braced mint paint door, ring pull"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "hall",
+   "at": [
+    4.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    3.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "sill",
+   "at": [
+    -4.25,
+    0.0,
+    2.0
+   ],
+   "arrive": [
+    -3.1,
+    0.0,
+    2.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "moon",
+   "name": "Spot_moon_1",
+   "position": [
+    0.0,
+    0.0,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "pick up the moon: its size is how far away you hold it"
+  },
+  {
+   "kind": "moon",
+   "name": "Spot_moon_2",
+   "position": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "hold the moon at arm's length: a ball; walk it to the window and it is the moon again"
+  },
+  {
+   "kind": "switch",
+   "name": "Spot_switch_1",
+   "position": [
+    3.0,
+    0.0,
+    1.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the pedestal: the moon goes here; set it down and it fills the room, and the west door opens"
+  }
+ ]
+}

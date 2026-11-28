@@ -11,6 +11,8 @@
 //   label  the prompt text (a string, or a function returning one)
 //   hover  optional: called with true when the prompt points at it and false when it stops,
 //          so a room can light up which of several look-alike things "use" would pick
+//   aimless  optional: picked whenever the player is within reach, wherever they look (a Blender
+//          room's way through a door, walk/blender.js); a thing aimed at is still picked first
 import * as THREE from 'three';
 
 const AIM_SLACK = 0.05;   // radians of forgiveness on top of the target's own size
@@ -49,8 +51,9 @@ export function createPlay(targets, { camera, button, touch = false }) {
       toTarget.set(t.x - camera.position.x, t.y - camera.position.y, t.z - camera.position.z);
       const dist = toTarget.length();
       if (dist < 1e-3) continue;
-      const angle = toTarget.angleTo(view);
-      if (angle > Math.atan((t.size || 0.2) / dist) + AIM_SLACK) continue;
+      let angle = toTarget.angleTo(view);
+      if (t.aimless) angle += Math.PI;                                           // after anything aimed at
+      else if (angle > Math.atan((t.size || 0.2) / dist) + AIM_SLACK) continue;
       if (angle < bestAngle) { bestAngle = angle; best = t; }
     }
     if (best !== current) {
@@ -77,5 +80,6 @@ export function createPlay(targets, { camera, button, touch = false }) {
   return {
     update, use, hide,
     get target() { return current ? labelOf(current) : null; },
+    get pick() { return current; },
   };
 }

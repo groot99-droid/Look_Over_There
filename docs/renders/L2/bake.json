@@ -1,0 +1,1295 @@
+{
+ "scene": "L2",
+ "pages": {
+  "0": {
+   "size": 2048,
+   "px_per_m": 30.9,
+   "m2": 5697.6,
+   "m2_outside": 2637.9,
+   "margin_px": 8,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_stains": [
+     0.0099,
+     0.3114,
+     0.4429,
+     0.4837
+    ],
+    "M_Door": [
+     0.1093,
+     0.3583,
+     0.6172,
+     0.6372
+    ],
+    "M_D_floor_L2": [
+     0.2322,
+     0.354,
+     0.4394,
+     0.4483
+    ],
+    "M_D_floor_L3": [
+     0.042,
+     0.3215,
+     6.8575,
+     7.9341
+    ]
+   },
+   "scale": 0.45008,
+   "seconds": 33,
+   "texel_p50_p90_p99_p995_max": [
+    0.2304,
+    0.3526,
+    0.4394,
+    0.4537,
+    8.6011
+   ]
+  },
+  "1": {
+   "size": 2048,
+   "px_per_m": 19.5,
+   "m2": 7154.9,
+   "m2_outside": 2664.4,
+   "margin_px": 4,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_ceil_L2": [
+     0.043,
+     0.0675,
+     0.0922,
+     0.0971
+    ],
+    "M_D_trim": [
+     0.0001,
+     0.0991,
+     0.1652,
+     0.1803
+    ],
+    "M_D_ceil_L3": [
+     0.0474,
+     0.2081,
+     14.6493,
+     15.1224
+    ]
+   },
+   "scale": 0.16849,
+   "seconds": 19,
+   "texel_p50_p90_p99_p995_max": [
+    0.0464,
+    0.1056,
+    0.1753,
+    0.1922,
+    15.7353
+   ]
+  },
+  "2": {
+   "size": 2048,
+   "px_per_m": 13.1,
+   "m2": 7828.0,
+   "m2_outside": 683.3,
+   "margin_px": 8,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_wall_L2": [
+     0.1431,
+     0.2843,
+     0.3742,
+     0.3909
+    ],
+    "M_D_wall_L3": [
+     0.0801,
+     0.3268,
+     0.6429,
+     1.0824
+    ]
+   },
+   "scale": 0.39248,
+   "seconds": 25,
+   "texel_p50_p90_p99_p995_max": [
+    0.1113,
+    0.2583,
+    0.3639,
+    0.3847,
+    1.772
+   ]
+  },
+  "3": {
+   "size": 2048,
+   "px_per_m": 17.3,
+   "m2": 2231.8,
+   "m2_outside": 0.0,
+   "margin_px": 4,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_frame": [
+     0.0014,
+     0.1638,
+     0.3825,
+     0.4159
+    ],
+    "M_X_steel": [
+     0.0,
+     0.0008,
+     0.0417,
+     0.0454
+    ],
+    "M_X_dark": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "M_D_door": [
+     0.1705,
+     0.2858,
+     0.3393,
+     0.3504
+    ],
+    "M_Fixture_Housing": [
+     0.0001,
+     12.7242,
+     13.9973,
+     14.335
+    ],
+    "M_Fluorescent_Dead": [
+     0.0,
+     0.0204,
+     0.0308,
+     0.043
+    ]
+   },
+   "scale": 0.37646,
+   "seconds": 315,
+   "texel_p50_p90_p99_p995_max": [
+    0.0791,
+    0.8028,
+    13.0312,
+    13.452,
+    21.1597
+   ]
+  }
+ },
+ "materials": {
+  "M_D_ceil_L2": {
+   "index": 4,
+   "page": 1
+  },
+  "M_D_frame": {
+   "index": 5,
+   "page": 3
+  },
+  "M_D_stains": {
+   "index": 6,
+   "page": 0
+  },
+  "M_D_trim": {
+   "index": 7,
+   "page": 1
+  },
+  "M_Door": {
+   "index": 8,
+   "page": 0
+  },
+  "M_D_door": {
+   "index": 37,
+   "page": 3
+  },
+  "M_X_steel": {
+   "index": 10,
+   "page": 3
+  },
+  "M_X_dark": {
+   "index": 11,
+   "page": 3
+  },
+  "M_D_floor_L2": {
+   "index": 38,
+   "page": 0
+  },
+  "M_D_ceil_L1": {
+   "index": 39,
+   "page": 0
+  },
+  "M_Fixture_Housing": {
+   "index": 40,
+   "page": 3
+  },
+  "M_Fluorescent_Dead": {
+   "index": 42,
+   "page": 3
+  },
+  "M_D_wall_L2": {
+   "index": 43,
+   "page": 2
+  },
+  "M_D_ceil_L3": {
+   "index": 44,
+   "page": 1
+  },
+  "M_D_floor_L3": {
+   "index": 45,
+   "page": 0
+  },
+  "M_D_wall_L3": {
+   "index": 46,
+   "page": 2
+  }
+ },
+ "prims": [
+  {
+   "mesh": 55,
+   "prim": 0,
+   "offset": 0,
+   "count": 96
+  },
+  {
+   "mesh": 56,
+   "prim": 0,
+   "offset": 768,
+   "count": 26640
+  },
+  {
+   "mesh": 57,
+   "prim": 0,
+   "offset": 213888,
+   "count": 640
+  },
+  {
+   "mesh": 58,
+   "prim": 0,
+   "offset": 219008,
+   "count": 18168
+  },
+  {
+   "mesh": 59,
+   "prim": 0,
+   "offset": 364352,
+   "count": 24
+  },
+  {
+   "mesh": 60,
+   "prim": 0,
+   "offset": 364544,
+   "count": 24
+  },
+  {
+   "mesh": 62,
+   "prim": 0,
+   "offset": 364736,
+   "count": 576
+  },
+  {
+   "mesh": 62,
+   "prim": 1,
+   "offset": 369344,
+   "count": 4608
+  },
+  {
+   "mesh": 80,
+   "prim": 0,
+   "offset": 406208,
+   "count": 520
+  },
+  {
+   "mesh": 81,
+   "prim": 0,
+   "offset": 410368,
+   "count": 520
+  },
+  {
+   "mesh": 82,
+   "prim": 0,
+   "offset": 414528,
+   "count": 520
+  },
+  {
+   "mesh": 83,
+   "prim": 0,
+   "offset": 418688,
+   "count": 520
+  },
+  {
+   "mesh": 84,
+   "prim": 0,
+   "offset": 422848,
+   "count": 520
+  },
+  {
+   "mesh": 85,
+   "prim": 0,
+   "offset": 427008,
+   "count": 520
+  },
+  {
+   "mesh": 86,
+   "prim": 0,
+   "offset": 431168,
+   "count": 520
+  },
+  {
+   "mesh": 87,
+   "prim": 0,
+   "offset": 435328,
+   "count": 520
+  },
+  {
+   "mesh": 88,
+   "prim": 0,
+   "offset": 439488,
+   "count": 520
+  },
+  {
+   "mesh": 89,
+   "prim": 0,
+   "offset": 443648,
+   "count": 520
+  },
+  {
+   "mesh": 90,
+   "prim": 0,
+   "offset": 447808,
+   "count": 520
+  },
+  {
+   "mesh": 91,
+   "prim": 0,
+   "offset": 451968,
+   "count": 520
+  },
+  {
+   "mesh": 92,
+   "prim": 0,
+   "offset": 456128,
+   "count": 520
+  },
+  {
+   "mesh": 93,
+   "prim": 0,
+   "offset": 460288,
+   "count": 520
+  },
+  {
+   "mesh": 94,
+   "prim": 0,
+   "offset": 464448,
+   "count": 520
+  },
+  {
+   "mesh": 95,
+   "prim": 0,
+   "offset": 468608,
+   "count": 520
+  },
+  {
+   "mesh": 96,
+   "prim": 0,
+   "offset": 472768,
+   "count": 520
+  },
+  {
+   "mesh": 97,
+   "prim": 0,
+   "offset": 476928,
+   "count": 520
+  },
+  {
+   "mesh": 98,
+   "prim": 0,
+   "offset": 481088,
+   "count": 520
+  },
+  {
+   "mesh": 99,
+   "prim": 0,
+   "offset": 485248,
+   "count": 520
+  },
+  {
+   "mesh": 100,
+   "prim": 0,
+   "offset": 489408,
+   "count": 520
+  },
+  {
+   "mesh": 101,
+   "prim": 0,
+   "offset": 493568,
+   "count": 520
+  },
+  {
+   "mesh": 102,
+   "prim": 0,
+   "offset": 497728,
+   "count": 520
+  },
+  {
+   "mesh": 103,
+   "prim": 0,
+   "offset": 501888,
+   "count": 520
+  },
+  {
+   "mesh": 104,
+   "prim": 0,
+   "offset": 506048,
+   "count": 520
+  },
+  {
+   "mesh": 105,
+   "prim": 0,
+   "offset": 510208,
+   "count": 520
+  },
+  {
+   "mesh": 106,
+   "prim": 0,
+   "offset": 514368,
+   "count": 520
+  },
+  {
+   "mesh": 107,
+   "prim": 0,
+   "offset": 518528,
+   "count": 520
+  },
+  {
+   "mesh": 108,
+   "prim": 0,
+   "offset": 522688,
+   "count": 520
+  },
+  {
+   "mesh": 109,
+   "prim": 0,
+   "offset": 526848,
+   "count": 520
+  },
+  {
+   "mesh": 110,
+   "prim": 0,
+   "offset": 531008,
+   "count": 520
+  },
+  {
+   "mesh": 111,
+   "prim": 0,
+   "offset": 535168,
+   "count": 520
+  },
+  {
+   "mesh": 112,
+   "prim": 0,
+   "offset": 539328,
+   "count": 520
+  },
+  {
+   "mesh": 113,
+   "prim": 0,
+   "offset": 543488,
+   "count": 520
+  },
+  {
+   "mesh": 114,
+   "prim": 0,
+   "offset": 547648,
+   "count": 520
+  },
+  {
+   "mesh": 115,
+   "prim": 0,
+   "offset": 551808,
+   "count": 520
+  },
+  {
+   "mesh": 116,
+   "prim": 0,
+   "offset": 555968,
+   "count": 520
+  },
+  {
+   "mesh": 117,
+   "prim": 0,
+   "offset": 560128,
+   "count": 520
+  },
+  {
+   "mesh": 118,
+   "prim": 0,
+   "offset": 564288,
+   "count": 520
+  },
+  {
+   "mesh": 119,
+   "prim": 0,
+   "offset": 568448,
+   "count": 520
+  },
+  {
+   "mesh": 120,
+   "prim": 0,
+   "offset": 572608,
+   "count": 520
+  },
+  {
+   "mesh": 121,
+   "prim": 0,
+   "offset": 576768,
+   "count": 520
+  },
+  {
+   "mesh": 122,
+   "prim": 0,
+   "offset": 580928,
+   "count": 520
+  },
+  {
+   "mesh": 123,
+   "prim": 0,
+   "offset": 585088,
+   "count": 520
+  },
+  {
+   "mesh": 124,
+   "prim": 0,
+   "offset": 589248,
+   "count": 520
+  },
+  {
+   "mesh": 125,
+   "prim": 0,
+   "offset": 593408,
+   "count": 520
+  },
+  {
+   "mesh": 126,
+   "prim": 0,
+   "offset": 597568,
+   "count": 520
+  },
+  {
+   "mesh": 127,
+   "prim": 0,
+   "offset": 601728,
+   "count": 520
+  },
+  {
+   "mesh": 128,
+   "prim": 0,
+   "offset": 605888,
+   "count": 520
+  },
+  {
+   "mesh": 129,
+   "prim": 0,
+   "offset": 610048,
+   "count": 520
+  },
+  {
+   "mesh": 130,
+   "prim": 0,
+   "offset": 614208,
+   "count": 520
+  },
+  {
+   "mesh": 131,
+   "prim": 0,
+   "offset": 618368,
+   "count": 520
+  },
+  {
+   "mesh": 132,
+   "prim": 0,
+   "offset": 622528,
+   "count": 520
+  },
+  {
+   "mesh": 133,
+   "prim": 0,
+   "offset": 626688,
+   "count": 520
+  },
+  {
+   "mesh": 134,
+   "prim": 0,
+   "offset": 630848,
+   "count": 520
+  },
+  {
+   "mesh": 135,
+   "prim": 0,
+   "offset": 635008,
+   "count": 520
+  },
+  {
+   "mesh": 136,
+   "prim": 0,
+   "offset": 639168,
+   "count": 520
+  },
+  {
+   "mesh": 137,
+   "prim": 0,
+   "offset": 643328,
+   "count": 520
+  },
+  {
+   "mesh": 138,
+   "prim": 0,
+   "offset": 647488,
+   "count": 520
+  },
+  {
+   "mesh": 139,
+   "prim": 0,
+   "offset": 651648,
+   "count": 520
+  },
+  {
+   "mesh": 140,
+   "prim": 0,
+   "offset": 655808,
+   "count": 520
+  },
+  {
+   "mesh": 141,
+   "prim": 0,
+   "offset": 659968,
+   "count": 520
+  },
+  {
+   "mesh": 142,
+   "prim": 0,
+   "offset": 664128,
+   "count": 520
+  },
+  {
+   "mesh": 143,
+   "prim": 0,
+   "offset": 668288,
+   "count": 520
+  },
+  {
+   "mesh": 144,
+   "prim": 0,
+   "offset": 672448,
+   "count": 520
+  },
+  {
+   "mesh": 145,
+   "prim": 0,
+   "offset": 676608,
+   "count": 520
+  },
+  {
+   "mesh": 146,
+   "prim": 0,
+   "offset": 680768,
+   "count": 520
+  },
+  {
+   "mesh": 147,
+   "prim": 0,
+   "offset": 684928,
+   "count": 520
+  },
+  {
+   "mesh": 148,
+   "prim": 0,
+   "offset": 689088,
+   "count": 520
+  },
+  {
+   "mesh": 149,
+   "prim": 0,
+   "offset": 693248,
+   "count": 520
+  },
+  {
+   "mesh": 150,
+   "prim": 0,
+   "offset": 697408,
+   "count": 520
+  },
+  {
+   "mesh": 151,
+   "prim": 0,
+   "offset": 701568,
+   "count": 520
+  },
+  {
+   "mesh": 152,
+   "prim": 0,
+   "offset": 705728,
+   "count": 520
+  },
+  {
+   "mesh": 153,
+   "prim": 0,
+   "offset": 709888,
+   "count": 520
+  },
+  {
+   "mesh": 154,
+   "prim": 0,
+   "offset": 714048,
+   "count": 520
+  },
+  {
+   "mesh": 155,
+   "prim": 0,
+   "offset": 718208,
+   "count": 520
+  },
+  {
+   "mesh": 156,
+   "prim": 0,
+   "offset": 722368,
+   "count": 520
+  },
+  {
+   "mesh": 157,
+   "prim": 0,
+   "offset": 726528,
+   "count": 520
+  },
+  {
+   "mesh": 158,
+   "prim": 0,
+   "offset": 730688,
+   "count": 520
+  },
+  {
+   "mesh": 159,
+   "prim": 0,
+   "offset": 734848,
+   "count": 520
+  },
+  {
+   "mesh": 160,
+   "prim": 0,
+   "offset": 739008,
+   "count": 520
+  },
+  {
+   "mesh": 161,
+   "prim": 0,
+   "offset": 743168,
+   "count": 520
+  },
+  {
+   "mesh": 162,
+   "prim": 0,
+   "offset": 747328,
+   "count": 520
+  },
+  {
+   "mesh": 163,
+   "prim": 0,
+   "offset": 751488,
+   "count": 520
+  },
+  {
+   "mesh": 164,
+   "prim": 0,
+   "offset": 755648,
+   "count": 520
+  },
+  {
+   "mesh": 165,
+   "prim": 0,
+   "offset": 759808,
+   "count": 520
+  },
+  {
+   "mesh": 166,
+   "prim": 0,
+   "offset": 763968,
+   "count": 520
+  },
+  {
+   "mesh": 167,
+   "prim": 0,
+   "offset": 768128,
+   "count": 520
+  },
+  {
+   "mesh": 168,
+   "prim": 0,
+   "offset": 772288,
+   "count": 520
+  },
+  {
+   "mesh": 169,
+   "prim": 0,
+   "offset": 776448,
+   "count": 520
+  },
+  {
+   "mesh": 170,
+   "prim": 0,
+   "offset": 780608,
+   "count": 520
+  },
+  {
+   "mesh": 171,
+   "prim": 0,
+   "offset": 784768,
+   "count": 520
+  },
+  {
+   "mesh": 172,
+   "prim": 0,
+   "offset": 788928,
+   "count": 520
+  },
+  {
+   "mesh": 173,
+   "prim": 0,
+   "offset": 793088,
+   "count": 520
+  },
+  {
+   "mesh": 174,
+   "prim": 0,
+   "offset": 797248,
+   "count": 520
+  },
+  {
+   "mesh": 175,
+   "prim": 0,
+   "offset": 801408,
+   "count": 520
+  },
+  {
+   "mesh": 176,
+   "prim": 0,
+   "offset": 805568,
+   "count": 520
+  },
+  {
+   "mesh": 177,
+   "prim": 0,
+   "offset": 809728,
+   "count": 520
+  },
+  {
+   "mesh": 178,
+   "prim": 0,
+   "offset": 813888,
+   "count": 520
+  },
+  {
+   "mesh": 179,
+   "prim": 0,
+   "offset": 818048,
+   "count": 520
+  },
+  {
+   "mesh": 180,
+   "prim": 0,
+   "offset": 822208,
+   "count": 520
+  },
+  {
+   "mesh": 181,
+   "prim": 0,
+   "offset": 826368,
+   "count": 520
+  },
+  {
+   "mesh": 182,
+   "prim": 0,
+   "offset": 830528,
+   "count": 520
+  },
+  {
+   "mesh": 183,
+   "prim": 0,
+   "offset": 834688,
+   "count": 520
+  },
+  {
+   "mesh": 184,
+   "prim": 0,
+   "offset": 838848,
+   "count": 520
+  },
+  {
+   "mesh": 185,
+   "prim": 0,
+   "offset": 843008,
+   "count": 520
+  },
+  {
+   "mesh": 186,
+   "prim": 0,
+   "offset": 847168,
+   "count": 520
+  },
+  {
+   "mesh": 187,
+   "prim": 0,
+   "offset": 851328,
+   "count": 520
+  },
+  {
+   "mesh": 188,
+   "prim": 0,
+   "offset": 855488,
+   "count": 520
+  },
+  {
+   "mesh": 189,
+   "prim": 0,
+   "offset": 859648,
+   "count": 520
+  },
+  {
+   "mesh": 190,
+   "prim": 0,
+   "offset": 863808,
+   "count": 520
+  },
+  {
+   "mesh": 191,
+   "prim": 0,
+   "offset": 867968,
+   "count": 520
+  },
+  {
+   "mesh": 192,
+   "prim": 0,
+   "offset": 872128,
+   "count": 520
+  },
+  {
+   "mesh": 193,
+   "prim": 0,
+   "offset": 876288,
+   "count": 520
+  },
+  {
+   "mesh": 194,
+   "prim": 0,
+   "offset": 880448,
+   "count": 520
+  },
+  {
+   "mesh": 195,
+   "prim": 0,
+   "offset": 884608,
+   "count": 520
+  },
+  {
+   "mesh": 196,
+   "prim": 0,
+   "offset": 888768,
+   "count": 520
+  },
+  {
+   "mesh": 197,
+   "prim": 0,
+   "offset": 892928,
+   "count": 520
+  },
+  {
+   "mesh": 198,
+   "prim": 0,
+   "offset": 897088,
+   "count": 520
+  },
+  {
+   "mesh": 199,
+   "prim": 0,
+   "offset": 901248,
+   "count": 520
+  },
+  {
+   "mesh": 200,
+   "prim": 0,
+   "offset": 905408,
+   "count": 520
+  },
+  {
+   "mesh": 201,
+   "prim": 0,
+   "offset": 909568,
+   "count": 520
+  },
+  {
+   "mesh": 202,
+   "prim": 0,
+   "offset": 913728,
+   "count": 520
+  },
+  {
+   "mesh": 203,
+   "prim": 0,
+   "offset": 917888,
+   "count": 520
+  },
+  {
+   "mesh": 204,
+   "prim": 0,
+   "offset": 922048,
+   "count": 520
+  },
+  {
+   "mesh": 205,
+   "prim": 0,
+   "offset": 926208,
+   "count": 520
+  },
+  {
+   "mesh": 206,
+   "prim": 0,
+   "offset": 930368,
+   "count": 520
+  },
+  {
+   "mesh": 207,
+   "prim": 0,
+   "offset": 934528,
+   "count": 520
+  },
+  {
+   "mesh": 208,
+   "prim": 0,
+   "offset": 938688,
+   "count": 520
+  },
+  {
+   "mesh": 209,
+   "prim": 0,
+   "offset": 942848,
+   "count": 520
+  },
+  {
+   "mesh": 210,
+   "prim": 0,
+   "offset": 947008,
+   "count": 520
+  },
+  {
+   "mesh": 211,
+   "prim": 0,
+   "offset": 951168,
+   "count": 520
+  },
+  {
+   "mesh": 212,
+   "prim": 0,
+   "offset": 955328,
+   "count": 520
+  },
+  {
+   "mesh": 213,
+   "prim": 0,
+   "offset": 959488,
+   "count": 520
+  },
+  {
+   "mesh": 214,
+   "prim": 0,
+   "offset": 963648,
+   "count": 520
+  },
+  {
+   "mesh": 215,
+   "prim": 0,
+   "offset": 967808,
+   "count": 520
+  },
+  {
+   "mesh": 216,
+   "prim": 0,
+   "offset": 971968,
+   "count": 520
+  },
+  {
+   "mesh": 217,
+   "prim": 0,
+   "offset": 976128,
+   "count": 520
+  },
+  {
+   "mesh": 218,
+   "prim": 0,
+   "offset": 980288,
+   "count": 520
+  },
+  {
+   "mesh": 219,
+   "prim": 0,
+   "offset": 984448,
+   "count": 520
+  },
+  {
+   "mesh": 220,
+   "prim": 0,
+   "offset": 988608,
+   "count": 520
+  },
+  {
+   "mesh": 221,
+   "prim": 0,
+   "offset": 992768,
+   "count": 520
+  },
+  {
+   "mesh": 222,
+   "prim": 0,
+   "offset": 996928,
+   "count": 520
+  },
+  {
+   "mesh": 223,
+   "prim": 0,
+   "offset": 1001088,
+   "count": 520
+  },
+  {
+   "mesh": 224,
+   "prim": 0,
+   "offset": 1005248,
+   "count": 520
+  },
+  {
+   "mesh": 225,
+   "prim": 0,
+   "offset": 1009408,
+   "count": 520
+  },
+  {
+   "mesh": 226,
+   "prim": 0,
+   "offset": 1013568,
+   "count": 520
+  },
+  {
+   "mesh": 227,
+   "prim": 0,
+   "offset": 1017728,
+   "count": 520
+  },
+  {
+   "mesh": 228,
+   "prim": 0,
+   "offset": 1021888,
+   "count": 520
+  },
+  {
+   "mesh": 229,
+   "prim": 0,
+   "offset": 1026048,
+   "count": 520
+  },
+  {
+   "mesh": 230,
+   "prim": 0,
+   "offset": 1030208,
+   "count": 80
+  },
+  {
+   "mesh": 230,
+   "prim": 1,
+   "offset": 1030848,
+   "count": 16
+  },
+  {
+   "mesh": 231,
+   "prim": 0,
+   "offset": 1030976,
+   "count": 7920
+  },
+  {
+   "mesh": 260,
+   "prim": 0,
+   "offset": 1094336,
+   "count": 408
+  },
+  {
+   "mesh": 261,
+   "prim": 0,
+   "offset": 1097600,
+   "count": 24
+  },
+  {
+   "mesh": 262,
+   "prim": 0,
+   "offset": 1097792,
+   "count": 24
+  },
+  {
+   "mesh": 263,
+   "prim": 0,
+   "offset": 1097984,
+   "count": 24
+  },
+  {
+   "mesh": 264,
+   "prim": 0,
+   "offset": 1098176,
+   "count": 24
+  },
+  {
+   "mesh": 265,
+   "prim": 0,
+   "offset": 1098368,
+   "count": 10776
+  },
+  {
+   "mesh": 266,
+   "prim": 0,
+   "offset": 1184576,
+   "count": 288
+  },
+  {
+   "mesh": 267,
+   "prim": 0,
+   "offset": 1186880,
+   "count": 24
+  },
+  {
+   "mesh": 268,
+   "prim": 0,
+   "offset": 1187072,
+   "count": 240
+  },
+  {
+   "mesh": 269,
+   "prim": 0,
+   "offset": 1188992,
+   "count": 240
+  },
+  {
+   "mesh": 270,
+   "prim": 0,
+   "offset": 1190912,
+   "count": 24
+  },
+  {
+   "mesh": 271,
+   "prim": 0,
+   "offset": 1191104,
+   "count": 24
+  },
+  {
+   "mesh": 272,
+   "prim": 0,
+   "offset": 1191296,
+   "count": 24
+  },
+  {
+   "mesh": 274,
+   "prim": 0,
+   "offset": 1191488,
+   "count": 144
+  },
+  {
+   "mesh": 275,
+   "prim": 0,
+   "offset": 1192640,
+   "count": 192
+  }
+ ],
+ "samples": 512,
+ "lights": [],
+ "seconds": 424,
+ "device": "GPU"
+}

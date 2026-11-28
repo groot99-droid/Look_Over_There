@@ -1,0 +1,196 @@
+{
+ "scene": "kit_street_segment",
+ "colliders": [
+  {
+   "s": "Building_fill_E",
+   "min": [
+    8.0,
+    0.0,
+    -38.0
+   ],
+   "max": [
+    22.0,
+    8.0,
+    -20.0
+   ]
+  },
+  {
+   "s": "Building_fill_W",
+   "min": [
+    -22.0,
+    0.0,
+    -20.0
+   ],
+   "max": [
+    -8.0,
+    11.0,
+    -2.0
+   ]
+  },
+  {
+   "s": "Building_slot_E",
+   "min": [
+    8.0,
+    0.0,
+    -16.0
+   ],
+   "max": [
+    24.0,
+    9.0,
+    -2.0
+   ]
+  },
+  {
+   "s": "Building_slot_W",
+   "min": [
+    -24.0,
+    0.0,
+    -38.0
+   ],
+   "max": [
+    -8.0,
+    10.0,
+    -24.0
+   ]
+  },
+  {
+   "s": "Ground_Segment",
+   "min": [
+    -30.0,
+    -1.0,
+    -40.0
+   ],
+   "max": [
+    30.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "s": "Lamp_Street_1",
+   "min": [
+    -5.6,
+    0.0,
+    -0.1
+   ],
+   "max": [
+    -5.4,
+    4.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Lamp_Street_2",
+   "min": [
+    5.4,
+    0.0,
+    -0.1
+   ],
+   "max": [
+    5.6,
+    4.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Lamp_Street_3",
+   "min": [
+    -5.6,
+    0.0,
+    -20.1
+   ],
+   "max": [
+    -5.4,
+    4.2,
+    -19.9
+   ]
+  },
+  {
+   "s": "Lamp_Street_4",
+   "min": [
+    5.4,
+    0.0,
+    -20.1
+   ],
+   "max": [
+    5.6,
+    4.2,
+    -19.9
+   ]
+  }
+ ],
+ "doors": [],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "slot_E",
+   "at": [
+    7.4,
+    0.0,
+    -9.0
+   ],
+   "arrive": [
+    6.9,
+    0.0,
+    -9.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "slot_W",
+   "at": [
+    -7.4,
+    0.0,
+    -31.0
+   ],
+   "arrive": [
+    -6.9,
+    0.0,
+    -31.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "bin",
+   "name": "Spot_bin_1",
+   "position": [
+    -5.4,
+    0.0,
+    -12.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "the trash route's bin at the kerb"
+  },
+  {
+   "kind": "bin",
+   "name": "Spot_bin_2",
+   "position": [
+    5.4,
+    0.0,
+    -30.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "what": "the trash route's bin at the kerb"
+  }
+ ]
+}

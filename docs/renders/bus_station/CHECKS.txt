@@ -1,0 +1,52 @@
+blender (on the render box): tools/blender/dress_overworld.py -- --scene bus_station --samples 512 --render-samples 128
+EXPORT_SCENE bus_station_layout.json: 10 colliders, 0 doors, 0 cameras, 0 markers, 1 links, 0 zones, 0 spots
+GATE export: world/bus_station.json from the dressed .blend EQUALS the greybox's
+PASS  LOT    Ground_lot: the lot's own asphalt (part 1's parking_lot) is this ground in the game; top at y 0.00, inside the lot round the set
+PASS  STRAY  7 tall solid mesh(es), each over a collider; 18 decor_* mesh(es) exempt
+PASS  CLEAR  links.bus_stop.arrive (0.00, 0.90): clear within 0.28 m
+PASS  CLEAR  links.bus_stop.at (0.00, 1.90): clear within 0.28 m
+PASS: 12 of 12 checks passed
+GATE layout check (the set's ground by the LOT rule above): PASS
+GATES_IN_BLENDER PASS
+CYCLES device: GPU
+BAKE {'samples': 512, 'ao_distance_m': 2.5, 'pages': [{'page': 0, 'size': 2048, 'px_per_m': 62.8, 'ao_p1_p10_p50_p90': [0.002, 0.168, 0.738, 0.998], 'materials': ['Deck', 'Line_Yellow', 'Paint_White', 'Paving', 'Plastic_Coral', 'Roof_Blue', 'Sign_Bus', 'Sign_Dest', 'Steel', 'Ticket_Face', 'Timetable_Print']}], 'seconds': 27, 'device': 'GPU'}
+CYCLES device: GPU
+PASS  COVER lines (one per collider, each covered by art within 5 cm): 9
+
+python tools/blender/build_overworld_greybox.py --check .
+GATES PASS
+
+node tools/worlddoc.mjs check world/bus_station.json
+  warning: link bus_stop: the manifest has no link from this door yet: a new link to add
+OK world/bus_station.json: 10 colliders, 0 doors, 0 markers, 1 links, 0 zones, 0 spots, 0 errors, 1 warnings
+
+glb_inspect.py world/bus_station.glb --budget tris=300000,mb=8
+triangles  3732 drawn, in 18 mesh(es), 18 instance(s)
+materials  18: Deck, Flower_Blue, Flower_Pink, Flower_Stem, Flower_White, Flower_Yellow, Glass, Lamp_Emit, Line_Yellow, Paint_White, Paving, Plastic_Coral, Roof_Blue, Sign_Bus, Sign_Dest, Steel, Ticket_Face, Timetable_Print
+textures   6, images: 1024x1024, 512x512, 432x512, 1024x160, 256x544, 512x640
+bbox       14.3252 x 2.82 x 7.6734 (x, y up, z), min [-7.1614, -0.02, -1.6734]
+requires   EXT_texture_webp
+pass       tris: 3732 triangles, budget 300000
+pass       mb: 0.48 MB, budget 8
+
+brightness (AO-only: base colour x AO texel, linear, under a white ambient of 1; the page's sun adds on top)
+material                m2           map       k    p50    p90    p99     >=1
+Paving                61.2 bus_station_0  1.0000  0.569  0.633  0.668   0.00%
+Roof_Blue             29.9 bus_station_0  1.0000  0.824  0.828  0.828   0.00%
+Steel                 17.7 bus_station_0  1.0000  0.276  0.418  0.467   0.00%
+Deck                   6.3 bus_station_0  1.0000  0.211  0.295  0.341   0.00%
+Line_Yellow            4.9 bus_station_0  1.0000  0.890  0.890  0.890   0.00%
+Plastic_Coral          4.1 bus_station_0  1.0000  0.485  0.673  0.769   0.00%
+Timetable_Print        3.0 bus_station_0  1.0000  0.653  0.777  0.887   0.00%
+Paint_White            1.5 bus_station_0  1.0000  0.784  0.787  0.787   0.00%
+Ticket_Face            1.3 bus_station_0  1.0000  0.032  0.558  0.687   0.00%
+Sign_Dest              1.2 bus_station_0  1.0000  0.042  0.081  0.898   0.00%
+Sign_Bus               0.7 bus_station_0  1.0000  0.820  0.868  0.961   0.25%
+
+node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over this scene's files, the .blend decompressed
+privacy grep: 39 files, 0 with hits

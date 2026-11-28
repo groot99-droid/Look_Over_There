@@ -1,0 +1,54 @@
+{
+ "0": {
+  "size": 2048,
+  "p1_p10_p50_p90": [
+   0.0,
+   0.044,
+   1.0,
+   1.0
+  ],
+  "samples": 256,
+  "distance_m": 1.5,
+  "device": "GPU",
+  "seconds": 15,
+  "materials": [
+   "Grass",
+   "Path",
+   "Rubber",
+   "Sand",
+   "Soil",
+   "Hedge"
+  ],
+  "px_per_m": 16.9
+ },
+ "1": {
+  "size": 2048,
+  "p1_p10_p50_p90": [
+   0.0,
+   0.033,
+   0.562,
+   0.998
+  ],
+  "samples": 256,
+  "distance_m": 0.8,
+  "device": "GPU",
+  "seconds": 26,
+  "materials": [
+   "Steel",
+   "Plastic_White",
+   "Plastic_Yellow",
+   "Plastic_Blue",
+   "Plastic_Red",
+   "Timber",
+   "Plastic_Green",
+   "Fence_White",
+   "Bin_Green",
+   "Facade",
+   "Fake_Door",
+   "Signs",
+   "Window",
+   "Awning_E"
+  ],
+  "px_per_m": 19.0
+ }
+}

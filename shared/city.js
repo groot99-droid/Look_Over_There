@@ -227,10 +227,11 @@ export function stalkerWaitAt(sx, sz, front = TOWER_FRONT.arrive) {
   return {x: clampTo(sx, -4, 4), z: clampTo(front[2] + side * STALKER_WAIT, ROAD.z0 + 3, ROAD.z1 - 3)};
 }
 // what a scene change does to the stalker: s is its state, hour the City's hour, to the scene you are going to
-export function carryStalker(s, hour, to) {
+// `tower`: the scenes behind the tower's door, where it waits for you outside (the apartment, and since 2026-11-28 the hotel it is in: the page passes the hotel's scenes)
+export function carryStalker(s, hour, to, tower = ["apartment"]) {
   const fresh = {active: false, x: 0, z: 0, wait: STALKER.firstWait};
   if (!s || !s.active || !dangerous(hour)) return fresh;
-  if (to === "apartment") return {active: true, ...stalkerWaitAt(s.x, s.z), wait: 0, waited: true};
+  if (tower.includes(to)) return {active: true, ...stalkerWaitAt(s.x, s.z), wait: 0, waited: true};
   if (to === "street") return {active: true, x: s.x, z: s.z, wait: 0, waited: !!s.waited};
   return fresh;
 }

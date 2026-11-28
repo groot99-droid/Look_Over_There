@@ -4,3 +4,8 @@ __pycache__/
 audio/files/
 node_modules/
 blender/layout/
+
+# the owner's Meshy character sources (kept outside the repo; see docs/renders/characters/README.md)
+blender/characters/source/
+__pycache__/
+blender/work/

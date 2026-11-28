@@ -1,0 +1,53 @@
+python tools/blender/build_overworld_greybox.py --check .
+GATE links: 1 pair inside the set (2 sides), 7 that leave it; 9 links in the files, every one accounted for
+  off this set: bus_station.bus_stop (bus) -> street (city, built)  [reused: overworld.bus>city and city.bus>overworld (built); only their lot-side points move]
+  off this set: endless_hills.lot (walk) -> parking_lot's south hedge, a stile at x 30 (the old signpost's mirror image)  [new: overworld.lot>hills and overworld.hills>lot]
+  off this set: market.lot (walk) -> parking_lot's east edge, where the asphalt meets the grass (x 62, z 76)  [new: overworld.lot>market and overworld.market>lot]
+  off this set: playground.lot (walk) -> parking_lot's west edge, where the asphalt meets the grass (x -62, z 76)  [new: overworld.lot>playground and overworld.playground>lot]
+  off this set: road.forest (walk) -> forest (dreamcore_forest, built)  [reused: overworld.road>forest (planned); forest.road>lot comes back to the road's end]
+  off this set: road.lot (walk) -> parking_lot's south hedge at the old signpost (shared/forest.js FOREST_ROAD_LOT, F at (-30, 95.6))  [reused: overworld.lot>forest (the lot's door forest_road, now to the road's start) and forest.road>lot's arrival]
+  off this set: tree_house.addon (gate) -> the tree house addon, not built  [reused: overworld.treehouse>addon (planned) to future_addon_treehouse (reserved)]
+GATE navigable: 7 of 7 scenes reachable from parking_lot (table_and_chairs and bus_station stand in it)
+GATE steps: 41 step boxes in 6 flights, one box a step, and 9 kerbs; the highest rise 0.250 m (at most 0.27 m)
+GATE hills steps: 2500 columns of 4 m; the highest rise between neighbours 0.260 m, seams included (at most 0.27 m)
+GATE corridors: 20 path, aisle, platform and gap rects, the narrowest 1.70 m (at least 1.6 m), none blocked
+GATE clear ground: 8 pieces, each on its own clear ground with no other collider in it, none overlapping, every moving part's reach inside its own
+GATE moving parts: 10 of 10 Play_<equipment>_<part> nodes in playground.glb on their pivots (6 pieces: climbing_frame, merry_go_round, sandbox, seesaw, spring_riders, swing; the slide and the monkey bars have none)
+GATE hills tile: x -100 to 100, z -100 to 100; the 50 column tops along the west edge equal the east edge's (largest difference 0.000 m) and the north edge's the south's (0.000 m); the surface's edge rows match (0.0e+00 m) and so do the slopes across each seam; heights -0.15 to 4.15 m
+  spots: facade x8, groundskeeper x11, minigame x8, puzzle x6, shop x6, toy x12
+GATES PASS
+
+node tools/worlddoc.mjs check <the 7 scene files>
+OK world/table_and_chairs.json: 6 colliders, 0 doors, 1 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
+  warning: the scene is 66 m along x: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: scene market is not in the world manifest yet: a new scene to add
+  warning: link lot: the manifest has no link from this door yet: a new link to add
+OK world/market.json: 70 colliders, 0 doors, 0 markers, 1 links, 0 zones, 12 spots, 0 errors, 3 warnings
+  warning: the scene is 102 m along x: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: the scene is 78 m along z: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: link lot: the manifest has no link from this door yet: a new link to add
+  warning: link tree_house: the manifest has no link from this door yet: a new link to add
+OK world/playground.json: 91 colliders, 0 doors, 0 markers, 2 links, 0 zones, 14 spots, 0 errors, 4 warnings
+  warning: link addon: the manifest has no link from this door yet: a new link to add
+  warning: link playground: the manifest has no link from this door yet: a new link to add
+OK world/tree_house.json: 53 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 2 warnings
+  warning: link bus_stop: the manifest has no link from this door yet: a new link to add
+OK world/bus_station.json: 10 colliders, 0 doors, 0 markers, 1 links, 0 zones, 0 spots, 0 errors, 1 warnings
+  warning: the scene is 485 m along z: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: link forest: the manifest has no link from this door yet: a new link to add
+  warning: link lot: the manifest has no link from this door yet: a new link to add
+OK world/road.json: 56 colliders, 0 doors, 0 markers, 2 links, 0 zones, 6 spots, 0 errors, 3 warnings
+  warning: the scene is 73 m along x: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: link lot: the manifest has no link from this door yet: a new link to add
+OK world/endless_hills.json: 2502 colliders, 0 doors, 0 markers, 1 links, 0 zones, 17 spots, 0 errors, 2 warnings
+exit 0
+
+node --test shared/*.test.js
+  tests 297
+  pass 297
+  fail 0
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over the 33 files of this commit (with CHECKS.txt) and the owner sheet
+  privacy grep: 0 with hits (C:/Windows/Fonts, the sheets' font folder, is allowed)
+
+export check: every world/<scene>.json from Blender equals --preview's (the model alone): all 7 equal

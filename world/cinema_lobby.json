@@ -1,0 +1,613 @@
+{
+ "scene": "cinema_lobby",
+ "colliders": [
+  {
+   "s": "Back_Counter",
+   "min": [
+    -7.0,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    7.0,
+    0.9,
+    -7.6
+   ]
+  },
+  {
+   "s": "Balcony_Rail",
+   "min": [
+    -12.0,
+    3.0,
+    -5.1
+   ],
+   "max": [
+    9.5,
+    4.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Balcony_Rail_2",
+   "min": [
+    11.9,
+    3.0,
+    -5.1
+   ],
+   "max": [
+    12.0,
+    4.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Balcony_Slab",
+   "min": [
+    -12.0,
+    2.7,
+    -8.0
+   ],
+   "max": [
+    12.0,
+    3.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Box_Office",
+   "min": [
+    -10.0,
+    0.0,
+    3.5
+   ],
+   "max": [
+    -6.5,
+    2.6,
+    6.5
+   ]
+  },
+  {
+   "s": "Concession_Counter",
+   "min": [
+    -7.0,
+    0.0,
+    -6.8
+   ],
+   "max": [
+    7.0,
+    1.1,
+    -6.0
+   ]
+  },
+  {
+   "s": "Drinks_Fridge",
+   "min": [
+    7.4,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    8.4,
+    2.0,
+    -7.3
+   ]
+  },
+  {
+   "s": "Lobby_Ceiling",
+   "min": [
+    -12.2,
+    6.0,
+    -8.2
+   ],
+   "max": [
+    12.2,
+    6.2,
+    8.2
+   ]
+  },
+  {
+   "s": "Lobby_Floor",
+   "min": [
+    -12.2,
+    -0.3,
+    -8.2
+   ],
+   "max": [
+    12.2,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Lobby_Wall_E_1",
+   "min": [
+    12.0,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    12.2,
+    6.0,
+    8.0
+   ]
+  },
+  {
+   "s": "Lobby_Wall_N_1",
+   "min": [
+    -12.2,
+    0.0,
+    -8.2
+   ],
+   "max": [
+    12.2,
+    6.0,
+    -8.0
+   ]
+  },
+  {
+   "s": "Lobby_Wall_S_1",
+   "min": [
+    -12.2,
+    0.0,
+    8.0
+   ],
+   "max": [
+    -1.2,
+    6.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Lobby_Wall_S_2",
+   "min": [
+    -1.2,
+    2.6,
+    8.0
+   ],
+   "max": [
+    1.2,
+    6.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Lobby_Wall_S_3",
+   "min": [
+    1.2,
+    0.0,
+    8.0
+   ],
+   "max": [
+    12.2,
+    6.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Lobby_Wall_W_1",
+   "min": [
+    -12.2,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    -12.0,
+    6.0,
+    8.0
+   ]
+  },
+  {
+   "s": "Screen_1_Door",
+   "min": [
+    -12.0,
+    0.0,
+    -2.0
+   ],
+   "max": [
+    -11.94,
+    2.4,
+    0.0
+   ]
+  },
+  {
+   "s": "Screen_2_Door",
+   "min": [
+    11.94,
+    0.0,
+    2.0
+   ],
+   "max": [
+    12.0,
+    2.4,
+    4.0
+   ]
+  },
+  {
+   "s": "Screen_3_Door",
+   "min": [
+    -8.8,
+    3.0,
+    -8.0
+   ],
+   "max": [
+    -7.2,
+    5.4,
+    -7.94
+   ]
+  },
+  {
+   "s": "Screen_4_Door",
+   "min": [
+    -2.8,
+    3.0,
+    -8.0
+   ],
+   "max": [
+    -1.2,
+    5.4,
+    -7.94
+   ]
+  },
+  {
+   "s": "Screen_5_Door",
+   "min": [
+    3.2,
+    3.0,
+    -8.0
+   ],
+   "max": [
+    4.8,
+    5.4,
+    -7.94
+   ]
+  },
+  {
+   "s": "Sheeted_Cardboard_Standee",
+   "min": [
+    -11.5,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -10.5,
+    1.9,
+    -3.4
+   ]
+  },
+  {
+   "s": "Stair_Wall",
+   "min": [
+    9.4,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    9.5,
+    1.0,
+    -1.4
+   ]
+  },
+  {
+   "s": "Step_balcony_00",
+   "min": [
+    9.6,
+    0.0,
+    -1.7
+   ],
+   "max": [
+    11.8,
+    0.25,
+    -1.4
+   ]
+  },
+  {
+   "s": "Step_balcony_01",
+   "min": [
+    9.6,
+    0.25,
+    -2.0
+   ],
+   "max": [
+    11.8,
+    0.5,
+    -1.7
+   ]
+  },
+  {
+   "s": "Step_balcony_02",
+   "min": [
+    9.6,
+    0.5,
+    -2.3
+   ],
+   "max": [
+    11.8,
+    0.75,
+    -2.0
+   ]
+  },
+  {
+   "s": "Step_balcony_03",
+   "min": [
+    9.6,
+    0.75,
+    -2.6
+   ],
+   "max": [
+    11.8,
+    1.0,
+    -2.3
+   ]
+  },
+  {
+   "s": "Step_balcony_04",
+   "min": [
+    9.6,
+    1.0,
+    -2.9
+   ],
+   "max": [
+    11.8,
+    1.25,
+    -2.6
+   ]
+  },
+  {
+   "s": "Step_balcony_05",
+   "min": [
+    9.6,
+    1.25,
+    -3.2
+   ],
+   "max": [
+    11.8,
+    1.5,
+    -2.9
+   ]
+  },
+  {
+   "s": "Step_balcony_06",
+   "min": [
+    9.6,
+    1.5,
+    -3.5
+   ],
+   "max": [
+    11.8,
+    1.75,
+    -3.2
+   ]
+  },
+  {
+   "s": "Step_balcony_07",
+   "min": [
+    9.6,
+    1.75,
+    -3.8
+   ],
+   "max": [
+    11.8,
+    2.0,
+    -3.5
+   ]
+  },
+  {
+   "s": "Step_balcony_08",
+   "min": [
+    9.6,
+    2.0,
+    -4.1
+   ],
+   "max": [
+    11.8,
+    2.25,
+    -3.8
+   ]
+  },
+  {
+   "s": "Step_balcony_09",
+   "min": [
+    9.6,
+    2.25,
+    -4.4
+   ],
+   "max": [
+    11.8,
+    2.5,
+    -4.1
+   ]
+  },
+  {
+   "s": "Step_balcony_10",
+   "min": [
+    9.6,
+    2.5,
+    -4.7
+   ],
+   "max": [
+    11.8,
+    2.75,
+    -4.4
+   ]
+  },
+  {
+   "s": "Step_balcony_11",
+   "min": [
+    9.6,
+    2.75,
+    -5.0
+   ],
+   "max": [
+    11.8,
+    3.0,
+    -4.7
+   ]
+  },
+  {
+   "s": "Understair_Cupboard",
+   "min": [
+    9.5,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    12.0,
+    2.7,
+    -5.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_wing_cinema_A",
+   "level": "cinema_lobby",
+   "hinge": [
+    -1.2,
+    0.0,
+    8.0
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "cinema doors (glass)"
+  },
+  {
+   "name": "DoorLeaf_wing_cinema_B",
+   "level": "cinema_lobby",
+   "hinge": [
+    1.2,
+    0.0,
+    8.0
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "cinema doors (glass)"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "cinema_lobby",
+   "level": "cinema_lobby",
+   "kind": "Spawn",
+   "position": [
+    0.0,
+    0.0,
+    6.7
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "wing_cinema",
+   "at": [
+    0.0,
+    0.0,
+    7.4
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    6.7
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_1",
+   "position": [
+    -4.6,
+    0.0,
+    4.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "role": "dressing",
+   "what": "first in the queue at the box office"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_2",
+   "position": [
+    -4.6,
+    0.0,
+    5.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "role": "dressing",
+   "what": "second in the queue"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_3",
+   "position": [
+    -4.6,
+    0.0,
+    6.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "role": "monster",
+   "what": "last in the queue; it is not always there"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_4",
+   "position": [
+    0.0,
+    0.0,
+    -7.2
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "npc",
+   "what": "behind the concession counter"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_5",
+   "position": [
+    -6.0,
+    3.0,
+    -5.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "monster",
+   "what": "at the balcony rail, looking down at the doors"
+  }
+ ]
+}

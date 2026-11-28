@@ -25,6 +25,7 @@ export function near(W, x, z, r) {
 export function worldFromDoc(doc, id, {powerOn = false, floor, art} = {}) {          // floor and art: for a Going back in chamber, whose id is not a floor (art = the floor whose model it reuses)
   art ??= REGISTRY.chamber(id)?.floor;                                              // a chamber the caller did not describe: the manifest knows whose model it reuses
   const W = newWorld(id, floor); if (art) W.art = art;
+  W.linkDoors = new Set((doc.links || []).map(l => "DoorLeaf_" + l.door));          // a Blender-first scene's ways (export_scene.py): their door leaves are the way on, not side doors
   for (const c of doc.colliders) W.boxes.push({n: c.min, x: c.max});
   for (const d of doc.doors || []) {
     const th = d.closed_yaw_deg * Math.PI / 180, dir = [Math.cos(th), -Math.sin(th)];

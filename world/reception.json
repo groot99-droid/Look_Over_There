@@ -1,0 +1,259 @@
+{
+ "scene": "reception",
+ "colliders": [
+  {
+   "s": "Front_Desk",
+   "min": [
+    -3.0,
+    0.0,
+    -1.0
+   ],
+   "max": [
+    3.0,
+    1.1,
+    -0.4
+   ]
+  },
+  {
+   "s": "Key_Cubbies",
+   "min": [
+    -4.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    4.0,
+    2.4,
+    -4.6
+   ]
+  },
+  {
+   "s": "Reception_Ceiling",
+   "min": [
+    -7.2,
+    3.0,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    3.2,
+    5.2
+   ]
+  },
+  {
+   "s": "Reception_Floor",
+   "min": [
+    -7.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Reception_Wall_E_1",
+   "min": [
+    7.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    7.2,
+    3.0,
+    5.0
+   ]
+  },
+  {
+   "s": "Reception_Wall_N_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    3.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Reception_Wall_S_1",
+   "min": [
+    -7.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    -0.47,
+    3.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Reception_Wall_S_2",
+   "min": [
+    -0.47,
+    2.16,
+    5.0
+   ],
+   "max": [
+    0.47,
+    3.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Reception_Wall_S_3",
+   "min": [
+    0.47,
+    0.0,
+    5.0
+   ],
+   "max": [
+    7.2,
+    3.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Reception_Wall_W_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -7.0,
+    3.0,
+    5.0
+   ]
+  },
+  {
+   "s": "Sofa",
+   "min": [
+    -6.5,
+    0.0,
+    2.5
+   ],
+   "max": [
+    -4.5,
+    0.8,
+    3.3
+   ]
+  },
+  {
+   "s": "Sofa_2",
+   "min": [
+    4.5,
+    0.0,
+    2.5
+   ],
+   "max": [
+    6.5,
+    0.8,
+    3.3
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_floor_2",
+   "level": "reception",
+   "hinge": [
+    0.47,
+    0.0,
+    5.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "reception",
+   "level": "reception",
+   "kind": "Spawn",
+   "position": [
+    0.0,
+    0.0,
+    3.8
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "floor_2",
+   "at": [
+    0.0,
+    0.0,
+    4.4
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    3.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "clue",
+   "name": "Spot_clue_1",
+   "position": [
+    6.2,
+    0.0,
+    -4.2
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_1",
+   "position": [
+    -6.3,
+    0.0,
+    -4.3
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "npc",
+   "name": "Spot_npc_1",
+   "position": [
+    0.0,
+    0.0,
+    -2.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the night clerk"
+  }
+ ]
+}

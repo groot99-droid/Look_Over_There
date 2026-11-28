@@ -1,0 +1,18 @@
+{
+ "normal": {
+  "gain": 1.4851,
+  "walls_p50_before": 0.202,
+  "target": 0.3,
+  "factor": {}
+ },
+ "alarm": {
+  "gain": 1.2917,
+  "walls_p50_before": 0.12,
+  "target": 0.155,
+  "factor": {
+   "Ceiling_Tile": 0.9004,
+   "Clock_Face": 0.9317,
+   "Sign_Plate": 0.8543
+  }
+ }
+}

@@ -1,0 +1,389 @@
+{
+ "scene": "rdwe_motel_room",
+ "colliders": [
+  {
+   "s": "Armchair",
+   "min": [
+    2.1,
+    0.0,
+    3.5
+   ],
+   "max": [
+    2.9,
+    0.9,
+    4.3
+   ]
+  },
+  {
+   "s": "Bed",
+   "min": [
+    -3.0,
+    0.0,
+    0.0
+   ],
+   "max": [
+    -0.9,
+    0.6,
+    1.6
+   ]
+  },
+  {
+   "s": "Beyond_bathroom",
+   "min": [
+    0.82,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    2.18,
+    2.31,
+    -5.35
+   ]
+  },
+  {
+   "s": "Beyond_drum",
+   "min": [
+    -3.55,
+    -0.05,
+    -2.81
+   ],
+   "max": [
+    -3.35,
+    2.25,
+    -1.19
+   ]
+  },
+  {
+   "s": "Chair",
+   "min": [
+    -0.4,
+    0.0,
+    4.35
+   ],
+   "max": [
+    0.1,
+    0.85,
+    4.85
+   ]
+  },
+  {
+   "s": "Luggage_Rack",
+   "min": [
+    -2.6,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -1.6,
+    0.5,
+    -4.55
+   ]
+  },
+  {
+   "s": "Nightstand_N",
+   "min": [
+    -3.0,
+    0.0,
+    -0.6
+   ],
+   "max": [
+    -2.55,
+    0.6,
+    -0.1
+   ]
+  },
+  {
+   "s": "Nightstand_S",
+   "min": [
+    -3.0,
+    0.0,
+    1.7
+   ],
+   "max": [
+    -2.55,
+    0.6,
+    2.2
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -3.2,
+    2.8,
+    -5.2
+   ],
+   "max": [
+    3.2,
+    3.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -3.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    3.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    3.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    3.2,
+    2.8,
+    5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -3.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    1.05,
+    2.8,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    1.05,
+    2.2,
+    -5.2
+   ],
+   "max": [
+    1.95,
+    2.8,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    1.95,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    3.2,
+    2.8,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -3.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    3.2,
+    2.8,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -3.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -3.0,
+    2.8,
+    -2.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -3.2,
+    2.14,
+    -2.58
+   ],
+   "max": [
+    -3.0,
+    2.8,
+    -1.42
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -3.2,
+    0.0,
+    -1.42
+   ],
+   "max": [
+    -3.0,
+    2.8,
+    5.0
+   ]
+  },
+  {
+   "s": "TV_Stand",
+   "min": [
+    2.45,
+    0.0,
+    0.2
+   ],
+   "max": [
+    3.0,
+    0.8,
+    1.8
+   ]
+  },
+  {
+   "s": "Table",
+   "min": [
+    0.4,
+    0.0,
+    4.25
+   ],
+   "max": [
+    1.2,
+    0.72,
+    4.95
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_bathroom",
+   "level": "rdwe_motel_room",
+   "hinge": [
+    1.07,
+    0.0,
+    -5.0
+   ],
+   "width": 0.86,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "bathroom",
+   "look": "porthole black lacquer door, no handle"
+  },
+  {
+   "name": "DoorLeaf_drum",
+   "level": "rdwe_motel_room",
+   "hinge": [
+    -3.0,
+    0.0,
+    -1.44
+   ],
+   "width": 1.12,
+   "height": 2.1,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "drum",
+   "look": "mirror-faced cherry red door, push plate"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "bathroom",
+   "at": [
+    1.5,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    1.5,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "drum",
+   "at": [
+    -2.25,
+    0.0,
+    -2.0
+   ],
+   "arrive": [
+    -1.1,
+    0.0,
+    -2.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "tv",
+   "name": "Spot_tv_1",
+   "position": [
+    0.8,
+    0.0,
+    1.2
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "the TV: you, a second ago"
+  },
+  {
+   "kind": "tv",
+   "name": "Spot_tv_2",
+   "position": [
+    2.6,
+    0.0,
+    -4.6
+   ],
+   "face": [
+    -0.6,
+    0.8
+   ],
+   "yaw_deg": -36.9,
+   "scale": 1.0,
+   "what": "the corner the TV films from, 2.5 m up: you on the bed, a second late",
+   "eye_height": 2.5
+  },
+  {
+   "kind": "tv",
+   "name": "Spot_tv_3",
+   "position": [
+    -0.55,
+    0.0,
+    0.8
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "sit on the end of the bed and watch: on the screen you are still standing"
+  }
+ ]
+}

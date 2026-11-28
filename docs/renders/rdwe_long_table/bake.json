@@ -1,0 +1,81 @@
+{
+ "0": {
+  "map": 0,
+  "size": 2048,
+  "gain": 3.839,
+  "C": 1.12,
+  "px_per_m": 62.8,
+  "p50_p90_p99_p995_max": [
+   0.3777,
+   0.5948,
+   1.2665,
+   2.0353,
+   5.1447
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 44,
+  "materials": [
+   "Ceil_Plaster",
+   "Floor_Shag",
+   "Wall_Cream"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "size": 2048,
+  "gain": 3.839,
+  "C": 1.12,
+  "px_per_m": 51.8,
+  "p50_p90_p99_p995_max": [
+   0.2151,
+   0.8937,
+   3.9744,
+   5.9617,
+   25.7331
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 80,
+  "materials": [
+   "Brass",
+   "Candle",
+   "China",
+   "China_Rim",
+   "Frame_Gilt",
+   "Leaf_Birch",
+   "Leaf_BottleGreen",
+   "Leaf_Glass",
+   "Leaf_Mustard",
+   "Linen_White",
+   "Maple",
+   "Maple_Dark",
+   "Marble_Top",
+   "Photo",
+   "Trim_Cream",
+   "Velvet_Red",
+   "Walnut"
+  ]
+ },
+ "2": {
+  "map": 2,
+  "size": 1024,
+  "gain": 3.839,
+  "C": 1.12,
+  "px_per_m": 48.6,
+  "p50_p90_p99_p995_max": [
+   0.2268,
+   0.718,
+   0.9571,
+   1.004,
+   1.6722
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 26,
+  "materials": [
+   "Maple_Dark_T",
+   "Velvet_Red_T"
+  ]
+ }
+}

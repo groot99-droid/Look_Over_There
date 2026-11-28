@@ -2,9 +2,9 @@
 
 Run it on a saved scene, from the repo root:
 
-    blender -b blender/scenes/<scene>.blend --python tools/blender/check_layout.py -- --scene <scene> [--collection Art]
+    blender -b blender/scenes/<scene>.blend --python tools/blender/check_layout.py -- --scene <scene> [--collection Art] [--floor <y>]
 
-It compares each visible mesh's world box, in GAME coordinates (metres, y up; Blender (x, y, z) is game (x, z, -y)), with the scene's collision
+With --floor <y> every height is read from that floor (a scene built at its storey's height, as the Going back in chambers are). It compares each visible mesh's world box, in GAME coordinates (metres, y up; Blender (x, y, z) is game (x, z, -y)), with the scene's collision
 file world/<scene>.json and prints one PASS or FAIL line per rule. The exit code is 1 when anything fails.
 
 Rules (a collider is a box {s, min, max}; "solid art" is every visible mesh whose name does not start with decor_):
@@ -12,7 +12,7 @@ Rules (a collider is a box {s, min, max}; "solid art" is every visible mesh whos
              (every 10 cm, both faces included) lies within 5 cm of the world box of some solid mesh.
   2. STRAY   no solid art taller than 0.2 m above the floor, reaching below head height, stands where no collider does: its floor plan lies within a
              collider that stands (starts near the floor and rises above 0.2 m), widened by 5 cm. A mesh named decor_* is exempt: it is passable.
-  3. CLEAR   the arrival points, door spots and markers (every `arrive` and `at` in the scene's constants, every marker of the collision file) are clear:
+  3. CLEAR   the arrival points, door spots and markers (every `arrive` and `at` in the scene's constants, every marker and link of the collision file) are clear:
              no standing collider and no solid art within the walker's radius (0.28 m).
 `python tools/blender/check_layout_test.py` tests the rules without Blender.
 """
@@ -52,24 +52,52 @@ def _stands(p):
     return (p["max"][1] - max(p["min"][1], 0.0)) > STAND_H and p["min"][1] < HEAD
 
 
+def _walk_up(world, x, z, reach):
+    """A spot with a `reach` is an F prompt that works from up to `reach` away (the forest's signpost back to the lot). When a standing collider (the
+    thing itself, which the page may draw) covers the spot, the walker stands beside it: the nearest point within reach, in eight directions, that is
+    clear of standing colliders by the walker's radius. The CLEAR rule then checks that point against the colliders and the art."""
+    stand = [c for c in world.get("colliders", []) if _standing(c)]
+    if not any(_in_plan(c, x, z, CLEAR_R) for c in stand):
+        return x, z
+    d = CLEAR_R
+    while d <= reach + 1e-9:
+        for k in range(8):
+            px, pz = round(x + d * math.cos(k * math.pi / 4), 3), round(z + d * math.sin(k * math.pi / 4), 3)
+            if not any(_in_plan(c, px, pz, CLEAR_R) for c in stand):
+                return px, pz
+        d += 0.05
+    return x, z
+
+
 def points_of(world, constants):
     """(label, x, z) of every arrival point, door spot and marker the scene names."""
     pts = [(f"marker {m['name']}", m["position"][0], m["position"][2]) for m in world.get("markers", []) if "position" in m]
+    for i, m in enumerate(m for m in world.get("markers", []) if "position" in m):
+        if m.get("kind") == "Entrance" and m.get("width"):
+            pts[i] = pts[i] + ("door",)              # a door in a wall's face (the street's doors): see the CLEAR rule
+    for lk in world.get("links", []):                  # a Blender-first scene's links (export_scene.py): where you press F and where you arrive
+        pts.append((f"link {lk['door']}.at", lk["at"][0], lk["at"][2]))
+        pts.append((f"link {lk['door']}.arrive", lk["arrive"][0], lk["arrive"][2]))
 
     def walk(o, path):
         if isinstance(o, dict):
             for k, v in o.items():
                 if k == "arrive" and isinstance(v, list) and len(v) == 3:
                     pts.append((f"{'.'.join(path) or 'constants'}.arrive", v[0], v[2]))
+                elif k == "at" and isinstance(v, list) and len(v) == 2 and "half" in o:
+                    continue                                  # a placed building's middle (the meadow's shed and house: at, half, height), not a spot to
+                                                              # walk to: its collider stands on it (rule 1 covers it) and its door is checked
                 elif k == "at" and isinstance(v, list) and len(v) == 2:
-                    pts.append((f"{'.'.join(path) or 'constants'}.at", v[0], v[1]))
+                    x, z = _walk_up(world, v[0], v[1], o["reach"]) if "reach" in o else (v[0], v[1])
+                    label = f"{'.'.join(path) or 'constants'}.at"
+                    pts.append((label if (x, z) == (v[0], v[1]) else f"{label} ({v[0]:.2f}, {v[1]:.2f}), reach {o['reach']}: its walk-up spot", x, z))
                 else:
                     walk(v, path + [k])
     walk(constants or {}, [])
     return pts
 
 
-def check(parts, world, constants=None, tol=TOL):
+def check(parts, world, constants=None, tol=TOL, points3=()):
     """parts: [{name, min:[x,y,z], max:[x,y,z]}] in game coordinates. Returns [(ok, rule, text)]."""
     res = []
     colliders = world.get("colliders", [])
@@ -104,7 +132,8 @@ def check(parts, world, constants=None, tol=TOL):
             continue
         for x in _samples(p["min"][0], p["max"][0], STEP / 2):
             for z in _samples(p["min"][2], p["max"][2], STEP / 2):
-                if not any(_in_plan(c, x, z, tol) for c in stand):
+                if not any(_in_plan(c, x, z, tol) for c in stand) and not any(_in_plan(c, x, z, tol) and c["min"][1] - tol <= p["min"][1] < c["max"][1] - tol
+                                                                             for c in colliders):   # or it sits in a collider at its own height (a flight's upper steps)
                     bad.append(f"{p['name']} at x {x:.2f}, z {z:.2f}")
                     break
             else:
@@ -119,10 +148,29 @@ def check(parts, world, constants=None, tol=TOL):
     # 3. the arrival points, door spots and markers are clear
     blockers = [("collider " + c["s"], c) for c in stand] + [("art " + p["name"], p) for p in solid if _stands(p)]
     pts = points_of(world, constants)
-    for label, x, z in pts:
+    for label, x, z, *door in pts:
         hit = [n for n, b in blockers if _in_plan(b, x, z, CLEAR_R)]
+        if hit and door:
+            # An Entrance marker with a width stands in the face of the wall it opens (world/street.json: x = +-8, the buildings' street fronts), so its own
+            # spot always touches that wall. It is clear when it lies on the face of every collider that blocks it, and the walker's spot in front of it
+            # (one radius and 3 cm out, on the open side) is clear of colliders and solid art.
+            on_face = all(abs(x - c["min"][0]) < 0.01 or abs(x - c["max"][0]) < 0.01 or abs(z - c["min"][2]) < 0.01 or abs(z - c["max"][2]) < 0.01
+                          for n, c in blockers if n.startswith("collider ") and _in_plan(c, x, z, CLEAR_R))
+            r = CLEAR_R + 0.03
+            for dx, dz in ((r, 0), (-r, 0), (0, r), (0, -r)):
+                if on_face and not any(_in_plan(b, x + dx, z + dz, CLEAR_R) for n, b in blockers):
+                    res.append((True, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): a door in a wall's face; its walk-up spot ({x + dx:.2f}, {z + dz:.2f}) is clear within {CLEAR_R:.2f} m"))
+                    break
+            else:
+                res.append((False, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): blocked by " + ", ".join(hit) + " (a door, and no clear walk-up spot in front of it)"))
+            continue
         res.append((not hit, "CLEAR", f"{label} ({x:.2f}, {z:.2f}): " + ("clear within %.2f m" % CLEAR_R if not hit else "blocked by " + ", ".join(hit))))
-    if not pts:
+    # points with a height (--links: every link's F spot and arrival): blocked only by what stands in the body's height above them
+    for label, x, y, z in points3:
+        hit = [n for n, b in [("collider " + c["s"], c) for c in colliders] + [("art " + p["name"], p) for p in solid]
+               if _in_plan(b, x, z, CLEAR_R) and b["min"][1] < y + 1.6 and b["max"][1] > y + 0.3]
+        res.append((not hit, "CLEAR", f"{label} ({x:.2f}, {y:.2f}, {z:.2f}): " + ("clear within %.2f m" % CLEAR_R if not hit else "blocked by " + ", ".join(hit))))
+    if not pts and not points3:
         res.append((False, "CLEAR", "no arrival points or markers found to check"))
     return res
 
@@ -153,15 +201,29 @@ def main(argv):
     def arg(n, d=None):
         return argv[argv.index(n) + 1] if n in argv else d
     scene = arg("--scene", "apartment")
-    world = json.loads((ROOT / f"world/{scene}.json").read_text())
+    wp = ROOT / f"world/{scene}.json"
+    if not wp.exists() and (ROOT / f"world/rooms/{scene}.json").exists():      # the hotel's room layouts (world/rooms/<layout>.json)
+        wp = ROOT / f"world/rooms/{scene}.json"
+    world = json.loads(wp.read_text())
     lay = ROOT / f"blender/layout/{scene}.json"
     constants = json.loads(lay.read_text()).get("constants") if lay.exists() else {}
     if arg("--boxes"):
         parts = json.loads(Path(arg("--boxes")).read_text())
     else:
         parts = blender_parts(arg("--collection", "Art"))
-    print(f"layout check: scene {scene}, {len(parts)} visible meshes, {len(world['colliders'])} colliders")
-    return 1 if report(check(parts, world, constants)) else 0
+    floor = float(arg("--floor", 0.0))
+    if floor:                                   # a scene whose floor is not at y 0 (the Going back in chambers): heights are read from its floor
+        def down(b):
+            return dict(b, min=[b["min"][0], b["min"][1] - floor, b["min"][2]], max=[b["max"][0], b["max"][1] - floor, b["max"][2]])
+        parts = [down(p) for p in parts]
+        world = dict(world, colliders=[dict(c, **down(c)) for c in world["colliders"]],
+                     markers=[dict(m, position=[m["position"][0], m["position"][1] - floor, m["position"][2]]) for m in world.get("markers", [])],
+                     links=[dict(l, **{k: [l[k][0], l[k][1] - floor, l[k][2]] for k in ("at", "arrive")}) for l in world.get("links", [])])
+    pts3 = []
+    if "--links" in argv:                                       # opt-in: the layout file's own links (every F spot and arrival), at their height
+        pts3 = [(f"link {l['door']}.{k}", *l[k]) for l in world.get("links", []) for k in ("at", "arrive")]
+    print(f"layout check: scene {scene}, {len(parts)} visible meshes, {len(world['colliders'])} colliders" + (f", floor at y {floor:g}" if floor else ""))
+    return 1 if report(check(parts, world, constants, points3=pts3)) else 0
 
 
 if __name__ == "__main__":

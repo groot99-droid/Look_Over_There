@@ -494,6 +494,8 @@ async function loadScene(id, arrival) {
   scene.add(root);
   const chamber = passage ? null : REGISTRY.chamber(id);
   Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, baked: bake.n, bake, lightSet: "day", grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
+  S.sceneLinks = sceneLinksOf(id, doc);
+  S.linkDoors = new Set((Array.isArray(doc.links) ? doc.links : []).map(l => "DoorLeaf_" + l.door));          // its ways in and on: never barricaded (shared/barricade.js)
   applySky(id, root); addBackdrop(cfg, root);
   boxes.length = 0; doors.length = 0;
   for (const c of doc.colliders) boxes.push({n: c.min, x: c.max});
@@ -514,7 +516,7 @@ async function loadScene(id, arrival) {
   if (id === OW_SCENE) { overworldProps(root); busStopLotProps(root); forestRoadLotProps(root); }
   if (id === FOREST_SCENE) forestProps(root);
   if (id === MEADOW_SCENE) meadowProps(root);
-  CITY.st = carryStalker(CITY.st, hourAt(CITY.t), id); CITY.mesh = null;                          // slice 10: at night it waits outside your apartment; otherwise it belongs to one visit to the street
+  CITY.st = carryStalker(CITY.st, hourAt(CITY.t), id, TOWER_SCENES); CITY.mesh = null;                          // slice 10: at night it waits outside your apartment; otherwise it belongs to one visit to the street
   if (id === CITY_SCENE) cityProps(root);
   if (id === APT_SCENE) apartmentProps(root);
   if (id === GROCERY_SCENE) groceryProps(root);
@@ -555,6 +557,52 @@ async function loadScene(id, arrival) {
   fade.style.opacity = 0;
   AUD.clearMonsters(); AUD.setLevel(id);
 }
+// ---------------------------------------------------------------- the Blender-first scenes' ways out (docs/BLENDER_AREAS.md): each world/<id>.json lists its `links`
+// ({door, at, arrive, face}, written by tools/blender/export_scene.py), and the manifest says where each door leads. F near a door's `at` follows the manifest's built link
+// from it; a `walk` link follows as soon as you step onto it. A manifest link may also name the spot itself (`from.at`) when the scene's file has none (the older scenes the
+// Blender areas join onto: the mall's entrance, the grocery's main floor). Doors the page's own code already handles (the bus, the forest road, the store's doors, the
+// City's buildings) are left to it.
+const SCENE_LINK_REACH = 1.6, SCENE_WALK_REACH = 1.1;
+const CODE_DOORS = {parking_lot: ["bus_stop", "forest_road", "store_doors"]};
+const CODE_SCENES = () => [CITY_SCENE, APT_SCENE, ...FOREST_SCENES];
+function sceneLinksOf(id, doc) {
+  if (CODE_SCENES().includes(id)) return [];
+  const out = new Map(), skip = CODE_DOORS[id] || [];
+  for (const l of Array.isArray(doc.links) ? doc.links : []) if (!skip.includes(l.door)) out.set(l.door, {door: l.door, at: l.at});
+  for (const l of REGISTRY.linksFrom(id)) if (l.from.door && Array.isArray(l.from.at) && !skip.includes(l.from.door)) out.set(l.from.door, {door: l.from.door, at: l.from.at});
+  return [...out.values()].map(x => ({...x, link: REGISTRY.linkFrom(id, x.door) || REGISTRY.linksFrom(id).find(l => l.from.door === x.door) || null}));
+}
+function sceneLinkNear(walk = false) {
+  if (loading || dead || !S.sceneLinks) return null;
+  let best = null, bd = 1e9;
+  for (const x of S.sceneLinks) {
+    if (!x.link || (x.link.connector === "walk") !== walk) continue;
+    const d = Math.hypot(P.p.x - x.at[0], P.p.z - x.at[2]);
+    if (walk && !x.armed) { if (d > SCENE_WALK_REACH + 1.0) x.armed = true; continue; }     // you arrive beside the way back: it waits until you have stepped away from it
+    if (d < (walk ? SCENE_WALK_REACH : SCENE_LINK_REACH) && Math.abs(P.p.y - x.at[1]) < 2.2 && d < bd) { best = x; bd = d; }
+  }
+  return best;
+}
+const SCENE_VERB = {elevator: "take the elevator", escalator: "take the escalator", stairs: "take the stairs", one_way: "go through", doors: "go through the door", stair_door: "take the stairs",
+  hatch: "climb through the hatch", lift: "take the lift", freight_lift: "take the freight lift", mirror: "step through the mirror", sky_hall: "go into the hall", service: "go through the service door",
+  service_corridor: "take the service corridor", pool_route: "swim on", pool_dive: "dive in", door: "go through the door"};
+function sceneLinkPrompt() {
+  const x = sceneLinkNear(false); if (!x) return "";
+  const l = x.link;
+  if (l.status !== "built") return "This way is shut for now";
+  if (roomShut(l)) return "A solo place for now (not in a room)";
+  return `Press F to ${SCENE_VERB[l.connector] || "go through"}`;
+}
+function followSceneLink(x) {
+  const l = x.link;
+  if (!l || l.status !== "built") { toast("This way is shut for now"); return true; }
+  if (roomShut(l)) { toast("That does not open in a room yet"); return true; }
+  if (!l.to.scene) { toast("That leads somewhere not built yet"); return true; }
+  loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face});
+  return true;
+}
+function trySceneLink() { const x = sceneLinkNear(false); return x ? followSceneLink(x) : false; }
+function walkSceneLinks() { const x = sceneLinkNear(true); if (x && x.link.status === "built" && !roomShut(x.link) && x.link.to.scene) followSceneLink(x); }
 function goLink(dr) {
   const l = dr.link;
   if (l.game && !l.direct && S.id !== "T") {                             // the game gates go through a walkable passage first
@@ -566,12 +614,14 @@ function goLink(dr) {
 
 // ---------------------------------------------------------------- hidden games: each keeps its own renderer and canvas; the host shows exactly one at a time
 let inGame = null;
-const RDWE_SCALE = 1.7;                                                              // rooms are made larger by shrinking the walker (see games/rdwe/controls.js)
+const RDWE_SCALE = 1.7;                                                              // the code rooms are made larger by shrinking the walker (see games/rdwe/controls.js); the Blender rooms are built to it
 const INTERN_SCALE = 1.6;
-const RDWE_ORDER = ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"];
+const RDWE_FIRST = "dining";                                                          // where the game starts when a link names no room of it (its rooms: games/rdwe/walk.js)
 const mkEl = (tag = "div") => document.createElement(tag);                          // detached elements: the original HUD stays invisible
 // the manifest's entry for a game gate (its soloOnly flag and where the player returns to); world/L4.json links carry the game and arrival, the manifest the rest
-const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === l.game && JSON.stringify(x.to.arrive) === JSON.stringify(l.arrive));
+// the meadow house's door (#133, the way into Right Door, Wrong Exit) is a door, not a gate: the page enters the game from it with its returnTo as the place to come back to
+const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.to.area === l.game && (x.connector === "gate" ? JSON.stringify(x.to.arrive) === JSON.stringify(l.arrive)
+  : !!x.returnTo && x.returnTo.scene === l.scene && JSON.stringify(x.returnTo.arrive) === JSON.stringify(l.arrive)));
 // in a room, a game gate the manifest does not mark coop-ready (soloOnly) stays shut; an unknown gate is shut too
 const roomShutGate = l => { const e = gateEntry(l); return !e || !!e.soloOnly; };
 // the room's view of me while I am inside a game: where, and which room of the game (the place the server relays by: `rdwe:teal`), sent from the game's own loop because the page's does not run
@@ -599,12 +649,16 @@ async function enterGame(l) {
   if (l.game === "rdwe") {
     const walk = await import("./games/rdwe/walk.js");
     const joy = mkEl(); const knob = mkEl(); knob.className = "knob"; joy.appendChild(knob);
-    const els = {mount, fade: gf, objective: mkEl(), hint: mkEl(), joystick: joy, readout: mkEl(), tally: mkEl(), use: mkEl("button")};
-    for (let i = Math.max(0, RDWE_ORDER.indexOf(l.room)); i < RDWE_ORDER.length; i++) {
+    const els = {mount, fade: gf, objective: mkEl(), hint: mkEl(), joystick: joy, readout: mkEl(), tally: mkEl(), use: mkEl("button"), prompt: $("prompt")};          // the page's prompt line shows a room's ways out
+    // the rooms are a graph (games/rdwe/blender_rooms.js): each walk ends by a door, and walk.next() says which room and door it leads to; none: the game ends
+    let room = walk.hasScene(l.room) ? l.room : RDWE_FIRST, via = null;
+    for (;;) {
       const coop = net.on && !roomShutGate(l) ? {peers: gamePeers, onFrame: gameNetTick} : undefined;          // in a party room: other players are drawn, and ours is sent
-      GN.place = coop ? `rdwe:${RDWE_ORDER[i]}` : null; GN.t = 0; GN.last = null;
-      result = await walk.start(RDWE_ORDER[i], els, {sound: true, scale: RDWE_SCALE, coop});
-      if (result !== "reached") break;
+      GN.place = coop ? `rdwe:${room}` : null; GN.t = 0; GN.last = null;
+      result = await walk.start(room, els, {sound: true, scale: RDWE_SCALE, coop, via});
+      const nx = result === "reached" ? walk.next() : null;
+      if (!nx) break;
+      ({room, via} = nx);
     }
     walk.cancel();
   } else if (l.game === "intern") {
@@ -659,7 +713,8 @@ function move(dx, dy, dz) {
   }
   p.y += dy; P.ground = false;
   const b = collide(p);
-  if (b) { if (dy < 0) { p.y = b.x[1] + 0.001; P.ground = true; } else p.y = b.n[1] - H - 0.001; P.v.y = 0; }
+  // at rest (dy 0) inside a box whose top is within a step of your feet, you stand on it: two floors a few mm apart (the atrium's lift landings on its galleries) must not push you under
+  if (b) { if (dy < 0 || (dy === 0 && b.x[1] - p.y <= STEP)) { p.y = b.x[1] + 0.001; P.ground = true; } else p.y = b.n[1] - H - 0.001; P.v.y = 0; }
 }
 const teleport = pos => { P.p.set(pos[0], pos[1] + 0.02, pos[2]); P.v.set(0, 0, 0); };
 
@@ -975,7 +1030,7 @@ function useConsumable(slot) {
   else { const t = placeTrap(r.kind, P.p.x, P.p.z, TRAPS.t); t.mesh = trapMesh(r.kind, t); TRAPS.list.push(t); toast(`${KIT_NAMES[r.kind]} set down: ${r.kind === "mine" ? "armed in a moment" : "armed almost at once, and loud"}`); }
   return true;
 }
-const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryStation() && !tryLoot() && !tryBarricade() && !tryCity()) useDoor(); };
+const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryStation() && !tryLoot() && !tryBarricade() && !tryCity() && !trySceneLink()) useDoor(); };
 const crouchToggle = () => { crouchLatch = !crouchLatch; };
 addEventListener("keydown", e => {
   if (inGame) return;
@@ -1592,6 +1647,7 @@ function updatePrompt() {
   if (!pz && !dead && !loading && !reviveTarget() && nearPower()) msg = "Press E to switch on the power";
   if (!msg && !dead && !loading && !reviveTarget() && nearStation()) msg = "Press E to open the Lost and Found";
   if (!msg && !dead && !loading && !reviveTarget()) msg = cityPrompt();
+  if (!msg && !dead && !loading && !reviveTarget()) msg = sceneLinkPrompt();
   if (!msg && !dead && !loading && !reviveTarget()) { const n = nearLoot(); if (n) msg = n.k === "locker" ? (LT.gun ? "You already carry a gun" : "Press E to open the locker") : n.k === "beacon" ? (BC.have >= MAX_BEACONS ? "You cannot carry more beacons" : "Press E to take the AFK Beacon") : (LT.rounds >= MAX_ROUNDS ? "You cannot carry more ammo" : "Press E to take the ammo pack (+3)"); }
   el.textContent = msg; el.style.display = msg ? "block" : "none";
   if (!pz && POWER_SOURCES.includes(S.id)) { hud.style.display = "block"; hud.textContent = POWER.on ? "POWER ON" : "POWER OFF"; }
@@ -2282,7 +2338,12 @@ async function walkOut(link) {
 // only: the server relays positions, and every rule here (the clock, the night, needs, money, jobs, saving, the stalker, pedestrians, anomalies) runs per player on their own
 // page. So two players side by side can be in different hours; a name tag shows that player's time. The other doors of the street are solo only (the manifest says which).
 const CITY_SCENE = "street", APT_SCENE = "apartment", GROCERY_SCENE = "main_floor", MALL_SCENE = "entrance", MUSEUM_SCENE = "galleries", FACTORY_SCENE = "factory_floor", LAB_SCENE = "laboratory";
-const inCity = () => CITY_SCENES.includes(S.id);
+// the City: its own scenes, and every scene of the areas behind its doors (the hotel in the tower, the mall's wings, the grocery's back, the museum's wing, Secret Operations
+// under the lab and the grocery): the clock runs, the needs drain and the night rules hold there as in the apartment (2026-11-28)
+const CITY_ALL = new Set([...CITY_SCENES, ...["city", "hotel", "mall", "grocery", "museum", "factory", "lab", "secret_ops"].flatMap(a => ((REGISTRY.area(a) || {}).scenes || []).filter(s => s.files).map(s => s.id))]);
+const inCity = () => CITY_ALL.has(S.id);
+// behind the tower's door: your apartment and the hotel it is in (the owner, 2026-11-28: the tower's door opens the hotel's lobby). The stalker waits outside it.
+const TOWER_SCENES = ["apartment", ...((REGISTRY.area("hotel") || {}).scenes || []).map(s => s.id)];
 let NEEDS = newNeeds();                                       // slice 4: hunger, money, the cart and the fridge (rules: shared/needs.js); in memory, like the clock
 const CITY = {t: 0, ui: 0, doors: [], mats: {}, st: {active: false, x: 0, z: 0, wait: 6}, mesh: null, mark: null, signPasses: 0, lastZ: null, anom: null, tr: {active: false, got: [], t0: 0, end: 0, group: null}, mu: {active: false, ex: [], fixes: 0, end: 0, figs: []}, fa: {active: false, st: null, end: 0, parts: null, held: null}, lb: {active: false, b: null, end: 0}, seen: newSightings(), spotT: 0, peds: newPeds()};             // t: seconds spent in the City (a reload starts again at 08:00); doors: [{d, shutter, lamp}] of the street that is loaded
 const cityState = () => { const h = hourAt(CITY.t); return {t: CITY.t, hour: h, clock: fmtClock(h), day: dayAt(CITY.t), phase: phaseAt(h), open: storesOpen(h)}; };
@@ -2415,8 +2476,8 @@ function forestTick() {
 }
 // what F does here, as a prompt (null: nothing of the forest's is near)
 function forestPrompt() {
-  if (S.id === OW_SCENE && nearXZ(...FOREST_ROAD_LOT.at, FOREST_ROAD_LOT.reach)) return "Press F to walk the road to the forest";
-  if (S.id === FOREST_SCENE && nearXZ(...FOREST.back.at, FOREST.back.reach)) return "Press F to walk back to the parking lot";
+  if (S.id === OW_SCENE && nearXZ(...FOREST_ROAD_LOT.at, FOREST_ROAD_LOT.reach)) return "Press F to walk down the road";
+  if (S.id === FOREST_SCENE && nearXZ(...FOREST.back.at, FOREST.back.reach)) return "Press F to walk back down the road";
   if (S.id !== MEADOW_SCENE) return null;
   if (nearXZ(...MEADOW.house.door.at, MEADOW.house.door.reach)) return roomShut(REGISTRY.linkFrom(MEADOW_SCENE, "house_door")) ? "The house: a solo place for now (not in a room)" : "Press F to open the door";
   if (nearXZ(...MEADOW.shed.door.at, MEADOW.shed.door.reach)) return "The shed is locked. Something inside is waiting for its puzzle.";
@@ -2603,7 +2664,7 @@ function leaveGrocery(msg) {
 function cityPhase() {
   const ph = phaseAt(hourAt(CITY.t)), was = CITY.mark; CITY.mark = ph; if (!was || was === ph) return;
   if (ph === "evening") toast("The stores are closing. Be home before midnight.", 4200);
-  else if (ph === "night") toast(S.id === APT_SCENE ? "Past midnight. Stay inside until dawn." : S.id === MALL_SCENE ? "Past midnight. The mall is locked; nothing comes in here." : "Midnight. Get to your apartment. Do not turn your back on it.", 5200);
+  else if (ph === "night") toast(TOWER_SCENES.includes(S.id) ? "Past midnight. Stay inside until dawn." : S.id === MALL_SCENE ? "Past midnight. The mall is locked; nothing comes in here." : "Midnight. Get to your apartment. Do not turn your back on it.", 5200);
   else if (was === "night") toast("Dawn.", 2800);
 }
 // the stalker (rules: shared/city.js): only on the street, only between midnight and 06:00. Blockout figure: tall, grey, red eyes. It is not in `monsters`, so nothing you carry touches it.
@@ -2616,7 +2677,7 @@ function stalkerMesh() {
 }
 function stalkerTick(dt) {
   const on = S.id === CITY_SCENE && dangerous(hourAt(CITY.t)) && !dead;
-  if (!on && CITY.st.active && dangerous(hourAt(CITY.t)) && S.id === APT_SCENE) return;          // slice 10: you are inside; it stands where it is, outside your door, until you come out or dawn
+  if (!on && CITY.st.active && dangerous(hourAt(CITY.t)) && TOWER_SCENES.includes(S.id)) return;          // slice 10: you are inside (the tower: your apartment or the hotel round it); it stands where it is, outside the door, until you come out or dawn
   if (on && CITY.st.waited) { CITY.st = {...CITY.st, waited: false}; toast("It waited for you. It is out here, by your door.", 4200); }
   let seen = false;
   if (CITY.st.active && on) {                                                    // in view: inside your cone and nothing solid between your eyes and its chest
@@ -2641,10 +2702,10 @@ function cityPrompt() {
   if (PC.open) return "";
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return roomShut(REGISTRY.linkFrom(OW_SCENE, "bus_stop")) ? "The bus does not take a room yet" : "Press F to take the bus to Hallam Row";
   const fp = forestPrompt(); if (fp !== null) return fp;
-  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
+  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to the corridor" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
   if (S.id === LAB_SCENE) {
     if (nearXZ(...LAB.door.at, LAB.door.reach)) return CITY.lb.active ? "Press F to leave your post early (no pay)" : "Press F to leave";
-    if (nearXZ(LAB.b2.x, LAB.b2.z + 0.6, 1.6)) return "B2 · AUTHORISED STAFF ONLY. The door is sealed.";
+    if (nearXZ(LAB.b2.x, LAB.b2.z + 0.6, 1.6) && !REGISTRY.linkFrom(LAB_SCENE, "b2")) return "B2 · AUTHORISED STAFF ONLY. The door is sealed.";          // open for now (the owner, 2026-11-28): Secret Operations is behind it
     const si = stationNear(P.p.x, P.p.z); if (CITY.lb.active && si >= 0) return `Press F to use the ${LAB.stations[si].label}`;
     return "";
   }
@@ -2684,7 +2745,7 @@ function cityPrompt() {
   const d = nearCityDoor(); if (!d) return "";
   if (roomShut(REGISTRY.linkFrom(CITY_SCENE, d.id) || {})) return `${d.label}: a solo place for now (not in a room)`;
   const stub = stubJob(d); if (stub) { const can = canStartStub(stub, hourAt(CITY.t)); return can.ok ? `Press F to start your shift (${d.job})` : `${d.label} (${d.job}): ${can.reason}`; }
-  return d.kind === "tower" ? "Press F to go up to your apartment" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.id === "mall" ? "Press F to go into the mall" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
+  return d.kind === "tower" ? "Press F to go into the tower" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.id === "mall" ? "Press F to go into the mall" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
 }
 // F at a bus stop rides the bus (a fade through loadScene); F at a door says what is behind it. Nothing is built inside yet.
 function tryCity() {
@@ -2906,6 +2967,13 @@ function museumProps(root) {
     const f = new THREE.Group(), part = (w, hh, d, ox, oy, oz) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), stone); o.position.set(ox, oy, oz); f.add(o); };
     part(0.42, 0.75, 0.26, 0, 0.95, 0); part(0.15, 0.58, 0.15, -0.11, 0.29, 0); part(0.15, 0.58, 0.15, 0.11, 0.29, 0); part(0.11, 0.6, 0.11, -0.28, 0.98, 0); part(0.11, 0.6, 0.11, 0.28, 0.98, 0); part(0.24, 0.28, 0.24, 0, 1.5, 0);
     g.add(f); CITY.mu.figs.push(f);
+    // the statue is a warrior (PR #78; the owner, 2026-11-26): its model replaces the box figure once it has loaded, at the scale the bake's shadows were made with (1.75 m tall)
+    const [model, scale] = MUSEUM.models[i];
+    loadGlb(`models/characters/${model}.glb`).then(gl => {
+      if (!f.parent) return;                                                        // left the hall before it loaded
+      const w = gl.scene; w.scale.setScalar(scale); w.traverse(o => { if (o.isMesh) { o.castShadow = false; o.frustumCulled = false; } });
+      f.clear(); f.add(w);
+    }).catch(() => {});                                                             // no model: the box figure stays
   });
   if (!art) for (let z = cz - hz + 3; z < cz + hz - 2; z += 6) { const l = new THREE.PointLight(0x9aa8d0, 1.6, 9, 1.6); l.position.set(0, h - 0.4, z); g.add(l); }   // the night lights
   root.add(g); placeStatues();
@@ -3273,7 +3341,7 @@ function onNet(m) {
 const PT = {open: false};
 const PLACE_NAMES = {parking_lot: "the parking lot", street: "Hallam Row", apartment: "an apartment on Hallam Row"};
 const placeName = id => !id ? "on the way somewhere" : PLACE_NAMES[id] || (REGISTRY.gamePlaces[id] ? `${REGISTRY.area(REGISTRY.gamePlaces[id].area).name}: ${REGISTRY.gamePlaces[id].room}` : null) || (REGISTRY.chamber(id) ? `Going back in: wave ${REGISTRY.chamber(id).wave.no}` : REGISTRY.floors[id] !== undefined ? `Look Over There, floor ${id}` : id);
-const nightBound = scene => inCity() !== CITY_SCENES.includes(scene) && inCity() && dangerous(hourAt(CITY.t));          // leaving the City at night, by your own clock
+const nightBound = scene => inCity() !== CITY_ALL.has(scene) && inCity() && dangerous(hourAt(CITY.t));          // leaving the City at night, by your own clock
 // may you go to this player now? {ok, why}
 function gotoState(p) {
   if (!p.scene) return {ok: false, why: "not in a place yet"};
@@ -3534,6 +3602,7 @@ function update(dt) {
   if ((keys.Space || g.jump) && P.ground && !P.crouch) { P.v.y = 6.2; P.ground = false; }
   move(wx, 0, wz); move(0, P.v.y * dt, 0);
   crossPortals(); if (loading) return;
+  walkSceneLinks(); if (loading) return;
   checkFall();
   P.eye += ((P.crouch ? 0.95 : EYE) - P.eye) * Math.min(1, dt * 10);
   simMonsters(dt);
@@ -3599,7 +3668,7 @@ FIN.t0 = performance.now();
 await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {ART_TEST, setLightSet, camera, FST, FOREST_SCENES, tryForest, forestPrompt, SHEAR, shearTick, shearCut, BAR, buildBarricades, cutBarricade, tryBarricade, gotPack, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {CITY_ALL, sceneLinksOf, sceneLinkNear, sceneLinkPrompt, trySceneLink, ART_TEST, setLightSet, camera, FST, FOREST_SCENES, tryForest, forestPrompt, SHEAR, shearTick, shearCut, BAR, buildBarricades, cutBarricade, tryBarricade, gotPack, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>

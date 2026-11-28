@@ -1,0 +1,61 @@
+{
+ "0": {
+  "map": 0,
+  "size": 1536,
+  "gain": 6.3785,
+  "C": 1.12,
+  "px_per_m": 85.7,
+  "p50_p90_p99_p995_max": [
+   0.2273,
+   0.3692,
+   0.7279,
+   1.2463,
+   5.4939
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 15,
+  "materials": [
+   "Ceil_Night",
+   "Floor_Carpet_Lilac",
+   "Wall_Clouds"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "size": 2048,
+  "gain": 6.3785,
+  "C": 1.12,
+  "px_per_m": 133.4,
+  "p50_p90_p99_p995_max": [
+   0.1665,
+   0.3641,
+   0.8334,
+   1.2603,
+   66.5064
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 99,
+  "materials": [
+   "Books",
+   "Brass",
+   "Leaf_TealPaint",
+   "Linen_Cyan",
+   "Linen_White",
+   "Linen_Yellow",
+   "Mirror",
+   "Note_Card",
+   "Paint_Cyan",
+   "Paint_Lime",
+   "Paint_Red",
+   "Paint_White",
+   "Paint_Yellow",
+   "Plastic_Black",
+   "Poster",
+   "Rubber_Black",
+   "Rug_Pink",
+   "Trim_White"
+  ]
+ }
+}

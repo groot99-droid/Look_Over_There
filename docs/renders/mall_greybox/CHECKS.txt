@@ -1,0 +1,111 @@
+python tools/blender/build_mall_greybox.py --check .
+GATE links: 22 pairs, 44 sides, 5 that leave this set; 49 links in the files
+  off this set: food_court.entrance -> entrance
+  off this set: service_corridor.network -> the hidden network (freight lift, not built)
+  off this set: wing_books.entrance -> entrance
+  off this set: wing_cinema.entrance -> entrance
+  off this set: wing_entertainment.entrance -> entrance
+GATE navigable: 18 of 18 scenes reachable from entrance through the links
+GATE steps: 72 step boxes, one box a step, the highest rise 0.250 m (at most 0.27 m)
+GATE corridors: 53 corridor, aisle and doorway rects, the narrowest 1.65 m (at least 1.6 m), none blocked
+GATE mirrors: 6 of 6 Mirror_<n> nodes in mirror_bathroom.glb, the portal ['Mirror_4']
+  mannequin spots: 49 in 16 scenes
+GATES PASS
+
+node tools/worlddoc.mjs check <the 18 scene files>
+  warning: scene wing_books is not in the world manifest yet: a new scene to add
+  warning: link bookstore: the manifest has no link from this door yet: a new link to add
+  warning: link construction: the manifest has no link from this door yet: a new link to add
+  warning: link entrance: the manifest has no link from this door yet: a new link to add
+  warning: link scene_2909: the manifest has no link from this door yet: a new link to add
+  warning: link service_corridor: the manifest has no link from this door yet: a new link to add
+OK world/wing_books.json: 83 colliders, 7 doors, 1 markers, 5 links, 0 zones, 3 spots, 0 errors, 6 warnings
+  warning: scene wing_cinema is not in the world manifest yet: a new scene to add
+  warning: link cinema_lobby: the manifest has no link from this door yet: a new link to add
+  warning: link entrance: the manifest has no link from this door yet: a new link to add
+  warning: link mirror_bathroom: the manifest has no link from this door yet: a new link to add
+  warning: link scene_3012: the manifest has no link from this door yet: a new link to add
+  warning: link service_corridor: the manifest has no link from this door yet: a new link to add
+OK world/wing_cinema.json: 73 colliders, 7 doors, 1 markers, 5 links, 0 zones, 3 spots, 0 errors, 6 warnings
+  warning: scene wing_entertainment is not in the world manifest yet: a new scene to add
+  warning: link entrance: the manifest has no link from this door yet: a new link to add
+  warning: link food_court: the manifest has no link from this door yet: a new link to add
+  warning: link scene_2991: the manifest has no link from this door yet: a new link to add
+  warning: link scene_3008: the manifest has no link from this door yet: a new link to add
+  warning: link service_corridor: the manifest has no link from this door yet: a new link to add
+OK world/wing_entertainment.json: 68 colliders, 7 doors, 1 markers, 5 links, 0 zones, 3 spots, 0 errors, 6 warnings
+  warning: scene bookstore is not in the world manifest yet: a new scene to add
+  warning: link bookstore_desk: the manifest has no link from this door yet: a new link to add
+  warning: link wing_books: the manifest has no link from this door yet: a new link to add
+OK world/bookstore.json: 23 colliders, 3 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 3 warnings
+  warning: scene bookstore_desk is not in the world manifest yet: a new scene to add
+  warning: link bookstore: the manifest has no link from this door yet: a new link to add
+OK world/bookstore_desk.json: 18 colliders, 2 doors, 1 markers, 1 links, 0 zones, 3 spots, 0 errors, 2 warnings
+  warning: scene cinema_lobby is not in the world manifest yet: a new scene to add
+  warning: link wing_cinema: the manifest has no link from this door yet: a new link to add
+OK world/cinema_lobby.json: 33 colliders, 2 doors, 1 markers, 1 links, 0 zones, 5 spots, 0 errors, 2 warnings
+  warning: scene scene_2909 is not in the world manifest yet: a new scene to add
+  warning: link sky_hall_01: the manifest has no link from this door yet: a new link to add
+  warning: link wing_books: the manifest has no link from this door yet: a new link to add
+OK world/scene_2909.json: 41 colliders, 2 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 3 warnings
+  warning: scene scene_3012 is not in the world manifest yet: a new scene to add
+  warning: link sky_hall_01: the manifest has no link from this door yet: a new link to add
+  warning: link sky_hall_02: the manifest has no link from this door yet: a new link to add
+  warning: link wing_cinema: the manifest has no link from this door yet: a new link to add
+OK world/scene_3012.json: 46 colliders, 3 doors, 1 markers, 3 links, 0 zones, 4 spots, 0 errors, 4 warnings
+  warning: scene scene_2991 is not in the world manifest yet: a new scene to add
+  warning: link sky_hall_04: the manifest has no link from this door yet: a new link to add
+  warning: link wing_entertainment: the manifest has no link from this door yet: a new link to add
+OK world/scene_2991.json: 38 colliders, 2 doors, 1 markers, 2 links, 0 zones, 4 spots, 0 errors, 3 warnings
+  warning: scene scene_3008 is not in the world manifest yet: a new scene to add
+  warning: link sky_hall_02: the manifest has no link from this door yet: a new link to add
+  warning: link sky_hall_03: the manifest has no link from this door yet: a new link to add
+  warning: link wing_entertainment: the manifest has no link from this door yet: a new link to add
+OK world/scene_3008.json: 62 colliders, 3 doors, 1 markers, 3 links, 0 zones, 4 spots, 0 errors, 4 warnings
+  warning: scene mirror_bathroom is not in the world manifest yet: a new scene to add
+  warning: link mirror: the manifest has no link from this door yet: a new link to add
+  warning: link wing_cinema: the manifest has no link from this door yet: a new link to add
+OK world/mirror_bathroom.json: 22 colliders, 5 doors, 1 markers, 2 links, 0 zones, 8 spots, 0 errors, 3 warnings
+  warning: scene food_court is not in the world manifest yet: a new scene to add
+  warning: link entrance: the manifest has no link from this door yet: a new link to add
+  warning: link service_corridor: the manifest has no link from this door yet: a new link to add
+  warning: link wing_entertainment: the manifest has no link from this door yet: a new link to add
+OK world/food_court.json: 106 colliders, 5 doors, 1 markers, 3 links, 0 zones, 5 spots, 0 errors, 4 warnings
+  warning: scene construction is not in the world manifest yet: a new scene to add
+  warning: link sky_hall_04: the manifest has no link from this door yet: a new link to add
+  warning: link wing_books: the manifest has no link from this door yet: a new link to add
+OK world/construction.json: 60 colliders, 2 doors, 1 markers, 2 links, 1 zones, 3 spots, 0 errors, 3 warnings
+  warning: scene service_corridor is not in the world manifest yet: a new scene to add
+  warning: link food_court: the manifest has no link from this door yet: a new link to add
+  warning: link network: the manifest has no link from this door yet: a new link to add
+  warning: link wing_books: the manifest has no link from this door yet: a new link to add
+  warning: link wing_cinema: the manifest has no link from this door yet: a new link to add
+  warning: link wing_entertainment: the manifest has no link from this door yet: a new link to add
+OK world/service_corridor.json: 36 colliders, 6 doors, 1 markers, 5 links, 0 zones, 3 spots, 0 errors, 6 warnings
+  warning: scene sky_hall_01 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link exit: the manifest has no link from this door yet: a new link to add
+OK world/sky_hall_01.json: 10 colliders, 2 doors, 2 markers, 2 links, 0 zones, 0 spots, 0 errors, 3 warnings
+  warning: scene sky_hall_02 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link exit: the manifest has no link from this door yet: a new link to add
+OK world/sky_hall_02.json: 10 colliders, 2 doors, 2 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene sky_hall_03 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link exit: the manifest has no link from this door yet: a new link to add
+OK world/sky_hall_03.json: 10 colliders, 2 doors, 2 markers, 2 links, 0 zones, 0 spots, 0 errors, 3 warnings
+  warning: scene sky_hall_04 is not in the world manifest yet: a new scene to add
+  warning: link entry: the manifest has no link from this door yet: a new link to add
+  warning: link exit: the manifest has no link from this door yet: a new link to add
+OK world/sky_hall_04.json: 10 colliders, 2 doors, 2 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+exit 0
+
+node --test shared/*.test.js
+  tests 297
+  pass 297
+  fail 0
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over the 77 files of this commit (with CHECKS.txt and export_scene.py) and the owner sheet
+  privacy grep: 0 with hits (the sheets' Windows font folder is allowed)
+
+export check: every world/<scene>.json from Blender equals --preview's (the model alone): all 18 equal

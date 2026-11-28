@@ -1,0 +1,83 @@
+{
+ "0": {
+  "size": 2048,
+  "px_per_m": 70.3,
+  "scale": 1.2284,
+  "knee": 0.5353,
+  "raw_p50_p90_p99_p995_max": [
+   0.372,
+   1.009,
+   3.134,
+   5.603,
+   37.765
+  ],
+  "p50_p90_p99_p995_max": [
+   0.372,
+   0.833,
+   1.149,
+   1.228,
+   1.321
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 104,
+  "materials": [
+   "Carpet_Apart",
+   "Carpet_Green",
+   "Carpet_Motel",
+   "Ceiling_Hall",
+   "Door_Jamb",
+   "Fascia_Paint",
+   "Floor_Tile",
+   "Soffit_Plaster",
+   "Wall_Hall",
+   "Wall_Tile"
+  ]
+ },
+ "1": {
+  "size": 2048,
+  "px_per_m": 18.0,
+  "scale": 0.7823,
+  "knee": 0.3298,
+  "raw_p50_p90_p99_p995_max": [
+   0.079,
+   0.649,
+   1.991,
+   5.618,
+   134.889
+  ],
+  "p50_p90_p99_p995_max": [
+   0.079,
+   0.524,
+   0.711,
+   0.782,
+   0.823
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 74,
+  "materials": [
+   "Brass",
+   "Comb_Yellow",
+   "Decal_Floor",
+   "Esc_Clad",
+   "Esc_Handrail",
+   "Esc_Panel",
+   "Esc_Plate",
+   "Esc_Riser",
+   "Esc_Skirt",
+   "Esc_Tread",
+   "Fascia_Paint",
+   "Iron_Black",
+   "Lamp_Dead",
+   "Leaf_Esc",
+   "Leaf_Glass",
+   "Plastic_Black",
+   "Plastic_White",
+   "Red_Paint",
+   "Sign_Green",
+   "Steel",
+   "Trim_Steel"
+  ]
+ }
+}

@@ -1,0 +1,66 @@
+{
+ "0": {
+  "set": "day",
+  "size": 1536,
+  "px_per_m": 48.9,
+  "scale": 1.6178,
+  "knee": 0.8408,
+  "raw_p50_p90_p99_p995_max": [
+   0.416,
+   1.484,
+   2.709,
+   2.865,
+   3.831
+  ],
+  "p50_p90_p99_p995_max": [
+   0.416,
+   1.267,
+   1.594,
+   1.618,
+   1.728
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 44,
+  "materials": [
+   "Carpet_Fleck",
+   "Ceiling_Teal",
+   "Wall_Teal"
+  ]
+ },
+ "1": {
+  "set": "day",
+  "size": 1536,
+  "px_per_m": 81.6,
+  "scale": 1.0427,
+  "knee": 0.5066,
+  "raw_p50_p90_p99_p995_max": [
+   0.16,
+   1.058,
+   2.209,
+   2.326,
+   18.368
+  ],
+  "p50_p90_p99_p995_max": [
+   0.16,
+   0.826,
+   1.032,
+   1.043,
+   1.236
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 61,
+  "materials": [
+   "Dome",
+   "Leather",
+   "Paper_Back",
+   "Paper_Teal",
+   "Plant_Leaf",
+   "Sofa_Foot",
+   "Soil",
+   "Terracotta",
+   "Trim_Teal"
+  ]
+ }
+}

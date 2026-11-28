@@ -1,0 +1,291 @@
+{
+ "scene": "rdwe_kids_bedroom",
+ "colliders": [
+  {
+   "s": "Bed",
+   "min": [
+    -3.8,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -1.8,
+    0.6,
+    -1.0
+   ]
+  },
+  {
+   "s": "Beyond_closet",
+   "min": [
+    4.35,
+    -0.05,
+    -2.81
+   ],
+   "max": [
+    4.55,
+    2.19,
+    -1.19
+   ]
+  },
+  {
+   "s": "Bookshelf",
+   "min": [
+    -4.0,
+    0.0,
+    0.8
+   ],
+   "max": [
+    -3.65,
+    1.6,
+    2.4
+   ]
+  },
+  {
+   "s": "Desk",
+   "min": [
+    1.4,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    3.0,
+    0.75,
+    -3.4
+   ]
+  },
+  {
+   "s": "Desk_Chair",
+   "min": [
+    2.0,
+    0.0,
+    -3.2
+   ],
+   "max": [
+    2.5,
+    0.85,
+    -2.7
+   ]
+  },
+  {
+   "s": "Nightstand",
+   "min": [
+    -1.7,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -1.2,
+    0.55,
+    -3.5
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -4.2,
+    2.8,
+    -4.2
+   ],
+   "max": [
+    4.2,
+    3.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -4.2,
+    -0.3,
+    -4.2
+   ],
+   "max": [
+    4.2,
+    0.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    4.0,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    4.2,
+    2.8,
+    -2.58
+   ]
+  },
+  {
+   "s": "Room_Wall_E_2",
+   "min": [
+    4.0,
+    2.08,
+    -2.58
+   ],
+   "max": [
+    4.2,
+    2.8,
+    -1.42
+   ]
+  },
+  {
+   "s": "Room_Wall_E_3",
+   "min": [
+    4.0,
+    0.0,
+    -1.42
+   ],
+   "max": [
+    4.2,
+    2.8,
+    4.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -4.2,
+    0.0,
+    -4.2
+   ],
+   "max": [
+    4.2,
+    2.8,
+    -4.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -4.2,
+    0.0,
+    4.0
+   ],
+   "max": [
+    4.2,
+    2.8,
+    4.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -4.2,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -4.0,
+    2.8,
+    4.0
+   ]
+  },
+  {
+   "s": "Toy_Chest",
+   "min": [
+    2.0,
+    0.0,
+    2.6
+   ],
+   "max": [
+    3.4,
+    0.6,
+    3.6
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_closet",
+   "level": "rdwe_kids_bedroom",
+   "hinge": [
+    4.0,
+    0.0,
+    -2.56
+   ],
+   "width": 1.12,
+   "height": 2.04,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "closet",
+   "look": "mirror-faced teal paint door, push plate"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "closet",
+   "at": [
+    3.25,
+    0.0,
+    -2.0
+   ],
+   "arrive": [
+    2.1,
+    0.0,
+    -2.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "hatch",
+   "at": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    0.6,
+    0.0,
+    0.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "notes",
+   "name": "Spot_notes_1",
+   "position": [
+    -2.6,
+    0.0,
+    -0.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the notes under the bed: someone counted the days here"
+  },
+  {
+   "kind": "stars",
+   "name": "Spot_stars_1",
+   "position": [
+    0.8,
+    0.0,
+    -1.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the glow stars: they make the same shape as the hallway's doors"
+  }
+ ]
+}

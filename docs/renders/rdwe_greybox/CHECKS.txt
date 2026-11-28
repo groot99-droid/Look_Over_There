@@ -1,0 +1,237 @@
+## python tools/blender/build_rdwe_greybox.py --check .
+GATE links: 54 pairs with both sides built (108 sides, the one-way ones included), 2 that loop on their own room, 5 that leave the set; 115 links in the files, every one accounted for
+GATE navigable: 43 of 43 rooms reachable from rdwe_dining; 42 can get back to it (no true exit: the finale's one way out is the ending)
+GATE overlaps: 0 interpenetrating collider pairs of 35164 checked (none allowed)
+GATE clearances: 326 links, arrivals, spots and spawns clear by 0.28 m with a floor under them; 248 door-front points (0.5 and 1 m in) clear
+GATE steps: 56 step boxes in 6 flights, one box a step; the highest rise 0.250 m (at most 0.27 m)
+GATE corridors: 13 corridor rects, the narrowest 2.00 m (at least 1.6 m), none blocked
+GATE extent: the largest room is 50.4 m across (a store floor, about 52 m, at most)
+GATE spots: every room has its trick's spot and the ones it needs; 10 SecCam; agent x6, beacon x1, book x1, buttons x1, cake x1, cards x1, cart x1, chandelier x1, change x3, clock x1, computer x4, count x1, dark x1, end x1, far x2, frame x1, grid x4, hide x12, hum x1, lamp x1, lap x1, locker x1, map x1, monitor x1, moon x1, note x1, notebook x1, notes x1, painting x1, photo x6, plaque x1, scuff x1, seam x1, seeker x1, stars x1, statue x1, switch x4, ticket x1, tin x3, trick x13, tv x1, view x4, watch x1, window x1, word x1
+GATE overlaps: 0 interpenetrating collider pairs of 35141 checked (none allowed)
+GATE clearances: 344 links, arrivals, spots and spawns clear by 0.28 m with a floor under them; 248 door-front points (0.5 and 1 m in) clear
+GATE steps: 56 step boxes in 6 flights, one box a step; the highest rise 0.250 m (at most 0.27 m)
+GATE corridors: 14 corridor rects, the narrowest 2.00 m (at least 1.6 m), none blocked
+GATE extent: the largest room is 50.4 m across (a store floor, about 52 m, at most)
+GATE spots: every room has its trick's spot and the ones it needs; 10 SecCam; agent x6, beacon x1, book x3, buttons x3, cake x1, cart x1, change x3, clock x2, computer x4, dark x3, frame x1, grid x6, hide x12, hum x1, lamp x1, lap x1, locker x3, map x3, monitor x2, moon x2, note x1, notes x1, photo x5, scuff x1, seeker x1, statue x3, switch x4, ticket x3, tin x3, trick x21, tv x3, view x6, watch x1, window x1
+GATE doors: 124 door leaves, no two with the same look; 103 exits with one Link_ each, 4 arrival-only, 17 that never open; every exit fixed
+GATES PASS
+
+## node tools/worlddoc.mjs check world/rdwe_*.json
+warning: scene rdwe_ames_room is not in the world manifest yet: a new scene to add
+  warning: link grid: the manifest has no link from this door yet: a new link to add
+  warning: link small: the manifest has no link from this door yet: a new link to add
+  warning: link word: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_ames_room.json: 24 colliders, 3 doors, 0 markers, 3 links, 0 zones, 3 spots, 0 errors, 4 warnings
+  warning: scene rdwe_anamorphic_room is not in the world manifest yet: a new scene to add
+  warning: link painted: the manifest has no link from this door yet: a new link to add
+  warning: link word: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_anamorphic_room.json: 17 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_attic is not in the world manifest yet: a new scene to add
+  warning: link hatch: the manifest has no link from this door yet: a new link to add
+  warning: link party: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_attic.json: 22 colliders, 1 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_bending_hall is not in the world manifest yet: a new scene to add
+  warning: link lap: the manifest has no link from this door yet: a new link to add
+  warning: link start: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_bending_hall.json: 25 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_birthday_party is not in the world manifest yet: a new scene to add
+  warning: link attic: the manifest has no link from this door yet: a new link to add
+  warning: link table: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_birthday_party.json: 26 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_changing_rooms is not in the world manifest yet: a new scene to add
+OK world/rdwe_birthday_party.json: 13 colliders, 2 doors, 0 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+warning: scene rdwe_changing_rooms is not in the world manifest yet: a new scene to add
+  warning: link flooded: the manifest has no link from this door yet: a new link to add
+  warning: link locker: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_changing_rooms.json: 22 colliders, 2 doors, 0 markers, 2 links, 1 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_crossroads is not in the world manifest yet: a new scene to add
+  warning: link east: the manifest has no link from this door yet: a new link to add
+  warning: link north: the manifest has no link from this door yet: a new link to add
+  warning: link south: the manifest has no link from this door yet: a new link to add
+  warning: link west: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_crossroads.json: 31 colliders, 4 doors, 0 markers, 4 links, 0 zones, 2 spots, 0 errors, 5 warnings
+  warning: scene rdwe_dining is not in the world manifest yet: a new scene to add
+  warning: link house: the manifest has no link from this door yet: a new link to add
+  warning: link loop: the manifest has no link from this door yet: a new link to add
+  warning: link pantry: the manifest has no link from this door yet: a new link to add
+  warning: link stairs: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_dining.json: 52 colliders, 4 doors, 1 markers, 4 links, 0 zones, 4 spots, 0 errors, 5 warnings
+warning: scene rdwe_dont_look is not in the world manifest yet: a new scene to add
+  warning: link mirror: the manifest has no link from this door yet: a new link to add
+  warning: link statue: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_dont_look.json: 19 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+  warning: scene rdwe_door_hall is not in the world manifest yet: a new scene to add
+  warning: link d3: the manifest has no link from this door yet: a new link to add
+  warning: link d6: the manifest has no link from this door yet: a new link to add
+  warning: link d9: the manifest has no link from this door yet: a new link to add
+  warning: link hallway: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_door_hall.json: 53 colliders, 13 doors, 0 markers, 4 links, 0 zones, 2 spots, 0 errors, 5 warnings
+  warning: scene rdwe_elevator_lobby is not in the world manifest yet: a new scene to add
+OK world/rdwe_door_hall.json: 46 colliders, 13 doors, 0 markers, 4 links, 0 zones, 1 spots, 0 errors, 5 warnings
+warning: scene rdwe_elevator_lobby is not in the world manifest yet: a new scene to add
+  warning: link crossroads: the manifest has no link from this door yet: a new link to add
+  warning: link lift_1: the manifest has no link from this door yet: a new link to add
+  warning: link lift_2: the manifest has no link from this door yet: a new link to add
+  warning: link lift_3: the manifest has no link from this door yet: a new link to add
+  warning: link lift_4: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_elevator_lobby.json: 29 colliders, 5 doors, 0 markers, 5 links, 0 zones, 3 spots, 0 errors, 6 warnings
+  warning: scene rdwe_finale is not in the world manifest yet: a new scene to add
+  warning: link grocery: the manifest has no link from this door yet: a new link to add
+  warning: link win: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_finale.json: 67 colliders, 2 doors, 0 markers, 2 links, 1 zones, 23 spots, 0 errors, 3 warnings
+  warning: scene rdwe_flooded is not in the world manifest yet: a new scene to add
+  warning: link arch: the manifest has no link from this door yet: a new link to add
+  warning: link frame: the manifest has no link from this door yet: a new link to add
+  warning: link grate: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_flooded.json: 21 colliders, 3 doors, 0 markers, 3 links, 1 zones, 2 spots, 0 errors, 4 warnings
+  warning: scene rdwe_giant_chair is not in the world manifest yet: a new scene to add
+  warning: link high: the manifest has no link from this door yet: a new link to add
+  warning: link kitchen: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_giant_chair.json: 45 colliders, 2 doors, 0 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+  warning: scene rdwe_green_grid is not in the world manifest yet: a new scene to add
+OK world/rdwe_giant_chair.json: 28 colliders, 2 doors, 0 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+warning: scene rdwe_green_grid is not in the world manifest yet: a new scene to add
+  warning: link seam: the manifest has no link from this door yet: a new link to add
+  warning: link teal2: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_green_grid.json: 31 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+  warning: scene rdwe_grocery is not in the world manifest yet: a new scene to add
+  warning: link entrance: the manifest has no link from this door yet: a new link to add
+  warning: link exit: the manifest has no link from this door yet: a new link to add
+  warning: link glow: the manifest has no link from this door yet: a new link to add
+  warning: link gods: the manifest has no link from this door yet: a new link to add
+  warning: link stockroom: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_grocery.json: 189 colliders, 4 doors, 0 markers, 5 links, 0 zones, 4 spots, 0 errors, 6 warnings
+  warning: scene rdwe_hallway is not in the world manifest yet: a new scene to add
+  warning: link dining: the manifest has no link from this door yet: a new link to add
+  warning: link door_a: the manifest has no link from this door yet: a new link to add
+  warning: link door_b: the manifest has no link from this door yet: a new link to add
+  warning: link door_c: the manifest has no link from this door yet: a new link to add
+  warning: link well: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_hallway.json: 65 colliders, 10 doors, 0 markers, 5 links, 0 zones, 1 spots, 0 errors, 6 warnings
+  warning: scene rdwe_kids_bedroom is not in the world manifest yet: a new scene to add
+  warning: link closet: the manifest has no link from this door yet: a new link to add
+  warning: link hatch: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_kids_bedroom.json: 15 colliders, 1 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_laundromat is not in the world manifest yet: a new scene to add
+OK world/rdwe_kids_bedroom.json: 11 colliders, 1 doors, 0 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+warning: scene rdwe_laundromat is not in the world manifest yet: a new scene to add
+  warning: link drum: the manifest has no link from this door yet: a new link to add
+  warning: link lockers: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_laundromat.json: 24 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+warning: scene rdwe_lights_out is not in the world manifest yet: a new scene to add
+  warning: link three: the manifest has no link from this door yet: a new link to add
+  warning: link void: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_lights_out.json: 18 colliders, 2 doors, 0 markers, 2 links, 0 zones, 4 spots, 0 errors, 3 warnings
+  warning: scene rdwe_long_table is not in the world manifest yet: a new scene to add
+  warning: link dining: the manifest has no link from this door yet: a new link to add
+  warning: link kitchen: the manifest has no link from this door yet: a new link to add
+  warning: link party: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_long_table.json: 37 colliders, 3 doors, 0 markers, 3 links, 0 zones, 2 spots, 0 errors, 4 warnings
+  warning: scene rdwe_map_room is not in the world manifest yet: a new scene to add
+OK world/rdwe_long_table.json: 24 colliders, 3 doors, 0 markers, 3 links, 0 zones, 1 spots, 0 errors, 4 warnings
+warning: scene rdwe_map_room is not in the world manifest yet: a new scene to add
+  warning: link door: the manifest has no link from this door yet: a new link to add
+  warning: link lift: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_map_room.json: 17 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_melting_library is not in the world manifest yet: a new scene to add
+  warning: link arch: the manifest has no link from this door yet: a new link to add
+  warning: link map: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_melting_library.json: 22 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_mirror_room is not in the world manifest yet: a new scene to add
+  warning: link moon: the manifest has no link from this door yet: a new link to add
+  warning: link reflection: the manifest has no link from this door yet: a new link to add
+  warning: link three: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_mirror_room.json: 27 colliders, 3 doors, 0 markers, 3 links, 0 zones, 3 spots, 0 errors, 4 warnings
+warning: scene rdwe_moon_window is not in the world manifest yet: a new scene to add
+  warning: link hall: the manifest has no link from this door yet: a new link to add
+  warning: link sill: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_moon_window.json: 19 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_motel_room is not in the world manifest yet: a new scene to add
+  warning: link bathroom: the manifest has no link from this door yet: a new link to add
+  warning: link drum: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_motel_room.json: 20 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_office_night is not in the world manifest yet: a new scene to add
+  warning: link lift: the manifest has no link from this door yet: a new link to add
+  warning: link stairs: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_office_night.json: 72 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_painted_door is not in the world manifest yet: a new scene to add
+  warning: link doors: the manifest has no link from this door yet: a new link to add
+  warning: link painted: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_painted_door.json: 15 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_repeating_room is not in the world manifest yet: a new scene to add
+  warning: link again: the manifest has no link from this door yet: a new link to add
+  warning: link library: the manifest has no link from this door yet: a new link to add
+  warning: link lift: the manifest has no link from this door yet: a new link to add
+  warning: link secret_ops: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_repeating_room.json: 31 colliders, 5 doors, 0 markers, 4 links, 0 zones, 4 spots, 0 errors, 5 warnings
+warning: scene rdwe_shrink_hall is not in the world manifest yet: a new scene to add
+  warning: link ames: the manifest has no link from this door yet: a new link to add
+  warning: link small: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_shrink_hall.json: 22 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_stair_loop is not in the world manifest yet: a new scene to add
+  warning: link hall: the manifest has no link from this door yet: a new link to add
+  warning: link landing: the manifest has no link from this door yet: a new link to add
+  warning: link top: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_stair_loop.json: 46 colliders, 3 doors, 0 markers, 3 links, 0 zones, 2 spots, 0 errors, 4 warnings
+  warning: scene rdwe_stretching_hall is not in the world manifest yet: a new scene to add
+  warning: link doors: the manifest has no link from this door yet: a new link to add
+  warning: link far: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_stretching_hall.json: 50 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_teal is not in the world manifest yet: a new scene to add
+  warning: link sleep: the manifest has no link from this door yet: a new link to add
+  warning: link void: the manifest has no link from this door yet: a new link to add
+  warning: link well: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_teal.json: 17 colliders, 2 doors, 0 markers, 3 links, 0 zones, 2 spots, 0 errors, 4 warnings
+  warning: scene rdwe_teal2 is not in the world manifest yet: a new scene to add
+  warning: link arch: the manifest has no link from this door yet: a new link to add
+  warning: link grid: the manifest has no link from this door yet: a new link to add
+  warning: link sleep: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_teal2.json: 15 colliders, 2 doors, 0 markers, 3 links, 0 zones, 3 spots, 0 errors, 4 warnings
+  warning: scene rdwe_three_doors is not in the world manifest yet: a new scene to add
+  warning: link back: the manifest has no link from this door yet: a new link to add
+  warning: link left: the manifest has no link from this door yet: a new link to add
+  warning: link middle: the manifest has no link from this door yet: a new link to add
+  warning: link right: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_three_doors.json: 23 colliders, 4 doors, 0 markers, 4 links, 0 zones, 1 spots, 0 errors, 5 warnings
+  warning: scene rdwe_tilted_hall is not in the world manifest yet: a new scene to add
+  warning: link end: the manifest has no link from this door yet: a new link to add
+  warning: link stairs: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_tilted_hall.json: 37 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_tiny_kitchen is not in the world manifest yet: a new scene to add
+  warning: link back: the manifest has no link from this door yet: a new link to add
+  warning: link table: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_tiny_kitchen.json: 24 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_trampoline is not in the world manifest yet: a new scene to add
+  warning: link bounce: the manifest has no link from this door yet: a new link to add
+  warning: link glow: the manifest has no link from this door yet: a new link to add
+  warning: link gods: the manifest has no link from this door yet: a new link to add
+  warning: link vent: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_trampoline.json: 18 colliders, 2 doors, 0 markers, 4 links, 1 zones, 2 spots, 0 errors, 5 warnings
+  warning: scene rdwe_upside_room is not in the world manifest yet: a new scene to add
+  warning: link chair: the manifest has no link from this door yet: a new link to add
+  warning: link hall: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_upside_room.json: 13 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 3 warnings
+  warning: scene rdwe_vending_room is not in the world manifest yet: a new scene to add
+OK world/rdwe_upside_room.json: 13 colliders, 2 doors, 0 markers, 2 links, 0 zones, 1 spots, 0 errors, 3 warnings
+warning: scene rdwe_vending_room is not in the world manifest yet: a new scene to add
+  warning: link lift: the manifest has no link from this door yet: a new link to add
+  warning: link machine: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_vending_room.json: 22 colliders, 3 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_void_room is not in the world manifest yet: a new scene to add
+  warning: link lit: the manifest has no link from this door yet: a new link to add
+  warning: link teal: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_void_room.json: 15 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_waiting_room is not in the world manifest yet: a new scene to add
+  warning: link number: the manifest has no link from this door yet: a new link to add
+  warning: link three: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_waiting_room.json: 21 colliders, 2 doors, 0 markers, 2 links, 0 zones, 3 spots, 0 errors, 3 warnings
+warning: scene rdwe_wrong_clock is not in the world manifest yet: a new scene to add
+  warning: link gallery: the manifest has no link from this door yet: a new link to add
+  warning: link hands: the manifest has no link from this door yet: a new link to add
+  warning: link waiting: the manifest has no link from this door yet: a new link to add
+OK world/rdwe_wrong_clock.json: 30 colliders, 3 doors, 0 markers, 3 links, 0 zones, 2 spots, 0 errors, 4 warnings
+
+## node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0

@@ -1,0 +1,22 @@
+{
+ "gain": 1.6934,
+ "target_p99": 0.98,
+ "target_p90": 0.9,
+ "factor": {
+  "Leaf_Room": 1.6934,
+  "Brass": 1.6934,
+  "Decal_Ceiling": 1.6934,
+  "Decal_Floor": 1.6934,
+  "Lamp_Dead": 1.6934,
+  "Plastic_Black": 1.6934,
+  "Plastic_White": 1.6934,
+  "Skirting": 1.6934,
+  "Trim_Wood": 1.6934,
+  "Carpet_Field": 1.6934,
+  "Ceiling_Popcorn": 1.6934,
+  "Door_Jamb": 1.6934,
+  "Threshold": 1.6934,
+  "Wall_Lower": 1.6934,
+  "Wall_Upper": 1.6934
+ }
+}

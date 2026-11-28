@@ -1,0 +1,69 @@
+{
+ "0": {
+  "set": "day",
+  "size": 1536,
+  "px_per_m": 47.8,
+  "scale": 1.9027,
+  "knee": 0.9008,
+  "raw_p50_p90_p99_p995_max": [
+   0.449,
+   1.75,
+   4.222,
+   4.776,
+   6.833
+  ],
+  "p50_p90_p99_p995_max": [
+   0.449,
+   1.422,
+   1.861,
+   1.903,
+   2.001
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 24,
+  "materials": [
+   "Carpet_Fleck",
+   "Ceiling_Teal",
+   "Wall_Teal"
+  ]
+ },
+ "1": {
+  "set": "day",
+  "size": 1536,
+  "px_per_m": 84.5,
+  "scale": 1.5418,
+  "knee": 0.6706,
+  "raw_p50_p90_p99_p995_max": [
+   0.241,
+   0.911,
+   2.143,
+   7.175,
+   19.223
+  ],
+  "p50_p90_p99_p995_max": [
+   0.241,
+   0.865,
+   1.268,
+   1.542,
+   1.625
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 76,
+  "materials": [
+   "Dome",
+   "Iron",
+   "Leaf_Glass",
+   "Leaf_Stone",
+   "Leather",
+   "Leather_Seam",
+   "Plant_Leaf",
+   "Sill",
+   "Sofa_Foot",
+   "Soil",
+   "Stone_Planter",
+   "Trim_Teal"
+  ]
+ }
+}

@@ -1,0 +1,58 @@
+blender (on the render box): tools/blender/dress_overworld.py -- --scene tree_house --samples 512 --render-samples 128
+EXPORT_SCENE tree_house_layout.json: 53 colliders, 2 doors, 0 cameras, 0 markers, 2 links, 0 zones, 2 spots
+GATE export: world/tree_house.json from the dressed .blend EQUALS the greybox's
+PASS  STRAY  25 tall solid mesh(es), each over a collider; 34 decor_* mesh(es) exempt
+PASS  CLEAR  links.addon.arrive (0.00, 2.60): clear within 0.28 m
+PASS  CLEAR  links.addon.at (0.00, 1.95): clear within 0.28 m
+PASS  CLEAR  links.playground.arrive (19.40, 0.00): clear within 0.28 m
+PASS  CLEAR  links.playground.at (22.60, 0.00): clear within 0.28 m
+PASS: 54 of 54 checks passed
+GATE layout check: PASS
+GATES_IN_BLENDER PASS
+CYCLES device: GPU
+BAKE {'size': 2048, 'px_per_m': 19.0, 'samples': 512, 'ao_distance_m': 2.5, 'ao_p1_p10_p50_p90': [0.002, 0.03, 0.855, 1.0], 'materials': ['Bark', 'Deck', 'Grass', 'Hedge', 'Leaf_Lilac', 'Leaf_Mint', 'Leaf_Pink', 'Mushroom_Cap', 'Mushroom_Stem', 'Puzzle_Board', 'Shingles', 'Siding', 'Steel', 'Stone', 'Trim_White'], 'seconds': 44, 'device': 'GPU'}
+CYCLES device: GPU
+PASS  COVER lines (one per collider, each covered by art within 5 cm): 49
+
+python tools/blender/build_overworld_greybox.py --check .
+GATES PASS
+
+node tools/worlddoc.mjs check world/tree_house.json
+  warning: link addon: the manifest has no link from this door yet: a new link to add
+  warning: link playground: the manifest has no link from this door yet: a new link to add
+OK world/tree_house.json: 53 colliders, 2 doors, 0 markers, 2 links, 0 zones, 2 spots, 0 errors, 2 warnings
+
+glb_inspect.py world/tree_house.glb --budget tris=300000,mb=8
+triangles  23185 drawn, in 24 mesh(es), 24 instance(s)
+materials  23: Bark, Deck, Door_Wood, Flower_Blue, Flower_Pink, Flower_Stem, Flower_White, Flower_Yellow, Grass, Hedge, Lamp_Emit, Leaf_Lilac, Leaf_Mint, Leaf_Pink, Mushroom_Cap, Mushroom_Stem, Puzzle_Board, Shingles, Siding, Steel, Stone, Trim_White, Window_Lit
+textures   13, images: 512x512, 1024x1024, 512x512, 1024x1024, 512x512, 512x512, 512x512, 512x512, 1024x560, 512x512, 512x512, 256x256
+bbox       48.0 x 15.1609 x 48.0 (x, y up, z), min [-24.0, -0.3, -24.0]
+requires   EXT_texture_webp
+pass       tris: 23185 triangles, budget 300000
+pass       mb: 1.83 MB, budget 8
+
+brightness (AO-only: base colour x AO texel, linear, under a white ambient of 1; the page's sun adds on top)
+material                m2           map       k    p50    p90    p99     >=1
+Grass               2361.6  tree_house_0  1.0000  0.520  0.569  0.601   0.00%
+Hedge                895.0  tree_house_0  1.0000  0.229  0.301  0.352   0.00%
+Leaf_Mint            787.5  tree_house_0  1.0000  0.604  0.738  0.776   0.00%
+Leaf_Pink            393.3  tree_house_0  1.0000  0.812  0.863  0.896   0.00%
+Deck                 380.0  tree_house_0  1.0000  0.310  0.483  0.517   0.00%
+Leaf_Lilac           297.5  tree_house_0  1.0000  0.812  0.863  0.896   0.00%
+Siding               177.3  tree_house_0  1.0000  0.317  0.585  0.601   0.00%
+Bark                 164.7  tree_house_0  1.0000  0.195  0.260  0.301   0.00%
+Shingles             160.6  tree_house_0  1.0000  0.057  0.387  0.567   0.00%
+Stone                  6.4  tree_house_0  1.0000  0.523  0.604  0.604   0.00%
+Puzzle_Board           5.1  tree_house_0  1.0000  0.012  0.183  0.211   0.00%
+Trim_White             3.7  tree_house_0  1.0000  0.221  0.818  0.824   0.00%
+Mushroom_Cap           1.0  tree_house_0  1.0000  0.399  0.714  0.743   0.00%
+Mushroom_Stem          0.5  tree_house_0  1.0000  0.206  0.419  0.454   0.00%
+Steel                  0.2  tree_house_0  1.0000  0.076  0.259  0.278   0.00%
+
+node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over this scene's files, the .blend decompressed
+privacy grep: 34 files, 0 with hits

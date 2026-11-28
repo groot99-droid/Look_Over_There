@@ -1,0 +1,3553 @@
+{
+ "source": "blender/Look_Over_There.blend (read-only)",
+ "made_by": "tools/blender/backrooms_L1_stairdoors.py",
+ "blender": "5.2.1 LTS",
+ "stairs": {
+  "B1_L1": {
+   "parts": {
+    "Stair_B1_L1_lower_ceil": {
+     "part": "ceil",
+     "materials": [
+      {
+       "name": "M_D_ceil_L1",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.9,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.8333,
+        0.8333,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "ceil_L1_diff.jpg",
+         "file": "ceil_L1_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "ceil_L1_nor.jpg",
+         "file": "ceil_L1_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      0.0085,
+      3.399,
+      2.7
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3333,
+        0.499,
+        2.7
+       ],
+       "max": [
+        1.3504,
+        6.299,
+        2.9
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_B1_L1_lower_housing": {
+     "part": "housing",
+     "materials": [
+      {
+       "name": "M_Fixture_Housing",
+       "base_color": [
+        0.62,
+        0.62,
+        0.6,
+        1.0
+       ],
+       "roughness": 0.6,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0
+      }
+     ],
+     "location": [
+      0.0085,
+      1.399,
+      2.64
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -0.3115,
+        0.779,
+        2.64
+       ],
+       "max": [
+        0.3285,
+        2.019,
+        2.7
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_B1_L1_lower_landing": {
+     "part": "landing",
+     "materials": [
+      {
+       "name": "M_D_floor_L1",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.95,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.8333,
+        0.8333,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "floor_L1_diff.jpg",
+         "file": "floor_L1_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "floor_L1_nor.jpg",
+         "file": "floor_L1_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      0.0085,
+      1.399,
+      -0.2
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3333,
+        0.499,
+        -0.2
+       ],
+       "max": [
+        1.3504,
+        2.299,
+        0.0
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_B1_L1_lower_tube": {
+     "part": "tube",
+     "materials": [
+      {
+       "name": "M_Fluorescent",
+       "base_color": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "roughness": 0.3,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "emission_strength": 6.0
+      }
+     ],
+     "location": [
+      0.0085,
+      1.399,
+      2.61
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -0.2715,
+        0.819,
+        2.61
+       ],
+       "max": [
+        0.2885,
+        1.979,
+        2.64
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_B1_L1_lower_wallHi": {
+     "part": "wallHi",
+     "materials": [
+      {
+       "name": "M_D_wall_L1",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.85,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_L1_diff.jpg",
+         "file": "wall_L1_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_L1_nor.jpg",
+         "file": "wall_L1_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      0.0085,
+      3.399,
+      0.0
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 36,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3333,
+        0.499,
+        0.0
+       ],
+       "max": [
+        -1.1333,
+        6.299,
+        2.7
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1504,
+        0.499,
+        0.0
+       ],
+       "max": [
+        1.3504,
+        6.299,
+        2.7
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.1333,
+        6.099,
+        0.0
+       ],
+       "max": [
+        1.1504,
+        6.299,
+        2.7
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3333,
+        0.499,
+        0.0
+       ],
+       "max": [
+        -0.5415,
+        0.699,
+        2.7
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        0.5586,
+        0.499,
+        0.0
+       ],
+       "max": [
+        1.3504,
+        0.699,
+        2.7
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -0.5415,
+        0.499,
+        2.16
+       ],
+       "max": [
+        0.5586,
+        0.699,
+        2.7
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_B1_L1_lower_wallLo": {
+     "part": "wallLo",
+     "materials": [
+      {
+       "name": "M_D_wall_B1",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.35,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_B1_diff.jpg",
+         "file": "wall_B1_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_B1_nor.jpg",
+         "file": "wall_B1_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      0.0085,
+      3.299,
+      -3.3
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 48,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3333,
+        0.499,
+        -3.3
+       ],
+       "max": [
+        -1.1333,
+        6.099,
+        -3.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3333,
+        0.499,
+        -3.0
+       ],
+       "max": [
+        -1.1333,
+        2.0,
+        -0.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3333,
+        2.2,
+        -3.0
+       ],
+       "max": [
+        -1.1333,
+        6.0,
+        -0.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3333,
+        0.499,
+        -0.2
+       ],
+       "max": [
+        -1.1333,
+        6.099,
+        0.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1504,
+        0.499,
+        -3.3
+       ],
+       "max": [
+        1.3504,
+        6.099,
+        -3.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1504,
+        0.499,
+        -3.0
+       ],
+       "max": [
+        1.3504,
+        2.0,
+        -0.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1504,
+        2.2,
+        -3.0
+       ],
+       "max": [
+        1.3504,
+        6.0,
+        -0.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1504,
+        0.499,
+        -0.2
+       ],
+       "max": [
+        1.3504,
+        6.099,
+        0.0
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    }
+   },
+   "leaf": {
+    "name": "DoorLeaf_Stair_B1_L1_up",
+    "hinge": [
+     -0.5114,
+     0.599,
+     0.0
+    ],
+    "rotation_z_deg": 0.0,
+    "boxes": [
+     {
+      "min": [
+       -0.5114,
+       0.574,
+       0.0
+      ],
+      "max": [
+       0.5285,
+       0.624,
+       2.12
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ],
+    "materials": [
+     {
+      "name": "M_Door",
+      "base_color": [
+       0.42,
+       0.3,
+       0.18,
+       1.0
+      ],
+      "roughness": 0.7,
+      "metallic": 0.0,
+      "emission": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "emission_strength": 0.0
+     }
+    ],
+    "props": {
+     "level": "B1",
+     "door": true,
+     "state": "closed",
+     "stairdoor": true
+    }
+   },
+   "collider": {
+    "name": "COL_StairDoor_B1_L1_lower",
+    "boxes": [
+     {
+      "min": [
+       -1.3333,
+       0.499,
+       -0.2
+      ],
+      "max": [
+       1.3504,
+       2.299,
+       0.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3333,
+       0.499,
+       -3.3
+      ],
+      "max": [
+       -1.1333,
+       6.099,
+       -3.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3333,
+       0.499,
+       -3.0
+      ],
+      "max": [
+       -1.1333,
+       2.0,
+       -0.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3333,
+       2.2,
+       -3.0
+      ],
+      "max": [
+       -1.1333,
+       6.0,
+       -0.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3333,
+       0.499,
+       -0.2
+      ],
+      "max": [
+       -1.1333,
+       6.099,
+       0.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1504,
+       0.499,
+       -3.3
+      ],
+      "max": [
+       1.3504,
+       6.099,
+       -3.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1504,
+       0.499,
+       -3.0
+      ],
+      "max": [
+       1.3504,
+       2.0,
+       -0.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1504,
+       2.2,
+       -3.0
+      ],
+      "max": [
+       1.3504,
+       6.0,
+       -0.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1504,
+       0.499,
+       -0.2
+      ],
+      "max": [
+       1.3504,
+       6.099,
+       0.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3333,
+       0.499,
+       0.0
+      ],
+      "max": [
+       -1.1333,
+       6.299,
+       2.7
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1504,
+       0.499,
+       0.0
+      ],
+      "max": [
+       1.3504,
+       6.299,
+       2.7
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.1333,
+       6.099,
+       0.0
+      ],
+      "max": [
+       1.1504,
+       6.299,
+       2.7
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3333,
+       0.499,
+       0.0
+      ],
+      "max": [
+       -0.5415,
+       0.699,
+       2.7
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       0.5586,
+       0.499,
+       0.0
+      ],
+      "max": [
+       1.3504,
+       0.699,
+       2.7
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -0.5415,
+       0.499,
+       2.16
+      ],
+      "max": [
+       0.5586,
+       0.699,
+       2.7
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3333,
+       0.499,
+       2.7
+      ],
+      "max": [
+       1.3504,
+       6.299,
+       2.9
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ]
+   }
+  },
+  "L1_L2": {
+   "parts": {
+    "Stair_L1_L2_lower_ceil": {
+     "part": "ceil",
+     "materials": [
+      {
+       "name": "M_D_ceil_L2",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.9,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.8333,
+        0.8333,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "ceil_L2_diff.jpg",
+         "file": "ceil_L2_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "ceil_L2_nor.jpg",
+         "file": "ceil_L2_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -0.0074,
+      -7.598,
+      5.9
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3574,
+        -10.808,
+        5.9
+       ],
+       "max": [
+        1.3426,
+        -4.388,
+        6.1
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L1_L2_lower_housing": {
+     "part": "housing",
+     "materials": [
+      {
+       "name": "M_Fixture_Housing",
+       "base_color": [
+        0.62,
+        0.62,
+        0.6,
+        1.0
+       ],
+       "roughness": 0.6,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0
+      }
+     ],
+     "location": [
+      -0.0074,
+      -9.908,
+      5.84
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -0.3274,
+        -10.528,
+        5.84
+       ],
+       "max": [
+        0.3126,
+        -9.288,
+        5.9
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L1_L2_lower_landing": {
+     "part": "landing",
+     "materials": [
+      {
+       "name": "M_D_floor_L2",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.95,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.8333,
+        0.8333,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "floor_L2_diff.jpg",
+         "file": "floor_L2_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "floor_L2_nor.jpg",
+         "file": "floor_L2_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -0.0074,
+      -9.908,
+      3.0
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3574,
+        -10.808,
+        3.0
+       ],
+       "max": [
+        1.3426,
+        -9.008,
+        3.2
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L1_L2_lower_tube": {
+     "part": "tube",
+     "materials": [
+      {
+       "name": "M_Fluorescent",
+       "base_color": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "roughness": 0.3,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "emission_strength": 6.0
+      }
+     ],
+     "location": [
+      -0.0074,
+      -9.908,
+      5.81
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -0.2874,
+        -10.488,
+        5.81
+       ],
+       "max": [
+        0.2726,
+        -9.328,
+        5.84
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L1_L2_lower_wallHi": {
+     "part": "wallHi",
+     "materials": [
+      {
+       "name": "M_D_wall_L2",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.85,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_L2_diff.jpg",
+         "file": "wall_L2_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_L2_nor.jpg",
+         "file": "wall_L2_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -0.0074,
+      -7.598,
+      3.2
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 36,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3574,
+        -10.808,
+        3.2
+       ],
+       "max": [
+        -1.1574,
+        -4.388,
+        5.9
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1426,
+        -10.808,
+        3.2
+       ],
+       "max": [
+        1.3426,
+        -4.388,
+        5.9
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.1574,
+        -4.588,
+        3.2
+       ],
+       "max": [
+        1.1426,
+        -4.388,
+        5.9
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3574,
+        -10.808,
+        3.2
+       ],
+       "max": [
+        -0.5574,
+        -10.608,
+        5.9
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        0.5426,
+        -10.808,
+        3.2
+       ],
+       "max": [
+        1.3426,
+        -10.608,
+        5.9
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -0.5574,
+        -10.808,
+        5.36
+       ],
+       "max": [
+        0.5426,
+        -10.608,
+        5.9
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L1_L2_lower_wallLo": {
+     "part": "wallLo",
+     "materials": [
+      {
+       "name": "M_D_wall_L1",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.85,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_L1_diff.jpg",
+         "file": "wall_L1_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_L1_nor.jpg",
+         "file": "wall_L1_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -0.0074,
+      -7.698,
+      -0.3
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 48,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -1.3574,
+        -10.808,
+        -0.3
+       ],
+       "max": [
+        -1.1574,
+        -4.588,
+        0.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3574,
+        -10.808,
+        0.0
+       ],
+       "max": [
+        -1.1574,
+        -9.6,
+        3.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3574,
+        -9.4,
+        0.0
+       ],
+       "max": [
+        -1.1574,
+        -9.3811,
+        3.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -1.3574,
+        -10.808,
+        3.0
+       ],
+       "max": [
+        -1.1574,
+        -4.588,
+        3.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1426,
+        -10.808,
+        -0.3
+       ],
+       "max": [
+        1.3426,
+        -4.588,
+        0.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1426,
+        -10.808,
+        0.0
+       ],
+       "max": [
+        1.3426,
+        -9.6,
+        3.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1426,
+        -9.4,
+        0.0
+       ],
+       "max": [
+        1.3426,
+        -9.3811,
+        3.0
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        1.1426,
+        -10.808,
+        3.0
+       ],
+       "max": [
+        1.3426,
+        -4.588,
+        3.2
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    }
+   },
+   "leaf": {
+    "name": "DoorLeaf_Stair_L1_L2_up",
+    "hinge": [
+     -0.5274,
+     -10.708,
+     3.2
+    ],
+    "rotation_z_deg": 0.0,
+    "boxes": [
+     {
+      "min": [
+       -0.5274,
+       -10.733,
+       3.2
+      ],
+      "max": [
+       0.5126,
+       -10.683,
+       5.32
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ],
+    "materials": [
+     {
+      "name": "M_Door",
+      "base_color": [
+       0.42,
+       0.3,
+       0.18,
+       1.0
+      ],
+      "roughness": 0.7,
+      "metallic": 0.0,
+      "emission": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "emission_strength": 0.0
+     }
+    ],
+    "props": {
+     "level": "L1",
+     "door": true,
+     "state": "closed",
+     "stairdoor": true
+    }
+   },
+   "collider": {
+    "name": "COL_StairDoor_L1_L2_lower",
+    "boxes": [
+     {
+      "min": [
+       -1.3574,
+       -10.808,
+       3.0
+      ],
+      "max": [
+       1.3426,
+       -9.008,
+       3.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3574,
+       -10.808,
+       -0.3
+      ],
+      "max": [
+       -1.1574,
+       -4.588,
+       0.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3574,
+       -10.808,
+       0.0
+      ],
+      "max": [
+       -1.1574,
+       -9.6,
+       3.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3574,
+       -9.4,
+       0.0
+      ],
+      "max": [
+       -1.1574,
+       -9.3811,
+       3.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3574,
+       -10.808,
+       3.0
+      ],
+      "max": [
+       -1.1574,
+       -4.588,
+       3.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1426,
+       -10.808,
+       -0.3
+      ],
+      "max": [
+       1.3426,
+       -4.588,
+       0.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1426,
+       -10.808,
+       0.0
+      ],
+      "max": [
+       1.3426,
+       -9.6,
+       3.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1426,
+       -9.4,
+       0.0
+      ],
+      "max": [
+       1.3426,
+       -9.3811,
+       3.0
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1426,
+       -10.808,
+       3.0
+      ],
+      "max": [
+       1.3426,
+       -4.588,
+       3.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3574,
+       -10.808,
+       3.2
+      ],
+      "max": [
+       -1.1574,
+       -4.388,
+       5.9
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       1.1426,
+       -10.808,
+       3.2
+      ],
+      "max": [
+       1.3426,
+       -4.388,
+       5.9
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.1574,
+       -4.588,
+       3.2
+      ],
+      "max": [
+       1.1426,
+       -4.388,
+       5.9
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3574,
+       -10.808,
+       3.2
+      ],
+      "max": [
+       -0.5574,
+       -10.608,
+       5.9
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       0.5426,
+       -10.808,
+       3.2
+      ],
+      "max": [
+       1.3426,
+       -10.608,
+       5.9
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -0.5574,
+       -10.808,
+       5.36
+      ],
+      "max": [
+       0.5426,
+       -10.608,
+       5.9
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -1.3574,
+       -10.808,
+       5.9
+      ],
+      "max": [
+       1.3426,
+       -4.388,
+       6.1
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ]
+   }
+  },
+  "L2_L3": {
+   "parts": {
+    "Stair_L2_L3_lower_ceil": {
+     "part": "ceil",
+     "materials": [
+      {
+       "name": "M_D_ceil_L3",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.9,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.8333,
+        0.8333,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "ceil_L3_diff.jpg",
+         "file": "ceil_L3_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "ceil_L3_nor.jpg",
+         "file": "ceil_L3_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -16.4778,
+      12.728,
+      9.1
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -17.8667,
+        10.078,
+        9.1
+       ],
+       "max": [
+        -15.0889,
+        15.378,
+        9.3
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L2_L3_lower_housing": {
+     "part": "housing",
+     "materials": [
+      {
+       "name": "M_Fixture_Housing",
+       "base_color": [
+        0.62,
+        0.62,
+        0.6,
+        1.0
+       ],
+       "roughness": 0.6,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0
+      }
+     ],
+     "location": [
+      -16.4778,
+      14.478,
+      9.04
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -16.7978,
+        13.858,
+        9.04
+       ],
+       "max": [
+        -16.1578,
+        15.098,
+        9.1
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L2_L3_lower_landing": {
+     "part": "landing",
+     "materials": [
+      {
+       "name": "M_D_floor_L3",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.95,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.8333,
+        0.8333,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "floor_L3_diff.jpg",
+         "file": "floor_L3_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "floor_L3_nor.jpg",
+         "file": "floor_L3_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -16.4778,
+      14.478,
+      6.2
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -17.8667,
+        13.578,
+        6.2
+       ],
+       "max": [
+        -15.0889,
+        15.378,
+        6.4
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L2_L3_lower_tube": {
+     "part": "tube",
+     "materials": [
+      {
+       "name": "M_Fluorescent",
+       "base_color": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "roughness": 0.3,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "emission_strength": 6.0
+      }
+     ],
+     "location": [
+      -16.4778,
+      14.478,
+      9.01
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -16.7578,
+        13.898,
+        9.01
+       ],
+       "max": [
+        -16.1978,
+        15.058,
+        9.04
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L2_L3_lower_wallHi": {
+     "part": "wallHi",
+     "materials": [
+      {
+       "name": "M_D_wall_L3",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.85,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_L3_diff.jpg",
+         "file": "wall_L3_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_L3_nor.jpg",
+         "file": "wall_L3_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -16.4778,
+      12.728,
+      6.4
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 36,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -17.8667,
+        10.078,
+        6.4
+       ],
+       "max": [
+        -17.6667,
+        15.378,
+        9.1
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -15.2889,
+        10.078,
+        6.4
+       ],
+       "max": [
+        -15.0889,
+        15.378,
+        9.1
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -17.6667,
+        10.078,
+        6.4
+       ],
+       "max": [
+        -15.2889,
+        10.278,
+        9.1
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -17.8667,
+        15.178,
+        6.4
+       ],
+       "max": [
+        -17.0278,
+        15.378,
+        9.1
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -15.9278,
+        15.178,
+        6.4
+       ],
+       "max": [
+        -15.0889,
+        15.378,
+        9.1
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -17.0278,
+        15.178,
+        8.56
+       ],
+       "max": [
+        -15.9278,
+        15.378,
+        9.1
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L2_L3_lower_wallLo": {
+     "part": "wallLo",
+     "materials": [
+      {
+       "name": "M_D_wall_L2",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.85,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_L2_diff.jpg",
+         "file": "wall_L2_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_L2_nor.jpg",
+         "file": "wall_L2_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      -16.4778,
+      12.828,
+      2.9
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 48,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        -17.8667,
+        10.278,
+        2.9
+       ],
+       "max": [
+        -17.6667,
+        15.378,
+        3.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -17.8667,
+        12.1694,
+        3.2
+       ],
+       "max": [
+        -17.6667,
+        13.4694,
+        5.4
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -17.8667,
+        10.278,
+        3.2
+       ],
+       "max": [
+        -17.6667,
+        11.3722,
+        6.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -17.8667,
+        14.2667,
+        3.2
+       ],
+       "max": [
+        -17.6667,
+        15.378,
+        6.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -17.8667,
+        10.278,
+        6.2
+       ],
+       "max": [
+        -17.6667,
+        15.378,
+        6.4
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -15.2889,
+        10.278,
+        2.9
+       ],
+       "max": [
+        -15.0889,
+        15.378,
+        3.2
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -15.2889,
+        12.1694,
+        3.2
+       ],
+       "max": [
+        -15.0889,
+        13.4694,
+        5.4
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        -15.2889,
+        10.278,
+        6.2
+       ],
+       "max": [
+        -15.0889,
+        15.378,
+        6.4
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    }
+   },
+   "leaf": {
+    "name": "DoorLeaf_Stair_L2_L3_up",
+    "hinge": [
+     -16.9978,
+     15.278,
+     6.4
+    ],
+    "rotation_z_deg": 0.0,
+    "boxes": [
+     {
+      "min": [
+       -16.9978,
+       15.253,
+       6.4
+      ],
+      "max": [
+       -15.9578,
+       15.303,
+       8.52
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ],
+    "materials": [
+     {
+      "name": "M_Door",
+      "base_color": [
+       0.42,
+       0.3,
+       0.18,
+       1.0
+      ],
+      "roughness": 0.7,
+      "metallic": 0.0,
+      "emission": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "emission_strength": 0.0
+     }
+    ],
+    "props": {
+     "level": "L2",
+     "door": true,
+     "state": "closed",
+     "stairdoor": true
+    }
+   },
+   "collider": {
+    "name": "COL_StairDoor_L2_L3_lower",
+    "boxes": [
+     {
+      "min": [
+       -17.8667,
+       13.578,
+       6.2
+      ],
+      "max": [
+       -15.0889,
+       15.378,
+       6.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       10.278,
+       2.9
+      ],
+      "max": [
+       -17.6667,
+       15.378,
+       3.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       12.1694,
+       3.2
+      ],
+      "max": [
+       -17.6667,
+       13.4694,
+       5.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       10.278,
+       3.2
+      ],
+      "max": [
+       -17.6667,
+       11.3722,
+       6.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       14.2667,
+       3.2
+      ],
+      "max": [
+       -17.6667,
+       15.378,
+       6.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       10.278,
+       6.2
+      ],
+      "max": [
+       -17.6667,
+       15.378,
+       6.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -15.2889,
+       10.278,
+       2.9
+      ],
+      "max": [
+       -15.0889,
+       15.378,
+       3.2
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -15.2889,
+       12.1694,
+       3.2
+      ],
+      "max": [
+       -15.0889,
+       13.4694,
+       5.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -15.2889,
+       10.278,
+       6.2
+      ],
+      "max": [
+       -15.0889,
+       15.378,
+       6.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       10.078,
+       6.4
+      ],
+      "max": [
+       -17.6667,
+       15.378,
+       9.1
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -15.2889,
+       10.078,
+       6.4
+      ],
+      "max": [
+       -15.0889,
+       15.378,
+       9.1
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.6667,
+       10.078,
+       6.4
+      ],
+      "max": [
+       -15.2889,
+       10.278,
+       9.1
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       15.178,
+       6.4
+      ],
+      "max": [
+       -17.0278,
+       15.378,
+       9.1
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -15.9278,
+       15.178,
+       6.4
+      ],
+      "max": [
+       -15.0889,
+       15.378,
+       9.1
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.0278,
+       15.178,
+       8.56
+      ],
+      "max": [
+       -15.9278,
+       15.378,
+       9.1
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       -17.8667,
+       10.078,
+       9.1
+      ],
+      "max": [
+       -15.0889,
+       15.378,
+       9.3
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ]
+   }
+  },
+  "L3_L4": {
+   "parts": {
+    "Stair_L3_L4_lower_ceil": {
+     "part": "ceil",
+     "materials": [
+      {
+       "name": "M_D_ceil_L4",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.9,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.8333,
+        0.8333,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "ceil_L4_diff.jpg",
+         "file": "ceil_L4_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "ceil_L4_nor.jpg",
+         "file": "ceil_L4_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      16.0,
+      -9.55,
+      12.3
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        14.6,
+        -12.2,
+        12.3
+       ],
+       "max": [
+        17.4,
+        -6.9,
+        12.5
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L3_L4_lower_housing": {
+     "part": "housing",
+     "materials": [
+      {
+       "name": "M_Fixture_Housing",
+       "base_color": [
+        0.62,
+        0.62,
+        0.6,
+        1.0
+       ],
+       "roughness": 0.6,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0
+      }
+     ],
+     "location": [
+      16.0,
+      -7.8,
+      12.24
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        15.68,
+        -8.42,
+        12.24
+       ],
+       "max": [
+        16.32,
+        -7.18,
+        12.3
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L3_L4_lower_landing": {
+     "part": "landing",
+     "materials": [
+      {
+       "name": "M_D_floor_L4",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.95,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        0.6667,
+        0.6667,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "floor_L4_diff.jpg",
+         "file": "floor_L4_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "floor_L4_nor.jpg",
+         "file": "floor_L4_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      16.0,
+      -7.8,
+      9.4
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        14.6,
+        -8.7,
+        9.4
+       ],
+       "max": [
+        17.4,
+        -6.9,
+        9.6
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L3_L4_lower_tube": {
+     "part": "tube",
+     "materials": [
+      {
+       "name": "M_Fluorescent",
+       "base_color": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "roughness": 0.3,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        0.97,
+        0.86,
+        1.0
+       ],
+       "emission_strength": 6.0
+      }
+     ],
+     "location": [
+      16.0,
+      -7.8,
+      12.21
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 6,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        15.72,
+        -8.38,
+        12.21
+       ],
+       "max": [
+        16.28,
+        -7.22,
+        12.24
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L3_L4_lower_wallHi": {
+     "part": "wallHi",
+     "materials": [
+      {
+       "name": "M_U_wall_L4",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.8,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_L4_diff.jpg",
+         "file": "wall_L4_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_L4_nor.jpg",
+         "file": "wall_L4_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      16.0,
+      -9.55,
+      9.6
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 36,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        14.6,
+        -12.2,
+        9.6
+       ],
+       "max": [
+        14.8,
+        -6.9,
+        12.3
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        17.2,
+        -12.2,
+        9.6
+       ],
+       "max": [
+        17.4,
+        -6.9,
+        12.3
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        14.8,
+        -12.2,
+        9.6
+       ],
+       "max": [
+        17.2,
+        -12.0,
+        12.3
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        14.6,
+        -7.1,
+        9.6
+       ],
+       "max": [
+        15.45,
+        -6.9,
+        12.3
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        16.55,
+        -7.1,
+        9.6
+       ],
+       "max": [
+        17.4,
+        -6.9,
+        12.3
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        15.45,
+        -7.1,
+        11.76
+       ],
+       "max": [
+        16.55,
+        -6.9,
+        12.3
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    },
+    "Stair_L3_L4_lower_wallLo": {
+     "part": "wallLo",
+     "materials": [
+      {
+       "name": "M_D_wall_L3",
+       "base_color": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ],
+       "roughness": 0.85,
+       "metallic": 0.0,
+       "emission": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "emission_strength": 0.0,
+       "mapping_scale": [
+        1.0,
+        1.0,
+        1.0
+       ],
+       "images": [
+        {
+         "name": "wall_L3_diff.jpg",
+         "file": "wall_L3_diff.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        },
+        {
+         "name": "wall_L3_nor.jpg",
+         "file": "wall_L3_nor.jpg",
+         "packed": true,
+         "size": [
+          512,
+          512
+         ]
+        }
+       ]
+      }
+     ],
+     "location": [
+      16.0,
+      -9.45,
+      6.1
+     ],
+     "parent": "LEVEL_L1",
+     "polys": 36,
+     "uv_layers": [
+      "Float2"
+     ],
+     "boxes": [
+      {
+       "min": [
+        14.6,
+        -12.0,
+        6.1
+       ],
+       "max": [
+        14.8,
+        -6.9,
+        6.4
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        14.6,
+        -8.5,
+        6.4
+       ],
+       "max": [
+        14.8,
+        -6.9,
+        9.4
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        14.6,
+        -12.0,
+        9.4
+       ],
+       "max": [
+        14.8,
+        -6.9,
+        9.6
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        17.2,
+        -12.0,
+        6.1
+       ],
+       "max": [
+        17.4,
+        -6.9,
+        6.4
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        17.2,
+        -8.5,
+        6.4
+       ],
+       "max": [
+        17.4,
+        -6.9,
+        9.4
+       ],
+       "verts": 8,
+       "faces": 6
+      },
+      {
+       "min": [
+        17.2,
+        -12.0,
+        9.4
+       ],
+       "max": [
+        17.4,
+        -6.9,
+        9.6
+       ],
+       "verts": 8,
+       "faces": 6
+      }
+     ]
+    }
+   },
+   "leaf": {
+    "name": "DoorLeaf_Stair_L3_L4_up",
+    "hinge": [
+     15.48,
+     -7.0,
+     9.6
+    ],
+    "rotation_z_deg": 0.0,
+    "boxes": [
+     {
+      "min": [
+       15.48,
+       -7.025,
+       9.6
+      ],
+      "max": [
+       16.52,
+       -6.975,
+       11.72
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ],
+    "materials": [
+     {
+      "name": "M_Door",
+      "base_color": [
+       0.42,
+       0.3,
+       0.18,
+       1.0
+      ],
+      "roughness": 0.7,
+      "metallic": 0.0,
+      "emission": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "emission_strength": 0.0
+     }
+    ],
+    "props": {
+     "level": "L3",
+     "door": true,
+     "state": "closed",
+     "stairdoor": true
+    }
+   },
+   "collider": {
+    "name": "COL_StairDoor_L3_L4_lower",
+    "boxes": [
+     {
+      "min": [
+       14.6,
+       -8.7,
+       9.4
+      ],
+      "max": [
+       17.4,
+       -6.9,
+       9.6
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       14.6,
+       -12.0,
+       6.1
+      ],
+      "max": [
+       14.8,
+       -6.9,
+       6.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       14.6,
+       -8.5,
+       6.4
+      ],
+      "max": [
+       14.8,
+       -6.9,
+       9.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       14.6,
+       -12.0,
+       9.4
+      ],
+      "max": [
+       14.8,
+       -6.9,
+       9.6
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       17.2,
+       -12.0,
+       6.1
+      ],
+      "max": [
+       17.4,
+       -6.9,
+       6.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       17.2,
+       -8.5,
+       6.4
+      ],
+      "max": [
+       17.4,
+       -6.9,
+       9.4
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       17.2,
+       -12.0,
+       9.4
+      ],
+      "max": [
+       17.4,
+       -6.9,
+       9.6
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       14.6,
+       -12.2,
+       9.6
+      ],
+      "max": [
+       14.8,
+       -6.9,
+       12.3
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       17.2,
+       -12.2,
+       9.6
+      ],
+      "max": [
+       17.4,
+       -6.9,
+       12.3
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       14.8,
+       -12.2,
+       9.6
+      ],
+      "max": [
+       17.2,
+       -12.0,
+       12.3
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       14.6,
+       -7.1,
+       9.6
+      ],
+      "max": [
+       15.45,
+       -6.9,
+       12.3
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       16.55,
+       -7.1,
+       9.6
+      ],
+      "max": [
+       17.4,
+       -6.9,
+       12.3
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       15.45,
+       -7.1,
+       11.76
+      ],
+      "max": [
+       16.55,
+       -6.9,
+       12.3
+      ],
+      "verts": 8,
+      "faces": 6
+     },
+     {
+      "min": [
+       14.6,
+       -12.2,
+       12.3
+      ],
+      "max": [
+       17.4,
+       -6.9,
+       12.5
+      ],
+      "verts": 8,
+      "faces": 6
+     }
+    ]
+   }
+  }
+ },
+ "bk_doors_stair": [
+  {
+   "name": "DoorLeaf_Stair_B1_L1_up",
+   "level": "B1",
+   "hinge": [
+    -0.5114,
+    0.0,
+    -0.599
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -90.0,
+   "state": "closed",
+   "link": {
+    "scene": "L1",
+    "door": "DoorLeaf_Stair_B1_L1_down",
+    "arrive": [
+     0.009,
+     0.0,
+     -0.799
+    ],
+    "face": [
+     0.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "DoorLeaf_Stair_B1_L1_down",
+   "level": "L1",
+   "hinge": [
+    -0.5114,
+    0.0,
+    -2.199
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "link": {
+    "scene": "B1",
+    "door": "DoorLeaf_Stair_B1_L1_up",
+    "arrive": [
+     0.009,
+     0.0,
+     -1.599
+    ],
+    "face": [
+     0.0,
+     -1.0
+    ]
+   }
+  },
+  {
+   "name": "DoorLeaf_Stair_L1_L2_up",
+   "level": "L1",
+   "hinge": [
+    -0.5274,
+    3.2,
+    10.708
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -90.0,
+   "state": "closed",
+   "link": {
+    "scene": "L2",
+    "door": "DoorLeaf_Stair_L1_L2_down",
+    "arrive": [
+     -0.007,
+     3.2,
+     10.508
+    ],
+    "face": [
+     0.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "DoorLeaf_Stair_L1_L2_down",
+   "level": "L2",
+   "hinge": [
+    -0.5274,
+    3.2,
+    9.108
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "link": {
+    "scene": "L1",
+    "door": "DoorLeaf_Stair_L1_L2_up",
+    "arrive": [
+     -0.007,
+     3.2,
+     9.708
+    ],
+    "face": [
+     0.0,
+     -1.0
+    ]
+   }
+  },
+  {
+   "name": "DoorLeaf_Stair_L2_L3_up",
+   "level": "L2",
+   "hinge": [
+    -16.9978,
+    6.4,
+    -15.278
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "link": {
+    "scene": "L3",
+    "door": "DoorLeaf_Stair_L2_L3_down",
+    "arrive": [
+     -16.478,
+     6.4,
+     -15.078
+    ],
+    "face": [
+     0.0,
+     -1.0
+    ]
+   }
+  },
+  {
+   "name": "DoorLeaf_Stair_L2_L3_down",
+   "level": "L3",
+   "hinge": [
+    -16.9978,
+    6.4,
+    -13.678
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -90.0,
+   "state": "closed",
+   "link": {
+    "scene": "L2",
+    "door": "DoorLeaf_Stair_L2_L3_up",
+    "arrive": [
+     -16.478,
+     6.4,
+     -14.278
+    ],
+    "face": [
+     0.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "DoorLeaf_Stair_L3_L4_up",
+   "level": "L3",
+   "hinge": [
+    15.48,
+    9.6,
+    7.0
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "link": {
+    "scene": "L4",
+    "door": "DoorLeaf_Stair_L3_L4_down",
+    "arrive": [
+     16.0,
+     9.6,
+     7.2
+    ],
+    "face": [
+     0.0,
+     -1.0
+    ]
+   }
+  },
+  {
+   "name": "DoorLeaf_Stair_L3_L4_down",
+   "level": "L4",
+   "hinge": [
+    15.48,
+    9.6,
+    8.6
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -90.0,
+   "state": "closed",
+   "link": {
+    "scene": "L3",
+    "door": "DoorLeaf_Stair_L3_L4_up",
+    "arrive": [
+     16.0,
+     9.6,
+     8.0
+    ],
+    "face": [
+     0.0,
+     1.0
+    ]
+   }
+  }
+ ]
+}

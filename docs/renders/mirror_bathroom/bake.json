@@ -1,0 +1,156 @@
+{
+ "0": {
+  "map": 0,
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 107.4,
+  "scale": 1.25649,
+  "knee": 0.53779,
+  "raw_p50_p90_p99_p995_max": [
+   0.3169,
+   0.8747,
+   2.8197,
+   7.1283,
+   7.4768
+  ],
+  "p50_p90_p99_p995_max": [
+   0.3169,
+   0.7755,
+   1.1338,
+   1.2565,
+   1.2605
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 35,
+  "materials": [
+   "Ceiling_Grid",
+   "Paint_Bath",
+   "Tile_Floor_Bath",
+   "Tile_Wall_Bath"
+  ]
+ },
+ "2": {
+  "map": 0,
+  "set": "night",
+  "size": 2048,
+  "px_per_m": 107.4,
+  "scale": 0.02751,
+  "knee": 0.01238,
+  "raw_p50_p90_p99_p995_max": [
+   0.008,
+   0.0617,
+   0.0922,
+   0.0941,
+   2.0325
+  ],
+  "p50_p90_p99_p995_max": [
+   0.008,
+   0.0259,
+   0.0274,
+   0.0275,
+   0.0308
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 53,
+  "materials": [
+   "Ceiling_Grid",
+   "Paint_Bath",
+   "Tile_Floor_Bath",
+   "Tile_Wall_Bath"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 119.8,
+  "scale": 1.19958,
+  "knee": 0.56489,
+  "raw_p50_p90_p99_p995_max": [
+   0.3267,
+   0.8331,
+   2.1028,
+   3.0941,
+   6.2816
+  ],
+  "p50_p90_p99_p995_max": [
+   0.3267,
+   0.7686,
+   1.1112,
+   1.1996,
+   1.3028
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 68,
+  "materials": [
+   "Ceramic_White",
+   "Chrome",
+   "Counter_Solid",
+   "Decal_Crack",
+   "Decal_Dust",
+   "Decal_Stain",
+   "Frame_Bronze",
+   "Frame_Chrome",
+   "Laminate_Stall",
+   "Leaf_Laminate",
+   "Mirror_Glass",
+   "Plastic_Black",
+   "Plastic_White",
+   "Plastic_Yellow",
+   "Sign_Green",
+   "Sign_White",
+   "Steel_Dark",
+   "Steel_Galv",
+   "Tile_Skirt"
+  ]
+ },
+ "3": {
+  "map": 1,
+  "set": "night",
+  "size": 2048,
+  "px_per_m": 119.8,
+  "scale": 0.01636,
+  "knee": 0.00682,
+  "raw_p50_p90_p99_p995_max": [
+   0.0033,
+   0.0173,
+   0.0917,
+   0.1472,
+   15.0699
+  ],
+  "p50_p90_p99_p995_max": [
+   0.0033,
+   0.012,
+   0.0159,
+   0.0164,
+   0.017
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 108,
+  "materials": [
+   "Ceramic_White",
+   "Chrome",
+   "Counter_Solid",
+   "Decal_Crack",
+   "Decal_Dust",
+   "Decal_Stain",
+   "Frame_Bronze",
+   "Frame_Chrome",
+   "Laminate_Stall",
+   "Leaf_Laminate",
+   "Mirror_Glass",
+   "Plastic_Black",
+   "Plastic_White",
+   "Plastic_Yellow",
+   "Sign_Green",
+   "Sign_White",
+   "Steel_Dark",
+   "Steel_Galv",
+   "Tile_Skirt"
+  ]
+ }
+}

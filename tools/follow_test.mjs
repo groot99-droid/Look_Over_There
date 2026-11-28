@@ -19,8 +19,13 @@ try {
   const setT = (h, day = 2) => page.evaluate(t => { window.__game.CITY.t = t; }, secondsAt(h, day));
   const stk = () => page.evaluate(() => { const g = window.__game, s = g.CITY.st; return {active: s.active, waited: !!s.waited, x: s.x, z: s.z, wait: s.wait, id: g.S.id, hour: g.cityState().hour, mesh: !!(g.CITY.mesh && g.CITY.mesh.visible)}; });
   const toast = () => page.evaluate(() => document.getElementById("toast").textContent);
-  const goIn = async () => { await stand(-6.4, -19, Math.PI / 2); await frames(2); await page.keyboard.press("KeyF"); await settled("apartment"); };
-  const goOut = async () => { await stand(APARTMENT.door.at[0], APARTMENT.door.at[1] - 0.4, Math.PI); await frames(2); await page.keyboard.press("KeyF"); await settled("street"); };
+  // since the hotel (2026-11-28) the tower's door opens its lobby, and the lobby's front doors lead back out; your apartment is room 301 on floor 3
+  const LOBBY_OUT = [-8.9, 0, -19], ROOM_301 = [-16.0, 0, -0.6];
+  const goIn = async () => { await stand(-6.4, -19, Math.PI / 2); await frames(2); await page.keyboard.press("KeyF"); await settled("lobby"); };
+  const goOut = async () => { if ((await stk()).id !== "lobby") { await page.evaluate(p => window.__game.loadScene("lobby", {pos: p, face: [1, 0]}), LOBBY_OUT); await settled("lobby"); }
+    await stand(LOBBY_OUT[0], LOBBY_OUT[2], -Math.PI / 2); await frames(2); await page.keyboard.press("KeyF"); await settled("street"); };
+  const upstairs = async () => { await page.evaluate(p => window.__game.loadScene("floor_3", {pos: p, face: [0, -1]}), ROOM_301); await settled("floor_3");
+    await stand(ROOM_301[0], ROOM_301[2], 0); await frames(2); await page.keyboard.press("KeyF"); await settled("apartment"); };
   const fromDoor = s => Math.hypot(s.x - TOWER_FRONT.arrive[0], s.z - TOWER_FRONT.arrive[2]);
 
   await page.evaluate(() => window.__game.loadScene("street", {pos: [0, 0, -19], face: [0, -1]})); await settled("street");
@@ -29,11 +34,11 @@ try {
   check("at 01:00 the stalker is out on the street", (await stk()).active);
   await goIn();
   let s = await stk();
-  check("you go in; it does not go away: it waits outside the door, 14 m up the street (along it, on the road)", s.id === "apartment" && s.active && s.waited && Math.abs((TOWER_FRONT.arrive[2] - s.z) - STALKER_WAIT) < 0.01 && fromDoor(s) >= STALKER_WAIT, JSON.stringify(s));
+  check("you go in; it does not go away: it waits outside the door, 14 m up the street (along it, on the road)", s.id === "lobby" && s.active && s.waited && Math.abs((TOWER_FRONT.arrive[2] - s.z) - STALKER_WAIT) < 0.01 && fromDoor(s) >= STALKER_WAIT, JSON.stringify(s));
   const waitSpot = {x: s.x, z: s.z};
   await frames(200);
   s = await stk();
-  check("inside, you are safe and it stays where it waits", s.id === "apartment" && s.active && s.x === waitSpot.x && s.z === waitSpot.z, JSON.stringify(s));
+  check("inside, you are safe and it stays where it waits", s.id === "lobby" && s.active && s.x === waitSpot.x && s.z === waitSpot.z, JSON.stringify(s));
   await goOut(); await frames(2);
   s = await stk();
   check("you step out and it is there, by your door", s.id === "street" && s.active && s.mesh && Math.abs(s.x - waitSpot.x) < 0.5 && Math.abs(s.z - waitSpot.z) < 0.5 + 5.5 * 0.1, JSON.stringify(s));
@@ -59,6 +64,7 @@ try {
   // asleep: the bed skips the night and it does not wait for morning
   await setT(2, 3); await stand(-6.4, -19, Math.PI / 2); await page.evaluate(() => { window.__game.CITY.st = {active: true, x: 0, z: -5, wait: 0}; }); await frames(1);
   await goIn(); check("it waited again on night 3", (await stk()).waited);
+  await upstairs(); check("up in your apartment it still waits outside the tower", (await stk()).waited);
   await stand(bedUse.at[0], bedUse.at[1], 0); await frames(2); await page.keyboard.press("KeyF"); await frames(5);
   s = await stk();
   check("you sleep until 06:00, and it is gone", !s.active && Math.abs(s.hour - 6) < 0.1, JSON.stringify(s));

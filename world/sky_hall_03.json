@@ -1,0 +1,230 @@
+{
+ "scene": "sky_hall_03",
+ "colliders": [
+  {
+   "s": "Sky_Ceiling",
+   "min": [
+    -1.4,
+    3.0,
+    -10.4
+   ],
+   "max": [
+    1.4,
+    3.25,
+    0.0
+   ]
+  },
+  {
+   "s": "Sky_End_0",
+   "min": [
+    -1.2,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    -0.55,
+    3.0,
+    0.0
+   ]
+  },
+  {
+   "s": "Sky_End_1",
+   "min": [
+    0.55,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    1.2,
+    3.0,
+    0.0
+   ]
+  },
+  {
+   "s": "Sky_End_2",
+   "min": [
+    -0.55,
+    2.16,
+    -0.2
+   ],
+   "max": [
+    0.55,
+    3.0,
+    0.0
+   ]
+  },
+  {
+   "s": "Sky_End_3",
+   "min": [
+    -1.2,
+    0.0,
+    -10.4
+   ],
+   "max": [
+    -0.55,
+    3.0,
+    -10.2
+   ]
+  },
+  {
+   "s": "Sky_End_4",
+   "min": [
+    0.55,
+    0.0,
+    -10.4
+   ],
+   "max": [
+    1.2,
+    3.0,
+    -10.2
+   ]
+  },
+  {
+   "s": "Sky_End_5",
+   "min": [
+    -0.55,
+    2.16,
+    -10.4
+   ],
+   "max": [
+    0.55,
+    3.0,
+    -10.2
+   ]
+  },
+  {
+   "s": "Sky_Floor",
+   "min": [
+    -1.2,
+    -0.3,
+    -10.2
+   ],
+   "max": [
+    1.2,
+    0.0,
+    -0.2
+   ]
+  },
+  {
+   "s": "Sky_Wall_E",
+   "min": [
+    1.2,
+    0.0,
+    -10.4
+   ],
+   "max": [
+    1.4,
+    3.0,
+    0.0
+   ]
+  },
+  {
+   "s": "Sky_Wall_W",
+   "min": [
+    -1.4,
+    0.0,
+    -10.4
+   ],
+   "max": [
+    -1.2,
+    3.0,
+    0.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_entry",
+   "level": "sky_hall_03",
+   "hinge": [
+    -0.52,
+    0.0,
+    -0.1
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "hall door"
+  },
+  {
+   "name": "DoorLeaf_exit",
+   "level": "sky_hall_03",
+   "hinge": [
+    0.52,
+    0.0,
+    -10.3
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "EXIT door"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Entry",
+   "room": "sky_hall_03",
+   "level": "sky_hall_03",
+   "kind": "Entrance",
+   "position": [
+    0.0,
+    0.0,
+    -1.1
+   ]
+  },
+  {
+   "name": "Exit",
+   "room": "sky_hall_03",
+   "level": "sky_hall_03",
+   "kind": "Exit",
+   "position": [
+    0.0,
+    0.0,
+    -9.3
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "entry",
+   "at": [
+    0.0,
+    0.0,
+    -0.7
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -1.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "exit",
+   "at": [
+    0.0,
+    0.0,
+    -9.7
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -9.3
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": []
+}

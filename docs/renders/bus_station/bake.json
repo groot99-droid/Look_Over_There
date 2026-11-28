@@ -1,0 +1,32 @@
+{
+ "samples": 512,
+ "ao_distance_m": 2.5,
+ "pages": [
+  {
+   "page": 0,
+   "size": 2048,
+   "px_per_m": 62.8,
+   "ao_p1_p10_p50_p90": [
+    0.002,
+    0.168,
+    0.738,
+    0.998
+   ],
+   "materials": [
+    "Deck",
+    "Line_Yellow",
+    "Paint_White",
+    "Paving",
+    "Plastic_Coral",
+    "Roof_Blue",
+    "Sign_Bus",
+    "Sign_Dest",
+    "Steel",
+    "Ticket_Face",
+    "Timetable_Print"
+   ]
+  }
+ ],
+ "seconds": 27,
+ "device": "GPU"
+}

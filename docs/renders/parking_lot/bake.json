@@ -1,0 +1,64 @@
+{
+ "0": {
+  "size": 2048,
+  "p1_p10_p50_p90": [
+   0.003,
+   0.402,
+   0.998,
+   1.0
+  ],
+  "samples": 256,
+  "distance_m": 1.5,
+  "device": "GPU",
+  "seconds": 15,
+  "materials": [
+   "Asphalt",
+   "Paving",
+   "Grass",
+   "Hedge"
+  ],
+  "px_per_m": 10.5
+ },
+ "1": {
+  "size": 2048,
+  "p1_p10_p50_p90": [
+   0.0,
+   0.012,
+   0.407,
+   1.0
+  ],
+  "samples": 256,
+  "distance_m": 0.8,
+  "device": "GPU",
+  "seconds": 61,
+  "materials": [
+   "Timber",
+   "Steel",
+   "Pylon_Blue",
+   "Bin_Green",
+   "Car_Plum",
+   "Tyre",
+   "Car_Mint",
+   "Car_Periwinkle",
+   "Car_Coral",
+   "Car_Silver",
+   "Car_Teal",
+   "Car_Cream",
+   "Car_Pink",
+   "Car_Yellow",
+   "Car_Cover",
+   "Bark",
+   "Leaf_Mint",
+   "Leaf_Lilac",
+   "Leaf_Pink",
+   "Kerb",
+   "Soil",
+   "Store_Signs",
+   "Signs",
+   "Plastic_Coral",
+   "Plastic_White",
+   "Shrub"
+  ],
+  "px_per_m": 10.9
+ }
+}

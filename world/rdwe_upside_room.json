@@ -1,0 +1,281 @@
+{
+ "scene": "rdwe_upside_room",
+ "colliders": [
+  {
+   "s": "Beyond_chair",
+   "min": [
+    -5.55,
+    -0.05,
+    -0.78
+   ],
+   "max": [
+    -5.35,
+    2.31,
+    0.78
+   ]
+  },
+  {
+   "s": "Beyond_hall",
+   "min": [
+    5.35,
+    -0.05,
+    -0.72
+   ],
+   "max": [
+    5.55,
+    2.55,
+    0.72
+   ]
+  },
+  {
+   "s": "Chandelier_Up",
+   "min": [
+    -0.3,
+    0.0,
+    -0.3
+   ],
+   "max": [
+    0.3,
+    1.7,
+    0.3
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -5.2,
+    3.4,
+    -5.2
+   ],
+   "max": [
+    5.2,
+    3.6,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -5.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    5.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    5.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    5.2,
+    3.4,
+    -0.49
+   ]
+  },
+  {
+   "s": "Room_Wall_E_2",
+   "min": [
+    5.0,
+    2.44,
+    -0.49
+   ],
+   "max": [
+    5.2,
+    3.4,
+    0.49
+   ]
+  },
+  {
+   "s": "Room_Wall_E_3",
+   "min": [
+    5.0,
+    0.0,
+    0.49
+   ],
+   "max": [
+    5.2,
+    3.4,
+    5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -5.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    5.2,
+    3.4,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -5.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    5.2,
+    3.4,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -5.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -5.0,
+    3.4,
+    -0.55
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -5.2,
+    2.2,
+    -0.55
+   ],
+   "max": [
+    -5.0,
+    3.4,
+    0.55
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -5.2,
+    0.0,
+    0.55
+   ],
+   "max": [
+    -5.0,
+    3.4,
+    5.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_chair",
+   "level": "rdwe_upside_room",
+   "hinge": [
+    -5.0,
+    0.0,
+    0.53
+   ],
+   "width": 1.06,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "chair",
+   "look": "stable (split) birch door, push plate"
+  },
+  {
+   "name": "DoorLeaf_hall",
+   "level": "rdwe_upside_room",
+   "hinge": [
+    5.0,
+    0.0,
+    -0.47
+   ],
+   "width": 0.94,
+   "height": 2.4,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "hall",
+   "look": "panelled plum door, no handle"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "chair",
+   "at": [
+    -4.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -3.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "hall",
+   "at": [
+    4.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    3.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "chandelier",
+   "name": "Spot_chandelier_1",
+   "position": [
+    0.0,
+    0.0,
+    -1.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the chandelier stands on the floor, lit, pointing up"
+  },
+  {
+   "kind": "trick",
+   "name": "Spot_trick_1",
+   "position": [
+    0.0,
+    0.0,
+    2.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "look up: the table is above you"
+  }
+ ]
+}

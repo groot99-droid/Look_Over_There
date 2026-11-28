@@ -1,0 +1,45 @@
+{
+ "samples": 512,
+ "ao_distance_m": 2.5,
+ "pages": [
+  {
+   "page": 0,
+   "size": 2048,
+   "px_per_m": 10.2,
+   "ao_p1_p10_p50_p90": [
+    0.9,
+    0.983,
+    1.0,
+    1.0
+   ],
+   "materials": [
+    "Grass"
+   ]
+  },
+  {
+   "page": 1,
+   "size": 1024,
+   "px_per_m": 12.9,
+   "ao_p1_p10_p50_p90": [
+    0.002,
+    0.048,
+    0.689,
+    1.0
+   ],
+   "materials": [
+    "Deck",
+    "Fake_Door",
+    "More_To_Come",
+    "Mushroom_Cap",
+    "Mushroom_Stem",
+    "Paint_White",
+    "Plaster_Pink",
+    "Sign_Back",
+    "Stone",
+    "Trim_White"
+   ]
+  }
+ ],
+ "seconds": 25,
+ "device": "GPU"
+}

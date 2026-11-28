@@ -1,0 +1,23 @@
+{
+ "gain": 3.5985,
+ "target_p99": 0.98,
+ "target_p90": 0.9,
+ "factor": {
+  "Leaf_Room": 3.5985,
+  "Brass": 2.1516,
+  "Decal_Ceiling": 3.5484,
+  "Gilt": 3.5985,
+  "Lamp_Dead": 3.5985,
+  "Picture": 2.7019,
+  "Plastic_Black": 3.5985,
+  "Plastic_White": 1.4499,
+  "Trim_White": 3.5985,
+  "Trim_Wood": 3.5985,
+  "Carpet_Green": 3.5985,
+  "Ceiling_Plaster": 3.5985,
+  "Dado_Paint": 3.5985,
+  "Door_Jamb": 3.5985,
+  "Paper_Repeat": 3.5985,
+  "Threshold": 3.5985
+ }
+}

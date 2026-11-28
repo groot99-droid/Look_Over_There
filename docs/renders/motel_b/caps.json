@@ -1,0 +1,27 @@
+{
+ "gain": 1.579,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Bedspread": 1.579,
+  "Brass": 1.579,
+  "Carpet_Room": 1.579,
+  "Ceiling_Room": 1.579,
+  "Curtain": 1.579,
+  "Door_Bath": 1.579,
+  "Frame_Gilt": 1.579,
+  "Grille": 1.579,
+  "Lamp_Base": 1.579,
+  "Linen_White": 1.579,
+  "Picture": 1.579,
+  "Plastic_Black": 1.579,
+  "Plastic_White": 1.579,
+  "Steel": 1.579,
+  "TV_Plastic": 1.579,
+  "TV_Screen": 1.579,
+  "Wall_Room": 1.579,
+  "Window_Frame": 1.579,
+  "Window_Void": 1.579,
+  "Wood_Laminate": 1.579
+ }
+}

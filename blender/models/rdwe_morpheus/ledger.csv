@@ -1,0 +1,16 @@
+code,piece,source_file,source_tris,game_tris,base_px,dims_m_xyz,offset_m,scale,glb_bytes,base_texture
+MO-00,lamp,MO-00_Morpheus_Lamp.glb,1949614,15000,1024,0.393x0.39x0.6,"-0.0000,0.0002,0.0004","1.0000,1.0000,1.0000",1434000,1024 px WebP q90 (baked from the original's base colour)
+MO-01,bedside_table,MO-01_Morpheus_Bedside_Table.glb,1930938,15000,1024,0.305x0.618x0.62,"0.0004,0.0000,0.0000","1.0000,1.0000,1.0000",1357860,1024 px WebP q90 (baked from the original's base colour)
+MO-02,armchair,MO-02_Morpheus_Armchair.glb,1926892,18000,1024,0.725x0.845x0.98,"-0.0001,-0.0003,-0.0003","1.0000,1.0000,1.0000",1465248,1024 px WebP q90 (baked from the original's base colour)
+MO-03,dresser,MO-03_Morpheus_Dresser.glb,1980532,18000,1024,0.55x1.122x0.88,"-0.0002,0.0000,-0.0002","1.0000,1.0000,1.0000",1495072,1024 px WebP q90 (baked from the original's base colour)
+MO-04,tall_cabinet,MO-04_Morpheus_Tall_Cabinet.glb,1920806,18000,1024,0.597x0.904x1.902,"0.0009,0.0014,0.0004","1.0000,1.0000,1.0000",1604772,1024 px WebP q90 (baked from the original's base colour)
+MO-05,bed,MO-05_Morpheus_Bed.glb,1945474,23999,2048,2.149x1.702x1.648,"0.0006,-0.0003,0.0004","1.0000,1.0000,1.0000",3051900,2048 px WebP q90 (baked from the original's base colour)
+MO-06,wall_mirror,MO-06_Morpheus_Wall_Mirror.glb,1942393,14999,1024,0.108x0.753x1.3,"-0.0002,-0.0000,-0.0009","1.0000,1.0000,1.0000",1200016,1024 px WebP q90 (baked from the original's base colour)
+MO-07,writing_desk,MO-07_Morpheus_Writing_Desk.glb,1964564,18000,1024,0.452x0.967x0.76,"0.0001,-0.0001,0.0001","1.0000,1.0000,1.0000",1551920,1024 px WebP q90 (baked from the original's base colour)
+MO-08,clock,MO-08_Morpheus_Clock.glb,968640,15000,512,0.181x0.206x0.4,"-0.0000,0.0000,-0.0001","1.0000,1.0000,1.0000",780408,512 px WebP q90 (baked from the original's base colour)
+MO-09,hourglass,MO-09_Morpheus_Hourglass.glb,1245966,14999,512,0.113x0.111x0.3,"-0.0000,-0.0001,-0.0000","1.0000,1.0000,1.0000",781676,512 px WebP q90 (baked from the original's base colour)
+MO-10,vase,MO-10_Morpheus_Vase.glb,1188414,15000,512,0.268x0.272x0.38,"0.0000,-0.0001,0.0002","1.0000,1.0000,1.0000",697292,512 px WebP q90 (baked from the original's base colour)
+MO-11,rug,MO-11_Morpheus_Rug.glb,264104,2000,1024,2.4x1.553x0.012,"0.0000,-0.0002,-0.0000","1.0000,1.0000,1.0000",519904,1024 px WebP q90 (baked from the original's base colour)
+MO-12,textiles,MO-12_Morpheus_Textiles.glb,1296285,14999,1024,0.65x0.502x0.483,"0.0000,0.0004,0.0000","1.0000,1.0000,1.0000",888192,1024 px WebP q90 (baked from the original's base colour)
+P6,sleeping_morpheus,P6.glb,30486,14997,1024,1.573x0.718x1.1,"-0.0003,0.0005,-0.5509","0.8294,0.8294,0.8294",1215196,1024 px WebP q90 (baked from the original's base colour)
+P12,mask,P12.glb,31058,3499,512,0.363x0.179x0.45,"-0.0002,0.0004,-0.2256","0.2370,0.2370,0.2370",321356,"512 px WebP q90 (baked from the original's base colour) (placed six times on the walls, each with its own mesh copy; 3.5k for the plan's 6k so the six fit the budget)"

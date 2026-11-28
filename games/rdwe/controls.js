@@ -8,6 +8,12 @@
 // Collision is axis-aligned boxes rather than raycasts: everything in these rooms
 // is a box (walls, table, chairs, sideboard, doors), so a circle-vs-AABB slide is
 // cheap enough for a phone and never lets the player through a wall.
+//
+// The rooms built in code are flat: their colliders are footprints. The rooms built in Blender
+// (walk/blender.js) have floors at several heights, stairs and landings, so setWorld() gives the
+// walker full 3D boxes instead: it stands on the highest top under it, climbs a box no higher
+// than STEP, falls when there is nothing under it, and is stopped by anything between its feet
+// (plus STEP) and its head. The camera base is then the feet plus the eye height.
 import * as THREE from 'three';
 
 export let EYE_HEIGHT = 1.62;
@@ -34,6 +40,8 @@ export function createControls(camera, domElement, { reducedMotion = false } = {
   let pointerLocked = false;
   let dragLooking = false;
   let colliders = [];           // [{ minX, maxX, minZ, maxZ }]
+  let world = null;             // setWorld: [{ n: [x, y, z], x: [x, y, z], off? }] (3D boxes; a door's box is `off` while it is open)
+  let fallV = 0, grounded = true, onFall = null;
   let bounds = null;            // { minX, maxX, minZ, maxZ } the walkable extent
   let walkTime = 0;             // for the head bob
   let bobScale = 1;             // trampoline beds double it
@@ -79,9 +87,9 @@ export function createControls(camera, domElement, { reducedMotion = false } = {
       case 'ShiftLeft': case 'ShiftRight': keys.run = true; break;
       case 'KeyC': case 'ControlLeft': case 'ControlRight': keys.crouch = true; break;
       case 'Space': if (!e.repeat) wantJump = true; break;
-      case 'KeyE': case 'Enter': case 'NumpadEnter':
-        // Enter still presses a focused button (SKIP, SOUND); E is never a button key
-        if (e.code !== 'KeyE' && e.target !== domElement && e.target.closest && e.target.closest('button, a, [role="button"]')) return;
+      case 'KeyE': case 'KeyF': case 'Enter': case 'NumpadEnter':
+        // Enter still presses a focused button (SKIP, SOUND); E and F are never button keys (F: the host's key for a door's way through)
+        if (e.code !== 'KeyE' && e.code !== 'KeyF' && e.target !== domElement && e.target.closest && e.target.closest('button, a, [role="button"]')) return;
         if (!e.repeat && onUseFn) onUseFn();
         break;
       default: return;
@@ -182,6 +190,37 @@ export function createControls(camera, domElement, { reducedMotion = false } = {
     return false;
   }
 
+  // 3D: the box, if any, that a body with its feet at fy overlaps at (x, z); `step` lifts the feet (a box that low is climbed, not hit)
+  const BODY_H = () => 1.7 / PLAYER_SCALE, STEP = () => 0.46 / PLAYER_SCALE;
+  function hit3(x, fy, z, lift = 0) {
+    let found = null;
+    for (let i = 0; i < world.length; i++) {
+      const b = world[i];
+      if (b.off || fy + lift >= b.x[1] || fy + BODY_H() <= b.n[1]) continue;
+      const cx = Math.max(b.n[0], Math.min(x, b.x[0])), cz = Math.max(b.n[2], Math.min(z, b.x[2]));
+      const dx = x - cx, dz = z - cz;
+      if (dx * dx + dz * dz < RADIUS * RADIUS) { if (!found || b.x[1] > found.x[1]) found = b; }
+    }
+    return found;
+  }
+  // one horizontal move along an axis in the 3D world: blocked, slid, or stepped up onto a low box
+  function move3(nx, nz) {
+    const fy = base.y - EYE_HEIGHT;
+    const b = hit3(nx, fy, nz);
+    if (!b) { base.x = nx; base.z = nz; return; }
+    if (grounded && !b.door && b.x[1] - fy <= STEP() && !hit3(nx, b.x[1] + 0.001, nz)) { base.x = nx; base.z = nz; base.y = b.x[1] + 0.001 + EYE_HEIGHT; }
+  }
+  function fall3(delta) {
+    fallV -= (9.8 / PLAYER_SCALE) * delta;
+    const fy = base.y - EYE_HEIGHT, ny = fy + fallV * delta;
+    const b = hit3(base.x, ny, base.z);
+    if (b) {
+      if (fallV < 0) { base.y = b.x[1] + 0.001 + EYE_HEIGHT; grounded = true; } else base.y = b.n[1] - BODY_H() - 0.001 + EYE_HEIGHT;
+      fallV = 0;
+    } else { base.y = ny + EYE_HEIGHT; grounded = false; }
+    if (onFall && base.y - EYE_HEIGHT < onFall.below) onFall.fn();
+  }
+
   function update(delta) {
     if (!enabled) return;
     // Xbox controller (added for the Look Over There host): left stick walks, right stick looks, X / A is "use"
@@ -224,6 +263,7 @@ export function createControls(camera, domElement, { reducedMotion = false } = {
       // Slide: each axis on its own, a few sub-steps so a fast frame cannot tunnel.
       const steps = 2;
       for (let s = 0; s < steps; s++) {
+        if (world) { move3(base.x + move.x / steps, base.z); move3(base.x, base.z + move.z / steps); continue; }
         const nx = base.x + move.x / steps;
         if (!collides(nx, base.z)) base.x = nx;
         const nz = base.z + move.z / steps;
@@ -231,6 +271,7 @@ export function createControls(camera, domElement, { reducedMotion = false } = {
       }
       walkTime += delta * (reducedMotion ? 0 : 1);
     }
+    if (world) fall3(Math.min(delta, 1 / 30));
     // jump (cosmetic: the rooms' colliders are flat) and crouch: the same three paces and the same jump as the rest of the world
     const crouchNow = keys.crouch || padCrouch;
     crouchY += ((crouchNow ? -0.45 / PLAYER_SCALE : 0) - crouchY) * Math.min(1, delta * 10);
@@ -249,11 +290,14 @@ export function createControls(camera, domElement, { reducedMotion = false } = {
     );
   }
 
-  function setPosition(x, y, z) { base.set(x, y, z); camera.position.copy(base); camera.position.y += eyeOffset; }
+  function setPosition(x, y, z) { base.set(x, y, z); fallV = 0; camera.position.copy(base); camera.position.y += eyeOffset; }
   function setBobScale(s) { bobScale = s; }
   function setEyeOffset(dy) { eyeOffset = dy; }
   function position() { return base; }
-  function setColliders(list, extent) { colliders = list || []; bounds = extent || null; }
+  function setColliders(list, extent) { colliders = list || []; bounds = extent || null; world = null; }
+  // the 3D boxes of a Blender room (see the header); fall: {below, fn} is called when the feet drop under `below` (the room puts the walker back)
+  function setWorld(boxes, fall = null) { world = boxes || []; colliders = []; bounds = null; fallV = 0; grounded = true; onFall = fall; }
+  function feet() { return base.y - EYE_HEIGHT; }
   function setEnabled(on) {
     enabled = !!on;
     if (!enabled) {
@@ -286,7 +330,7 @@ export function createControls(camera, domElement, { reducedMotion = false } = {
   }
 
   return {
-    update, setPosition, position, setLook, getLook, lookAt, rotateBy, setColliders, setEnabled,
+    update, setPosition, position, setLook, getLook, lookAt, rotateBy, setColliders, setWorld, feet, setEnabled,
     isMoving, setKeys, onJoystick, onUse, dispose, EYE_HEIGHT, setBobScale, setEyeOffset,
   };
 }

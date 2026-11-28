@@ -1,0 +1,91 @@
+python tools/blender/build_gbi_greybox.py --check . --glb docs/renders/gbi_greybox/glb
+GATE links: 10 pairs inside the set (20 sides, both present), 9 that leave it; 29 links in the files, every one accounted for
+  off this set: gbi_B1_2.from_B1_1 (door) -> gbi_B1_1
+  off this set: gbi_B1_4.exit_to_overworld (painted-sky hall) -> overworld
+  off this set: gbi_L1_2.stair_from_L1_1 (stair door) -> gbi_L1_1
+  off this set: gbi_L1_4.stair_down (stair door) -> gbi_B1_1
+  off this set: gbi_L2_2.stair_from_L2_1 (stair door) -> gbi_L2_1
+  off this set: gbi_L2_4.stair_down (stair door) -> gbi_L1_1
+  off this set: gbi_L3_2.stair_from_L3_1 (stair door) -> gbi_L3_1
+  off this set: gbi_L3_4.stair_down (stair door) -> gbi_L2_1
+  off this set: gbi_L4_3.exit_to_L4_4 (painted-sky hall) -> gbi_L4_4
+GATE one arrival and one way on: 15 chambers, each with exactly its arrival and its way on (gbi_L4_1 arrives by its spawn); the chain runs L4_1 > L4_2 > L4_3 > L4_4 > L3_1 > L3_2 > L3_3 > L3_4 > L2_1 > L2_2 > L2_3 > L2_4 > L1_1 > L1_2 > L1_3 > L1_4 > B1_1 > B1_2 > B1_3 > B1_4 > overworld
+GATE spots: every chamber has Spot_locker x1 and at least one Spot_loot, Spot_puzzle, Spot_object and Spot_monster; 5 safe houses (B1, L1, L2, L3, L4) each with shop, stash, save, craft, respawn, locker and a Zone_safe
+GATE monster distance: every Spot_monster at least 16 m from its chamber's arrival (the nearest 26.7 m)
+GATE footprints: 890 colliders, every one inside x -26.3 to 26.3, z -22.35 to 27.35 and its storey; every link, spot and marker on its chamber's floor (B1 -3, L1 0, L2 3.2, L3 6.4, L4 9.6)
+GATE overlaps: 796 standing colliders, no two sharing space (floor and ceiling slabs, and a kit piece's boxes among themselves, aside)
+GATE clearances: every link's two points and every spot clear of the colliders (walker radius 0.28 m); 93 doors, each with 0.7 m clear on both sides inside the chamber; 31 corridors and aisles, the narrowest 2.80 m (at least 1.6 m), none blocked
+GATE reachable: from each chamber's arrival a walker reaches the way on and every spot (287 points), doors open
+GATE hazards: 25 hazards, every chamber with at least one; each a Hazard_<kind>_<n> part with its two travel ends (Spot_hazard_..._a/_b) inside its Zone_hazard; kinds: crush x8, lava x2, tide x3, gas x4, blade x8
+GATE steps: 10 kerbs (the display islands), the highest rise 0.270 m (at most 0.27 m); no flights in these chambers
+GATE hazard parts: 25 of 25 Hazard_<kind>_<n> nodes in the chambers' GLBs, each its own object on its origin
+GATE model: 15 of 15 files exactly as the model says
+  spots: call x6, craft x5, hazard x50, locker x20, loot x45, monster x46, object x45, panel x6, puzzle x15, respawn x5, save x5, shop x5, stash x5, vent x4
+GATES PASS
+
+node tools/worlddoc.mjs check <the 15 chamber files>
+  warning: scene gbi_B1_2 is not in the world manifest yet: a new scene to add
+  warning: link from_B1_1: the manifest has no link from this door yet: a new link to add
+  warning: link to_B1_3: the manifest has no link from this door yet: a new link to add
+OK world/gbi_B1_2.json: 52 colliders, 2 doors, 1 markers, 2 links, 3 zones, 19 spots, 0 errors, 3 warnings
+  warning: scene gbi_B1_3 is not in the world manifest yet: a new scene to add
+  warning: link exit_to_B1_4: the manifest has no link from this door yet: a new link to add
+  warning: link from_B1_2: the manifest has no link from this door yet: a new link to add
+OK world/gbi_B1_3.json: 35 colliders, 8 doors, 1 markers, 2 links, 8 zones, 16 spots, 0 errors, 3 warnings
+  warning: scene gbi_B1_4 is not in the world manifest yet: a new scene to add
+  warning: link exit_to_overworld: the manifest has no link from this door yet: a new link to add
+  warning: link from_B1_3: the manifest has no link from this door yet: a new link to add
+OK world/gbi_B1_4.json: 39 colliders, 3 doors, 1 markers, 2 links, 4 zones, 18 spots, 0 errors, 3 warnings
+  warning: scene gbi_L1_2 is not in the world manifest yet: a new scene to add
+  warning: link lift_to_L1_3: the manifest has no link from this door yet: a new link to add
+  warning: link stair_from_L1_1: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L1_2.json: 157 colliders, 6 doors, 1 markers, 2 links, 2 zones, 21 spots, 0 errors, 3 warnings
+  warning: scene gbi_L1_3 is not in the world manifest yet: a new scene to add
+  warning: link exit_to_L1_4: the manifest has no link from this door yet: a new link to add
+  warning: link lift_from_L1_2: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L1_3.json: 69 colliders, 10 doors, 1 markers, 2 links, 2 zones, 18 spots, 0 errors, 3 warnings
+  warning: scene gbi_L1_4 is not in the world manifest yet: a new scene to add
+  warning: link from_L1_3: the manifest has no link from this door yet: a new link to add
+  warning: link stair_down: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L1_4.json: 49 colliders, 8 doors, 1 markers, 2 links, 2 zones, 15 spots, 0 errors, 3 warnings
+  warning: scene gbi_L2_2 is not in the world manifest yet: a new scene to add
+  warning: link exit_to_L2_3: the manifest has no link from this door yet: a new link to add
+  warning: link stair_from_L2_1: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L2_2.json: 124 colliders, 29 doors, 1 markers, 2 links, 2 zones, 20 spots, 0 errors, 3 warnings
+  warning: scene gbi_L2_3 is not in the world manifest yet: a new scene to add
+  warning: link from_L2_2: the manifest has no link from this door yet: a new link to add
+  warning: link to_L2_4: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L2_3.json: 32 colliders, 4 doors, 1 markers, 2 links, 2 zones, 15 spots, 0 errors, 3 warnings
+  warning: scene gbi_L2_4 is not in the world manifest yet: a new scene to add
+  warning: link from_L2_3: the manifest has no link from this door yet: a new link to add
+  warning: link stair_down: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L2_4.json: 36 colliders, 5 doors, 1 markers, 2 links, 2 zones, 15 spots, 0 errors, 3 warnings
+  warning: scene gbi_L3_2 is not in the world manifest yet: a new scene to add
+  warning: link stair_from_L3_1: the manifest has no link from this door yet: a new link to add
+  warning: link to_L3_3: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L3_2.json: 46 colliders, 3 doors, 1 markers, 2 links, 2 zones, 19 spots, 0 errors, 3 warnings
+  warning: scene gbi_L3_3 is not in the world manifest yet: a new scene to add
+  warning: link from_L3_2: the manifest has no link from this door yet: a new link to add
+  warning: link lift_to_L3_4: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L3_3.json: 54 colliders, 2 doors, 1 markers, 2 links, 2 zones, 17 spots, 0 errors, 3 warnings
+  warning: scene gbi_L3_4 is not in the world manifest yet: a new scene to add
+  warning: link lift_from_L3_3: the manifest has no link from this door yet: a new link to add
+  warning: link stair_down: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L3_4.json: 46 colliders, 3 doors, 1 markers, 2 links, 1 zones, 15 spots, 0 errors, 3 warnings
+  warning: scene gbi_L4_1 is not in the world manifest yet: a new scene to add
+  warning: link lift_to_L4_2: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L4_1.json: 54 colliders, 4 doors, 1 markers, 1 links, 1 zones, 16 spots, 0 errors, 2 warnings
+  warning: scene gbi_L4_2 is not in the world manifest yet: a new scene to add
+  warning: link exit_to_L4_3: the manifest has no link from this door yet: a new link to add
+  warning: link lift_from_L4_1: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L4_2.json: 66 colliders, 3 doors, 1 markers, 2 links, 3 zones, 23 spots, 0 errors, 3 warnings
+  warning: scene gbi_L4_3 is not in the world manifest yet: a new scene to add
+  warning: link exit_to_L4_4: the manifest has no link from this door yet: a new link to add
+  warning: link from_L4_2: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L4_3.json: 31 colliders, 3 doors, 1 markers, 2 links, 2 zones, 15 spots, 0 errors, 3 warnings
+exit 0
+
+node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0

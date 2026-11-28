@@ -1,0 +1,41 @@
+{
+ "gain": 0.87,
+ "wall_materials": [
+  "Wall_Navy"
+ ],
+ "wall_p50_before": 0.345,
+ "target_wall_p50": 0.3,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Acoustic_Finale": 0.543,
+  "Alu": 0.87,
+  "Basin": 0.87,
+  "Cam_Black": 0.87,
+  "Cam_White": 0.81,
+  "Chrome": 0.87,
+  "Cubicle_Frame": 0.87,
+  "Cubicle_Panel": 0.87,
+  "Desk_Top": 0.87,
+  "Gondola": 0.87,
+  "Kick_Finale": 0.87,
+  "Leaf_Blue": 0.727,
+  "Leaf_Glass": 0.87,
+  "Leather": 0.87,
+  "Linen": 0.87,
+  "Maple": 0.87,
+  "Monitor": 0.87,
+  "Quilt_Pink": 0.87,
+  "Rack_Body": 0.87,
+  "Rack_Grille": 0.87,
+  "Rubber_Black": 0.87,
+  "Rug_Finale": 0.87,
+  "Strip_Housing": 0.479,
+  "Stripe_Pink": 0.761,
+  "Till": 0.458,
+  "Vent_Grille": 0.87,
+  "Vinyl_Finale": 0.371,
+  "Wall_Navy": 0.87,
+  "Wood_House": 0.87
+ }
+}

@@ -1,0 +1,401 @@
+{
+ "scene": "rdwe_waiting_room",
+ "colliders": [
+  {
+   "s": "Beyond_number",
+   "min": [
+    2.32,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    3.68,
+    2.19,
+    -5.35
+   ]
+  },
+  {
+   "s": "Beyond_three",
+   "min": [
+    -7.55,
+    -0.05,
+    -0.81
+   ],
+   "max": [
+    -7.35,
+    2.25,
+    0.81
+   ]
+  },
+  {
+   "s": "Coat_Stand",
+   "min": [
+    6.3,
+    0.0,
+    -1.8
+   ],
+   "max": [
+    6.7,
+    1.8,
+    -1.4
+   ]
+  },
+  {
+   "s": "Counter",
+   "min": [
+    -2.0,
+    0.0,
+    4.4
+   ],
+   "max": [
+    2.0,
+    1.05,
+    5.0
+   ]
+  },
+  {
+   "s": "Magazine_Table",
+   "min": [
+    3.2,
+    0.0,
+    -0.4
+   ],
+   "max": [
+    4.4,
+    0.42,
+    0.4
+   ]
+  },
+  {
+   "s": "Plant",
+   "min": [
+    6.1,
+    0.0,
+    -4.7
+   ],
+   "max": [
+    6.7,
+    1.4,
+    -4.1
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -7.2,
+    3.0,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    3.2,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -7.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    7.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    7.2,
+    3.0,
+    5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    2.55,
+    3.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    2.55,
+    2.08,
+    -5.2
+   ],
+   "max": [
+    3.45,
+    3.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    3.45,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    7.2,
+    3.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -7.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    7.2,
+    3.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -7.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -7.0,
+    3.0,
+    -0.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -7.2,
+    2.14,
+    -0.58
+   ],
+   "max": [
+    -7.0,
+    3.0,
+    0.58
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -7.2,
+    0.0,
+    0.58
+   ],
+   "max": [
+    -7.0,
+    3.0,
+    5.0
+   ]
+  },
+  {
+   "s": "Seats_1",
+   "min": [
+    -4.0,
+    0.0,
+    -2.0
+   ],
+   "max": [
+    2.0,
+    0.45,
+    -1.5
+   ]
+  },
+  {
+   "s": "Seats_2",
+   "min": [
+    -4.0,
+    0.0,
+    -0.2
+   ],
+   "max": [
+    2.0,
+    0.45,
+    0.3
+   ]
+  },
+  {
+   "s": "Seats_3",
+   "min": [
+    -4.0,
+    0.0,
+    1.6
+   ],
+   "max": [
+    2.0,
+    0.45,
+    2.1
+   ]
+  },
+  {
+   "s": "Ticket_Machine",
+   "min": [
+    5.6,
+    0.0,
+    3.4
+   ],
+   "max": [
+    6.4,
+    1.4,
+    4.2
+   ]
+  },
+  {
+   "s": "Water_Cooler",
+   "min": [
+    -6.6,
+    0.0,
+    -4.6
+   ],
+   "max": [
+    -6.2,
+    1.3,
+    -4.2
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_number",
+   "level": "rdwe_waiting_room",
+   "hinge": [
+    2.57,
+    0.0,
+    -5.0
+   ],
+   "width": 0.86,
+   "height": 2.04,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "number",
+   "look": "six-panel cream gloss door, no handle"
+  },
+  {
+   "name": "DoorLeaf_three",
+   "level": "rdwe_waiting_room",
+   "hinge": [
+    -7.0,
+    0.0,
+    0.56
+   ],
+   "width": 1.12,
+   "height": 2.1,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "three",
+   "look": "porthole mint paint door, push plate"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "number",
+   "at": [
+    3.0,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    3.0,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "three",
+   "at": [
+    -6.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -5.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "ticket",
+   "name": "Spot_ticket_1",
+   "position": [
+    5.0,
+    0.0,
+    2.6
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "take a ticket: your number is the number of rooms left"
+  },
+  {
+   "kind": "ticket",
+   "name": "Spot_ticket_2",
+   "position": [
+    0.0,
+    0.0,
+    -0.75
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "sit: the display counts down while you sit, and stops when you stand"
+  },
+  {
+   "kind": "ticket",
+   "name": "Spot_ticket_3",
+   "position": [
+    3.0,
+    0.0,
+    -3.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the display over the door: NOW SERVING; the door opens on your number"
+  }
+ ]
+}
