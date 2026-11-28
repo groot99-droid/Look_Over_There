@@ -94,7 +94,7 @@ export function checkManifest(doc, {worldDocs = null} = {}) {
     }
     if (l.returnTo !== undefined && !(isObj(l.returnTo) && areas.has(l.returnTo.area) && (l.returnTo.scene === undefined || sceneArea.get(l.returnTo.scene) === l.returnTo.area))) err(`${at}: returnTo is not a place`);
   }
-  for (const id of coopRooms.keys()) if (!(doc.links || []).some(l => l && l.status === "built" && l.connector === "gate" && !l.soloOnly && l.to && l.to.area === id)) err(`area ${id} is coop but no built gate leads into it that a room can follow (its gate says soloOnly)`);
+  for (const id of coopRooms.keys()) if (!(doc.links || []).some(l => l && l.status === "built" && !l.soloOnly && l.to && l.to.area === id)) err(`area ${id} is coop but no built gate leads into it that a room can follow (its gate says soloOnly)`);
 
   for (const [name, m] of Object.entries(isObj(doc.modes) ? doc.modes : {})) {
     const at = `mode ${name}`;

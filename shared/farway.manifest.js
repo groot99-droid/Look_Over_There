@@ -13,6 +13,8 @@ const gate = (door, game, to, returnScene, soloOnly = true) => ({
   id: `lot.L4.${door}`, status: "built", connector: "gate", soloOnly,
   from: {area: "lot", scene: "L4", door}, to: {area: game, ...to}, returnTo: {area: "lot", scene: returnScene},
 });
+import {BLENDER_SCENES, BLENDER_LINKS} from "./farway.scenes.js";      // the Blender areas' scenes and links, made by tools/blender/wire_scenes.py
+
 const plan = (id, from, to, connector, extra = {}) => ({id, status: "planned", connector, from, to, ...extra});
 const stub = (id, name, status, scenes) => ({id, name, status, scenes: scenes.map(s => ({id: s}))});
 
@@ -20,7 +22,7 @@ export const FARWAY = {
   manifestVersion: 1,
   world: "Farway",
   flags: ["original_complete", "job_intern", "job_trash", "job_museum", "job_lab", "job_factory", "keycard_tier_1", "keycard_tier_2", "admin_access"],
-  connectors: ["stair_door", "gate", "doors", "walk", "elevator", "stairs", "bus", "pool_dive", "pool_route", "service_corridor", "one_way"],
+  connectors: ["stair_door", "gate", "doors", "walk", "elevator", "stairs", "bus", "pool_dive", "pool_route", "service_corridor", "one_way", "escalator", "freight_lift", "mirror", "service", "sky_hall"],
 
   // a mode is a way to play a round; `players.max` is the room size the server enforces
   modes: {
@@ -43,7 +45,7 @@ export const FARWAY = {
         {id: "L1", floorY: 0, files: ["world/L1.glb", "world/L1.json"], multiplayer: true, puzzle: "switches", loot: {lockers: 0, packs: 3}},
         {id: "L2", floorY: 3.2, files: ["world/L2.glb", "world/L2.json"], multiplayer: true, puzzle: "keypad", loot: {lockers: 0, packs: 3}},
         {id: "L3", floorY: 6.4, files: ["world/L3.glb", "world/L3.json"], multiplayer: true, powerSource: true, loot: {lockers: 0, packs: 4}},
-        {id: "L4", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/L4.json"], multiplayer: true, powerSource: true, loot: {lockers: 0, packs: 3}},
+        {id: "L4", floorY: 9.6, files: ["world/L4.glb", "world/parking_lot.glb", "world/city_skyline.glb", "world/Exterior.glb", "world/L4.json"], multiplayer: true, powerSource: true, loot: {lockers: 0, packs: 3}},
       ],
     },
     {id: "rdwe", name: "Right Door, Wrong Exit", status: "built", coop: true, tone: "dreamcore", rooms: ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"]},
@@ -53,8 +55,10 @@ export const FARWAY = {
       id: "overworld", name: "Overworld", status: "built", tone: "dreamcore",
       scenes: [
         // presence (session 17): a room's players can be in the lot together. The server relays who is there and where; it runs nothing.
-        {id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/Exterior.glb", "world/parking_lot.json"], presence: true},
-        ...["table_and_chairs", "playground", "tree_house", "bus_station", "road", "endless_hills"].map(id => ({id})),
+        // #133: the lot is the Overworld's own scene: the store's art (L4.glb), the lot (parking_lot.glb) and the town on the horizon (city_skyline.glb), under the Overworld's sky
+        {id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/parking_lot.glb", "world/city_skyline.glb", "world/parking_lot.json"], presence: true,
+         backdrop: {day: "world/backdrops/overworld_clear_day.webp", night: "world/backdrops/overworld_night.webp"}},
+        ...BLENDER_SCENES.overworld,          // the Blender Overworld (#115 to #122): the market, the playground, the courts and the track, the tree house, the road, the hills
       ],
     },
     {
@@ -65,7 +69,7 @@ export const FARWAY = {
       // B1's 4th is wave 20, the run's end, with no stairs.
       id: "gbi", name: "Going back in", status: "built", tone: "backrooms",
       scenes: [
-        {id: "gbi_L4_4", floorY: 9.6, multiplayer: true, files: ["world/L4.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
+        {id: "gbi_L4_4", floorY: 9.6, multiplayer: true, files: ["world/L4.glb", "world/parking_lot.glb", "world/city_skyline.glb", "world/Exterior.glb", "world/gbi_L4_4.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L4", index: 4, wave: {monsters: 3, kind: "creature"}, stairsDown: "DoorLeaf_Stair_L3_L4_down", next: "gbi_L3_1"}},
         {id: "gbi_L3_1", floorY: 6.4, multiplayer: true, files: ["world/L3.glb", "world/gbi_L3_1.json"], loot: {lockers: 0, packs: 3}, chamber: {floor: "L3", index: 1, wave: {monsters: 3, kind: "creature"}}},
       ],
     },
@@ -81,16 +85,17 @@ export const FARWAY = {
       // presence (session 17): a room's players see each other on the street and in the apartment. Nothing else is shared: each player's clock, needs, money, jobs and night are their own.
       scenes: [{id: "street", floorY: 0, files: ["world/street.glb", "world/street.json"], presence: true}, {id: "apartment", floorY: 0, files: ["world/apartment.glb", "world/apartment.json"], presence: true}, {id: "bus_stop"}],
     },
-    stub("hotel", "Strange hotel (apartment tower)", "planned", ["sub_pools", "lobby", "atrium", "floor_1_lower", "floor_1_upper", "floor_2_lower", "floor_2_upper", "floor_3", "roof", "anomaly_maze"]),
+    // the hotel (the apartment tower, #93 to #107): the lobby behind the tower's door on Hallam Row, the atrium, three floors, the roof, the pools and the maze
+    {id: "hotel", name: "Strange hotel (apartment tower)", status: "built", tone: "liminal", scenes: BLENDER_SCENES.hotel},
     {
       // slice 13 (session 9): the mall's atrium, a blockout behind the street's MALL door. Open to go in by day; at 20:00 it locks you in until dawn.
       id: "mall", name: "Liminal mall", status: "built", tone: "liminal",
-      scenes: [{id: "entrance", floorY: 0, files: ["world/entrance.glb", "world/entrance.json"]}],
+      scenes: [{id: "entrance", floorY: 0, files: ["world/entrance.glb", "world/entrance.json"]}, ...BLENDER_SCENES.mall],          // #110 to #116: the wings and the rooms round the atrium
     },
     {
       // slice 4 (session 9): the grocery's main floor, a blockout behind the street's grocery door; open by day like the other stores. The back of house stays planned.
       id: "grocery", name: "Grocery", status: "built", tone: "liminal",
-      scenes: [{id: "main_floor", floorY: 0, files: ["world/main_floor.glb", "world/main_floor.json"]}, {id: "back_of_house"}],
+      scenes: [{id: "main_floor", floorY: 0, files: ["world/main_floor.glb", "world/main_floor.json"]}, ...BLENDER_SCENES.grocery],          // #108 to #111: the aisles, the second floor, the back of house, the basement
     },
     {
       // slice 14 (session 9): the museum night guard's shift, behind 108 Hallam Row. One gallery hall, blockout; you are only in it during your shift.
@@ -108,7 +113,8 @@ export const FARWAY = {
       scenes: [{id: "laboratory", floorY: 0, files: ["world/laboratory.glb", "world/laboratory.json"]}],
     },
     stub("jobs", "Hallam Row (street of jobs)", "planned", ["street_of_jobs"]),
-    stub("secret_ops", "Secret Operations (Project Never Land)", "planned", ["service_entry", "hidden_entry"]),
+    // #125 and #127: thirteen scenes. Open for now (the owner, 2026-11-28): the lab's B2 door and the grocery's freight lift need no keycard yet
+    {id: "secret_ops", name: "Secret Operations (Project Never Land)", status: "built", tone: "liminal", scenes: BLENDER_SCENES.secret_ops},
     {id: "future_addon_shed", name: "Reserved for the shed", status: "reserved"},
     {id: "future_addon_treehouse", name: "Reserved for the tree house", status: "reserved"},
   ],
@@ -123,7 +129,6 @@ export const FARWAY = {
     stair("L3", "DoorLeaf_Stair_L2_L3_down", "L2", "DoorLeaf_Stair_L2_L3_up", [-16.478, 6.4, -14.278], [0.0, 1.0]),
     stair("L3", "DoorLeaf_Stair_L3_L4_up", "L4", "DoorLeaf_Stair_L3_L4_down", [16.0, 9.6, 7.2], [0.0, -1.0]),
     stair("L4", "DoorLeaf_Stair_L3_L4_down", "L3", "DoorLeaf_Stair_L3_L4_up", [16.0, 9.6, 8.0], [0.0, 1.0]),
-    gate("DoorLeaf_Gate_RDW", "rdwe", {room: "dining", arrive: [-121.2, 9.6, 63.6], face: [0.0, 1.0]}, "L4", false),          // a room can enter it (session 11): coop, see docs/ROUND.md section D
     gate("DoorLeaf_Gate_ITN", "intern", {arrive: [116.4, 9.6, 75.0], face: [1.0, 0.0]}, "L4"),
 
     // Going back in: the stairs down from the 4th chamber of L4 to the first chamber of L3. One way (the chamber's own `up` door has no link). Arrival is on L3's floor (6.4).
@@ -142,34 +147,24 @@ export const FARWAY = {
      note: "Just a ride. You arrive on the east sidewalk of Hallam Row, facing up the street."},
     {id: "city.bus>overworld", status: "built", connector: "bus", from: {area: "city", scene: "street", door: "bus_stop"}, to: {area: "overworld", scene: "parking_lot", arrive: [-41.0, 9.6, 43.0], face: [0.0, -1.0]},
      note: "The ride back. The City's clock pauses while you are away."},
-    // slice 2: the apartment tower's door on the street opens straight into your apartment for now (the tower's lobby and floors belong to the planned hotel area), and its door leads back.
-    // A room can use both (session 17): at night the street is not safe, so a player on the street must be able to get home. Every other door of the street stays solo only.
-    {id: "city.tower>apartment", status: "built", connector: "doors", from: {area: "city", scene: "street", door: "tower"}, to: {area: "city", scene: "apartment", arrive: [1.5, 0.0, 1.4], face: [0.0, -1.0]},
-     note: "The tower's lobby is not built yet: the door opens into your apartment."},
-    {id: "city.apartment>street", status: "built", connector: "doors", from: {area: "city", scene: "apartment", door: "front_door"}, to: {area: "city", scene: "street", arrive: [-6.2, 0.0, -19.0], face: [1.0, 0.0]}},
+    // slice 2 had the apartment tower's door open straight into your apartment. Since the hotel (2026-11-28, the owner: "Lobby only") it opens the hotel's lobby, and your apartment is
+    // room 301 on floor 3: city.tower>hotel_lobby, hotel.lobby.street, hotel.floor_3.room_301>apartment and city.apartment>floor_3 are in farway.scenes.js. A room can use them all.
     // slice 3: once the Intern's application is accepted (the quiz in shared/application.js; the flag is kept in the browser), 666 Hallam Row's door starts your shift: the Intern game, solo only.
     // returnTo carries where you stand when you come back out. Open store hours still apply (the street's doors shut at 20:00).
     {id: "city.666>intern", status: "built", connector: "doors", soloOnly: true, requires: ["job_intern"], from: {area: "city", scene: "street", door: "w666"}, to: {area: "intern"},
      returnTo: {area: "city", scene: "street", arrive: [-6.2, 0.0, -127.0], face: [1.0, 0.0]}, note: "A shift at The Intern. Needs the accepted application."},
-    // the road to the forest (built without the Overworld's own road scene yet): a signpost by the parking lot's north-west hedge, F walks you down it; a signpost at the road's end walks you back
-    {id: "overworld.lot>forest", status: "built", connector: "walk", from: {area: "overworld", scene: "parking_lot", door: "forest_road"}, to: {area: "dreamcore_forest", scene: "forest", arrive: [0.0, 0.0, 6.0], face: [0.0, -1.0]},
-     note: "The road to the forest. You arrive where it ends among the trees, facing up the path."},
-    {id: "forest.road>lot", status: "built", connector: "walk", from: {area: "dreamcore_forest", scene: "forest", door: "road_back"}, to: {area: "overworld", scene: "parking_lot", arrive: [-30.0, 9.6, 93.0], face: [0.0, -1.0]}},
+    // the road to the forest: the lot's signpost walks you onto the Overworld's road (#115), whose far end walks into the forest; the forest's signpost back walks you to the road's forest end.
+    // Those three links are in farway.scenes.js (overworld.parking_lot.forest_road, overworld.road.forest, forest.road>lot).
     // the forest's path ends in a bright gap: walking through it is the way into the meadow, and walking back out of the meadow's south edge is the way back
     {id: "forest.gap>meadow", status: "built", connector: "walk", from: {area: "dreamcore_forest", scene: "forest", door: "gap"}, to: {area: "dreamcore_forest", scene: "meadow", arrive: [0.0, 0.0, 6.0], face: [0.0, -1.0]}},
     {id: "meadow.gap>forest", status: "built", connector: "walk", from: {area: "dreamcore_forest", scene: "meadow", door: "gap"}, to: {area: "dreamcore_forest", scene: "forest", arrive: [0.0, 0.0, -86.0], face: [0.0, 1.0]}},
-    plan("overworld.road>forest", {area: "overworld", scene: "road"}, {area: "dreamcore_forest", scene: "forest"}, "walk", {note: "The Overworld's own road scene, when it is built, replaces the signpost walk (overworld.lot>forest)."}),
-    // the house's front door: Right Door, Wrong Exit, solo only (as its gate in L4's exterior is); you come back out on the path in front of the house
-    {id: "forest.house>rdwe", status: "built", connector: "doors", soloOnly: true, from: {area: "dreamcore_forest", scene: "meadow", door: "house_door"}, to: {area: "rdwe", room: "dining"},
+    // the house's front door: Right Door, Wrong Exit. Since #133 it is the only way in (the balloon house and its gate on L4's lot are gone), and a room can follow it
+    // (the owner, 2026-11-27: "the co-op entrance to RDWE is the meadow house as well"). You come back out on the path in front of the house.
+    {id: "forest.house>rdwe", status: "built", connector: "doors", from: {area: "dreamcore_forest", scene: "meadow", door: "house_door"}, to: {area: "rdwe", room: "dining"},
      returnTo: {area: "dreamcore_forest", scene: "meadow", arrive: [0.0, 0.0, -57.5], face: [0.0, 1.0]}, note: "The house is much bigger inside."},
     plan("forest.shed>addon", {area: "dreamcore_forest", scene: "meadow", door: "shed"}, {area: "future_addon_shed"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
-    plan("overworld.treehouse>addon", {area: "overworld", scene: "tree_house"}, {area: "future_addon_treehouse"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
-    plan("city.street>hotel_lobby", {area: "city", scene: "street"}, {area: "hotel", scene: "lobby"}, "doors"),
-    plan("hotel.lobby>atrium", {area: "hotel", scene: "lobby", door: "back_hall"}, {area: "hotel", scene: "atrium"}, "doors", {note: "A back door past the deli under the loft, then a narrow hall."}),
-    plan("hotel.atrium>floors", {area: "hotel", scene: "atrium"}, {area: "hotel", scene: "floor_1_lower"}, "elevator", {note: "One elevator to every floor. Each floor has its own section of the atrium."}),
-    plan("hotel.floor_1_stairs", {area: "hotel", scene: "floor_1_lower"}, {area: "hotel", scene: "floor_1_upper"}, "stairs", {note: "Same on floor 2. Floor 3 has one level, and its upper level is the roof."}),
-    plan("hotel.atrium>maze", {area: "hotel", scene: "atrium"}, {area: "hotel", scene: "anomaly_maze"}, "one_way", {note: "Also reached when the elevator glitches. You leave only by solving it."}),
-    plan("hotel.sub_pools>lot.B1", {area: "hotel", scene: "sub_pools"}, {area: "lot", scene: "B1"}, "pool_route", {note: "Separate pools connected underwater, a long way with many levels between."}),
+    plan("overworld.treehouse>addon", {area: "overworld", scene: "tree_house", door: "addon"}, {area: "future_addon_treehouse"}, "gate", {note: "Leads to its own addon later. Also a puzzle."}),
+    plan("hotel.sub_pools>lot.B1", {area: "hotel", scene: "sub_pool_11", door: "under_b1"}, {area: "lot", scene: "B1"}, "pool_route", {note: "Separate pools connected underwater, a long way with many levels between."}),
     // slice 13: the street's MALL door and back. In by day (08:00 to 20:00); at 20:00 the doors lock until 06:00 with you inside; solo only.
     {id: "city.street>mall", status: "built", connector: "doors", soloOnly: true, from: {area: "city", scene: "street", door: "mall"}, to: {area: "mall", scene: "entrance", arrive: [0.0, 0.0, 10.4], face: [0.0, -1.0]},
      note: "The mall can lock you in."},
@@ -189,9 +184,9 @@ export const FARWAY = {
     {id: "city.w214>lab", status: "built", connector: "doors", soloOnly: true, requires: ["job_lab"], from: {area: "city", scene: "street", door: "w214"}, to: {area: "lab", scene: "laboratory", arrive: [0.0, 0.0, 4.4], face: [0.0, -1.0]}},
     {id: "lab.laboratory>street", status: "built", connector: "doors", soloOnly: true, from: {area: "lab", scene: "laboratory", door: "front_door"}, to: {area: "city", scene: "street", arrive: [-6.2, 0.0, -95.0], face: [1.0, 0.0]}},
     {id: "museum.galleries>street", status: "built", connector: "doors", soloOnly: true, from: {area: "museum", scene: "galleries", door: "front_door"}, to: {area: "city", scene: "street", arrive: [6.2, 0.0, -41.0], face: [-1.0, 0.0]}},
-    plan("grocery.backhouse>secret_ops", {area: "grocery", scene: "back_of_house"}, {area: "secret_ops", scene: "service_entry"}, "service_corridor", {requires: ["keycard_tier_1"]}),
     plan("rdwe.repeating_room>secret_ops", {area: "rdwe", room: "repeating_room"}, {area: "secret_ops", scene: "hidden_entry"}, "gate", {note: "The only entrance with no clearance. Hinted by a room that repeats or a door seen from one angle."}),
     plan("intern.pool_dive>secret_ops", {area: "intern", room: "S8_H"}, {area: "secret_ops", scene: "service_entry"}, "pool_dive", {note: "The Intern's escape."}),
     plan("rdwe.finale>grocery", {area: "rdwe", room: "grocery"}, {area: "grocery", scene: "main_floor"}, "doors", {note: "One ending, many exits."}),
+    ...BLENDER_LINKS,
   ],
 };

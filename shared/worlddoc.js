@@ -107,8 +107,9 @@ export function checkWorldDoc(doc, {manifest = null} = {}) {
     const here = sceneOf(doc.scene), near = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) <= 0.05);
     if (!here) warn(`scene ${doc.scene} is not in the world manifest yet: a new scene to add`);
     if (blenderFirst) {
+      // a manifest link that names its own F spot (`from.at`: a door the file has no link for, as hotel floor 3's apartment door) is not looked for in the file
       const out = (manifest.links || []).filter(l => l.from && l.from.scene === doc.scene && l.from.door), into = (manifest.links || []).filter(l => l.to && l.to.scene === doc.scene && l.to.arrive);
-      for (const l of out) if (!links.some(k => k.door === l.from.door)) err(`the manifest's link ${l.id} leaves by the door ${l.from.door}, which the file has no link for`);
+      for (const l of out) if (!Array.isArray(l.from.at) && !links.some(k => k.door === l.from.door)) err(`the manifest's link ${l.id} leaves by the door ${l.from.door}, which the file has no link for`);
       for (const k of links) if (isObj(k) && isName(k.door) && !out.some(l => l.from.door === k.door)) warn(`link ${k.door}: the manifest has no link from this door yet: a new link to add`);
       for (const l of into) if (!links.some(k => near(k.arrive, l.to.arrive) && near(k.face, l.to.face))) warn(`the manifest's link ${l.id} arrives at ${fmt(l.to.arrive)}, which is no arrive point of the file`);
     }

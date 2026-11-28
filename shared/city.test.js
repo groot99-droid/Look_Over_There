@@ -36,10 +36,13 @@ test("world/apartment.json is what shared/city.js makes", () => {
   assert.deepEqual(JSON.parse(fs.readFileSync(new URL("../world/apartment.json", import.meta.url), "utf8")), JSON.parse(JSON.stringify(apartmentDoc())));
 });
 test("the apartment links match the layout, and the clock runs in both City scenes", () => {
-  const into = REGISTRY.linkFrom("street", "tower"), out = REGISTRY.linkFrom("apartment", "front_door");
-  assert.ok(into && into.status === "built" && !into.soloOnly && out && out.status === "built" && !out.soloOnly, "a room can go home too (session 17)");
+  // since the hotel (the owner, 2026-11-28: "Lobby only"): the tower's door opens the hotel's lobby, and your apartment is room 301 on hotel floor 3
+  const tower = REGISTRY.linkFrom("street", "tower"), lobbyOut = REGISTRY.linkFrom("lobby", "street"), into = REGISTRY.linkFrom("floor_3", "room_301"), out = REGISTRY.linkFrom("apartment", "front_door");
+  for (const l of [tower, lobbyOut, into, out]) assert.ok(l && l.status === "built" && !l.soloOnly, "a room can go home too (session 17)");
+  assert.equal(tower.to.scene, "lobby"); assert.equal(into.to.scene, "apartment"); assert.equal(out.to.scene, "floor_3");
   assert.deepEqual(into.to.arrive, APARTMENT.arrive); assert.deepEqual(into.to.face, APARTMENT.face);
-  assert.deepEqual(out.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(out.to.face, TOWER_FRONT.face);
+  assert.deepEqual(lobbyOut.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(lobbyOut.to.face, TOWER_FRONT.face);
+  assert.ok(Math.hypot(out.to.arrive[0] - into.from.at[0], out.to.arrive[2] - into.from.at[2]) < 1, "you come out by your own door");
   assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor", "entrance", "galleries", "factory_floor", "laboratory"]);
   const [hx, hz] = APARTMENT.half, inside = ([x, z]) => Math.abs(x) < hx && Math.abs(z) < hz, hit = ([x, z], b) => x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2];
   for (const p of [APARTMENT.arrive.filter((_, i) => i !== 1), APARTMENT.door.at, APARTMENT.computer.at]) { assert.ok(inside(p), "inside the room " + p); assert.ok(!hit(p, APARTMENT.bed) && !hit(p, APARTMENT.desk), "clear of furniture " + p); }

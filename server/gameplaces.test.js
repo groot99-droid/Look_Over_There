@@ -27,7 +27,8 @@ function client(port) {
     quiet: async ms => { await new Promise(r => setTimeout(r, ms)); return inbox.splice(0); }};
 }
 const kind = t => m => m.t === t;
-async function join(srv, room, name) { const c = client(srv.port); await c.open; c.send({t: "join", room, name}); const w = await c.next(kind("welcome")); return Object.assign(c, {id: w.id, welcome: w}); }
+// since #133 the way into Right Door, Wrong Exit is the meadow house, past the lot: the Original's flag opens it (the browser holds it, see presence.test.js)
+async function join(srv, room, name) { const c = client(srv.port); await c.open; c.send({t: "join", room, name, flags: ["original_complete"]}); const w = await c.next(kind("welcome")); return Object.assign(c, {id: w.id, welcome: w}); }
 const sees = async (srv, room, c, scene) => { const end = Date.now() + 2000; while (Date.now() < end) { if (srv.rooms.get(room).players.get(c.id).scene === scene) return true; await new Promise(r => setTimeout(r, 10)); } return false; };
 
 test("shipped: a place in Right Door, Wrong Exit is accepted, one in the Intern is refused (it is still solo only)", async () => {
