@@ -54,7 +54,8 @@ export function behindSpot(W, dr, seen = null) {
 }
 // pick the chained door: candidates in random order (rnd), the first that is safe. Returns the door or null.
 export function pickChainedDoor(W, spots, rnd) {
-  const cand = W.doors.filter(dr => !dr.link && Math.abs(dr.cy - W.floor) < 0.6);
+  // never a way on (a stair link, or a Blender chamber's linked door), and never a door that is not one: a vent, or a leaf the scene says is locked (built shut)
+  const cand = W.doors.filter(dr => !dr.link && !(W.linkDoors && W.linkDoors.has(dr.d.name)) && !dr.d.locked && dr.d.kind !== "vent" && Math.abs(dr.cy - W.floor) < 0.6);
   for (let i = cand.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [cand[i], cand[j]] = [cand[j], cand[i]]; }
   return cand.find(dr => safeToChain(W, dr, spots)) || null;
 }

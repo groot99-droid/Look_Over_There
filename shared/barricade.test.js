@@ -37,6 +37,7 @@ test("on every chamber, the picked door leaves every spot reachable; never a sta
     for (const s of spots) assert.ok(seen[nearestWalk(W.nav, ...s)], id + " seed " + seed + ": a spot behind the chain");
   }
   assert.ok(picked > 0, "some chamber has a door that is safe to chain");
+  for (const id of REGISTRY.chambers) { const W = worldOf(id), dr = pickChainedDoor(W, spotsOf(W), rng32(1)); if (dr) assert.ok(dr.d.kind !== "vent" && !dr.d.locked && !W.linkDoors.has(dr.d.name), `${id}: ${dr.d.name} is a real side door`); }
   // since #123 the third floor's stairwell door is chamber 1's way on (into chamber 2), so it is a link and never chained
   const l31 = pickChainedDoor(worldOf("gbi_L3_1"), spotsOf(worldOf("gbi_L3_1")), rng32(1)); assert.ok(!l31 || l31.d.name !== L3_DOOR);
   assert.equal(pickChainedDoor(worldOf("gbi_L4_4"), spotsOf(worldOf("gbi_L4_4")), rng32(1)), null, "the fourth floor chamber has no door that is safe: its stair door is the way on, its gates are off the map");

@@ -23,7 +23,7 @@ const atOf = l => l.from.at || (doc(l.from.scene).links || []).find(k => k.door 
 // a scene whose way in is drawn by the page's own code, not a scene file (the street, the apartment, the forest): loaded straight, its links checked by the manifest test
 const CODE = ["street", "apartment", "forest", "meadow"];
 try {
-  const page = await (await browser.newContext({viewport: {width: 480, height: 320}})).newPage(); page.on("pageerror", e => errors.push(e.message));
+  const page = await (await browser.newContext({viewport: {width: 900, height: 700}})).newPage(); page.on("pageerror", e => errors.push(e.message));
   await page.goto(`http://localhost:${srv.port}/`); await page.click("#l-solo");
   await page.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 240000});
   // the City's clock at noon, so the stores and the mall are open and nothing locks you in

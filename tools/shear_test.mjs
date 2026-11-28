@@ -113,7 +113,7 @@ try {
   let chained = null;
   for (const id of REGISTRY.chambers) {
     await page.evaluate(id => window.__game.loadScene(id), id); await settled(id); await page.evaluate(() => { window.__game.P.imm = 1e9; });
-    chained = await page.evaluate(() => { const g = window.__game, d = g.BAR.st && g.BAR.st.door; if (!d) return null; window.__chainedDoor = d.d.name; return {name: d.d.name, chained: d.chained, box: d.box.chained, target: d.target, behind: g.BAR.behind.length, link: !!d.link}; });
+    chained = await page.evaluate(() => { const g = window.__game, d = g.BAR.st && g.BAR.st.door; if (!d || !g.BAR.behind.length) return null; window.__chainedDoor = d.d.name; return {name: d.d.name, chained: d.chained, box: d.box.chained, target: d.target, behind: g.BAR.behind.length, link: !!d.link}; });
     if (chained) { chained.scene = id; break; }
   }
   const door = chained;

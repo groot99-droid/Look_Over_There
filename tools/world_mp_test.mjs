@@ -82,7 +82,7 @@ try {
   await until("Bob sees Ann in the lot", b, id => { const p = window.__game.net.peers.get(id); return p && p.scene === "parking_lot" && p.obj.visible && Math.hypot(p.tx + 8, p.tz - 46) < 0.5; }, idA, async () => JSON.stringify(await peerOn(b, idA)) + "; " + xzOf(playerOf(idA)));
   // each sees the other move
   await stand(b, idB, "parking_lot", -10, 46, "Bob walks off");          // #133: the cars are solid now, one stands at (-12, 50)
-  await until("Ann sees Bob move, and his avatar follows", a, id => { const p = window.__game.net.peers.get(id); return p && Math.hypot(p.tx + 12, p.tz - 50) < 0.5 && Math.hypot(p.obj.position.x + 12, p.obj.position.z - 50) < 1; }, idB, async () => JSON.stringify(await peerOn(a, idB)));
+  await until("Ann sees Bob move, and his avatar follows", a, id => { const p = window.__game.net.peers.get(id); return p && Math.hypot(p.tx + 10, p.tz - 46) < 0.5 && Math.hypot(p.obj.position.x + 10, p.obj.position.z - 46) < 1; }, idB, async () => JSON.stringify(await peerOn(a, idB)));
   await stand(a, idA, "parking_lot", -20, 44, "Ann walks off");
   await until("Bob sees Ann move", b, id => { const p = window.__game.net.peers.get(id); return p && Math.hypot(p.tx + 20, p.tz - 44) < 0.5 && Math.hypot(p.obj.position.x + 20, p.obj.position.z - 44) < 1; }, idA, async () => JSON.stringify(await peerOn(b, idA)));
 

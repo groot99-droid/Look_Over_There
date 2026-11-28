@@ -2,12 +2,13 @@
 // dining room, which is now world/rdwe_dining.glb with its baked light and world/rdwe_dining.json's colliders; the walker stands on the floor, is
 // stopped by a wall and climbs the green stairs; the door at the top takes it to the hallway, a side door of the hallway to the hall of doors and
 // back, each time at the far side's arrival point; a shut door does not open; the dining room's front door (`house`) ends the game and the player is
-// back on L4. Then the grocery's entrance into the finale, and the finale's `win` door out. Every delivered room is checked for its files.
+// back in the meadow, in front of the house. Then the grocery's entrance into the finale, and the finale's `win` door out. Every delivered room is checked for its files.
 // Usage: node tools/rdwe_blender_test.mjs     (needs Playwright + Chromium, and internet for three.js from unpkg; run from the repo root)
 import {createRequire} from "node:module";
 import {readFileSync, existsSync} from "node:fs";
 import {createServer} from "../server/server.js";
 import {ROOMS, SPINE, MISSING} from "../games/rdwe/blender_rooms.js";
+import {MEADOW} from "../shared/forest.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
@@ -33,12 +34,13 @@ const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-
 const errors = [];
 const wait = (page, fn, arg, ms = 90000) => page.waitForFunction(fn, arg, {timeout: ms, polling: 100}).then(() => true, () => false);
 const W = "./games/rdwe/walk.js";
+// since #133 the way in is the meadow house's door (the balloon house and its gate on L4's lot are gone): F there enters the game, and you come back out in front of it
 async function enterGate(page) {
-  await page.evaluate(async () => { const g = window.__game; if (g.S.id !== "L4") await g.loadScene("L4"); const dr = g.doors.find(d => d.d.name === "DoorLeaf_Gate_RDW"); g.teleport([dr.cx, g.S.floor, dr.cz]); g.openDoor(dr, true); });
-  if (!await wait(page, () => window.__game.S.id === "T" && !window.__game.loading)) return false;
-  await page.evaluate(() => { const g = window.__game, dr = g.doors.find(d => d.link && d.link.game); g.openDoor(dr, true); });
+  await page.evaluate(async door => { const g = window.__game; if (g.S.id !== "meadow") await g.loadScene("meadow", {pos: [door.at[0], 0, door.at[1] + 0.5], face: [0, -1]}); g.teleport([door.at[0], 0, door.at[1]]); g.doAction(); }, MEADOW.house.door);
   return wait(page, () => document.getElementById("gamemount").style.display === "block");
 }
+const backOut = page => wait(page, () => window.__game.S.id === "meadow" && !window.__game.loading && document.getElementById("gamemount").style.display === "none", null, 150000);
+const atHouse = p => Math.hypot(p[0] - MEADOW.returnHouse.arrive[0], p[2] - MEADOW.returnHouse.arrive[2]) < 2.5;
 // (polled with evaluate: waitForFunction takes the promise an async predicate returns as truthy)
 async function inRoom(page, id, ms = 120000) {
   const t0 = Date.now();
@@ -65,7 +67,7 @@ try {
   page.on("pageerror", e => errors.push(e.message)); if (process.env.RDWE_DEBUG) page.on("console", m => console.log("[console]", m.text().slice(0, 200)));
   await page.goto(`http://localhost:${srv.port}/`); await page.click("#l-solo");
   await page.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 240000});
-  check("the L4 gate takes us into the game", await enterGate(page));
+  check("the meadow house's door takes us into the game", await enterGate(page));
   check("the game opens in the dining room", await inRoom(page, "dining"));
   const room = await page.evaluate(async W => {
     const c = (await import(W)).debug.current, b = c.built; let meshes = 0, baked = 0;
@@ -131,9 +133,9 @@ try {
   check("link 4: the hallway's first door leads back down to the dining room, at the top of the stairs", await inRoom(page, "dining") && near(await where(page), ROOMS.dining.links.stairs.arrive), JSON.stringify(await where(page)));
   const out = await useLink(page, "house");
   check("the dining room's front door is a way out", out.state === "exit" && out.label === "LEAVE", JSON.stringify(out));
-  const back = await wait(page, () => window.__game.S.id === "L4" && !window.__game.loading && document.getElementById("gamemount").style.display === "none", null, 150000);
+  const back = await backOut(page);
   const p4 = await page.evaluate(() => window.__game.P.p.toArray());
-  check("... and the player is back on L4 at the gate", back && Math.hypot(p4[0] + 121.2, p4[2] - 63.6) < 2.5, JSON.stringify(p4));
+  check("... and the player is back in the meadow, in front of the house", back && atHouse(p4), JSON.stringify(p4));
   check("... and the walk says the game was left by the house door", await page.evaluate(async W => { const w = await import(W); return w.next() === null && w.leftBy() === "house"; }, W));
   // again: the trampoline park's reserved door is shut; the grocery's entrance opens on the finale, and the finale's win door ends the game
   check("into the game again", await enterGate(page) && await inRoom(page, "dining"));
@@ -149,7 +151,7 @@ try {
   check("the finale is loaded, with its win door", fin.meshes > 20 && fin.boxes > 60 && fin.win, JSON.stringify(fin));
   const win = await useLink(page, "win");
   check("the finale's win door is a way out", win.state === "exit" && win.label === "LEAVE", JSON.stringify(win));
-  check("... and the player is back on L4", await wait(page, () => window.__game.S.id === "L4" && !window.__game.loading && document.getElementById("gamemount").style.display === "none", null, 150000)
+  check("... and the player is back in the meadow", await backOut(page)
     && await page.evaluate(async W => (await import(W)).leftBy() === "win", W));
   // every other room loads and stands the walker on a floor at each of its arrival points
   const ids = Object.keys(ROOMS);
