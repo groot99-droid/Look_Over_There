@@ -885,6 +885,44 @@ def maze(k):
 
 
 # ---------------------------------------------------------------- the escalators and the other staircase
+# The three escalator runs: (flight, lane x0, lane x1, z where the first step starts, direction along z, floor it starts on). 16 steps of 0.3 m by 0.25 m.
+ESC_RUNS = (("esc_0_4", -2.8, -1.6, 2.4, -1, 0.0), ("esc_4_8", -0.6, 0.6, -2.4, 1, 4.0), ("esc_8_12", 1.6, 2.8, 2.4, -1, 8.0))
+ESC_N, ESC_TREAD, ESC_RISE = 16, 0.3, 0.25
+ESC_BAL = 0.12          # a balustrade's thickness beside the steps (skirt, panel and deck)
+ESC_BAL_H = 0.95        # its top (the handrail) above the steps' nosing line
+ESC_TRUSS = 1.25        # an upper run's truss: its underside this far below the nosing line
+ESC_NEWEL = 0.5         # how far a balustrade's newel runs on past the last step, on the floor it stands on
+ESC_GUARD_H = 1.05      # the landings' guards (glass, a steel cap) along the edge over the hall
+
+
+def esc_solids(S):
+    """Added with the dressed scene (tools/blender/build_hotel_stairs.py), each with its collider; the steps are the greybox's, unchanged.
+    - Each run's two balustrades, one box a step: for the ground run from the floor (its truss is clad down to the floor), for the upper runs from
+      the truss's underside, to the handrail over the step's far end.
+    - The ground run's truss under each step (Fill_esc_0_4_<nn>, floor to the step's underside), so its underside is closed, not walked under.
+    - The newels, where each balustrade runs on past the end steps onto the floor (Newel_<run>_<bottom|top>_<W|E>).
+    - The landings' guards over the hall, between the newels (Guard_<landing>_<k>)."""
+    for fl, l0, l1, z0, d, y0 in ESC_RUNS:
+        for i in range(ESC_N):
+            za, zb = sorted((z0 + d * ESC_TREAD * i, z0 + d * ESC_TREAD * (i + 1)))
+            bottom, top = y0 + ESC_RISE * i, y0 + ESC_RISE * (i + 1)
+            lo = 0.0 if y0 == 0.0 else top - ESC_TRUSS
+            hi = top + ESC_RISE + ESC_BAL_H
+            S.solid(f"Balustrade_{fl}_W_{i:02d}", (l0 - ESC_BAL, lo, za), (l0, hi, zb), "rail")
+            S.solid(f"Balustrade_{fl}_E_{i:02d}", (l1, lo, za), (l1 + ESC_BAL, hi, zb), "rail")
+            if y0 == 0.0 and i:
+                S.solid(f"Fill_{fl}_{i:02d}", (l0, 0.0, za), (l1, bottom, zb), "rail")
+        z1 = z0 + d * ESC_TREAD * ESC_N
+        for end, zz, yy, dd in (("bottom", z0, y0, -d), ("top", z1, y0 + ESC_RISE * ESC_N, d)):
+            na, nb = sorted((zz, zz + dd * ESC_NEWEL))
+            S.solid(f"Newel_{fl}_{end}_W", (l0 - ESC_BAL, yy, na), (l0, yy + ESC_RISE + ESC_BAL_H, nb), "rail")
+            S.solid(f"Newel_{fl}_{end}_E", (l1, yy, na), (l1 + ESC_BAL, yy + ESC_RISE + ESC_BAL_H, nb), "rail")
+    for y, ze, spans in ((4.0, -2.4, ((-1.48, -0.72), (0.72, 3.0))), (8.0, 2.4, ((-3.0, -0.72), (0.72, 1.48))), (12.0, -2.4, ((-3.0, 1.48),))):
+        g0, g1 = sorted((ze, ze + (0.06 if ze < 0 else -0.06)))
+        for k, (x0, x1) in enumerate(spans, 1):
+            S.solid(f"Guard_{int(y)}_{k}", (x0, y, g0), (x1, y + ESC_GUARD_H, g1), "rail")
+
+
 def escalators():
     S = Scene("escalators", "Escalators", "6 m by 8.8 m, 15.2 m high: three escalator runs between the galleries", levels=(0.0,), mood="connector")
     x0, x1, z0, z1, h = -3.0, 3.0, -4.4, 4.4, 15.2
@@ -896,6 +934,7 @@ def escalators():
     flight(S, "esc_0_4", -2.8, -1.6, 2.4, -1, "z", 0.0, 4.0, 16, 0.3)
     flight(S, "esc_4_8", -0.6, 0.6, -2.4, +1, "z", 4.0, 8.0, 16, 0.3)
     flight(S, "esc_8_12", 1.6, 2.8, 2.4, -1, "z", 8.0, 12.0, 16, 0.3)
+    esc_solids(S)
     for y, zl, za, side, face in ((0.0, 3.8, 3.2, "S", (0, -1)), (4.0, -3.8, -3.2, "N", (0, 1)), (8.0, 3.8, 3.2, "S", (0, -1)), (12.0, -3.8, -3.2, "N", (0, 1))):
         L = f"L{int(y)}"
         if side == "S":
@@ -921,6 +960,9 @@ def other_stairs():
     for k in range(3):
         y = 4.0 * k
         flight(S, f"st_{k}_a", x0, -0.1, 1.4, -1, "z", y, y + 2.0, 8, 0.3)
+        if k == 0:      # added with the dressed scene (build_hotel_stairs.py): the ground flight is solid concrete to the floor, not walked under
+            for i in range(1, 8):
+                S.solid(f"Fill_st_0_a_{i:02d}", (x0, 0.0, 1.4 - 0.3 * (i + 1)), (-0.1, 0.25 * i, 1.4 - 0.3 * i), "stair")
         S.solid(f"Half_Landing_{k}", (x0, y + 2.0 - SLAB, z0), (x1, y + 2.0, -1.0), "floor")
         flight(S, f"st_{k}_b", 0.1, x1, -1.0, +1, "z", y + 2.0, y + 4.0, 8, 0.3)
         S.solid(f"Landing_{int(y + 4)}", (x0, y + 4.0 - SLAB, 1.4), (x1, y + 4.0, z1), "floor")
