@@ -1,0 +1,178 @@
+# parking_lot: the lot made an Overworld scene; the house, its balloons and its gate gone
+
+The owner, 2026-11-27: "The parking lot was supposed to be part of the overworld and that house with balloons was supposed to go since it's
+been replaced." The lot in front of the store is now its own Overworld scene, built Blender-first like the market, the playground and the
+road, with its own GLB, and dressed in their look. The Right Door, Wrong Exit house to the west (its old entrance; the meadow's house door,
+`forest.house>rdwe`, replaced it), its balloons and its gate are gone from every scene the page draws.
+
+| File | What |
+|---|---|
+| `world/parking_lot.glb` | the lot only (WebP textures, 5.48 MB, 114,712 triangles, 43 materials), merged by material |
+| `world/parking_lot.json` | the layout: 186 colliders, 6 links, 2 markers, 2 spots; written by `export_scene.py` from the `.blend`, equal to `build_overworld_greybox.py --preview`'s |
+| `world/lightmaps/parking_lot_0.webp`, `_1.webp` | the AO bake (2048 each, linear, `TEXCOORD_1`): the ground and the hedges; everything standing |
+| `blender/scenes/parking_lot.blend` | the saved scene (Git LFS): `Art`, `Layout` (the `COL_` boxes and empties), `Export` (merged, with the AO UVs) |
+| `blender/textures/overworld_lot/` | asphalt, grass, hedge, paving (made by the build, after the road's and the bus station's), the boards' lettering, and `store_signs.png`: the store's own four sign pictures (its logo, PARKING, STOP, the cart sign), copied out of the old `Exterior.glb` |
+| `tools/blender/build_overworld_lot.py` | the build: textures, art, layout check, bake, export, stills, before/after, owner sheet |
+| `tools/blender/build_overworld_greybox.py` | the layout model gains `parking_lot()`; the lot's four joins become PAIRS; `--check` gains the lot's gate |
+| `tools/split_exterior.py` | the store's outside after the ruling (below) |
+| `1_arrival.jpg`, `2_wide.jpg`, `3_detail.jpg`, `4_plan.jpg` | the stills (Cycles, 96 samples, the store of `L4.glb` and the two sets in place, the Overworld's clear-day sky) |
+| `before_after_arrival.jpg`, `before_after_west.jpg` | the same view before (L4.glb + the old Exterior.glb, as the page draws the lot today) and after |
+| `bake.json`, `brightness.txt`, `CHECKS.txt` | the bake's report, the brightness table, every gate's output |
+
+## The decisions
+
+**The Exterior split: (b), with the lot shared.** The lot's GLB is drawn by all three scenes that showed the lot: the Overworld's
+`parking_lot`, the Original's `L4` (you walk out into the lot there, and its Intern gate is out in it) and Going back in's `gbi_L4_4` (the
+view out of the glass doors). So the lot looks the same through the glass, on the walk out and in the Overworld. `world/Exterior.glb` keeps
+only what `L4` and `gbi_L4_4` still need from it: the Intern's street and gate, the city round it, its road (`Road_ITN`) and the sky box
+(`Sky_LOT_Exterior`, which `applySky` lights). `tools/split_exterior.py` (plain Python, re-runnable) dropped the lot, the house (walls, roof,
+trim, floor, both balloon materials, flowers, swing, fence, clouds, sun, the "wrong exit", its furniture, `Road_RDW`), the gate box
+(`Gate_RDW_wall`, `Gate_RDW_step`, `DoorLeaf_Gate_RDW`) and the cones west of the city: 61 of its 275 nodes stay, each kept primitive's
+buffers and every kept image byte for byte (decoded and compared), 4.24 MB -> 1.60 MB. The scene's extras lost `sl_group` (an add-on's
+script list with a user folder) and the sites' `origin` (an owner's name). It also edits `world/L4.json` and `world/gbi_L4_4.json`: the
+gate's stairwell (19 boxes) and the house's two props go, the stairwell's holes in the ground and the grass are filled, and the south
+hedge is cut where the lot's art cuts it. Their doors and markers are left to the coordinator (the manifest test pins the gate).
+Option (a), retiring Exterior, would have taken the Intern's gate out of the Original; that was not part of the ruling.
+
+**Draft PR #132 (the Exterior rebake) is superseded.** It baked the old Exterior with the lot and the house in it; the lot is now this
+scene (its own AO bake), and the house is gone. The city and the Intern's street that stay in Exterior are unbaked, as on main; #132's
+tools could bake them again on the split file.
+
+**The far city: left to the Overworld skies.** The Overworld's lot draws no city. The Intern's city set did not stand far off: five of its
+towers stood on the lot's asphalt (one 91 m tall between the planter rows, one 18 m east of the table), one cut through the store's east
+end, and its west wall (x 60 to 61, 80 m tall) ran down the lot's east edge exactly where the market joins it (x 61, z 76). The Overworld's
+four skies (`world/backdrops/overworld_*.webp`, #117) already carry the town past the south hedge, the hills and the far store, seen from
+this lot's spawn. The city stays in `Exterior.glb` for `L4` and `gbi_L4_4` only, where the Original still walks to the Intern's gate.
+
+## What is there
+
+The lot keeps part 1's frame (its floor at y 9.6; the store of `world/L4.glb` at its north side, facing it) and its playable layout:
+
+- **The asphalt** (x -62 to 62, z 27.75 to 98) in four rows of bays, a line every 2.7 m from x -54 to 54, as part 1's; the zebra crossing to
+  the doors, the store's yellow no-parking lines, a low kerb along its north edge. The road's head runs through the gap in the south hedge.
+- **The cars:** part 1's, in their bays, made pastel plastic (plum, mint, periwinkle, coral, silver, teal, cream, pink, yellow) and solid
+  (part 1's could be walked through): 62. Gone: the two that stood between the table and the store (the store front is in view from the
+  table now), the one in the bus station's place and the covered car there; the other covered car moved 1.2 m off the parking post it stood on.
+- **The hedges:** part 1's planter row (z 54.5 to 56.5, on a kerb) with a pastel tree where each of its trees stood and a lamp where each of
+  its lamps stood; its back hedge (z 98 to 99.5) with the road's gap (x -34 to -26) and the hills' stile (x 29 to 31).
+- **Part 1's street furniture where it stood:** the parking, stop and cart posts with the store's own signs, the LOOK OVER THERE pylon
+  (its logo both ways), the benches and bins by the doors, the cycle rack, the cart corral; its carts (decor), its old tyres (flower
+  planters now), its cones.
+- **The old signpost** at the road's head (FOREST_ROAD_LOT.post, (-30, 96.6)), TO THE FOREST, with its collider where index.html puts one.
+- **The joins:** an arch over each edge join (MARKET east, PLAYGROUND west, PARKING LOT on their far faces), a paved way out under each,
+  the road's gap, the stile with its THE HILLS board.
+- **Round the store:** the paved apron, a bed of lawn each side with pastel trees (solid trunks) and shrubs, flowers along the hedges.
+- **Lawns** out to 400 m (part 1's grass), the near 20 m baked, the rest not (open ground); invisible edge walls at 400 m.
+- Two `Spot_groundskeeper` on the back hedge.
+
+The table and chairs and the bus station (#121) stay sets of their own, as the greybox has them: nothing of the lot stands in their places
+(the gate checks it), and the stills show them there.
+
+### Joins and doors (parking_lot's frame)
+
+| Door | F at | Arrive | Facing | The other side |
+|---|---|---|---|---|
+| `market` | (61, 9.6, 76) | (59.6, 9.6, 76) | (-1, 0) | `market.lot` (its west gap) |
+| `playground` | (-61, 9.6, 76) | (-59.6, 9.6, 76) | (1, 0) | `playground.lot` (its east gap) |
+| `forest_road` | (-30, 9.6, 95.6) | (-30, 9.6, 93) | (0, -1) | `road.lot` (the road's lot end) |
+| `hills` | (30, 9.6, 95.6) | (30, 9.6, 93) | (0, -1) | `endless_hills.lot` (its signpost) |
+| `store_doors` | (0, 9.6, 28.6) | (-8, 9.6, 43.6) (the table: `lot.L4.front_doors>overworld`) | (0, -1) | the store (the options screen) |
+| `bus_stop` | (-42.4, 9.6, 44.2) | (-41, 9.6, 43) (`city.bus>overworld`) | (0, -1) | Hallam Row; the bus station set's points replace these when it is placed |
+
+The first four are the greybox README's points, unchanged (its `--check` compares them). Markers: `Spawn_table` (-8, 9.6, 43.6), kind
+Spawn (the manifest test's), and `Store_doors` (0, 9.6, 28.5), kind Entrance. The store's 55 colliders are copied from `world/L4.json` and
+the doors' block from `tools/make_parking_lot.mjs` (now a stub that points here: it would have rebuilt the old file).
+
+## Light (docs/BLENDER.md R1, AO-only)
+
+As every Overworld scene: the baked materials carry `aomap` (`world/lightmaps/parking_lot_<n>.webp`) and `aomap_intensity` 1.0 on the second
+UV set; the page keeps them lit (it does not read `aomap` yet). Cycles AO on the rented GPU, 256 samples, OIDN, 8 px margin; the store
+(`L4.glb`) and the two sets are in the scene for the rays, never baked or exported.
+
+| Map | What | AO distance | px/m | AO p10 / p50 / p90 |
+|---|---|---|---|---|
+| `parking_lot_0` | asphalt, paving, the near lawns, the hedges | 1.5 m | 10.5 | 0.40 / 1.00 / 1.00 |
+| `parking_lot_1` | everything standing | 0.8 m | 10.9 | 0.01 / 0.41 / 1.00 |
+
+Not baked: the lamp heads (`Lamp_Emit`), the paint, the far lawn, the cars' glass and lamps, the flowers, the carts (hundreds of thin wires).
+Map 1's low p50 is the faces nobody sees (under the cars' bodies, inside the crowns' blobs and the planter kerbs).
+
+## Brightness
+
+As the other Overworld scenes: base colour x AO texel (linear), under a white ambient of 1, before the page's sun; area-weighted, max channel.
+The asphalt is the road's (p50 0.11), the grass the road's and the bus station's. Every colour is held at or under 0.85; the store's signs
+were dimmed to 0.92 so their whites stay under 1 (0.08 % of their texels reach 1, at the letters' edges). `brightness.txt` has the full table.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Grass | 13,857 | 0.552 | 0.588 | 0.617 |
+| Asphalt | 8,985 | 0.107 | 0.117 | 0.129 |
+| Paving | 2,642 | 0.651 | 0.738 | 0.776 |
+| Hedge | 1,293 | 0.207 | 0.262 | 0.301 |
+| the nine car colours | 212 to 382 each | 0.24 to 0.49 | 0.50 to 0.85 | 0.50 to 0.85 |
+| Leaf_Pink / Mint / Lilac | 549 to 673 | 0.21 to 0.23 | 0.80 to 0.85 | 0.80 to 0.85 |
+| Store_Signs | 40.7 | 0.347 | 0.799 | 0.831 |
+
+## Gates (CHECKS.txt has the full output)
+
+- Layout check on the saved scene, in the lot's floor frame (y - 9.6) as for every Overworld scene: **141 of 141 pass** (126 COVER, STRAY,
+  14 CLEAR); the store's 56 colliders are left to `L4.glb`, whose art they are.
+- `export_scene.py` writes the same `world/parking_lot.json` as `--preview`.
+- `build_overworld_greybox.py --check .`: **GATES PASS**, with the new lot gate: the joins at the README's points, the store's colliders as
+  `L4.json` has them, the spawn, no house, gate or city collider and nothing standing on the house's plot, the sets' places clear; and its
+  corridors (the aisles, the edge joins, the road's gap either side of the signpost, the stile, the way from the table to the doors).
+- `node tools/worlddoc.mjs check`: `parking_lot.json`, `L4.json`, `gbi_L4_4.json` OK, **0 errors** (warnings: the lot is over 60 m, its
+  market, playground and hills doors are new to the manifest).
+- `glb_inspect --budget tris=300000,mb=8`: `parking_lot.glb` pass (114,712 triangles, 5.48 MB). The split `Exterior.glb` is 1.53 MB and
+  427,468 triangles, over the triangle budget as main's was (1,443,500): its 8 city trees are 42,886 triangles each, and only the removal
+  was asked of its geometry.
+- `node --test shared/*.test.js`: 297 of 297 pass; `node tools/manifest.mjs check`: 0 errors, 0 warnings.
+- Privacy grep (user names, absolute paths, session ids, e-mails, the render host) over every committed file of this work, the `.blend`
+  decompressed, and the owner sheet: 0 hits. No `sl_group` in either GLB. The stills carry no comment or APP1 segment.
+
+## For the coordinator to wire (not done here: `index.html`, `shared/` and the tests are untouched)
+
+1. `shared/farway.manifest.js`, the Overworld's scene: `{id: "parking_lot", floorY: 9.6, files: ["world/L4.glb", "world/parking_lot.glb",
+   "world/parking_lot.json"], presence: true, backdrop: {day: "world/backdrops/overworld_clear_day.webp", ...}}`. The backdrop is needed now:
+   the sky box stays in `Exterior.glb`, which the lot no longer loads.
+2. `L4` and `gbi_L4_4`: `files: ["world/L4.glb", "world/parking_lot.glb", "world/Exterior.glb", ...]` (the lot, then the Intern's street
+   and city).
+3. Drop the gate `gate("DoorLeaf_Gate_RDW", "rdwe", ...)`, and with it, from `world/L4.json` and `world/gbi_L4_4.json`, the door
+   `DoorLeaf_Gate_RDW` and the marker `Entrance_RDW_House_1` (their colliders are gone already). **`shared/manifest.test.js` pins the gate and
+   must be updated with it**: the gates loop and `soloOnly` asserts (lines 63 to 69), the door-link count (line 47, 10 -> 9), and the
+   `pageScenes` `glbs` lists for L4, parking_lot and gbi_L4_4 (lines 23 to 25 and 121). `tools/gates_test.mjs` and
+   `tools/games_party_test.mjs` walk to that gate too. Note: that gate was the coop way into Right Door, Wrong Exit (`soloOnly: false`);
+   `forest.house>rdwe` is solo only, so rooms lose their way in unless it is made coop.
+4. The lot's links: `overworld.lot>market` / `overworld.market>lot`, `overworld.lot>playground` / `overworld.playground>lot`,
+   `overworld.lot>hills` / `overworld.hills>lot` (new), and `overworld.lot>forest` (door `forest_road`, now to the road's start), as the
+   greybox README lists them; `store_doors` and `bus_stop` are in the file at today's points.
+5. `index.html`: `applySky` finds no sky box in the lot (the backdrop replaces it); drop the drawn table (`overworldProps`), the shelter
+   (`busStopLotProps`) when the two sets' GLBs go in at the greybox's ATTACH points, and the drawn signpost in `forestRoadLotProps` (this GLB
+   has it, and the file its collider at the same place; keep its F logic).
+
+## Open
+
+- In `L4` and `gbi_L4_4` the Intern's city still stands on the lot (five towers on the asphalt, one through the store's east end), as it
+  always has; some of the lot's cars stand inside them there, as part 1's did. Taking those towers out of the Original too is a ruling of its
+  own (and `L4.json`'s colliders with them).
+- `L4.json` keeps part 1's walk-through cars: the lot's new solids (cars, trees, arches, bins, rack, signpost) are walk-through in the
+  Original until the coordinator copies their colliders from `parking_lot.json`, if wanted.
+- `tools/blender/overworld_greybox_sheets.py` has not been rerun with the lot in the model.
+
+## Sources and licences
+
+Everything here was made for this scene by the build (numpy noise and drawing; the lettering uses the system's sans-serif bold to draw pixels,
+no font file is shipped), except the store's four sign pictures, copied unchanged out of the old `world/Exterior.glb` (the game's own). No
+Meshy, no Higgsfield, no downloads, no purchases.
+
+## Rebuild
+
+From the repo root (Blender 5.2, Python with numpy and Pillow; `<work>/ctx` may hold the two sets' GLBs, the clear-day backdrop and the old
+`Exterior.glb` as `Exterior_before.glb`, for the stills and the before/after only):
+
+    python tools/split_exterior.py
+    python tools/blender/build_overworld_lot.py --stage textures
+    blender -b --factory-startup --python tools/blender/build_overworld_lot.py -- --stage art,bake,export,render --samples 256 --work <work>
+    python tools/blender/pack_scene.py parking_lot --work <work>/parking_lot
+    blender -b --factory-startup --python tools/blender/build_overworld_lot.py -- --stage compare --work <work>
+    python tools/blender/build_overworld_lot.py --stage sheet --work <work> --out <png>

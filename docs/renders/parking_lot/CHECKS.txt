@@ -1,0 +1,106 @@
+blender (on the render box): tools/blender/build_overworld_lot.py -- --stage art,bake,export,render --samples 256 --render-samples 96
+ART parking_lot: 409 art objects, about 115834 triangles
+EXPORT_SCENE parking_lot.json: 186 colliders, 0 doors, 0 cameras, 2 markers, 6 links, 0 zones, 2 spots
+GATE export: world/parking_lot.json from the .blend EQUALS the greybox model's (--preview)
+PASS  STORE  56 colliders of the store (world/L4.json's, and the doors' block): their art is world/L4.glb's
+PASS  STRAY  241 tall solid mesh(es), each over a collider; 78 decor_* mesh(es) exempt
+PASS: 141 of 141 checks passed
+CHECK_LAYOUT parking_lot exit 0
+  page 2048: 26777.0 m2, 10.5 px/m
+  AO map 0 baked {'size': 2048, 'p1_p10_p50_p90': [0.003, 0.402, 0.998, 1.0], 'samples': 256, 'distance_m': 1.5, 'device': 'GPU', 'seconds': 15, 'materials': ['Asphalt', 'Paving', 'Grass', 'Hedge']}
+  page 2048: 5819.3 m2, 10.9 px/m
+  AO map 1 baked {'size': 2048, 'p1_p10_p50_p90': [0.0, 0.012, 0.407, 1.0], 'samples': 256, 'distance_m': 0.8, 'device': 'GPU', 'seconds': 61, 'materials': ['Timber', 'Steel', 'Pylon_Blue', 'Bin_Green', 'Car_Plum', 'Tyre', 'Car_Mi
+PASS  COVER lines (one per collider of the lot's own but the edge walls, each covered by art within 5 cm): 126
+
+python tools/blender/build_overworld_greybox.py --check .
+GATE links: 5 pair inside the set (10 sides), 5 that leave it; 15 links in the files, every one accounted for
+  off this set: bus_station.bus_stop (bus) -> street (city, built)  [reused: overworld.bus>city and city.bus>overworld (built); only their lot-side points move]
+  off this set: parking_lot.bus_stop (bus) -> street (city, built)  [built: overworld.bus>city and city.bus>overworld]
+  off this set: parking_lot.store_doors (doors) -> L4 (the store's glass doors; the options screen)  [built: lot.L4.front_doors>overworld (in, to the table); planned: overworld.store_doors>lot]
+  off this set: road.forest (walk) -> forest (dreamcore_forest, built)  [reused: overworld.road>forest (planned); forest.road>lot comes back to the road's end]
+  off this set: tree_house.addon (gate) -> the tree house addon, not built  [reused: overworld.treehouse>addon (planned) to future_addon_treehouse (reserved)]
+GATE navigable: 8 of 8 scenes reachable from parking_lot (table_and_chairs and bus_station stand in it)
+GATE lot: the joins market, playground, forest_road and hills at the README's points; 55 store colliders from world/L4.json and the doors' block; the spawn at (-8.0, 9.6, 43.6); no house, gate or city collider, nothing standing on the house's plot; the table's and the bus station's places clear; 62 cars
+GATE steps: 41 step boxes in 6 flights, one box a step, and 9 kerbs; the highest rise 0.250 m (at most 0.27 m)
+GATE hills steps: 2500 columns of 4 m; the highest rise between neighbours 0.260 m, seams included (at most 0.27 m)
+GATE corridors: 29 path, aisle, platform and gap rects, the narrowest 1.70 m (at least 1.6 m), none blocked
+GATE clear ground: 8 pieces, each on its own clear ground with no other collider in it, none overlapping, every moving part's reach inside its own
+GATE moving parts: 10 of 10 Play_<equipment>_<part> nodes in playground.glb on their pivots (6 pieces: climbing_frame, merry_go_round, sandbox, seesaw, spring_riders, swing; the slide and the monkey bars have none)
+GATE hills tile: x -100 to 100, z -100 to 100; the 50 column tops along the west edge equal the east edge's (largest difference 0.000 m) and the north edge's the south's (0.000 m); the surface's edge rows match (0.0e+00 m) and so do the slopes across each seam; heights -0.15 to 4.15 m
+  spots: facade x8, groundskeeper x13, minigame x8, puzzle x6, shop x6, toy x12
+GATES PASS
+
+python tools/split_exterior.py   (a second run: nothing left to drop)
+world/Exterior.glb: already split, nothing to drop
+world\L4.json: already split
+world\gbi_L4_4.json: already split
+
+node tools/worlddoc.mjs check world/parking_lot.json world/L4.json world/gbi_L4_4.json
+  warning: the scene is 126 m along x: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: the scene is 122 m along z: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: link hills: the manifest has no link from this door yet: a new link to add
+  warning: link market: the manifest has no link from this door yet: a new link to add
+  warning: link playground: the manifest has no link from this door yet: a new link to add
+OK world/parking_lot.json: 186 colliders, 0 doors, 2 markers, 6 links, 0 zones, 2 spots, 0 errors, 5 warnings
+OK world/L4.json: 217 colliders, 3 doors, 3 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
+OK world/gbi_L4_4.json: 218 colliders, 3 doors, 3 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
+
+glb_inspect.py --budget tris=300000,mb=8
+parking_lot: triangles  114712 drawn, in 43 mesh(es), 43 instance(s)
+parking_lot: materials  43: Asphalt, Bark, Bin_Green, Car_Coral, Car_Cover, Car_Cream, Car_Glass, Car_Light, Car_Mint, Car_Periwinkle, Car_Pink, Car_Plum, Car_Silver, Car_Teal, Car_Yellow, Cart_Blue, Cart_Wire, Flower_Lilac, Flower_Pink, Flower_Stem, Flower_White, Flower_Yellow, Grass, Grass_Far, Hedge, Kerb, Lamp_Emit, Leaf_Lilac, Leaf_Mint, Leaf_Pink, Paint_White, Paint_Yellow, Paving, Plastic_Coral, Plastic_White, Pylon_Blue, Shrub, Signs, Soil, Steel, Store_Signs, Timber, Tyre
+parking_lot: textures   7, images: 1024x1024, 1024x1024, 512x512, 512x512, 1024x1024, 1024x512
+parking_lot: bbox       800.0 x 14.06 x 800.0 (x, y up, z), min [-400.0, 8.6, -400.0]
+parking_lot: requires   EXT_texture_webp
+parking_lot: pass       tris: 114712 triangles, budget 300000
+parking_lot: pass       mb: 5.48 MB, budget 8
+Exterior: triangles  427468 drawn, in 37 mesh(es), 60 instance(s)
+Exterior: materials  42: LowPolyProp_SR_Awning, PhotorealArch_SR_BrickL.001, PhotorealArch_SR_BrickR.001, LowPolyProp_SR_Car1.001, LowPolyProp_SR_Car2.001, LowPolyProp_SR_NewsBox, PhotorealArch_SR_Road.001, PhotorealArch_SR_Sidewalk.001, LowPolyProp_SR_Sign, PhotorealArch_SR_Tower.001, LowPolyProp_SR_TrafficLight, M_City_asphalt, M_City_brick, M_City_brick2, M_City_concrete, M_City_glassdark, M_City_glasslit, M_City_glasslit2, M_City_lamp, M_City_metal, metal_trash_can, metal_trash_can_rust, metal_trash_can_rust.001, M_City_neon_b, M_City_neon_g, M_City_neon_r, M_City_paint, M_City_red, M_City_stone, tree_small_02_branches, tree_small_02_leaves, tree_small_02_trunk, M_City_walk, M_City_white, M_Door, M_X_orange, M_X_white, M_X_dark, M_Gate_AlcoveLit, M_Gate_Alcove, M_U_asphalt, M_U_sky
+Exterior: textures   23, images: 512x512, 512x512, 128x128, 128x128, 128x128, 128x128, 128x128, 128x128, 128x128, 256x256, 128x128, 128x128, 256x256, 128x128, 128x128, 256x256, 128x128, 2048x1024
+Exterior: bbox       720.0005 x 720.0 x 720.0003 (x, y up, z), min [-360.0004, -350.4, -330.0]
+Exterior: requires   KHR_draco_mesh_compression, KHR_texture_transform
+Exterior: OVER       tris: 427468 triangles, budget 300000
+Exterior: pass       mb: 1.53 MB, budget 8
+
+brightness (AO-only: base colour x AO texel, linear, under a white ambient of 1; the page's sun adds on top)
+material                m2           map       k    p50    p90    p99     >=1
+Grass              13856.5 parking_lot_0  1.0000  0.552  0.588  0.617   0.00%
+Asphalt             8985.2 parking_lot_0  1.0000  0.107  0.117  0.129   0.00%
+Paving              2642.2 parking_lot_0  1.0000  0.651  0.738  0.776   0.00%
+Hedge               1293.0 parking_lot_0  1.0000  0.207  0.262  0.301   0.00%
+Leaf_Mint            673.4 parking_lot_1  1.0000  0.229  0.800  0.800   0.00%
+Leaf_Pink            663.4 parking_lot_1  1.0000  0.210  0.850  0.850   0.00%
+Leaf_Lilac           548.7 parking_lot_1  1.0000  0.230  0.850  0.850   0.00%
+Car_Plum             382.4 parking_lot_1  1.0000  0.235  0.500  0.500   0.00%
+Kerb                 366.1 parking_lot_1  1.0000  0.000  0.700  0.700   0.00%
+Car_Mint             339.9 parking_lot_1  1.0000  0.364  0.760  0.760   0.00%
+Car_Silver           339.9 parking_lot_1  1.0000  0.325  0.720  0.720   0.00%
+Car_Cream            332.2 parking_lot_1  1.0000  0.486  0.820  0.820   0.00%
+Car_Pink             297.4 parking_lot_1  1.0000  0.393  0.850  0.850   0.00%
+Tyre                 294.5 parking_lot_1  1.0000  0.012  0.032  0.044   0.00%
+Car_Coral            254.9 parking_lot_1  1.0000  0.373  0.850  0.850   0.00%
+Car_Periwinkle       254.9 parking_lot_1  1.0000  0.386  0.800  0.800   0.00%
+Car_Teal             254.9 parking_lot_1  1.0000  0.333  0.680  0.680   0.00%
+Car_Yellow           212.4 parking_lot_1  1.0000  0.400  0.850  0.850   0.00%
+Soil                 199.5 parking_lot_1  1.0000  0.197  0.259  0.260   0.00%
+Pylon_Blue            99.8 parking_lot_1  1.0000  0.336  0.520  0.520   0.00%
+Shrub                 78.9 parking_lot_1  1.0000  0.503  0.560  0.560   0.00%
+Bark                  46.4 parking_lot_1  1.0000  0.312  0.400  0.400   0.00%
+Steel                 41.5 parking_lot_1  1.0000  0.520  0.600  0.600   0.00%
+Store_Signs           40.7 parking_lot_1  1.0000  0.347  0.799  0.831   0.08%
+Car_Cover             39.2 parking_lot_1  1.0000  0.580  0.740  0.740   0.00%
+Signs                 38.0 parking_lot_1  1.0000  0.203  0.823  0.831   0.00%
+Timber                13.4 parking_lot_1  1.0000  0.302  0.500  0.500   0.00%
+Bin_Green              3.5 parking_lot_1  1.0000  0.418  0.471  0.478   0.00%
+Plastic_Coral          3.0 parking_lot_1  1.0000  0.373  0.577  0.847   0.00%
+Plastic_White          0.5 parking_lot_1  1.0000  0.563  0.743  0.772   0.00%
+
+node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
+
+node tools/manifest.mjs check
+OK: 17 areas, 32 built and 15 planned links, 23 world files compared, 0 errors, 0 warnings
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over this work's files, the .blend decompressed, and the owner sheet
+privacy grep: 28 files, 0 with hits
