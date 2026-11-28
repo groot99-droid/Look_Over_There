@@ -1,31 +1,204 @@
 {
-  "_doc": "CC0 models copied from the Chronicle Museum (Earth_Worldbuild/_Museum/assets/models). target_h is the height each is shown at; voyager_rotation is the Smithsonian Voyager scene's upright rotation (a glTF-space quaternion x, y, z, w) that the GLB itself does not carry. Poly Haven glTFs keep only their diffuse map.",
-  "models": {
-    "ph-chandelier-02": {
-      "title": "Chandelier",
-      "artist": "Poly Haven",
-      "date": "",
-      "museum": "Poly Haven",
-      "source": "polyhaven",
-      "license": "CC0",
-      "url": "https://polyhaven.com/a/Chandelier_02",
-      "target_h": 0.848,
-      "file": "Chandelier_02_1k.gltf",
-      "units": "m",
-      "asset": "Chandelier_02"
-    },
-    "ph-bench": {
-      "title": "Painted wooden bench",
-      "artist": "Poly Haven",
-      "date": "",
-      "museum": "Poly Haven",
-      "source": "polyhaven",
-      "license": "CC0",
-      "url": "https://polyhaven.com/a/painted_wooden_bench",
-      "target_h": 0.889,
-      "file": "painted_wooden_bench_1k.gltf",
-      "units": "m",
-      "asset": "painted_wooden_bench"
-    }
+ "_doc": "CC0 models copied from the Chronicle Museum (Earth_Worldbuild/_Museum/assets/models). target_h is the height each is shown at; voyager_rotation is the Smithsonian Voyager scene's upright rotation (a glTF-space quaternion x, y, z, w) that the GLB itself does not carry. Poly Haven glTFs keep only their diffuse map.",
+ "models": {
+  "ph-chandelier-02": {
+   "title": "Chandelier",
+   "artist": "Poly Haven",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/Chandelier_02",
+   "target_h": 0.848,
+   "file": "Chandelier_02_1k.gltf",
+   "units": "m",
+   "asset": "Chandelier_02"
+  },
+  "ph-chandelier-01": {
+   "title": "Chandelier",
+   "artist": "Poly Haven",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/Chandelier_01",
+   "target_h": 0.798,
+   "file": "Chandelier_01_1k.gltf",
+   "units": "m",
+   "asset": "Chandelier_01"
+  },
+  "ph-bench": {
+   "title": "Painted wooden bench",
+   "artist": "Poly Haven",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/painted_wooden_bench",
+   "target_h": 0.889,
+   "file": "painted_wooden_bench_1k.gltf",
+   "units": "m",
+   "asset": "painted_wooden_bench"
+  },
+  "ph-marble-bust": {
+   "title": "Marble bust",
+   "artist": "Poly Haven (photoscan)",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/marble_bust_01",
+   "target_h": 0.515,
+   "file": "marble_bust_01_1k.gltf",
+   "units": "m",
+   "asset": "marble_bust_01"
+  },
+  "ph-ceramic-vase": {
+   "title": "Antique ceramic vase",
+   "artist": "Poly Haven",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/antique_ceramic_vase_01",
+   "target_h": 0.44,
+   "file": "antique_ceramic_vase_01_1k.gltf",
+   "units": "m",
+   "asset": "antique_ceramic_vase_01"
+  },
+  "ph-brass-vase": {
+   "title": "Brass vase",
+   "artist": "Poly Haven",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/brass_vase_01",
+   "target_h": 0.692,
+   "file": "brass_vase_01_1k.gltf",
+   "units": "m",
+   "asset": "brass_vase_01"
+  },
+  "ph-ornate-mirror": {
+   "title": "Ornate mirror",
+   "artist": "Poly Haven",
+   "date": "",
+   "museum": "Poly Haven",
+   "source": "polyhaven",
+   "license": "CC0",
+   "url": "https://polyhaven.com/a/ornate_mirror_01",
+   "target_h": 0.744,
+   "file": "ornate_mirror_01_1k.gltf",
+   "units": "m",
+   "asset": "ornate_mirror_01"
+  },
+  "si-houdon-washington": {
+   "title": "George Washington",
+   "artist": "Jean-Antoine Houdon",
+   "date": "c. 1786",
+   "museum": "National Portrait Gallery",
+   "source": "smithsonian",
+   "license": "CC0",
+   "url": "https://3d.si.edu/object/3d/george-washington-houdon:ff28cb3a-ad00-43b3-a928-fa61ab0a288f",
+   "target_h": 0.559,
+   "voyager_rotation": [
+    -0.0311292,
+    0.8498295,
+    -0.4599163,
+    0.2555343
+   ],
+   "file": "model.glb",
+   "units": "mm",
+   "package": "3d_package:ff28cb3a-ad00-43b3-a928-fa61ab0a288f"
+  },
+  "si-waterston-bust": {
+   "title": "Helen Ruthven Waterston",
+   "artist": "Edmonia Lewis",
+   "date": "1862",
+   "museum": "Smithsonian American Art Museum",
+   "source": "smithsonian",
+   "license": "CC0",
+   "url": "https://3d.si.edu/object/3d/helen-ruthven-waterston:d825c526-69dd-472a-8d47-7da7fbe88fb7",
+   "target_h": 0.302,
+   "voyager_rotation": [
+    0.0019998,
+    0.0149994,
+    -3e-05,
+    0.9998855
+   ],
+   "file": "model.glb",
+   "units": "m",
+   "package": "3d_package:d825c526-69dd-472a-8d47-7da7fbe88fb7"
+  },
+  "si-xianglu": {
+   "title": "Lidded incense burner (xianglu) with geometric decoration and narrative scenes",
+   "artist": "Western Han dynasty, China",
+   "date": "ca. 2nd century BCE",
+   "museum": "National Museum of Asian Art (Freer Gallery)",
+   "source": "smithsonian",
+   "license": "CC0",
+   "url": "https://3d.si.edu/object/3d/lidded-incense-burner-xianglu:ce850625-2cf1-4c6f-9086-0d5845d9a664",
+   "target_h": 0.179,
+   "voyager_rotation": [
+    -0.7071068,
+    0,
+    0,
+    0.7071068
+   ],
+   "file": "model.glb",
+   "units": "mm",
+   "package": "3d_package:ce850625-2cf1-4c6f-9086-0d5845d9a664"
+  },
+  "si-kangxi-baluster-vase": {
+   "title": "Baluster vase from a five-piece garniture",
+   "artist": "Kangxi reign, Qing dynasty, China",
+   "date": "1662\u00e2\u20ac\u201c1722",
+   "museum": "National Museum of Asian Art (Freer Gallery)",
+   "source": "smithsonian",
+   "license": "CC0",
+   "url": "https://3d.si.edu/object/3d/baluster-vase:d8c6393a-4ebc-11ea-b77f-2e728ce88125",
+   "target_h": 0.463,
+   "voyager_rotation": [
+    0.1622001,
+    -0.1643311,
+    0.6897842,
+    0.68621
+   ],
+   "file": "model.glb",
+   "units": "m",
+   "package": "3d_package:d8c6393a-4ebc-11ea-b77f-2e728ce88125"
+  },
+  "si-kangxi-beaker-vase": {
+   "title": "Beaker-shaped vase from a five-piece garniture",
+   "artist": "Kangxi reign, Qing dynasty, China",
+   "date": "1662\u00e2\u20ac\u201c1722",
+   "museum": "National Museum of Asian Art (Freer Gallery)",
+   "source": "smithsonian",
+   "license": "CC0",
+   "url": "https://3d.si.edu/object/3d/beaker-shaped-vase:d8c63a70-4ebc-11ea-b77f-2e728ce88125",
+   "target_h": 0.425,
+   "voyager_rotation": [
+    0.0653088,
+    -0.7024576,
+    -0.7064958,
+    -0.0561407
+   ],
+   "file": "model.glb",
+   "units": "m",
+   "package": "3d_package:d8c63a70-4ebc-11ea-b77f-2e728ce88125"
+  },
+  "si-winged-monster": {
+   "title": "Kneeling winged monster",
+   "artist": "Northern Qi dynasty, China",
+   "date": "550\u00e2\u20ac\u201c577",
+   "museum": "National Museum of Asian Art (Freer Gallery)",
+   "source": "smithsonian",
+   "license": "CC0",
+   "url": "https://3d.si.edu/object/3d/kneeling-winged-monster:0dc68216-3651-44c7-99cf-18e5d4d1eb9f",
+   "target_h": 0.884,
+   "file": "model.glb",
+   "units": "mm",
+   "package": "3d_package:0dc68216-3651-44c7-99cf-18e5d4d1eb9f"
   }
+ }
 }
