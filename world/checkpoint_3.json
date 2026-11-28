@@ -1,0 +1,1067 @@
+{
+ "scene": "checkpoint_3",
+ "colliders": [
+  {
+   "s": "Barrier_01",
+   "min": [
+    8.5,
+    0.0,
+    -2.0
+   ],
+   "max": [
+    9.1,
+    1.1,
+    2.0
+   ]
+  },
+  {
+   "s": "Barrier_02",
+   "min": [
+    1.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    1.6,
+    1.1,
+    -2.0
+   ]
+  },
+  {
+   "s": "Barrier_03",
+   "min": [
+    1.0,
+    0.0,
+    2.0
+   ],
+   "max": [
+    1.6,
+    1.1,
+    5.0
+   ]
+  },
+  {
+   "s": "Ceiling_001",
+   "min": [
+    2.0,
+    3.0,
+    -13.0
+   ],
+   "max": [
+    8.0,
+    3.2,
+    -8.2
+   ]
+  },
+  {
+   "s": "Ceiling_002",
+   "min": [
+    -1.8,
+    3.2,
+    -8.0
+   ],
+   "max": [
+    14.0,
+    3.4,
+    8.0
+   ]
+  },
+  {
+   "s": "Ceiling_003",
+   "min": [
+    -16.0,
+    3.0,
+    -2.0
+   ],
+   "max": [
+    -8.0,
+    3.2,
+    2.0
+   ]
+  },
+  {
+   "s": "Ceiling_004",
+   "min": [
+    -7.8,
+    2.8,
+    -1.2
+   ],
+   "max": [
+    -2.0,
+    3.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Ceiling_005",
+   "min": [
+    2.0,
+    3.0,
+    8.2
+   ],
+   "max": [
+    8.0,
+    3.2,
+    13.0
+   ]
+  },
+  {
+   "s": "Desk_01",
+   "min": [
+    3.6,
+    0.0,
+    -9.0
+   ],
+   "max": [
+    7.6,
+    0.9,
+    -8.4
+   ]
+  },
+  {
+   "s": "Desk_02",
+   "min": [
+    3.6,
+    0.0,
+    8.4
+   ],
+   "max": [
+    7.6,
+    0.9,
+    9.0
+   ]
+  },
+  {
+   "s": "Floor_001",
+   "min": [
+    1.8,
+    -0.3,
+    -13.2
+   ],
+   "max": [
+    8.2,
+    0.0,
+    -8.2
+   ]
+  },
+  {
+   "s": "Floor_002",
+   "min": [
+    -2.0,
+    -0.3,
+    -8.2
+   ],
+   "max": [
+    14.2,
+    0.0,
+    8.2
+   ]
+  },
+  {
+   "s": "Floor_003",
+   "min": [
+    -16.2,
+    -0.3,
+    -2.2
+   ],
+   "max": [
+    -7.8,
+    0.0,
+    2.2
+   ]
+  },
+  {
+   "s": "Floor_004",
+   "min": [
+    -7.8,
+    -0.3,
+    -1.4
+   ],
+   "max": [
+    -2.0,
+    0.0,
+    1.4
+   ]
+  },
+  {
+   "s": "Floor_005",
+   "min": [
+    1.8,
+    -0.3,
+    8.2
+   ],
+   "max": [
+    8.2,
+    0.0,
+    13.2
+   ]
+  },
+  {
+   "s": "Glass_01",
+   "min": [
+    3.6,
+    1.1,
+    -8.2
+   ],
+   "max": [
+    7.6,
+    2.4,
+    -8.0
+   ]
+  },
+  {
+   "s": "Glass_02",
+   "min": [
+    3.6,
+    1.1,
+    8.0
+   ],
+   "max": [
+    7.6,
+    2.4,
+    8.2
+   ]
+  },
+  {
+   "s": "Lintel_01",
+   "min": [
+    -8.0,
+    2.2,
+    -0.6
+   ],
+   "max": [
+    -7.8,
+    3.0,
+    0.6
+   ]
+  },
+  {
+   "s": "Lintel_02",
+   "min": [
+    -2.0,
+    2.2,
+    -0.6
+   ],
+   "max": [
+    -1.8,
+    3.2,
+    0.6
+   ]
+  },
+  {
+   "s": "Lintel_03",
+   "min": [
+    3.6,
+    2.4,
+    -8.2
+   ],
+   "max": [
+    7.6,
+    3.2,
+    -8.0
+   ]
+  },
+  {
+   "s": "Lintel_04",
+   "min": [
+    3.6,
+    2.4,
+    8.0
+   ],
+   "max": [
+    7.6,
+    3.2,
+    8.2
+   ]
+  },
+  {
+   "s": "Lintel_05",
+   "min": [
+    2.3,
+    2.2,
+    -8.2
+   ],
+   "max": [
+    3.3,
+    3.2,
+    -8.0
+   ]
+  },
+  {
+   "s": "Lintel_06",
+   "min": [
+    2.3,
+    2.2,
+    8.0
+   ],
+   "max": [
+    3.3,
+    3.2,
+    8.2
+   ]
+  },
+  {
+   "s": "Pillar_01",
+   "min": [
+    4.6,
+    0.0,
+    -4.4
+   ],
+   "max": [
+    5.4,
+    3.2,
+    -3.6
+   ]
+  },
+  {
+   "s": "Pillar_02",
+   "min": [
+    4.6,
+    0.0,
+    3.6
+   ],
+   "max": [
+    5.4,
+    3.2,
+    4.4
+   ]
+  },
+  {
+   "s": "Sill_01",
+   "min": [
+    3.6,
+    0.0,
+    -8.2
+   ],
+   "max": [
+    7.6,
+    1.1,
+    -8.0
+   ]
+  },
+  {
+   "s": "Sill_02",
+   "min": [
+    3.6,
+    0.0,
+    8.0
+   ],
+   "max": [
+    7.6,
+    1.1,
+    8.2
+   ]
+  },
+  {
+   "s": "Wall_001",
+   "min": [
+    1.8,
+    0.0,
+    -13.2
+   ],
+   "max": [
+    8.2,
+    3.0,
+    -13.0
+   ]
+  },
+  {
+   "s": "Wall_002",
+   "min": [
+    1.8,
+    0.0,
+    -13.0
+   ],
+   "max": [
+    2.0,
+    3.0,
+    -8.2
+   ]
+  },
+  {
+   "s": "Wall_003",
+   "min": [
+    8.0,
+    0.0,
+    -13.0
+   ],
+   "max": [
+    8.2,
+    3.0,
+    -8.2
+   ]
+  },
+  {
+   "s": "Wall_004",
+   "min": [
+    -2.0,
+    0.0,
+    -8.2
+   ],
+   "max": [
+    2.3,
+    3.2,
+    -8.0
+   ]
+  },
+  {
+   "s": "Wall_005",
+   "min": [
+    3.3,
+    0.0,
+    -8.2
+   ],
+   "max": [
+    3.6,
+    3.2,
+    -8.0
+   ]
+  },
+  {
+   "s": "Wall_006",
+   "min": [
+    7.6,
+    0.0,
+    -8.2
+   ],
+   "max": [
+    14.2,
+    3.2,
+    -8.0
+   ]
+  },
+  {
+   "s": "Wall_007",
+   "min": [
+    -2.0,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    -1.8,
+    3.2,
+    -0.6
+   ]
+  },
+  {
+   "s": "Wall_008",
+   "min": [
+    14.0,
+    0.0,
+    -8.0
+   ],
+   "max": [
+    14.2,
+    3.2,
+    8.0
+   ]
+  },
+  {
+   "s": "Wall_009",
+   "min": [
+    -16.2,
+    0.0,
+    -2.2
+   ],
+   "max": [
+    -7.8,
+    3.0,
+    -2.0
+   ]
+  },
+  {
+   "s": "Wall_010",
+   "min": [
+    -16.2,
+    0.0,
+    -2.0
+   ],
+   "max": [
+    -16.0,
+    3.0,
+    2.0
+   ]
+  },
+  {
+   "s": "Wall_011",
+   "min": [
+    -8.0,
+    0.0,
+    -2.0
+   ],
+   "max": [
+    -7.8,
+    3.0,
+    -0.6
+   ]
+  },
+  {
+   "s": "Wall_012",
+   "min": [
+    -7.8,
+    0.0,
+    -1.4
+   ],
+   "max": [
+    -2.0,
+    2.8,
+    -1.2
+   ]
+  },
+  {
+   "s": "Wall_013",
+   "min": [
+    -8.0,
+    0.0,
+    0.6
+   ],
+   "max": [
+    -7.8,
+    3.0,
+    2.0
+   ]
+  },
+  {
+   "s": "Wall_014",
+   "min": [
+    -2.0,
+    0.0,
+    0.6
+   ],
+   "max": [
+    -1.8,
+    3.2,
+    8.0
+   ]
+  },
+  {
+   "s": "Wall_015",
+   "min": [
+    -7.8,
+    0.0,
+    1.2
+   ],
+   "max": [
+    -2.0,
+    2.8,
+    1.4
+   ]
+  },
+  {
+   "s": "Wall_016",
+   "min": [
+    -16.2,
+    0.0,
+    2.0
+   ],
+   "max": [
+    -7.8,
+    3.0,
+    2.2
+   ]
+  },
+  {
+   "s": "Wall_017",
+   "min": [
+    -2.0,
+    0.0,
+    8.0
+   ],
+   "max": [
+    2.3,
+    3.2,
+    8.2
+   ]
+  },
+  {
+   "s": "Wall_018",
+   "min": [
+    3.3,
+    0.0,
+    8.0
+   ],
+   "max": [
+    3.6,
+    3.2,
+    8.2
+   ]
+  },
+  {
+   "s": "Wall_019",
+   "min": [
+    7.6,
+    0.0,
+    8.0
+   ],
+   "max": [
+    14.2,
+    3.2,
+    8.2
+   ]
+  },
+  {
+   "s": "Wall_020",
+   "min": [
+    1.8,
+    0.0,
+    8.2
+   ],
+   "max": [
+    2.0,
+    3.0,
+    13.0
+   ]
+  },
+  {
+   "s": "Wall_021",
+   "min": [
+    8.0,
+    0.0,
+    8.2
+   ],
+   "max": [
+    8.2,
+    3.0,
+    13.0
+   ]
+  },
+  {
+   "s": "Wall_022",
+   "min": [
+    1.8,
+    0.0,
+    13.0
+   ],
+   "max": [
+    8.2,
+    3.0,
+    13.2
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_booth_n",
+   "level": "checkpoint_3",
+   "hinge": [
+    3.27,
+    0.0,
+    -8.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_booth_s",
+   "level": "checkpoint_3",
+   "hinge": [
+    2.33,
+    0.0,
+    8.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_corridors_b",
+   "level": "checkpoint_3",
+   "hinge": [
+    -16.0,
+    0.0,
+    0.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "goes_to": "corridors_b",
+   "link_door": "corridors_b"
+  },
+  {
+   "name": "DoorLeaf_decon_in",
+   "level": "checkpoint_3",
+   "hinge": [
+    -7.8,
+    0.0,
+    0.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_decon_out",
+   "level": "checkpoint_3",
+   "hinge": [
+    -1.8,
+    0.0,
+    0.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_registrar_hall",
+   "level": "checkpoint_3",
+   "hinge": [
+    14.0,
+    0.0,
+    -0.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "goes_to": "registrar_hall",
+   "link_door": "registrar_hall",
+   "keycard_tier": 3
+  }
+ ],
+ "cameras": [
+  {
+   "id": "SecCam_01",
+   "level": "checkpoint_3",
+   "position": [
+    -15.7,
+    2.65,
+    -1.7
+   ],
+   "facing_deg": 90.0,
+   "rig": "SecCam_01_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.65,
+   "circuit": "C",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.37
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.61
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.23,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_02",
+   "level": "checkpoint_3",
+   "position": [
+    -2.3,
+    2.45,
+    0.9
+   ],
+   "facing_deg": -90.0,
+   "rig": "SecCam_02_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.45,
+   "circuit": "C",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.74
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.22
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_03",
+   "level": "checkpoint_3",
+   "position": [
+    -1.5,
+    2.85,
+    -7.7
+   ],
+   "facing_deg": 45.0,
+   "rig": "SecCam_03_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.85,
+   "circuit": "C",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.11
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.83
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.69,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_04",
+   "level": "checkpoint_3",
+   "position": [
+    13.7,
+    2.85,
+    7.7
+   ],
+   "facing_deg": -135.0,
+   "rig": "SecCam_04_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.85,
+   "circuit": "C",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.48
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.44
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.92,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  }
+ ],
+ "markers": [],
+ "links": [
+  {
+   "door": "corridors_b",
+   "at": [
+    -15.3,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -14.6,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "registrar_hall",
+   "at": [
+    13.3,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    12.6,
+    0.0,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "restricted",
+   "name": "Zone_restricted_checkpoint_3",
+   "min": [
+    -16.0,
+    0.0,
+    -13.0
+   ],
+   "max": [
+    14.0,
+    3.2,
+    13.0
+   ]
+  },
+  {
+   "kind": "trigger",
+   "name": "Zone_trigger_decon",
+   "min": [
+    -7.8,
+    0.0,
+    -1.2
+   ],
+   "max": [
+    -2.0,
+    2.8,
+    1.2
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "agent",
+   "name": "Spot_agent_1",
+   "position": [
+    5.0,
+    0.0,
+    -11.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "guard"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_2",
+   "position": [
+    5.0,
+    0.0,
+    11.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "role": "guard"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_3",
+   "position": [
+    11.0,
+    0.0,
+    -6.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "role": "spawn"
+  },
+  {
+   "kind": "ammo",
+   "name": "Spot_ammo_1",
+   "position": [
+    -9.0,
+    0.0,
+    1.4
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "filed",
+   "name": "Spot_filed_1",
+   "position": [
+    12.6,
+    0.0,
+    6.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "phase": 2
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    7.0,
+    0.0,
+    12.4
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "reader",
+   "name": "Spot_reader_registrar_hall",
+   "position": [
+    13.55,
+    0.0,
+    1.2
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "keycard_tier": 3,
+   "door": "registrar_hall"
+  }
+ ]
+}

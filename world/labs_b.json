@@ -1,0 +1,930 @@
+{
+ "scene": "labs_b",
+ "colliders": [
+  {
+   "s": "Bench_01",
+   "min": [
+    -14.0,
+    0.0,
+    -1.0
+   ],
+   "max": [
+    -11.0,
+    0.95,
+    -0.1
+   ]
+  },
+  {
+   "s": "Bench_02",
+   "min": [
+    -6.0,
+    0.0,
+    1.0
+   ],
+   "max": [
+    -3.0,
+    0.95,
+    1.9
+   ]
+  },
+  {
+   "s": "Bench_03",
+   "min": [
+    3.0,
+    0.0,
+    -1.0
+   ],
+   "max": [
+    6.0,
+    0.95,
+    -0.1
+   ]
+  },
+  {
+   "s": "Bench_04",
+   "min": [
+    11.0,
+    0.0,
+    1.0
+   ],
+   "max": [
+    14.0,
+    0.95,
+    1.9
+   ]
+  },
+  {
+   "s": "Ceiling_001",
+   "min": [
+    -18.0,
+    3.0,
+    -18.0
+   ],
+   "max": [
+    -8.0,
+    3.2,
+    -10.2
+   ]
+  },
+  {
+   "s": "Ceiling_002",
+   "min": [
+    -18.0,
+    3.2,
+    -10.0
+   ],
+   "max": [
+    18.0,
+    3.4,
+    6.0
+   ]
+  },
+  {
+   "s": "Ceiling_003",
+   "min": [
+    -18.0,
+    3.0,
+    6.2
+   ],
+   "max": [
+    18.0,
+    3.2,
+    8.6
+   ]
+  },
+  {
+   "s": "Cubicle_01",
+   "min": [
+    -10.0,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -7.0,
+    2.6,
+    -4.0
+   ]
+  },
+  {
+   "s": "Cubicle_02",
+   "min": [
+    -1.5,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    1.5,
+    2.6,
+    -4.0
+   ]
+  },
+  {
+   "s": "Cubicle_03",
+   "min": [
+    7.0,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    10.0,
+    2.6,
+    -4.0
+   ]
+  },
+  {
+   "s": "Floor_001",
+   "min": [
+    -18.2,
+    -0.3,
+    -18.2
+   ],
+   "max": [
+    -7.8,
+    0.0,
+    -10.2
+   ]
+  },
+  {
+   "s": "Floor_002",
+   "min": [
+    -18.2,
+    -0.3,
+    -10.2
+   ],
+   "max": [
+    18.2,
+    0.0,
+    8.8
+   ]
+  },
+  {
+   "s": "Lintel_01",
+   "min": [
+    -15.0,
+    2.4,
+    6.0
+   ],
+   "max": [
+    -13.4,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Lintel_02",
+   "min": [
+    -1.0,
+    2.4,
+    6.0
+   ],
+   "max": [
+    1.0,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Lintel_03",
+   "min": [
+    13.4,
+    2.4,
+    6.0
+   ],
+   "max": [
+    15.0,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Lintel_04",
+   "min": [
+    -14.0,
+    2.2,
+    -10.2
+   ],
+   "max": [
+    -12.8,
+    3.2,
+    -10.0
+   ]
+  },
+  {
+   "s": "Pillar_01",
+   "min": [
+    -4.4,
+    0.0,
+    -3.0
+   ],
+   "max": [
+    -3.6,
+    3.2,
+    -2.2
+   ]
+  },
+  {
+   "s": "Pillar_02",
+   "min": [
+    3.6,
+    0.0,
+    -3.0
+   ],
+   "max": [
+    4.4,
+    3.2,
+    -2.2
+   ]
+  },
+  {
+   "s": "Shelf_01",
+   "min": [
+    -17.4,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    -8.6,
+    2.0,
+    -17.6
+   ]
+  },
+  {
+   "s": "Tank_01",
+   "min": [
+    -17.0,
+    0.0,
+    -17.0
+   ],
+   "max": [
+    -16.0,
+    2.4,
+    -16.0
+   ]
+  },
+  {
+   "s": "Tank_02",
+   "min": [
+    -12.0,
+    0.0,
+    -17.0
+   ],
+   "max": [
+    -11.0,
+    2.4,
+    -16.0
+   ]
+  },
+  {
+   "s": "Wall_001",
+   "min": [
+    -18.2,
+    0.0,
+    -18.2
+   ],
+   "max": [
+    -7.8,
+    3.0,
+    -18.0
+   ]
+  },
+  {
+   "s": "Wall_002",
+   "min": [
+    -18.2,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    -18.0,
+    3.0,
+    -10.2
+   ]
+  },
+  {
+   "s": "Wall_003",
+   "min": [
+    -8.0,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    -7.8,
+    3.0,
+    -10.2
+   ]
+  },
+  {
+   "s": "Wall_004",
+   "min": [
+    -18.2,
+    0.0,
+    -10.2
+   ],
+   "max": [
+    -14.0,
+    3.2,
+    -10.0
+   ]
+  },
+  {
+   "s": "Wall_005",
+   "min": [
+    -12.8,
+    0.0,
+    -10.2
+   ],
+   "max": [
+    18.2,
+    3.2,
+    -10.0
+   ]
+  },
+  {
+   "s": "Wall_006",
+   "min": [
+    -18.2,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    -18.0,
+    3.2,
+    6.0
+   ]
+  },
+  {
+   "s": "Wall_007",
+   "min": [
+    18.0,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    18.2,
+    3.2,
+    6.0
+   ]
+  },
+  {
+   "s": "Wall_008",
+   "min": [
+    -18.2,
+    0.0,
+    6.0
+   ],
+   "max": [
+    -15.0,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Wall_009",
+   "min": [
+    -13.4,
+    0.0,
+    6.0
+   ],
+   "max": [
+    -1.0,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Wall_010",
+   "min": [
+    1.0,
+    0.0,
+    6.0
+   ],
+   "max": [
+    13.4,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Wall_011",
+   "min": [
+    15.0,
+    0.0,
+    6.0
+   ],
+   "max": [
+    18.2,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Wall_012",
+   "min": [
+    -18.2,
+    0.0,
+    6.2
+   ],
+   "max": [
+    -18.0,
+    3.0,
+    8.6
+   ]
+  },
+  {
+   "s": "Wall_013",
+   "min": [
+    18.0,
+    0.0,
+    6.2
+   ],
+   "max": [
+    18.2,
+    3.0,
+    8.6
+   ]
+  },
+  {
+   "s": "Wall_014",
+   "min": [
+    -18.2,
+    0.0,
+    8.6
+   ],
+   "max": [
+    18.2,
+    3.0,
+    8.8
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_corridors_b_east",
+   "level": "labs_b",
+   "hinge": [
+    10.47,
+    0.0,
+    8.6
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "goes_to": "corridors_b",
+   "link_door": "corridors_b_east"
+  },
+  {
+   "name": "DoorLeaf_corridors_b_west",
+   "level": "labs_b",
+   "hinge": [
+    -9.53,
+    0.0,
+    8.6
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "goes_to": "corridors_b",
+   "link_door": "corridors_b_west"
+  },
+  {
+   "name": "DoorLeaf_labs_a",
+   "level": "labs_b",
+   "hinge": [
+    -18.0,
+    0.0,
+    -3.53
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "goes_to": "labs_a",
+   "link_door": "labs_a",
+   "keycard_tier": 2
+  },
+  {
+   "name": "DoorLeaf_specimen",
+   "level": "labs_b",
+   "hinge": [
+    -12.93,
+    0.0,
+    -10.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  }
+ ],
+ "cameras": [
+  {
+   "id": "SecCam_01",
+   "level": "labs_b",
+   "position": [
+    -17.7,
+    2.85,
+    -9.7
+   ],
+   "facing_deg": 45.0,
+   "rig": "SecCam_01_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.85,
+   "circuit": "B",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.37
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.61
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.23,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_02",
+   "level": "labs_b",
+   "position": [
+    17.7,
+    2.85,
+    -9.7
+   ],
+   "facing_deg": -45.0,
+   "rig": "SecCam_02_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.85,
+   "circuit": "B",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.74
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.22
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_03",
+   "level": "labs_b",
+   "position": [
+    -17.7,
+    2.65,
+    7.4
+   ],
+   "facing_deg": 90.0,
+   "rig": "SecCam_03_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.65,
+   "circuit": "B",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.11
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.83
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.69,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  },
+  {
+   "id": "SecCam_04",
+   "level": "labs_b",
+   "position": [
+    -8.3,
+    2.65,
+    -17.7
+   ],
+   "facing_deg": -45.0,
+   "rig": "SecCam_04_rig",
+   "style": "security_camera_01",
+   "mount_height_above_floor": 2.65,
+   "circuit": "B",
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.48
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.44
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 50.0,
+    "cycles": 1,
+    "phase": 0.92,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    40.0
+   ]
+  }
+ ],
+ "markers": [],
+ "links": [
+  {
+   "door": "corridors_b_east",
+   "at": [
+    10.0,
+    0.0,
+    7.9
+   ],
+   "arrive": [
+    10.0,
+    0.0,
+    7.2
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "corridors_b_west",
+   "at": [
+    -10.0,
+    0.0,
+    7.9
+   ],
+   "arrive": [
+    -10.0,
+    0.0,
+    7.2
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "labs_a",
+   "at": [
+    -17.3,
+    0.0,
+    -4.0
+   ],
+   "arrive": [
+    -16.6,
+    0.0,
+    -4.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "restricted",
+   "name": "Zone_restricted_labs_b",
+   "min": [
+    -18.0,
+    0.0,
+    -18.0
+   ],
+   "max": [
+    18.0,
+    3.2,
+    8.6
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "agent",
+   "name": "Spot_agent_1",
+   "position": [
+    0.0,
+    0.0,
+    -8.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "spawn"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_2",
+   "position": [
+    12.0,
+    0.0,
+    -8.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "spawn"
+  },
+  {
+   "kind": "agent",
+   "name": "Spot_agent_3",
+   "position": [
+    -9.6,
+    0.0,
+    -14.4
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "guard"
+  },
+  {
+   "kind": "ammo",
+   "name": "Spot_ammo_1",
+   "position": [
+    -16.0,
+    0.0,
+    4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "ammo",
+   "name": "Spot_ammo_2",
+   "position": [
+    16.0,
+    0.0,
+    4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "filed",
+   "name": "Spot_filed_1",
+   "position": [
+    16.4,
+    0.0,
+    -8.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "phase": 2
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    -14.5,
+    0.0,
+    -16.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "keycard_tier": 3
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_2",
+   "position": [
+    8.5,
+    0.0,
+    -2.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "sample": 1
+  },
+  {
+   "kind": "patrol",
+   "name": "Spot_patrol_S_1",
+   "position": [
+    -16.4,
+    0.0,
+    7.4
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "route": "S",
+   "order": 1,
+   "loop": 1
+  },
+  {
+   "kind": "patrol",
+   "name": "Spot_patrol_S_2",
+   "position": [
+    16.4,
+    0.0,
+    7.4
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "route": "S",
+   "order": 2,
+   "loop": 1
+  },
+  {
+   "kind": "reader",
+   "name": "Spot_reader_labs_a",
+   "position": [
+    -17.55,
+    0.0,
+    -2.8
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "keycard_tier": 2,
+   "door": "labs_a"
+  }
+ ]
+}

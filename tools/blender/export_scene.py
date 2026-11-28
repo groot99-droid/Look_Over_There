@@ -15,7 +15,9 @@ The format is the page's (world/L1.json): `scene`, `colliders`, `doors`, `camera
 | `Zone_<kind>_<name>` mesh          | `zones`: {kind, name, min, max}                                                                      |
 | `Spot_<kind>[_<n>]` empty          | `spots`: {kind, name, position, face, yaw_deg, scale, + the empty's other custom properties}         |
 
-A spot's `face` is its empty's -Y axis as game (x, z), as for Arrive_; `yaw_deg` is the same direction as a three.js rotation.y: a model whose
+A camera's `facing_deg` is its empty's -Y axis as the page's yaw (index.html aimFeed: it looks along (sin, cos) of it), and its custom
+properties may be groups (pan, tilt, zoom) or arrays (view_range_m), written as objects and lists, as in world/L1.json. A mesh named SecCam_
+(its rig, which the page moves and smashes) is art, not a camera. A spot's `face` is its empty's -Y axis as game (x, z), as for Arrive_; `yaw_deg` is the same direction as a three.js rotation.y: a model whose
 front is +z, given `rotation.y = yaw_deg * PI / 180`, faces `face`. `scale` is the empty's custom property `scale` (1 when it has none).
 
 Everything is read from the whole file (any collection); numbers are rounded to the millimetre. It fails on a Link_ without its Arrive_.
@@ -117,7 +119,18 @@ def collect(scene):
             a = arrive[key]
             out["links"].append({"door": key, "at": _g(ob.matrix_world.translation), "arrive": _g(a.matrix_world.translation), "face": facing(a)})
         elif n.startswith("SecCam_") and ob.type == "EMPTY":
-            out["cameras"].append(camera(scene, n, _g(ob.matrix_world.translation), facing(ob), ob))
+            if "pan" not in ob.keys():                  # flat custom properties (the grocery's and the mall's cameras): camera() fills in L1's sweep
+                out["cameras"].append(camera(scene, n, _g(ob.matrix_world.translation), facing(ob), ob))
+                continue
+            # grouped properties (pan, tilt, zoom as groups; the secret-operations scenes): written as they are
+            f = facing(ob)
+            c = {"id": n, "level": scene, "position": _g(ob.matrix_world.translation), "facing_deg": round(math.degrees(math.atan2(f[0], f[1])), 1) + 0.0}
+            for k in ob.keys():
+                v = ob[k]
+                v = v.to_dict() if hasattr(v, "to_dict") else v.to_list() if hasattr(v, "to_list") else v
+                if k not in c and isinstance(v, (int, float, str, dict, list)):
+                    c[k] = v
+            out["cameras"].append(c)
         elif n.startswith("Zone_") and ob.type == "MESH":
             kind = n.split("_")[1]
             mn, mx = _box(ob)
