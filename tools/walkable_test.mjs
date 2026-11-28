@@ -8,6 +8,8 @@ import {createRequire} from "node:module";
 import fs from "node:fs";
 import {createServer} from "../server/server.js";
 import {BLENDER_SCENES, BLENDER_LINKS} from "../shared/farway.scenes.js";
+import {secondsAt} from "../shared/city.js";
+import {FOREST_ROAD_LOT} from "../shared/forest.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
@@ -26,8 +28,8 @@ try {
   const page = await (await browser.newContext({viewport: {width: 900, height: 700}})).newPage(); page.on("pageerror", e => errors.push(e.message));
   await page.goto(`http://localhost:${srv.port}/`); await page.click("#l-solo");
   await page.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 240000});
-  // the City's clock at noon, so the stores and the mall are open and nothing locks you in
-  await page.evaluate(() => { const g = window.__game; if (g.CITY) g.CITY.t = 12 / 24 * (g.CITY.day || 1200); });
+  // the City at noon, fed and rested, before every link: the stores and the mall are open, nothing locks you in, and nobody faints and wakes at home over a long run
+  const noon = () => page.evaluate(t => { const g = window.__game; g.CITY.t = t; g.NEEDS = {...g.NEEDS, hunger: 100, rest: 100}; }, secondsAt(12, 1));
 
   const areas = Object.entries(BLENDER_SCENES).filter(([a]) => !only.length || only.includes(a));
   for (const [area, scenes] of areas) {
@@ -42,15 +44,17 @@ try {
     const mine = new Set(scenes.map(s => s.id));
     for (const l of BLENDER_LINKS.filter(l => mine.has(l.from.scene) || mine.has(l.to.scene))) {
       if (CODE.includes(l.from.scene)) continue;
-      const spot = atOf(l);
+      // the lot's signpost is the page's own code (F at FOREST_ROAD_LOT), not a scene link
+      const code = l.from.scene === "parking_lot" && l.from.door === "forest_road";
+      const spot = code ? [FOREST_ROAD_LOT.at[0], 9.6, FOREST_ROAD_LOT.at[1]] : atOf(l);
       if (!spot) { check(`${l.id}: has an F spot`, false); continue; }
-      await page.evaluate(id => window.__game.loadScene(id, null), l.from.scene); await settled(page, l.from.scene);
-      await at(page, [spot[0], spot[1], spot[2]]);
+      await noon(); await page.evaluate(id => window.__game.loadScene(id, null), l.from.scene); await settled(page, l.from.scene); await noon();
+      if (l.connector !== "walk" || code) await at(page, [spot[0], spot[1], spot[2]]);          // a walk link is stepped onto below, from away (standing on it would fire it now)
       if (l.status !== "built") {
         const p = await page.evaluate(() => window.__game.sceneLinkPrompt());
         check(`${l.id}: planned, so it says it is shut`, /shut/.test(p), p); continue;
       }
-      if (l.connector !== "walk") {
+      if (l.connector !== "walk" || code) {
         const p = await page.evaluate(() => window.__game.sceneLinkPrompt() || window.__game.cityPrompt());
         check(`${l.id}: at its F spot you are offered the way`, /Press F/.test(p), p);
         await page.evaluate(() => window.__game.doAction());

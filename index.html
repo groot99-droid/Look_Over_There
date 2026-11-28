@@ -705,7 +705,8 @@ function move(dx, dy, dz) {
   }
   p.y += dy; P.ground = false;
   const b = collide(p);
-  if (b) { if (dy < 0) { p.y = b.x[1] + 0.001; P.ground = true; } else p.y = b.n[1] - H - 0.001; P.v.y = 0; }
+  // at rest (dy 0) inside a box whose top is within a step of your feet, you stand on it: two floors a few mm apart (the atrium's lift landings on its galleries) must not push you under
+  if (b) { if (dy < 0 || (dy === 0 && b.x[1] - p.y <= STEP)) { p.y = b.x[1] + 0.001; P.ground = true; } else p.y = b.n[1] - H - 0.001; P.v.y = 0; }
 }
 const teleport = pos => { P.p.set(pos[0], pos[1] + 0.02, pos[2]); P.v.set(0, 0, 0); };
 
