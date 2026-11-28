@@ -27,8 +27,12 @@ try {
   await page.evaluate(() => window.__game.loadScene("parking_lot", {pos: [-8, 9.6, 43.6]})); await settled(page, "parking_lot");
   check("away from the signpost the lot offers no road", !/forest/.test(await prompt(page)));
   await at(page, FOREST_ROAD_LOT.at[0], 9.6, FOREST_ROAD_LOT.at[1]);
-  check("at the signpost: F walks the road to the forest", /road to the forest/.test(await prompt(page)), await prompt(page));
-  await pressF(page); check("the road leads into the forest", await settled(page, "forest"));
+  check("at the signpost: F walks down the road", /walk down the road/.test(await prompt(page)), await prompt(page));
+  // since #115 the signpost leads onto the Overworld's road; its far end walks into the forest
+  await pressF(page); check("the signpost leads onto the road", await settled(page, "road"));
+  const roadEnd = (await page.evaluate(() => fetch("world/road.json").then(r => r.json()))).links.find(l => l.door === "forest");
+  await at(page, roadEnd.at[0], 0, roadEnd.at[2] + 4); await page.waitForTimeout(200); await at(page, roadEnd.at[0], 0, roadEnd.at[2]);
+  check("the road's far end leads into the forest", await settled(page, "forest"));
   let w = await where(page);
   check("you arrive at the road's end, facing up the path", near(w.p, FOREST.arrive) && Math.abs(w.yaw) < 0.05, JSON.stringify(w));
   check("the forest has its trees and the pastel haze", await page.evaluate(() => { const g = window.__game; let n = 0; g.S.root.traverse(o => { if (o.isInstancedMesh) n += o.count; }); return n > 400 && g.FST.hazy(); }));
@@ -62,8 +66,12 @@ try {
   check("walking back south takes you into the forest", await settled(page, "forest"));
   w = await where(page); check("at the path's north end, facing back down it", near(w.p, FOREST.fromMeadow.arrive) && Math.abs(Math.abs(w.yaw) - Math.PI) < 0.05, JSON.stringify(w));
   await at(page, FOREST.back.at[0], 0, FOREST.back.at[1]);
-  check("the signpost at the road's end walks you back", /back to the parking lot/.test(await prompt(page)), await prompt(page));
-  await pressF(page); check("to the parking lot", await settled(page, "parking_lot"));
+  check("the signpost at the road's end walks you back", /back down the road/.test(await prompt(page)), await prompt(page));
+  await pressF(page); check("onto the road, at its forest end", await settled(page, "road"));
+  w = await where(page); check("where the road meets the forest", near(w.p, roadEnd.arrive), JSON.stringify(w));
+  const roadHome = (await page.evaluate(() => fetch("world/road.json").then(r => r.json()))).links.find(l => l.door === "lot");
+  await at(page, roadHome.at[0], 0, roadHome.at[2] - 4); await page.waitForTimeout(200); await at(page, roadHome.at[0], 0, roadHome.at[2]);
+  check("the road's lot end walks you to the parking lot", await settled(page, "parking_lot"));
   w = await where(page); check("beside the signpost you left by", near(w.p, [FOREST_ROAD_LOT.at[0], 0, FOREST_ROAD_LOT.at[1]], FOREST_ROAD_LOT.reach + 1), JSON.stringify(w));
   check("the lot has its own sky again (no forest haze)", await page.evaluate(() => !window.__game.FST.hazy()));
 
@@ -73,10 +81,10 @@ try {
   await room.waitForFunction(() => window.__game && !document.getElementById("load") && window.__game.net.phase === "playing", null, {timeout: 240000});
   await room.evaluate(() => window.__game.loadScene("meadow", {pos: [0, 0, 6]})); await settled(room, "meadow");
   await room.evaluate(([x, z]) => { window.__game.teleport([x, 0, z]); }, MEADOW.house.door.at);
-  check("in a room the house's prompt says it is solo", /solo place/.test(await prompt(room)), await prompt(room));
+  // since #133 a room can follow the house's door into Right Door, Wrong Exit (the owner, 2026-11-27: the meadow house is the co-op way in)
+  check("in a room the house's door opens too", /Press F to open the door/.test(await prompt(room)), await prompt(room));
   await pressF(room);
-  const toast = await room.evaluate(() => document.getElementById("toast")?.textContent || "");
-  check("and F there says so and goes nowhere", /does not open while you are in a room/.test(toast) && (await where(room)).id === "meadow", toast);
+  check("and F there takes you into the game", await room.waitForFunction(() => document.getElementById("gamemount").style.display === "block", null, {timeout: 90000}).then(() => true, () => false));
   check("no page errors", errors.length === 0, errors.slice(0, 3).join(" | "));
 } catch (e) { console.log("ERROR", e.message); failed++; }
 await browser.close(); await srv.close(); console.log(failed ? `${failed} FAILED` : "ALL PASSED"); process.exit(failed ? 1 : 0);

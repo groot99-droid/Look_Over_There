@@ -2456,7 +2456,7 @@ function forestTick() {
 // what F does here, as a prompt (null: nothing of the forest's is near)
 function forestPrompt() {
   if (S.id === OW_SCENE && nearXZ(...FOREST_ROAD_LOT.at, FOREST_ROAD_LOT.reach)) return "Press F to walk down the road";
-  if (S.id === FOREST_SCENE && nearXZ(...FOREST.back.at, FOREST.back.reach)) return "Press F to walk back to the parking lot";
+  if (S.id === FOREST_SCENE && nearXZ(...FOREST.back.at, FOREST.back.reach)) return "Press F to walk back down the road";
   if (S.id !== MEADOW_SCENE) return null;
   if (nearXZ(...MEADOW.house.door.at, MEADOW.house.door.reach)) return roomShut(REGISTRY.linkFrom(MEADOW_SCENE, "house_door")) ? "The house: a solo place for now (not in a room)" : "Press F to open the door";
   if (nearXZ(...MEADOW.shed.door.at, MEADOW.shed.door.reach)) return "The shed is locked. Something inside is waiting for its puzzle.";

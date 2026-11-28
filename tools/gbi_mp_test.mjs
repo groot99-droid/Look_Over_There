@@ -66,7 +66,9 @@ const newPage = async name => { const page = await (await browser.newContext({vi
 const inGame = p => p.waitForFunction(() => window.__game && !document.getElementById("load"), null, {timeout: 240000});
 const settled = (p, id) => p.waitForFunction(i => window.__game.S.id === i && !window.__game.loading, id, {timeout: 180000});
 // through the stairs-down door as a player goes: stand at it, open it, wait for the leaf, step into the hallway behind it
+// or, from a Blender chamber (#123), F at its way-on link's spot
 async function takeStairs(page, doorName) {
+  if (await page.evaluate(n => { const g = window.__game, x = (g.S.sceneLinks || []).find(l => l.door === n); if (!x) return false; g.teleport(x.at); g.P.v.set(0, 0, 0); g.doAction(); return true; }, doorName)) return;
   await page.evaluate(n => { const g = window.__game, dr = g.doors.find(d => d.d.name === n); g.P.p.set(dr.cx, g.S.floor + 0.02, dr.cz + 1.2); g.P.v.set(0, 0, 0); g.openDoor(dr, true); }, doorName);
   await page.waitForFunction(n => { const dr = window.__game.doors.find(d => d.d.name === n); return dr && dr.hallN && dr.p >= 0.6; }, doorName, {timeout: 60000, polling: 100});
   await page.evaluate(n => { const g = window.__game, dr = g.doors.find(d => d.d.name === n); g.P.p.set(dr.hallC[0] + dr.hallN[0] * 0.3, g.S.floor + 0.02, dr.hallC[1] + dr.hallN[1] * 0.3); g.P.v.set(0, 0, 0); }, doorName);

@@ -3,6 +3,7 @@
 // Usage: node tools/games_party_test.mjs     (needs Playwright + Chromium; run from the repo root)
 import {createRequire} from "node:module";
 import {createServer} from "../server/server.js";
+import {MEADOW} from "../shared/forest.js";
 const {chromium} = createRequire(import.meta.url)("playwright");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let failed = 0; const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
@@ -19,15 +20,17 @@ const until = (page, fn, arg, ms = 90000) => page.waitForFunction(fn, arg, {time
 const room = () => srv.rooms.get("GAMES");
 const placeOf = id => room().players.get(id)?.scene;
 const serverPlace = async (id, want, ms = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (placeOf(id) === want) return true; await sleep(100); } return false; };
-const GATE = "DoorLeaf_Gate_RDW";
-// L4 -> the gate door -> the passage "T" -> its far door -> the game runs (the game mount is shown)
-async function enter(page, door) {
+// since #133 the way in is the meadow house's door (the balloon house and its gate on L4's lot are gone), and a room can follow it (the owner, 2026-11-27).
+// The meadow is past the parking lot, so the room's server lets you be there only with the Original's flag: the page holds it, and tells the server.
+const GATE = "meadow house";
+async function enter(page) {
   await page.evaluate(async door => {
-    const g = window.__game; if (g.S.id !== "L4") await g.loadScene("L4");
-    const dr = g.doors.find(d => d.d.name === door); g.teleport([dr.cx, g.S.floor, dr.cz]); g.openDoor(dr, true);
-  }, door);
-  if (!await until(page, () => window.__game.S.id === "T" && !window.__game.loading)) return false;
-  await page.evaluate(() => { const g = window.__game, dr = g.doors.find(d => d.link && d.link.game); g.openDoor(dr, true); });
+    const g = window.__game;
+    try { localStorage.setItem("original_complete", "1"); } catch (e) {}
+    g.net.send({t: "flags", flags: ["original_complete"]});
+    if (g.S.id !== "meadow") await g.loadScene("meadow", {pos: [door.at[0], 0, door.at[1] + 0.5], face: [0, -1]});
+    g.teleport([door.at[0], 0, door.at[1]]); g.doAction();
+  }, MEADOW.house.door);
   return until(page, () => document.getElementById("gamemount").style.display === "block");
 }
 const gameState = page => page.evaluate(async () => { const c = (await import("./games/rdwe/walk.js")).debug.current; return c ? {peers: c.peerCount(), at: c.controls.position().toArray()} : null; });
@@ -81,14 +84,15 @@ try {
   }
   for (const id of ROOMS) check(`positions in the room "${id}" are inside the server's limits`, fits(ext[id]), JSON.stringify(ext[id]));
   check("Bob is still in the second room, alone", placeOf(bid) === "rdwe:hallway" && (await gameState(b))?.peers === 0, String(placeOf(bid)));
-  // Ann finishes the last room: she is back on L4 at the gate's arrival point, Bob's game goes on
+  // Ann finishes the last room: she is back in the meadow in front of the house (its link's returnTo), Bob's game goes on
   await finishRoom(a);
-  check("Ann is back on L4 at the arrival point", await until(a, () => window.__game.S.id === "L4" && !window.__game.loading && document.getElementById("gamemount").style.display === "none", null, 150000)
-    && await a.evaluate(() => { const p = window.__game.P.p; return Math.hypot(p.x + 121.2, p.z - 63.6) < 2.5; }));
-  check("the server has Ann on L4 and Bob still in the game", await serverPlace(aid, "L4") && placeOf(bid) === "rdwe:hallway", `${placeOf(aid)} / ${placeOf(bid)}`);
+  check("Ann is back in the meadow, in front of the house", await until(a, () => window.__game.S.id === "meadow" && !window.__game.loading && document.getElementById("gamemount").style.display === "none", null, 150000)
+    && await a.evaluate(([x, z]) => { const p = window.__game.P.p; return Math.hypot(p.x - x, p.z - z) < 2.5; }, [MEADOW.returnHouse.arrive[0], MEADOW.returnHouse.arrive[2]]));
+  check("the server has Ann in the meadow and Bob still in the game", await serverPlace(aid, "meadow") && placeOf(bid) === "rdwe:hallway", `${placeOf(aid)} / ${placeOf(bid)}`);
   const sb2 = await gameState(b);
   check("Bob's game is still running", !!sb2 && sb2.peers === 0, JSON.stringify(sb2));
   // the Intern is still solo only
+  await a.evaluate(() => window.__game.loadScene("L4")); await until(a, () => window.__game.S.id === "L4" && !window.__game.loading);
   await a.evaluate(() => { const g = window.__game, dr = g.doors.find(d => d.d.name === "DoorLeaf_Gate_ITN"); g.teleport([dr.cx, g.S.floor, dr.cz]); g.openDoor(dr, true); });
   const toast = await a.evaluate(() => document.getElementById("toast")?.textContent || "");
   check("the Intern's gate still does not open in a room", /does not open in a room/.test(toast) && await a.evaluate(() => window.__game.S.id) === "L4", toast);
@@ -104,7 +108,7 @@ try {
   check("Bob, in the game, holds the results and is not shown them", await until(b, () => !!window.__game.net.heldResults, null, 20000) && await b.evaluate(() => !window.__game.FIN.results && getComputedStyle(document.getElementById("results")).display === "none" && document.getElementById("gamemount").style.display === "block"));
   check("and his game is still running", !!(await gameState(b)));
   await b.evaluate(async () => (await import("./games/rdwe/walk.js")).cancel());
-  check("Bob comes back to L4", await until(b, () => window.__game.S.id === "L4" && !window.__game.loading && document.getElementById("gamemount").style.display === "none", null, 150000));
+  check("Bob comes back out of the house, to the meadow", await until(b, () => window.__game.S.id === "meadow" && !window.__game.loading && document.getElementById("gamemount").style.display === "none", null, 150000));
   check("and is shown the results then", await until(b, () => !!window.__game.FIN.results && !window.__game.net.heldResults && getComputedStyle(document.getElementById("results")).display === "flex", null, 20000)
     && await b.evaluate(() => [...document.querySelectorAll("#r-rows tr")].filter(r => r.querySelector("td")).length === 1));
   check("no page errors", errors.length === 0, errors.join(" | "));
