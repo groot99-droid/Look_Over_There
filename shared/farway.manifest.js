@@ -85,7 +85,7 @@ export const FARWAY = {
     {
       // slice 13 (session 9): the mall's atrium, a blockout behind the street's MALL door. Open to go in by day; at 20:00 it locks you in until dawn.
       id: "mall", name: "Liminal mall", status: "built", tone: "liminal",
-      scenes: [{id: "entrance", floorY: 0, files: ["world/entrance.json"]}],
+      scenes: [{id: "entrance", floorY: 0, files: ["world/entrance.glb", "world/entrance.json"]}],
     },
     {
       // slice 4 (session 9): the grocery's main floor, a blockout behind the street's grocery door; open by day like the other stores. The back of house stays planned.
