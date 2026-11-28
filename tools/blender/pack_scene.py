@@ -34,7 +34,11 @@ def main(argv):
         print(f"{dst.relative_to(ROOT)}  {im.size[0]}x{im.size[1]}  {dst.stat().st_size / 1e3:.0f} KB")
     raw = work / f"{scene}_raw.glb"
     glb = ROOT / f"world/{scene}.glb"
-    subprocess.run([sys.executable, str(ROOT / "tools/webp_glb.py"), str(raw), str(glb), str(q)], check=True)
+    b = raw.read_bytes()
+    if b'"images"' in b[20:20 + int.from_bytes(b[12:16], "little")]:
+        subprocess.run([sys.executable, str(ROOT / "tools/webp_glb.py"), str(raw), str(glb), str(q)], check=True)
+    else:                                                              # flat colours only (the table and chairs): nothing to convert
+        glb.write_bytes(b)
     print(f"{glb.relative_to(ROOT)}  {glb.stat().st_size / 1e6:.2f} MB")
 
 

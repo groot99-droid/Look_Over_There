@@ -4,13 +4,19 @@
     blender -b --factory-startup --python tools/blender/dress_overworld.py -- --scene tree_house [--stage all] [--samples 512] [--render-samples 128]
     python tools/blender/pack_scene.py tree_house --work work/ow_tree_house                    (WebP: world/tree_house.glb and its AO map)
 
-Scenes: tree_house, road, endless_hills. Every coordinate comes from tools/blender/build_overworld_greybox.py's model (imported here, never
+Scenes: tree_house, road, endless_hills, table_and_chairs, bus_station. Every coordinate comes from tools/blender/build_overworld_greybox.py's model (imported here, never
 retyped), so the colliders, doors, links, spots and edges stay exactly where the greybox put them: the run writes the layout through
 tools/blender/export_scene.py to the work folder and fails unless it equals world/<scene>.json byte for byte.
 
 Each greybox box that has art becomes one dressed object of the same name whose world box is the box (a trunk is a tapered cylinder that
 touches its box's faces, a railing is posts and rails filling it, a hedge is a rounded box), so tools/blender/check_layout.py's rules hold;
 the extra dressing (crowns, flowers, roofs, windows, kerbs, the hills' puzzle props) is named decor_ and is passable.
+
+table_and_chairs and bus_station are sets that stay part of the lot (the greybox's ATTACH puts them in parking_lot's frame): their GLBs hold
+the set only, never ground (the lot's own asphalt is under them in the game). The lot round them (the greybox's ctx_ boxes) is built into a
+Context collection that the stills show and the AO bake's rays hit (so the legs and the platform meet the ground), and that is never exported.
+The greybox gives the table and the chairs colliders with decor_ parts; here each becomes one solid object of the collider's name (the top
+and the foot, the seat, the back and the foot), so the layout check's COVER rule holds.
 
 Stages (all by default, in one run): art (builds, saves blender/scenes/<scene>.blend, writes the layout and runs the layout check) -> bake
 (merges by material into the Export collection, a shared second UV set, a Cycles AO bake, OIDN; work/ow_<scene>/<scene>_0.png) -> export
@@ -56,10 +62,10 @@ WORK = ROOT / f"work/ow_{SCENE}"
 STILLS = ROOT / f"docs/renders/{SCENE}"
 AO_URL = f"world/lightmaps/{SCENE}_0.webp"
 MARGIN_PX = 8
-TARGET_PXM = {"tree_house": 24.0, "road": 10.0, "endless_hills": 9.0}.get(SCENE, 12.0)
+TARGET_PXM = {"tree_house": 24.0, "road": 10.0, "endless_hills": 9.0, "table_and_chairs": 128.0, "bus_station": 48.0}.get(SCENE, 12.0)
 AO_DIST = 2.5
 S = GB.build(SCENE)
-RNG = np.random.default_rng({"tree_house": 11, "road": 12, "endless_hills": 13}.get(SCENE, 1))
+RNG = np.random.default_rng({"tree_house": 11, "road": 12, "endless_hills": 13, "table_and_chairs": 14, "bus_station": 15}.get(SCENE, 1))
 
 
 def G(p):
@@ -94,6 +100,16 @@ MAT = {
     "Flower_Pink": (None, (0.98, 0.60, 0.78), 1.0, 0.5, 0, False), "Flower_Yellow": (None, (0.98, 0.88, 0.42), 1.0, 0.5, 0, False),
     "Flower_White": (None, (0.94, 0.94, 0.92), 1.0, 0.5, 0, False), "Flower_Blue": (None, (0.60, 0.72, 0.98), 1.0, 0.5, 0, False),
     "Flower_Stem": (None, (0.36, 0.66, 0.34), 1.0, 0.7, 0, False),
+    # the two lot sets: moulded plastic in index.html's colours (the yellow and blue a touch under 1, so nothing clips), the station's print
+    "Plastic_White": (None, (0.93, 0.91, 0.86), 1.0, 0.35, 0, True), "Plastic_Grey": (None, (0.81, 0.78, 0.72), 1.0, 0.4, 0, True),
+    "Plastic_Pink": (None, (0.97, 0.66, 0.77), 1.0, 0.35, 0, True), "Plastic_Mint": (None, (0.62, 0.88, 0.78), 1.0, 0.35, 0, True),
+    "Plastic_Yellow": (None, (0.97, 0.86, 0.52), 1.0, 0.35, 0, True), "Plastic_Blue": (None, (0.60, 0.77, 0.97), 1.0, 0.35, 0, True),
+    "Plastic_Coral": (None, (0.90, 0.56, 0.56), 1.0, 0.35, 0, True), "Roof_Blue": (None, (0.56, 0.72, 0.92), 1.0, 0.4, 0, True),
+    "Parasol_Pink": (None, (0.94, 0.70, 0.80), 1.0, 0.7, 0, True), "Parasol_White": (None, (0.93, 0.91, 0.87), 1.0, 0.7, 0, True),
+    "Paving": ("paving", (1, 1, 1), 2.0, 0.85, 0, True), "Timetable_Print": ("timetable", (1, 1, 1), None, 0.4, 0, True),
+    "Ticket_Face": ("ticket_face", (1, 1, 1), None, 0.4, 0, True), "Sign_Bus": ("bus_flag", (1, 1, 1), None, 0.4, 0, True),
+    "Sign_Dest": ("dest_sign", (1, 1, 1), None, 0.4, 0, True),
+    "Glass": (None, (0.80, 0.92, 0.95), 1.0, 0.05, 0, False),     # the shelter's panes: see-through (alpha 0.3), not baked
 }
 _mats = {}
 
@@ -124,6 +140,13 @@ def material(name):
         else:
             bsdf.inputs[key].default_value = c
         bsdf.inputs["Emission Strength"].default_value = emit
+    if name == "Glass":
+        bsdf.inputs["Alpha"].default_value = 0.3
+        for a, v in (("surface_render_method", "BLENDED"), ("blend_method", "BLEND")):   # the glTF exporter writes alphaMode BLEND
+            try:
+                setattr(m, a, v)
+            except (AttributeError, TypeError):
+                pass
     m.diffuse_color = c
     _mats[name] = m
     return m
@@ -189,12 +212,17 @@ def gsphere(g, c, r, sub=2):
     return g.add(verts, faces, True)
 
 
+def gbox_open(g, mn, mx):
+    """A box with no bottom face (it lies on the ground, where nobody sees it and the AO page would waste room on it)."""
+    return g.add(box_v(mn, mx), [(0, 1, 3, 2), (4, 6, 7, 5), (2, 3, 7, 6), (0, 2, 6, 4), (1, 5, 7, 3)])   # gbox's faces, less (0, 4, 5, 1)
+
+
 def gquad_y(g, x0, x1, z0, z1, y):
     return g.add([(x0, y, z0), (x0, y, z1), (x1, y, z1), (x1, y, z0)], [(0, 1, 2, 3)])
 
 
 # ---------------------------------------------------------------- objects
-ART, LAYOUT = None, None
+ART, LAYOUT, CTX = None, None, None
 
 
 def to_object(name, g, mat, uv="box", tile=None, bevel=0.0, coll=None, origin=None):
@@ -639,6 +667,206 @@ def extra_endless_hills():
     to_object("decor_Puzzle_Hopscotch", hs, "Paint_White")
 
 
+# ---------------------------------------------------------------- the two lot sets: table_and_chairs and bus_station
+def _bx(name):
+    return next(b for b in S.boxes if b["name"] == name)
+
+
+PLASTIC = {"pink": "Plastic_Pink", "mint": "Plastic_Mint", "yellow": "Plastic_Yellow", "blue": "Plastic_Blue"}
+GLYPH = {"B": ["##.", "#.#", "##.", "#.#", "##."], "U": ["#.#", "#.#", "#.#", "#.#", "###"], "S": ["###", "#..", "###", "..#", "###"]}
+
+
+def set_box(b):
+    """The lot sets' greybox boxes dressed here (True), or left to dress_box (False)."""
+    n = b["name"]
+    if SCENE == "table_and_chairs":
+        return n.startswith(("decor_Table_", "decor_Chair_"))     # rebuilt from these same boxes by extra_table_and_chairs
+    if SCENE != "bus_station":
+        return False
+    mn, mx = mn_mx(b)
+    if n == "Platform":
+        to_object(n, gbox_open(Geo(), mn, mx), "Paving", bevel=0.015)
+    elif n.startswith(("Shelter_Back", "Shelter_Side")):
+        glass_panel(b)
+    elif n == "Shelter_Roof":
+        to_object(n, gbox(Geo(), mn, mx), "Roof_Blue", bevel=0.04)
+    elif n == "Shelter_Bench":
+        bench_geo(b)
+    elif n == "Timetable":
+        g = Geo()                                                  # two posts the board's height (the solid art over its collider)
+        for x0 in (mn[0], mx[0] - 0.06):
+            gbox(g, (x0, mn[1], mn[2] + 0.02), (x0 + 0.06, mx[1], mx[2] - 0.02))
+        to_object(n, g, "Steel", bevel=0.006)
+        to_object("decor_Timetable_Face", gbox(Geo(), (mn[0] + 0.06, mn[1] + 0.7, mn[2] + 0.03), (mx[0] - 0.06, mx[1] - 0.05, mx[2] - 0.03)),
+                  "Timetable_Print", uv="fit")
+    elif n == "Ticket_Machine":
+        to_object(n, gbox(Geo(), mn, mx), "Plastic_Coral", bevel=0.03)
+        to_object("decor_Ticket_Machine_Face", gbox(Geo(), (mn[0] + 0.08, mn[1] + 0.25, mx[2]), (mx[0] - 0.08, mx[1] - 0.06, mx[2] + 0.008)),
+                  "Ticket_Face", uv="fit")
+    elif n == "decor_Stop_Sign":
+        to_object(n, gbox(Geo(), mn, mx), "Sign_Bus", uv="fit", bevel=0.005)
+    elif n == "decor_Bay_Lines":
+        bay_paint(b)
+    elif n == "decor_Bay_Kerb_Paint":
+        to_object(n, gbox_open(Geo(), mn, (mx[0], mx[1] + 0.002, mx[2])), "Paint_White")
+    else:
+        return False
+    return True
+
+
+def glass_panel(b):
+    """A shelter wall: an aluminium frame filling the greybox box (the solid art over its collider) and a pane of glass in it (decor_)."""
+    mn, mx = mn_mx(b)
+    along = 0 if (mx[0] - mn[0]) >= (mx[2] - mn[2]) else 2
+    cross = 2 - along
+    L = mx[along] - mn[along]
+    fw = 0.06
+    g = Geo()
+    for lo_y, hi_y in ((mn[1], mn[1] + fw), (mx[1] - fw, mx[1])):  # the bottom and top rails
+        gbox(g, (mn[0], lo_y, mn[2]), (mx[0], hi_y, mx[2]))
+    n = max(1, round(L / 1.8))
+    for k in range(n + 1):                                         # the posts, about 1.8 m apart
+        lo, hi = list(mn), list(mx)
+        lo[along] = mn[along] + (L - fw) * k / n
+        hi[along] = lo[along] + fw
+        gbox(g, lo, hi)
+    to_object(b["name"], g, "Steel", bevel=0.006)
+    c = (mn[cross] + mx[cross]) / 2
+    lo, hi = list(mn), list(mx)
+    lo[cross], hi[cross] = c - 0.006, c + 0.006
+    lo[along] += fw / 2
+    hi[along] -= fw / 2
+    lo[1] += fw / 2
+    hi[1] -= fw / 2
+    to_object("decor_" + b["name"] + "_Glass", gbox(Geo(), lo, hi), "Glass")
+
+
+def bay_paint(b):
+    """The bus bay painted on the lot: a yellow box open to the kerb and BUS in block letters, read from the platform."""
+    mn, mx = mn_mx(b)
+    y0, y1 = mn[1] + 0.003, mn[1] + 0.008
+    g = Geo()
+    w = 0.1
+    gbox_open(g, (mn[0], y0, mx[2] - w), (mx[0], y1, mx[2]))
+    for x0 in (mn[0], mx[0] - w):
+        gbox_open(g, (x0, y0, mn[2]), (x0 + w, y1, mx[2] - w))
+    # facing the bay (south, +z) from the platform, east (+x) is on your left: the letters run toward -x, their tops to the south
+    cell, gap, word = 0.28, 0.28, "BUS"
+    xl = (len(word) * 3 * cell + (len(word) - 1) * gap) / 2
+    ztop = mx[2] - 0.6
+    for i, ch in enumerate(word):
+        for r, row in enumerate(GLYPH[ch]):
+            for c, on in enumerate(row):
+                if on == "#":
+                    x, z = xl - i * (3 * cell + gap) - c * cell, ztop - r * cell
+                    gbox_open(g, (x - cell, y0, z - cell), (x, y1, z))
+    to_object(b["name"], g, "Line_Yellow")
+
+
+def extra_table_and_chairs():
+    t = _bx("Table")
+    tmn, tmx = mn_mx(t)
+    cx, cz = (tmn[0] + tmx[0]) / 2, (tmn[2] + tmx[2]) / 2
+    R = (tmx[0] - tmn[0]) / 2
+    top = _bx("decor_Table_Top")
+    y0, y1 = top["min"][1], top["max"][1]
+    # the table: a round moulded top with a rolled rim and a round foot, one object (its box is the collider's); the pedestal between them
+    g = Geo()
+    gcyl(g, cx, cz, 0, 0, 0, 0, seg=40, rings=[(y0, R - 0.03), (y0 + 0.02, R), (y1 - 0.015, R), (y1, R - 0.015)])
+    gcyl(g, cx, cz, 0, 0, 0, 0, seg=28, rings=[(0.0, 0.36), (0.015, 0.36), (0.04, 0.26)])
+    to_object("Table", g, "Plastic_White")
+    lg = Geo()
+    gcyl(lg, cx, cz, 0, 0, 0, 0, seg=16, rings=[(0.04, 0.12), (y0, 0.08)])      # index.html's leg: 0.12 m at the foot, 0.08 m at the top
+    to_object("decor_Table_Leg", lg, "Plastic_Grey")
+    # four chairs: seat, a back leaning 3 cm out and a round foot as one object over each collider; the post between them
+    for nm, ccx, ccz, col in GB.CHAIRS:
+        seat, back = _bx(f"decor_Chair_{nm}_Seat"), _bx(f"decor_Chair_{nm}_Back")
+        g = Geo()
+        gbox(g, seat["min"], seat["max"])
+        ox, oz = 0.03 * (ccx > 0) - 0.03 * (ccx < 0), 0.03 * (ccz > 0) - 0.03 * (ccz < 0)
+        bv = [(x + ox * (y > 0.6), y, z + oz * (y > 0.6)) for (x, y, z) in box_v(back["min"], back["max"])]
+        g.add(bv, [(0, 1, 3, 2), (4, 6, 7, 5), (0, 4, 5, 1), (2, 3, 7, 6), (0, 2, 6, 4), (1, 5, 7, 3)])
+        gcyl(g, ccx, ccz, 0.0, 0.025, 0.2, 0.19, seg=24)
+        to_object(f"Chair_{nm}", g, PLASTIC[col], bevel=0.01)
+        pg = Geo()
+        gcyl(pg, ccx, ccz, 0.025, seat["min"][1], 0.035, 0.03, seg=12)
+        to_object(f"decor_Chair_{nm}_Post", pg, "Plastic_Grey")
+    # a parasol through the table (decor: overhead, its hem 1.96 m up), pink and white panels
+    pole = Geo()
+    gcyl(pole, cx, cz, y1, 2.44, 0.02, 0.02, seg=10)
+    gsphere(pole, (cx, 2.48, cz), (0.035, 0.035, 0.035), sub=1)
+    to_object("decor_Parasol_Pole", pole, "Plastic_White")
+    can = {"Parasol_Pink": Geo(), "Parasol_White": Geo()}
+    N, Rr, yr, ya, hem = 8, 1.3, 2.08, 2.44, 0.12
+    for k in range(N):
+        a0, a1 = 2 * math.pi * k / N, 2 * math.pi * (k + 1) / N
+        am = (a0 + a1) / 2
+        p0 = (cx + Rr * math.cos(a0), yr, cz + Rr * math.sin(a0))
+        p1 = (cx + Rr * math.cos(a1), yr, cz + Rr * math.sin(a1))
+        pm = (cx + Rr * 0.96 * math.cos(am), yr + 0.03, cz + Rr * 0.96 * math.sin(am))
+        gk = can[("Parasol_Pink", "Parasol_White")[k % 2]]
+        gk.add([(cx, ya, cz), p0, pm, p1], [(0, 1, 2), (0, 2, 3)])
+        gk.add([p0, p1, (p1[0], yr - hem, p1[2]), (p0[0], yr - hem, p0[2])], [(0, 1, 2, 3)])
+    for m, g in can.items():
+        to_object(f"decor_Parasol_{m.split('_')[1]}", g, m)
+    # left on the table: a paper cup and a napkin holder
+    cup = Geo()
+    gcyl(cup, cx + 0.28, cz - 0.2, y1, y1 + 0.11, 0.032, 0.042, seg=14)
+    to_object("decor_Table_Cup", cup, "Paint_White")
+    nh = Geo()
+    gbox(nh, (cx - 0.33, y1, cz + 0.12), (cx - 0.21, y1 + 0.08, cz + 0.2))
+    to_object("decor_Table_Napkin_Holder", nh, "Plastic_Grey", bevel=0.005)
+    to_object("decor_Table_Napkins", gbox(Geo(), (cx - 0.32, y1 + 0.02, cz + 0.135), (cx - 0.22, y1 + 0.11, cz + 0.185)), "Paint_White")
+
+
+def extra_bus_station():
+    pf = _bx("Platform")
+    mn, mx = mn_mx(pf)
+    # weeds at the platform's foot (decor: you walk through them), and a few ticket stubs dropped on it
+    pts = [(float(RNG.uniform(mn[0], mx[0])), float(mn[2] - RNG.uniform(0.03, 0.12))) for _ in range(30)]
+    pts += [(float(x0 + s * RNG.uniform(0.03, 0.12)), float(RNG.uniform(mn[2], mx[2] - 0.3))) for x0, s in ((mn[0], -1), (mx[0], 1)) for _ in range(8)]
+    flowers("Platform_Weeds", pts, size=0.7)
+    st = Geo()
+    for _ in range(6):
+        x, z, a = float(RNG.uniform(-6.0, 6.0)), float(RNG.uniform(0.2, 2.2)), float(RNG.uniform(0, math.pi))
+        ca, sa = math.cos(a), math.sin(a)
+        st.add([(x + ca * u - sa * v, mx[1] + 0.002, z + sa * u + ca * v) for u, v in ((-0.035, -0.018), (-0.035, 0.018), (0.035, 0.018), (0.035, -0.018))],
+               [(0, 1, 2, 3)])
+    to_object("decor_Ticket_Stubs", st, "Paint_White")
+    # under the roof: a light strip (Lamp_Emit: the page lights it from dusk) and the destination board at the front, on two hangers
+    rf = _bx("Shelter_Roof")
+    rmn, rmx = mn_mx(rf)
+    rc = (rmn[2] + rmx[2]) / 2
+    to_object("decor_Shelter_Lamp", gbox(Geo(), (-1.8, rmn[1] - 0.04, rc - 0.07), (1.8, rmn[1], rc + 0.07)), "Lamp_Emit")
+    zs = rmx[2] - 0.14
+    to_object("decor_Shelter_Dest", gbox(Geo(), (-1.0, rmn[1] - 0.32, zs), (1.0, rmn[1] - 0.06, zs + 0.04)), "Sign_Dest", uv="fit")
+    hg = Geo()
+    for x in (-0.8, 0.8):
+        gbox(hg, (x - 0.01, rmn[1] - 0.07, zs + 0.01), (x + 0.01, rmn[1], zs + 0.03))
+    to_object("decor_Shelter_Dest_Hangers", hg, "Steel")
+    # a backrest on the bench, against the glass (decor: it is inside the bench's and the back wall's plan)
+    bn = _bx("Shelter_Bench")
+    bmn, bmx = mn_mx(bn)
+    bk = Geo()
+    for k in range(2):
+        gbox(bk, (bmn[0], bmx[1] + 0.08 + k * 0.14, bmn[2]), (bmx[0], bmx[1] + 0.18 + k * 0.14, bmn[2] + 0.04))
+    for x0 in (bmn[0] + 0.1, bmx[0] - 0.16):
+        gbox(bk, (x0, bmx[1] - 0.06, bmn[2]), (x0 + 0.06, bmx[1] + 0.34, bmn[2] + 0.03))
+    to_object("decor_Shelter_Bench_Back", bk, "Deck", bevel=0.008)
+
+
+CTX_MAT = {"asphalt": "Asphalt", "store": "Concrete", "glass": "Glass", "hedge": "Hedge", "steel": "Steel"}
+
+
+def build_context():
+    """The lot round a set (the greybox's ctx_ boxes): the stills show it and the bake's rays hit it; never exported, never in the layout check."""
+    for b in S.boxes:
+        if b.get("ctx"):
+            mn, mx = mn_mx(b)
+            m = CTX_MAT.get(b["mat"], "Concrete")
+            to_object(b["name"], gbox(Geo(), mn, mx), m, coll=CTX, bevel=0.3 if m == "Hedge" else 0.0)
+
+
 # ---------------------------------------------------------------- the layout (the greybox's names, exactly)
 def build_layout():
     unit = bpy.data.meshes.new("COL_unit")
@@ -695,12 +923,15 @@ def build_art():
     for b in S.boxes:
         if b.get("zone") or b.get("ctx") or not b.get("art", True):
             continue
-        dress_box(b)
+        if not set_box(b):
+            dress_box(b)
     for m in S.meshes:                                              # the hills' surface (decor_Hills_Surface), the greybox's vertices
         g = Geo()
         g.add([tuple(v) for v in m["verts"]], [tuple(f) for f in m["faces"]], True)
         to_object(m["name"], g, "Grass")
-    {"tree_house": extra_tree_house, "road": extra_road, "endless_hills": extra_endless_hills}[SCENE]()
+    {"tree_house": extra_tree_house, "road": extra_road, "endless_hills": extra_endless_hills, "table_and_chairs": extra_table_and_chairs,
+     "bus_station": extra_bus_station}[SCENE]()
+    build_context()
 
 
 def setup_world():
@@ -830,11 +1061,25 @@ def gate_layout():
         print(f"{'PASS' if ok else 'FAIL'}  HILLS  {n} Ground_Hills_ columns: the surface at each column's centre is its top within {worst * 1000:.1f} mm")
         world = dict(world, colliders=[c for c in cols if not c["s"].startswith("Ground_Hills_")])
         note = " (the hills' columns by the HILLS rule above)"
+    lot_ok = True
+    if S.attach:
+        # A set in the lot ships no ground: its Ground_ collider (art=False in the greybox) is the lot's own asphalt in the game. It must lie
+        # flat at the set's floor (top at y 0) inside the lot round the set (the greybox's ctx_Lot_asphalt); the rest take check_layout's rules.
+        lot = _bx("ctx_Lot_asphalt")
+        bare = {b["name"] for b in S.boxes if b["col"] and not b.get("art", True) and b["name"].startswith("Ground_")}
+        for c in cols:
+            if c["s"] in bare:
+                ok = abs(c["max"][1]) < 1e-6 and all(lot["min"][i] <= c["min"][i] and c["max"][i] <= lot["max"][i] for i in (0, 2))
+                lot_ok = lot_ok and ok
+                print(f"{'PASS' if ok else 'FAIL'}  LOT    {c['s']}: the lot's own asphalt (part 1's parking_lot) is this ground in the game; top at y "
+                      f"{c['max'][1]:.2f}, inside the lot round the set")
+        world = dict(world, colliders=[c for c in cols if c["s"] not in bare])
+        note = " (the set's ground by the LOT rule above)"
     consts = {"links": {l["door"]: {"arrive": l["arrive"], "at": [l["at"][0], l["at"][2]]} for l in world["links"]}}
     res = check_layout.check(parts, world, consts)
     bad = check_layout.report(res)
-    print(f"GATE layout check{note}: {'PASS' if not bad else 'FAIL'}")
-    return same and not bad
+    print(f"GATE layout check{note}: {'PASS' if not bad and lot_ok else 'FAIL'}")
+    return same and not bad and lot_ok
 
 
 # ---------------------------------------------------------------- bake
@@ -987,6 +1232,9 @@ def stage_bake():
     ART.hide_render = True
     setup_cycles(SAMPLES, bake=True)
     objs = [o for n, o in exp.items() if n in MAT and MAT[n][5]]
+    glass = [o for o in bpy.data.objects if o.type == "MESH" and o.data.materials and o.data.materials[0].name == "Glass" and not o.hide_render]
+    for o in glass:                                                # see-through: the AO rays pass it
+        o.hide_render = True
     if SCENE == "road":
         for o in objs:
             chop(o)
@@ -1035,6 +1283,8 @@ def stage_bake():
         bpy.data.images.remove(img)
         bpy.data.images.remove(png)
         reps.append({"page": n, "size": Sz, "px_per_m": round(dens, 1), "ao_p1_p10_p50_p90": pc, "materials": sorted(o.name for o in objs_g)})
+    for o in glass:
+        o.hide_render = False
     rep = {"samples": SAMPLES, "ao_distance_m": AO_DIST, "pages": reps, "seconds": round(time.time() - t0), "device": bpy.context.scene.cycles.device}
     print("BAKE", rep)
     (WORK / "bake.json").write_text(json.dumps(rep, indent=1))
@@ -1101,6 +1351,15 @@ def shots():
         a = L["lot"]
         return {"1_arrival": ((a["arrive"][0], 1.6, a["arrive"][2]), (0.0, 1.4, -60.0), 65),
                 "2_wide": ((11.0, 14.0, -180.0), (-2.0, 0.0, -300.0), 60), "3_detail": ((2.0, 1.6, -GB.ROAD_L + 16.0), (0.0, 3.0, -GB.ROAD_L), 60)}
+    if SCENE == "table_and_chairs":
+        sp = json.loads((ROOT / f"world/{SCENE}.json").read_text())["markers"][0]["position"]
+        return {"1_arrival": ((sp[0], 1.6, sp[2]), (sp[0], 1.15, sp[2] - 10.0), 65),
+                "2_wide": ((4.6, 3.0, 5.4), (0.0, 0.75, 0.0), 50), "3_detail": ((1.25, 1.3, 1.15), (-0.1, 0.74, -0.15), 50)}
+    if SCENE == "bus_station":
+        a = L["bus_stop"]
+        y0 = a["arrive"][1]
+        return {"1_arrival": ((a["arrive"][0], y0 + 1.6, a["arrive"][2]), (a["arrive"][0] + a["face"][0] * 5, y0 + 1.1, a["arrive"][2] + a["face"][1] * 5), 75),
+                "2_wide": ((-9.5, 4.2, 10.0), (0.5, 1.0, 0.8), 50), "3_detail": ((2.2, 1.75, 2.3), (4.3, 1.35, -0.1), 55)}
     a = L["lot"]
     y0 = a["arrive"][1]
     px, pz = GB.PUZZLES[1][2], GB.PUZZLES[1][3]
@@ -1150,13 +1409,13 @@ def stage_render():
 
 
 def collections():
-    global ART, LAYOUT
+    global ART, LAYOUT, CTX
     sc = bpy.context.scene
-    for cn in ("Art", "Layout"):
+    for cn in ("Art", "Layout", "Context"):
         if cn not in bpy.data.collections:
             c = bpy.data.collections.new(cn)
             sc.collection.children.link(c)
-    ART, LAYOUT = bpy.data.collections["Art"], bpy.data.collections["Layout"]
+    ART, LAYOUT, CTX = bpy.data.collections["Art"], bpy.data.collections["Layout"], bpy.data.collections["Context"]
 
 
 if __name__ == "__main__":
