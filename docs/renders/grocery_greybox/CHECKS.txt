@@ -22,11 +22,11 @@ OK world/second_floor.json: 38 colliders, 2 doors, 1 markers, 2 links, 0 zones, 
   warning: link freight_down: the manifest has no link from this door yet: a new link to add
   warning: link main_floor: the manifest has no link from this door yet: a new link to add
   warning: link secret_ops: the manifest has no link from this door yet: a new link to add
-OK world/back_of_house.json: 64 colliders, 7 doors, 1 markers, 4 links, 1 zones, 16 spots, 0 errors, 4 warnings
+OK world/back_of_house.json: 65 colliders, 7 doors, 1 markers, 4 links, 1 zones, 16 spots, 0 errors, 4 warnings
   warning: scene basement is not in the world manifest yet: a new scene to add
   warning: link back_of_house: the manifest has no link from this door yet: a new link to add
   warning: link freight_up: the manifest has no link from this door yet: a new link to add
-OK world/basement.json: 74 colliders, 5 doors, 1 markers, 2 links, 1 zones, 7 spots, 0 errors, 3 warnings
+OK world/basement.json: 75 colliders, 5 doors, 1 markers, 2 links, 1 zones, 7 spots, 0 errors, 3 warnings
 exit 0
 
 node --test shared/*.test.js
