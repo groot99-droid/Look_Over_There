@@ -81,7 +81,7 @@ try {
   await until("Ann sees Bob in the lot, with his avatar and name tag", a, id => { const p = window.__game.net.peers.get(id); return p && p.scene === "parking_lot" && p.obj.visible && Math.hypot(p.tx + 5, p.tz - 46) < 0.5 && Math.abs(p.ty - 9.6) < 0.3 && p.obj.children.some(o => o.isSprite && o.material.map === p.tex); }, idB, async () => JSON.stringify(await peerOn(a, idB)) + "; " + xzOf(playerOf(idB)));
   await until("Bob sees Ann in the lot", b, id => { const p = window.__game.net.peers.get(id); return p && p.scene === "parking_lot" && p.obj.visible && Math.hypot(p.tx + 8, p.tz - 46) < 0.5; }, idA, async () => JSON.stringify(await peerOn(b, idA)) + "; " + xzOf(playerOf(idA)));
   // each sees the other move
-  await stand(b, idB, "parking_lot", -12, 50, "Bob walks off");
+  await stand(b, idB, "parking_lot", -10, 46, "Bob walks off");          // #133: the cars are solid now, one stands at (-12, 50)
   await until("Ann sees Bob move, and his avatar follows", a, id => { const p = window.__game.net.peers.get(id); return p && Math.hypot(p.tx + 12, p.tz - 50) < 0.5 && Math.hypot(p.obj.position.x + 12, p.obj.position.z - 50) < 1; }, idB, async () => JSON.stringify(await peerOn(a, idB)));
   await stand(a, idA, "parking_lot", -20, 44, "Ann walks off");
   await until("Bob sees Ann move", b, id => { const p = window.__game.net.peers.get(id); return p && Math.hypot(p.tx + 20, p.tz - 44) < 0.5 && Math.hypot(p.obj.position.x + 20, p.obj.position.z - 44) < 1; }, idA, async () => JSON.stringify(await peerOn(b, idA)));
@@ -142,11 +142,13 @@ try {
   await b.evaluate(() => { window.__game.tryCity(); });
   check("the grocery door says it is a solo place, and Bob stays on the street", /solo place/.test(await toastOf(b)) && /solo place/.test(await promptOf(b)) && await b.evaluate(() => window.__game.S.id === "street" && !window.__game.loading), `${await toastOf(b)} / ${await promptOf(b)}`);
   await stand(b, idB, "street", ...inFront(tower), "Bob at the tower door");
-  await b.evaluate(() => { window.__game.tryCity(); }); await settled(b, "apartment");
-  await serverUntil("the tower door opens for a room: the server has Bob in the apartment", () => serverHas(idB, "apartment"), () => xzOf(playerOf(idB)));
-  await until("Ann, on the street, no longer draws Bob", a, id => { const p = window.__game.net.peers.get(id); return p && p.scene === "apartment" && !p.obj.visible; }, idB);
-  await stand(b, idB, "apartment", APARTMENT.door.at[0], APARTMENT.door.at[1] , "Bob at his front door");
-  await b.evaluate(() => { window.__game.tryCity(); }); await settled(b, "street");
+  // since the hotel (the owner, 2026-11-28: "Lobby only") the tower's door opens its lobby, a presence scene too
+  await b.evaluate(() => { window.__game.tryCity(); }); await settled(b, "lobby");
+  await serverUntil("the tower door opens for a room: the server has Bob in the hotel's lobby", () => serverHas(idB, "lobby"), () => xzOf(playerOf(idB)));
+  await until("Ann, on the street, no longer draws Bob", a, id => { const p = window.__game.net.peers.get(id); return p && p.scene === "lobby" && !p.obj.visible; }, idB);
+  const lobbyOut = (await b.evaluate(() => fetch("world/lobby.json").then(r => r.json()))).links.find(l => l.door === "street").at;
+  await stand(b, idB, "lobby", lobbyOut[0], lobbyOut[2], "Bob at the lobby's front doors");
+  await b.evaluate(() => { window.__game.doAction(); }); await settled(b, "street");
   await serverUntil("and back out to the street", () => serverHas(idB, "street"), () => xzOf(playerOf(idB)));
 
   // ---- slice 3: the party list and "go to a friend"
