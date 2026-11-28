@@ -68,9 +68,10 @@ GROUPS = {
     "Exterior": [["M_U_asphalt", "M_U_pavement", "M_U_line", "M_U_yline", "M_City_asphalt", "M_City_walk", "M_City_white", "M_City_paint",
                   "PhotorealArch_SR_Road.001", "PhotorealArch_SR_Sidewalk.001"],
                  ["M_U_grass", "M_U_hedge"],
-                 ["M_City_brick", "M_City_brick2", "M_City_stone", "M_City_concrete", "M_City_metal", "M_City_red",
+                 ["M_City_brick", "M_City_brick2", "M_City_stone", "M_City_concrete",
                   "PhotorealArch_SR_BrickL.001", "PhotorealArch_SR_BrickR.001", "PhotorealArch_SR_Tower.001"],
-                 []],
+                 []],                               # the city's small parts (M_City_metal, M_City_red) come here: at map 2's 2.4 px/m their pieces
+                                                    # are smaller than a texel, so the bake wrote no texel for them and they came out black
 }[SCENE]
 # 4 px between islands on maps with thousands of small islands (B1: the trims and the props; Exterior: the house's things), 8 px elsewhere
 PAGE_MARGIN = {"Exterior": {3: 4}}.get(SCENE, {1: 4, 3: 4})
@@ -79,8 +80,9 @@ EXTERIOR_SCALE = 0.12                               # faces that look out of the
 # (the slabs' and the terrain's undersides) are never seen; they get EXTERIOR_SCALE instead. Blender z of the ground; None indoors.
 GROUND_Z = {"Exterior": 9.6}.get(SCENE)
 # Lamp parts: allowed to clip to white (they sit against the glowing tubes); every other material keeps its 99.5th percentile under the map's white.
-# Exterior: the dreamcore house's trim and roof next to its glowing window and the red "wrong exit", and the gate alcove next to its lit panel.
-HOT = {"Exterior": {"M_RDW_trim", "M_RDW_roof", "M_Gate_Alcove"}}.get(SCENE, {"M_Fixture_Housing", "M_Fluorescent_Dead"})
+# Exterior: the dreamcore house's trim and roof next to its glowing window and the red "wrong exit", the gate alcove next to its lit panel,
+# and the city's metal (window frames and railings against the lit windows).
+HOT = {"Exterior": {"M_RDW_trim", "M_RDW_roof", "M_Gate_Alcove", "M_City_metal"}}.get(SCENE, {"M_Fixture_Housing", "M_Fluorescent_Dead"})
 # Which percentile of a map's inside texels is its white (default 99.5). Exterior map 2, the city: the walls right round the lit windows are
 # 15 to 30 times the walls' median, so the map's white is put at the 97th percentile and those rims clip (they read as the windows' glow).
 WHITE_PCT = {"Exterior": {2: 97.0}}.get(SCENE, {})
@@ -88,10 +90,13 @@ WHITE_PCT = {"Exterior": {2: 97.0}}.get(SCENE, {})
 # Glass (transmission or alpha blend), anything glowing, skinned or drawn in more than one place is left out on every floor as well.
 # Exterior: the sky dome glows anyway; the city's dark window glass (72 500 vertices, a far backdrop) stays on the page's lights, as its
 # lightmap UVs alone would put the GLB over the +10 % size budget. It still casts light and shadow in the bake.
-# The last four bake black (no light reaches them in the model: the red trim inside a city building, the gate's step down into the terrain,
-# the house's coffee table and the picture behind its frame glass), so they too keep the page's lights rather than show black.
+# Hidden in the model, so no light reaches them and they would bake black: the dreamcore gate's concrete box (Gate_RDW_wall, up to 10.2 m)
+# encloses the house's coffee table and the gate's own step, and the picture's artwork is behind its frame glass, which is opaque (its
+# texture has no alpha). The page cannot show them either; they keep the page's lights. The house's sofa, television and picture frame are
+# lit only by the house's dim glow (the sofa's 99th percentile 0.01 shown) and keep the page's lights too.
 NEVER = {"B1": {"M_Water", "M_Fluorescent", "M_X_exit"},
-         "Exterior": {"M_U_sky", "M_City_glassdark", "M_City_red", "M_Gate_Step", "coffee_table_round_01", "hanging_picture_frame_01_artwork"}}[SCENE]
+         "Exterior": {"M_U_sky", "M_City_glassdark", "M_Gate_Step", "coffee_table_round_01", "hanging_picture_frame_01_artwork",
+                      "sofa_02", "Television_01", "hanging_picture_frame_01"}}[SCENE]
 CLIP_END = {"Exterior": 1000.0}.get(SCENE, 300.0)  # the review cameras' far clip (the Exterior's sky dome is 360 m out)
 
 

@@ -2,18 +2,19 @@
  "exposure": 3.5,
  "rule": "factor = 0.97 / the material's displayed p99 at exposure 3.5 (lab_display), for every baked material over 0.98",
  "factor": {
-  "PhotorealArch_SR_BrickL.001": 0.584,
-  "PhotorealArch_SR_BrickR.001": 0.584,
-  "PhotorealArch_SR_Tower.001": 0.682,
-  "M_City_brick": 0.545,
-  "M_City_brick2": 0.446,
-  "M_City_concrete": 0.682,
+  "PhotorealArch_SR_BrickL.001": 0.577,
+  "PhotorealArch_SR_BrickR.001": 0.577,
+  "PhotorealArch_SR_Tower.001": 0.673,
+  "M_City_brick": 0.538,
+  "M_City_brick2": 0.44,
+  "M_City_concrete": 0.673,
   "M_City_paint": 0.392,
+  "M_City_red": 0.787,
   "M_City_walk": 0.679,
   "M_City_white": 0.392,
-  "M_RDW_balloon": 0.696,
-  "M_RDW_balloon2": 0.597,
-  "M_RDW_trim": 0.604,
-  "M_RDW_roof": 0.758
+  "M_RDW_balloon": 0.659,
+  "M_RDW_balloon2": 0.576,
+  "M_RDW_trim": 0.562,
+  "M_RDW_roof": 0.706
  }
 }
