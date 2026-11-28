@@ -83,6 +83,13 @@ try {
     if (ran) ext[id] = await extent(a);
   }
   for (const id of ROOMS) check(`positions in the room "${id}" are inside the server's limits`, fits(ext[id]), JSON.stringify(ext[id]));
+  // the Blender rooms off the story are places too: Ann goes through the grocery's stockroom door into the vending room (games/rdwe/blender_rooms.js), and back
+  const jump = (page, room, via) => page.evaluate(async ([room, via]) => (await import("./games/rdwe/walk.js")).debug.current.jump(room, via), [room, via]);
+  await jump(a, "vending_room", "machine");
+  check("Ann reaches a room off the story (the vending room) and the server has her there", await inRoom(a, "vending_room") && await serverPlace(aid, "rdwe:vending_room"), String(placeOf(aid)));
+  check(`positions in the vending room are inside the server's limits`, fits(await extent(a)));
+  await jump(a, "grocery", "stockroom");
+  check("and back into the grocery", await inRoom(a, "grocery") && await serverPlace(aid, "rdwe:grocery"), String(placeOf(aid)));
   check("Bob is still in the second room, alone", placeOf(bid) === "rdwe:hallway" && (await gameState(b))?.peers === 0, String(placeOf(bid)));
   // Ann finishes the last room: she is back in the meadow in front of the house (its link's returnTo), Bob's game goes on
   await finishRoom(a);
