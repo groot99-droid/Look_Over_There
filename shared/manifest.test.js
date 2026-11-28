@@ -210,7 +210,7 @@ test("the City's street is on the page, never a floor the server runs, and the b
 
 // ---- presence (session 17): page scenes a room's players can be in together. The server relays who is there and where, and runs nothing.
 test("presence scenes: the parking lot is one, the floors and the chambers are not, and the field is checked", () => {
-  const blender = Object.fromEntries(Object.values(BLENDER_SCENES).flat().map(s => [s.id, s.floorY]));          // every Blender area scene is one too (shared/farway.scenes.js)
+  const blender = Object.fromEntries(Object.values(BLENDER_SCENES).flat().filter(s => s.presence).map(s => [s.id, s.floorY]));          // every Blender area scene is one too (shared/farway.scenes.js)
   assert.deepEqual(REGISTRY.presence, {parking_lot: 9.6, ...blender, street: 0, apartment: 0, forest: 0, meadow: 0}, "the lot, the Blender areas, the street, the apartment, the forest and the meadow are places a room can be in, each at its floor height");
   for (const id of ["B1", "L4", "gbi_L4_4", "main_floor", "entrance", "laboratory"]) assert.equal(REGISTRY.presence[id], undefined, id);
   assert.equal(REGISTRY.floors.parking_lot, undefined, "the server still runs nothing there");

@@ -2455,7 +2455,7 @@ function forestTick() {
 }
 // what F does here, as a prompt (null: nothing of the forest's is near)
 function forestPrompt() {
-  if (S.id === OW_SCENE && nearXZ(...FOREST_ROAD_LOT.at, FOREST_ROAD_LOT.reach)) return "Press F to walk the road to the forest";
+  if (S.id === OW_SCENE && nearXZ(...FOREST_ROAD_LOT.at, FOREST_ROAD_LOT.reach)) return "Press F to walk down the road";
   if (S.id === FOREST_SCENE && nearXZ(...FOREST.back.at, FOREST.back.reach)) return "Press F to walk back to the parking lot";
   if (S.id !== MEADOW_SCENE) return null;
   if (nearXZ(...MEADOW.house.door.at, MEADOW.house.door.reach)) return roomShut(REGISTRY.linkFrom(MEADOW_SCENE, "house_door")) ? "The house: a solo place for now (not in a room)" : "Press F to open the door";
@@ -2681,10 +2681,10 @@ function cityPrompt() {
   if (PC.open) return "";
   if (S.id === OW_SCENE && nearXZ(BUS_LOT.at[0], BUS_LOT.at[1], BUS_LOT.radius)) return roomShut(REGISTRY.linkFrom(OW_SCENE, "bus_stop")) ? "The bus does not take a room yet" : "Press F to take the bus to Hallam Row";
   const fp = forestPrompt(); if (fp !== null) return fp;
-  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to Hallam Row" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
+  if (S.id === APT_SCENE) return nearXZ(...APARTMENT.door.at, APARTMENT.door.reach) ? "Press F to go out to the corridor" : nearXZ(...APARTMENT.computer.at, APARTMENT.computer.reach) ? "Press F to use the computer" : nearXZ(...bedUse.at, bedUse.reach) ? phaseAt(hourAt(CITY.t)) === "day" ? isTired(NEEDS) ? `Press F to nap (${REST.napHours} hours) and save` : "Press F to save (you can sleep from 20:00)" : "Press F to sleep until morning and save" : nearXZ(...APARTMENT.fridge.at, APARTMENT.fridge.reach) ? "Press F to eat from the fridge" : "";
   if (S.id === LAB_SCENE) {
     if (nearXZ(...LAB.door.at, LAB.door.reach)) return CITY.lb.active ? "Press F to leave your post early (no pay)" : "Press F to leave";
-    if (nearXZ(LAB.b2.x, LAB.b2.z + 0.6, 1.6)) return "B2 · AUTHORISED STAFF ONLY. The door is sealed.";
+    if (nearXZ(LAB.b2.x, LAB.b2.z + 0.6, 1.6) && !REGISTRY.linkFrom(LAB_SCENE, "b2")) return "B2 · AUTHORISED STAFF ONLY. The door is sealed.";          // open for now (the owner, 2026-11-28): Secret Operations is behind it
     const si = stationNear(P.p.x, P.p.z); if (CITY.lb.active && si >= 0) return `Press F to use the ${LAB.stations[si].label}`;
     return "";
   }
@@ -2724,7 +2724,7 @@ function cityPrompt() {
   const d = nearCityDoor(); if (!d) return "";
   if (roomShut(REGISTRY.linkFrom(CITY_SCENE, d.id) || {})) return `${d.label}: a solo place for now (not in a room)`;
   const stub = stubJob(d); if (stub) { const can = canStartStub(stub, hourAt(CITY.t)); return can.ok ? `Press F to start your shift (${d.job})` : `${d.label} (${d.job}): ${can.reason}`; }
-  return d.kind === "tower" ? "Press F to go up to your apartment" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.id === "mall" ? "Press F to go into the mall" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
+  return d.kind === "tower" ? "Press F to go into the tower" : !storesOpen(hourAt(CITY.t)) ? `${d.label}: closed` : d.id === "grocery" ? "Press F to go into the grocery" : d.id === "mall" ? "Press F to go into the mall" : d.quiz && heldFlags().includes(QUIZZES[d.quiz].flag) ? `Press F to start your shift (${d.job})` : `${d.label}: press F`;
 }
 // F at a bus stop rides the bus (a fade through loadScene); F at a door says what is behind it. Nothing is built inside yet.
 function tryCity() {
@@ -2946,6 +2946,13 @@ function museumProps(root) {
     const f = new THREE.Group(), part = (w, hh, d, ox, oy, oz) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), stone); o.position.set(ox, oy, oz); f.add(o); };
     part(0.42, 0.75, 0.26, 0, 0.95, 0); part(0.15, 0.58, 0.15, -0.11, 0.29, 0); part(0.15, 0.58, 0.15, 0.11, 0.29, 0); part(0.11, 0.6, 0.11, -0.28, 0.98, 0); part(0.11, 0.6, 0.11, 0.28, 0.98, 0); part(0.24, 0.28, 0.24, 0, 1.5, 0);
     g.add(f); CITY.mu.figs.push(f);
+    // the statue is a warrior (PR #78; the owner, 2026-11-26): its model replaces the box figure once it has loaded, at the scale the bake's shadows were made with (1.75 m tall)
+    const [model, scale] = MUSEUM.models[i];
+    loadGlb(`models/characters/${model}.glb`).then(gl => {
+      if (!f.parent) return;                                                        // left the hall before it loaded
+      const w = gl.scene; w.scale.setScalar(scale); w.traverse(o => { if (o.isMesh) { o.castShadow = false; o.frustumCulled = false; } });
+      f.clear(); f.add(w);
+    }).catch(() => {});                                                             // no model: the box figure stays
   });
   if (!art) for (let z = cz - hz + 3; z < cz + hz - 2; z += 6) { const l = new THREE.PointLight(0x9aa8d0, 1.6, 9, 1.6); l.position.set(0, h - 0.4, z); g.add(l); }   // the night lights
   root.add(g); placeStatues();

@@ -85,6 +85,9 @@ export const BLENDER_SCENES = {
     {id: "registrar_hall", floorY: 0.0, files: ["world/registrar_hall.glb", "world/registrar_hall.json"], presence: true},
     {id: "control_room", floorY: 0.0, files: ["world/control_room.glb", "world/control_room.json"], presence: true},
   ],
+  museum: [
+    {id: "galleries_wing", floorY: 0.0, files: ["world/galleries_wing.glb", "world/galleries_wing.json"]},
+  ],
 };
 
 export const BLENDER_LINKS = [
@@ -286,6 +289,10 @@ export const BLENDER_LINKS = [
   {id: "mall.wing_cinema.entrance", status: "built", connector: "doors", from: {area: "mall", scene: "wing_cinema", door: "entrance"}, to: {area: "mall", scene: "entrance", arrive: [-14.6, 0.0, -1.0], face: [1.0, 0.0]}, soloOnly: true},
   {id: "mall.wing_entertainment.entrance", status: "built", connector: "doors", from: {area: "mall", scene: "wing_entertainment", door: "entrance"}, to: {area: "mall", scene: "entrance", arrive: [14.6, 0.0, -1.0], face: [-1.0, 0.0]}, soloOnly: true},
   {id: "mall.food_court.entrance", status: "built", connector: "doors", from: {area: "mall", scene: "food_court", door: "entrance"}, to: {area: "mall", scene: "entrance", arrive: [4.0, 0.0, -10.6], face: [0.0, 1.0]}, soloOnly: true},
+  {id: "museum.galleries.wing_w", status: "built", connector: "doors", from: {area: "museum", scene: "galleries", door: "wing_w", at: [-5.4, 0.0, -10.0]}, to: {area: "museum", scene: "galleries_wing", arrive: [-7.8, 0.0, -10.0], face: [-1.0, 0.0]}, soloOnly: true},
+  {id: "museum.galleries.wing_e", status: "built", connector: "doors", from: {area: "museum", scene: "galleries", door: "wing_e", at: [5.4, 0.0, -10.0]}, to: {area: "museum", scene: "galleries_wing", arrive: [7.8, 0.0, -10.0], face: [1.0, 0.0]}, soloOnly: true},
+  {id: "museum.galleries_wing.hall_w", status: "built", connector: "doors", from: {area: "museum", scene: "galleries_wing", door: "hall_w"}, to: {area: "museum", scene: "galleries", arrive: [-5.2, 0.0, -10.0], face: [1.0, 0.0]}, soloOnly: true},
+  {id: "museum.galleries_wing.hall_e", status: "built", connector: "doors", from: {area: "museum", scene: "galleries_wing", door: "hall_e"}, to: {area: "museum", scene: "galleries", arrive: [5.2, 0.0, -10.0], face: [-1.0, 0.0]}, soloOnly: true},
   {id: "grocery.main_floor.aisles", status: "built", connector: "doors", from: {area: "grocery", scene: "main_floor", door: "aisles", at: [0.0, 0.0, -8.3]}, to: {area: "grocery", scene: "aisles", arrive: [0.0, 0.0, -10.6], face: [0.0, -1.0]}, soloOnly: true},
   {id: "grocery.main_floor.back_of_house", status: "built", connector: "doors", from: {area: "grocery", scene: "main_floor", door: "back_of_house", at: [11.4, 0.0, -5.5]}, to: {area: "grocery", scene: "back_of_house", arrive: [13.5, 0.0, -5.5], face: [1.0, 0.0]}, soloOnly: true},
   {id: "grocery.aisles.main_floor", status: "built", connector: "doors", from: {area: "grocery", scene: "aisles", door: "main_floor"}, to: {area: "grocery", scene: "main_floor", arrive: [0.0, 0.0, -7.8], face: [0.0, 1.0]}, soloOnly: true},

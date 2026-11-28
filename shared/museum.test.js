@@ -6,23 +6,8 @@ import {DOORS, DAY_S, hourAt, secondsAt} from "./city.js";
 import {STUB_SHIFTS} from "./pay.js";
 import {REGISTRY} from "./registry.js";
 
-test("world/galleries.json keeps the hall shared/museum.js makes (the Blender build adds the wing's doorways and exhibits), and the links match", () => {
-  // since the galleries wing (PR #81) the hall's file is the Blender build's: its side walls are split at the two doorways (z -10.9 to -9.1) and it adds the wing's
-  // exhibits, its door leaves and their colliders. Everything else is museum.js's, unchanged, so the statues' paths and the plinths still match the file.
-  const file = JSON.parse(fs.readFileSync(new URL("../world/galleries.json", import.meta.url), "utf8")), made = JSON.parse(JSON.stringify(museumDoc()));
-  const byName = new Map(file.colliders.map(c => [c.s, c]));
-  for (const c of made.colliders) {
-    if (c.s === "Wall_W" || c.s === "Wall_E") continue;
-    assert.deepEqual(byName.get(c.s), c, `collider ${c.s} as museum.js makes it`);
-  }
-  for (const side of ["W", "E"]) {
-    const whole = made.colliders.find(c => c.s === `Wall_${side}`), south = byName.get(`Wall_${side}`), north = byName.get(`Wall_${side}_N`), head = byName.get(`Wall_${side}_Head`);
-    assert.ok(south && north && head, `wall ${side} is split at its doorway`);
-    for (const p of [south, north, head]) { assert.deepEqual([p.min[0], p.max[0]], [whole.min[0], whole.max[0]]); assert.ok(p.min[2] >= whole.min[2] - 1e-9 && p.max[2] <= whole.max[2] + 1e-9); }
-    assert.equal(north.min[2], whole.min[2]); assert.equal(south.max[2], whole.max[2]);
-    assert.ok(north.max[2] < south.min[2] && head.min[2] === north.max[2] && head.max[2] === south.min[2] && head.min[1] >= 2.0, `the doorway in wall ${side} has a head over it`);
-  }
-  for (const k of ["cameras", "markers"]) assert.deepEqual(file[k], made[k], k);
+test("world/galleries.json is what shared/museum.js makes, and the links match", () => {
+  assert.deepEqual(JSON.parse(fs.readFileSync(new URL("../world/galleries.json", import.meta.url), "utf8")), JSON.parse(JSON.stringify(museumDoc())));
   const into = REGISTRY.linkFrom("street", "e108"), out = REGISTRY.linkFrom("galleries", "front_door");
   assert.ok(into && out && into.soloOnly && out.soloOnly);
   assert.deepEqual(into.requires, ["job_museum"]);

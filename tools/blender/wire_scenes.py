@@ -36,7 +36,10 @@ CONNECTOR = {"door": "doors"}
 # pairs that stay planned: under water, until swimming exists (the hotel's pools)
 PLANNED = {"pool_route": "Under water: shut until swimming exists."}
 # scenes that are not presence scenes (links touching them are soloOnly)
-SOLO_SCENES = {"entrance", "main_floor", "laboratory", "street_solo_only"}
+SOLO_SCENES = {"entrance", "main_floor", "laboratory", "galleries"}
+
+# Blender scenes with no greybox builder: (area, scene, floorY, presence)
+EXTRA_SCENES = [("museum", "galleries_wing", 0.0, False)]          # #81: the museum's side wing, off the hall's two doorways (a guard's shift is solo)
 
 # the joins onto the older scenes: (id, from, to, connector, extra). `from.at` is the F spot on a scene whose world file has no links.
 JOINS = [
@@ -61,6 +64,11 @@ JOINS = [
     ("mall.wing_cinema.entrance", ("mall", "wing_cinema", "entrance"), {"area": "mall", "scene": "entrance", "arrive": [-14.6, 0.0, -1.0], "face": [1.0, 0.0]}, "doors", {}),
     ("mall.wing_entertainment.entrance", ("mall", "wing_entertainment", "entrance"), {"area": "mall", "scene": "entrance", "arrive": [14.6, 0.0, -1.0], "face": [-1.0, 0.0]}, "doors", {}),
     ("mall.food_court.entrance", ("mall", "food_court", "entrance"), {"area": "mall", "scene": "entrance", "arrive": [4.0, 0.0, -10.6], "face": [0.0, 1.0]}, "doors", {}),
+    # the museum's side wing (#81): the hall's doorways at z -10, the natural-history hall to the west and the history gallery to the east
+    ("museum.galleries.wing_w", {"area": "museum", "scene": "galleries", "door": "wing_w", "at": [-5.4, 0.0, -10.0]}, ("museum", "galleries_wing", "hall_w"), "doors", {}),
+    ("museum.galleries.wing_e", {"area": "museum", "scene": "galleries", "door": "wing_e", "at": [5.4, 0.0, -10.0]}, ("museum", "galleries_wing", "hall_e"), "doors", {}),
+    ("museum.galleries_wing.hall_w", ("museum", "galleries_wing", "hall_w"), {"area": "museum", "scene": "galleries", "arrive": [-5.2, 0.0, -10.0], "face": [1.0, 0.0]}, "doors", {}),
+    ("museum.galleries_wing.hall_e", ("museum", "galleries_wing", "hall_e"), {"area": "museum", "scene": "galleries", "arrive": [5.2, 0.0, -10.0], "face": [-1.0, 0.0]}, "doors", {}),
     # the grocery: the aisles through the north wall's gap, the back of house through the staff doors (#108)
     ("grocery.main_floor.aisles", {"area": "grocery", "scene": "main_floor", "door": "aisles", "at": [0.0, 0.0, -8.3]}, ("grocery", "aisles", "main_floor"), "doors", {}),
     ("grocery.main_floor.back_of_house", {"area": "grocery", "scene": "main_floor", "door": "back_of_house", "at": [11.4, 0.0, -5.5]}, ("grocery", "back_of_house", "main_floor"), "doors", {}),
@@ -131,6 +139,10 @@ def collect():
                 elif note:
                     l["note"] = note
                 links.append(l)
+    for area, sid, fy, pres in EXTRA_SCENES:
+        scenes.setdefault(area, []).append({"id": sid, "floorY": fy, "files": [f"world/{sid}.glb", f"world/{sid}.json"], **({"presence": True} if pres else {})})
+        if not pres:
+            SOLO_SCENES.add(sid)
     for lid, fr, to, conn, extra in JOINS:
         if isinstance(fr, tuple):
             fr = {"area": fr[0], "scene": fr[1], "door": fr[2]}
