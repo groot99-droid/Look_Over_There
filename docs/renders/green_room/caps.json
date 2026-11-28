@@ -1,0 +1,31 @@
+{
+ "gain": 2.078,
+ "wall_p50_before": 0.077,
+ "target_wall_p50": 0.16,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Bedspread": 2.078,
+  "Blotter": 2.078,
+  "Book_Green": 2.078,
+  "Brass": 2.078,
+  "Carpet_Room": 2.078,
+  "Ceiling_Room": 1.9478,
+  "Door_Bath": 2.078,
+  "Drape": 2.078,
+  "Drape_Sheer": 2.078,
+  "Frame_Gilt": 2.078,
+  "Linen_White": 2.078,
+  "Paper": 1.913,
+  "Picture": 2.078,
+  "Plastic_Black": 2.078,
+  "Plastic_White": 2.078,
+  "Skirting": 2.078,
+  "Trim_Cream": 2.078,
+  "Velvet_Green": 2.078,
+  "Wall_Room": 2.078,
+  "Window_Frame": 2.078,
+  "Window_Void": 2.078,
+  "Wood_Dark": 2.078
+ }
+}

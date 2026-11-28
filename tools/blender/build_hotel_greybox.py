@@ -234,6 +234,8 @@ def room_layout(lay):
         box(S, "Bed", -0.8, 0.8, z0, -5.2, 0, 0.55)
         box(S, "Armchair", 1.4, 2.2, -4.0, -3.2, 0, 0.8)
         box(S, "Wardrobe", 1.8, x1, -2.6, -1.6, 0, 2.0)
+        box(S, "Desk", x0, -1.85, -4.6, -3.4, 0, 0.78)              # the writing desk and its chair (floor 2's dressing)
+        box(S, "Nightstand", 0.95, 1.45, z0, -6.72, 0, 0.6)
         S.spot("bed", 1, (1.3, 0, -6.2), face=(-1, 0))
         S.spot("hide", 1, (-1.95, 0, -6.45), props={"where": "wardrobe nook"})
         S.label("nook", -1.95, -6.2)
@@ -267,10 +269,11 @@ CORR_X, CORR_Z, CORR_H = 20.0, 1.1, 2.8
 DOOR_XS = (-16.0, -8.0, 0.0, 8.0, 16.0)
 
 
-def corridor_floor(sid, title, rooms, fmat, lift, east, features, mood, extra_doors=()):
+def corridor_floor(sid, title, rooms, fmat, lift, east, features, mood, extra_doors=(), stair_w=DOOR_W):
     """A 40 m by 2.2 m corridor: rooms on both sides (DOOR_XS, north then south), the elevator at the west end when `lift`, and at the east end
     either a stairwell up (east = ('up', door id, target)) or a door to the stairwell (east = ('down', door id, target)).
-    features: (kind, side, x) with kind alcove | closet; extra_doors: (door id, side, x, target) for doors to other scenes."""
+    features: (kind, side, x) with kind alcove | closet; extra_doors: (door id, side, x, target) for doors to other scenes. stair_w: the stair
+    doors' openings and leaves (floor 2's are the connector kit's 1.1 m stair door, blender/kit/README.md)."""
     S = Scene(sid, title, "a corridor 40 m by 2.2 m, 2.8 m high, with rooms on both sides", mood=mood)
     x0, x1, z0, z1 = -CORR_X, CORR_X, -CORR_Z, CORR_Z
     holes = {"N": [], "S": [], "W": [], "E": []}
@@ -283,7 +286,7 @@ def corridor_floor(sid, title, rooms, fmat, lift, east, features, mood, extra_do
         holes[side].append((a, DOOR_W, DOOR_H))
     if lift:
         holes["W"].append((0.0, 1.2, 2.2))
-    holes["E"].append((0.0, DOOR_W, DOOR_H))
+    holes["E"].append((0.0, stair_w, DOOR_H))
     shell(S, "Corridor", x0, x1, z0, z1, 0.0, CORR_H, holes, fmat=fmat)
     S.corridor("corridor", x0, x1, z0, z1)
     S.label(title.split(":")[0], -10.0, 0.0)
@@ -345,24 +348,24 @@ def corridor_floor(sid, title, rooms, fmat, lift, east, features, mood, extra_do
     way, eid, eto = east
     if way == "up":
         sx0, sx1 = CORR_X + T, 26.6
-        S.door("stairwell", (CORR_X, 0.0, -DOOR_W / 2), (0, 1), (1, 0))
+        S.door("stairwell", (CORR_X, 0.0, -stair_w / 2), (0, 1), (1, 0), width=stair_w)
         S.solid("Stairwell_Floor", (CORR_X, -SLAB, -1.2), (sx1 + T, 0.0, 1.2), fmat)
         S.solid("Stairwell_Ceiling", (CORR_X, 6.0, -1.2), (sx1 + T, 6.2, 1.2), "ceiling", ("ceiling",))
         S.solid("Stairwell_Wall_N", (CORR_X, 0.0, -1.2), (sx1 + T, 6.0, -1.0))
         S.solid("Stairwell_Wall_S", (CORR_X, 0.0, 1.0), (sx1 + T, 6.0, 1.2))
         S.solid("Stairwell_Wall_W_up", (CORR_X, CORR_H, -1.0), (sx0, 6.0, 1.0))
-        wall(S, "Stairwell_Wall_E", "z", sx1, sx1 + T, -1.0, 1.0, 0.0, 6.0, [(-DOOR_W / 2, DOOR_W / 2, 3.2, 3.2 + DOOR_H)])
+        wall(S, "Stairwell_Wall_E", "z", sx1, sx1 + T, -1.0, 1.0, 0.0, 6.0, [(-stair_w / 2, stair_w / 2, 3.2, 3.2 + DOOR_H)])
         flight(S, f"{sid}_up", -1.0, 1.0, 21.4, +1, "x", 0.0, 3.2, 13, 0.28)
         land0 = 21.4 + 13 * 0.28
         S.solid("Landing_Top", (land0, 2.9, -1.0), (sx1, 3.2, 1.0), "stair")
-        S.door(eid, (sx1, 3.2, -DOOR_W / 2), (0, 1), (-1, 0))
+        S.door(eid, (sx1, 3.2, -stair_w / 2), (0, 1), (-1, 0), width=stair_w)
         S.link(eid, (26.0, 3.2, 0.0), (25.5, 3.2, 0.0), (-1, 0), eto)
         S.label("stairwell", 23.0, 0.0)
         S.light(23.5, 5.6, 0.0, 120)
         if not lift:
             S.marker("Spawn", (25.5, 3.2, 0.0))
     else:
-        S.door(eid, (CORR_X, 0.0, -DOOR_W / 2), (0, 1), (1, 0), props={"kind": "stair door"})
+        S.door(eid, (CORR_X, 0.0, -stair_w / 2), (0, 1), (1, 0), width=stair_w, props={"kind": "stair door"})
         S.link(eid, (19.4, 0.0, 0.0), (18.8, 0.0, 0.0), (-1, 0), eto)
         shell(S, "StairLanding", CORR_X + T, 21.6, -1.0, 1.0, 0.0, CORR_H, sides="NSE", fmat=fmat)     # the top landing behind the door
         S.label("top landing", 20.9, 1.8, kind="note")
@@ -638,6 +641,9 @@ def key_room(sid, title, what):
         box(S, "Table", -1.5, 1.5, -1.0, 1.0, 0, 0.9)
         S.solid("Key_Hooks", (-4.0, 1.0, -5.0), (4.0, 2.2, -4.9), "fake_door")
         box(S, "Safe", 5.4, 6.6, -4.6, -3.6, 0, 1.2, "lift")
+        box(S, "Key_Cabinets_W", -7.0, -6.55, -3.0, 3.0, 0, 2.2)    # floor 2's dressing: a wall of key cabinets, more hooks, a locked cage
+        S.solid("Key_Hooks_E", (6.9, 1.0, -2.0), (7.0, 2.2, 3.0), "fake_door")
+        box(S, "Key_Cage", 4.6, 7.0, -5.0, -2.8, 0, 2.4, "rail")
         S.spot("puzzle", 1, (0.0, 0.0, -2.2), face=(0, -1))
         S.spot("key", 1, (0.0, 0.0, 1.8), face=(0, -1))
         S.label("KEY ROOM", 0.0, 2.6)
@@ -950,12 +956,54 @@ def _f2(sid):
     if lower:
         feats = [("alcove", "S", -12.0), ("closet", "S", 4.0), ("alcove", "S", 12.0), ("closet", "N", -4.0)]
         extra = [("dining", "N", -12.0, "dining"), ("reception", "N", 12.0, "reception")]
-        return corridor_floor(sid, "Floor 2, lower: green carpet", rooms, "carpet_green", ("lift", "atrium (floor 2 gallery)"),
-                              ("up", "stairs_up", "floor_2_upper"), feats, "the neighbour hunts", extra)
+        S = corridor_floor(sid, "Floor 2, lower: green carpet", rooms, "carpet_green", ("lift", "atrium (floor 2 gallery)"),
+                           ("up", "stairs_up", "floor_2_upper"), feats, "the neighbour hunts", extra, stair_w=1.1)
+        console(S, "S", 12.0)
+        kit_floor2(S, True)
+        return S
     feats = [("closet", "N", -12.0), ("alcove", "N", 4.0), ("alcove", "N", 12.0), ("closet", "S", 12.0)]
     extra = [("key_room", "S", -12.0, "key_room")]
-    return corridor_floor(sid, "Floor 2, upper: green carpet", rooms, "carpet_green", None, ("down", "stairs_down", "floor_2_lower"), feats,
-                          "the neighbour hunts", extra)
+    S = corridor_floor(sid, "Floor 2, upper: green carpet", rooms, "carpet_green", None, ("down", "stairs_down", "floor_2_lower"), feats,
+                       "the neighbour hunts", extra, stair_w=1.1)
+    console(S, "N", 4.0)
+    kit_floor2(S, False)
+    return S
+
+
+def kit_floor2(S, lower):
+    """Floor 2 dressed (tools/blender/build_hotel_floor2.py) with the connector kit (blender/kit/README.md), as tools/blender/kit_place.py places
+    it, written here by kit_layout() (floor 3's approach), so `--preview` gives the file the dressed scene exports:
+    - on the lower level the elevator at (-20, 0, 0), yaw 90: the kit's car and landing replace the LiftCar shell and the plain lift door; the door
+      record keeps the id `lift` (the link's), the kit's own Link_/Arrive_/Marker_ are left out (the greybox's stay);
+    - the stair door at every stair door, yaw -90: `stairwell` (20, 0, 0) and `stairs_up` (26.6, 3.2, 0) on the lower level, `stairs_down`
+      (20, 0, 0) on the upper. The corridor and the landings are the landings, so only the kit's door record is used; the openings are the kit's
+      1.1 m (stair_w)."""
+    gone = {b["name"] for b in S.boxes if b["name"].startswith("LiftCar_")} | {"DoorLeaf_lift", "DoorLeaf_stairwell", "DoorLeaf_stairs_up", "DoorLeaf_stairs_down"}
+    S.boxes = [b for b in S.boxes if b["name"] not in gone]
+    S.doors = [d for d in S.doors if d["name"] not in gone]
+    S._names -= gone
+    S.labels = [lb for lb in S.labels if not lb["text"].startswith("lift car")]
+    if lower:
+        kit_layout(S, "elevator", "F2", (-CORR_X, 0.0, 0.0), 90.0, doors={"lift": "lift"}, zones=False, markers=False, mat="lift")
+        kit_layout(S, "stair_door", "F2", (CORR_X, 0.0, 0.0), -90.0, cols=lambda n: False, doors={"stair": "stairwell"}, spots=False, zones=False, markers=False)
+        kit_layout(S, "stair_door", "F2_top", (26.6, 3.2, 0.0), -90.0, cols=lambda n: False, doors={"stair": "stairs_up"}, spots=False, zones=False, markers=False)
+        S.label("elevator (kit)", -21.3, 1.8, kind="note")
+        # the kit's call-button spot stands 0.22 m from the north wall in this 2.2 m corridor, inside a walker's 0.28 m: it moves 8 cm toward the
+        # corridor's middle, still beside the button (as on floor 3)
+        for e in S.empties:
+            if e["name"] == "Spot_call_1_F2":
+                e["pos"][2] = round(e["pos"][2] + 0.08, 3)
+        # the kit landing's frame stands 6 cm proud of the west wall, so the clear corridor starts 8 cm in from it
+        S.corridors[0]["min"][0] = -CORR_X + 0.08
+    else:
+        kit_layout(S, "stair_door", "F2", (CORR_X, 0.0, 0.0), -90.0, cols=lambda n: False, doors={"stair": "stairs_down"}, spots=False, zones=False, markers=False)
+
+
+def console(S, side, a):
+    """Floor 2's console table (a vase on it), 20 cm deep against an alcove's back wall: clear of the corridor and of the hide spot."""
+    sg = -1 if side == "N" else 1
+    zb = sg * (CORR_Z + T + 1.0)
+    box(S, "Console", a - 0.45, a + 0.45, min(zb, zb - sg * 0.2), max(zb, zb - sg * 0.2), 0, 0.82)
 
 
 def _f3(sid):
