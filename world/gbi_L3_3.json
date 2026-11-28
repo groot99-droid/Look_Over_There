@@ -1,0 +1,1113 @@
+{
+ "scene": "gbi_L3_3",
+ "colliders": [
+  {
+   "s": "Car_Ceiling_to_L3_4",
+   "min": [
+    -15.05,
+    8.8,
+    -22.15
+   ],
+   "max": [
+    -12.95,
+    8.88,
+    -20.05
+   ]
+  },
+  {
+   "s": "Car_Floor_to_L3_4",
+   "min": [
+    -15.05,
+    6.28,
+    -22.15
+   ],
+   "max": [
+    -12.95,
+    6.4,
+    -20.05
+   ]
+  },
+  {
+   "s": "Car_Front_E_to_L3_4",
+   "min": [
+    -13.4,
+    6.4,
+    -20.1
+   ],
+   "max": [
+    -13.0,
+    8.8,
+    -20.05
+   ]
+  },
+  {
+   "s": "Car_Front_W_to_L3_4",
+   "min": [
+    -15.0,
+    6.4,
+    -20.1
+   ],
+   "max": [
+    -14.6,
+    8.8,
+    -20.05
+   ]
+  },
+  {
+   "s": "Car_Head_to_L3_4",
+   "min": [
+    -14.6,
+    8.6,
+    -20.1
+   ],
+   "max": [
+    -13.4,
+    8.8,
+    -20.05
+   ]
+  },
+  {
+   "s": "Car_Wall_Back_to_L3_4",
+   "min": [
+    -15.0,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    -13.0,
+    8.8,
+    -22.1
+   ]
+  },
+  {
+   "s": "Car_Wall_E_to_L3_4",
+   "min": [
+    -13.0,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    -12.95,
+    8.8,
+    -20.05
+   ]
+  },
+  {
+   "s": "Car_Wall_W_to_L3_4",
+   "min": [
+    -15.05,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    -15.0,
+    8.8,
+    -20.05
+   ]
+  },
+  {
+   "s": "Ceiling",
+   "min": [
+    -26.3,
+    9.6,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    9.8,
+    27.35
+   ]
+  },
+  {
+   "s": "Column_12_11",
+   "min": [
+    11.5,
+    6.4,
+    10.5
+   ],
+   "max": [
+    12.5,
+    9.6,
+    11.5
+   ]
+  },
+  {
+   "s": "Column_12_19",
+   "min": [
+    11.5,
+    6.4,
+    18.5
+   ],
+   "max": [
+    12.5,
+    9.6,
+    19.5
+   ]
+  },
+  {
+   "s": "Column_12_m16",
+   "min": [
+    11.5,
+    6.4,
+    -16.5
+   ],
+   "max": [
+    12.5,
+    9.6,
+    -15.5
+   ]
+  },
+  {
+   "s": "Column_12_m8",
+   "min": [
+    11.5,
+    6.4,
+    -8.5
+   ],
+   "max": [
+    12.5,
+    9.6,
+    -7.5
+   ]
+  },
+  {
+   "s": "Column_20_11",
+   "min": [
+    19.5,
+    6.4,
+    10.5
+   ],
+   "max": [
+    20.5,
+    9.6,
+    11.5
+   ]
+  },
+  {
+   "s": "Column_20_19",
+   "min": [
+    19.5,
+    6.4,
+    18.5
+   ],
+   "max": [
+    20.5,
+    9.6,
+    19.5
+   ]
+  },
+  {
+   "s": "Column_20_m16",
+   "min": [
+    19.5,
+    6.4,
+    -16.5
+   ],
+   "max": [
+    20.5,
+    9.6,
+    -15.5
+   ]
+  },
+  {
+   "s": "Column_20_m8",
+   "min": [
+    19.5,
+    6.4,
+    -8.5
+   ],
+   "max": [
+    20.5,
+    9.6,
+    -7.5
+   ]
+  },
+  {
+   "s": "Column_4_11",
+   "min": [
+    3.5,
+    6.4,
+    10.5
+   ],
+   "max": [
+    4.5,
+    9.6,
+    11.5
+   ]
+  },
+  {
+   "s": "Column_4_19",
+   "min": [
+    3.5,
+    6.4,
+    18.5
+   ],
+   "max": [
+    4.5,
+    9.6,
+    19.5
+   ]
+  },
+  {
+   "s": "Column_4_m16",
+   "min": [
+    3.5,
+    6.4,
+    -16.5
+   ],
+   "max": [
+    4.5,
+    9.6,
+    -15.5
+   ]
+  },
+  {
+   "s": "Column_4_m8",
+   "min": [
+    3.5,
+    6.4,
+    -8.5
+   ],
+   "max": [
+    4.5,
+    9.6,
+    -7.5
+   ]
+  },
+  {
+   "s": "Column_m12_11",
+   "min": [
+    -12.5,
+    6.4,
+    10.5
+   ],
+   "max": [
+    -11.5,
+    9.6,
+    11.5
+   ]
+  },
+  {
+   "s": "Column_m12_19",
+   "min": [
+    -12.5,
+    6.4,
+    18.5
+   ],
+   "max": [
+    -11.5,
+    9.6,
+    19.5
+   ]
+  },
+  {
+   "s": "Column_m12_m16",
+   "min": [
+    -12.5,
+    6.4,
+    -16.5
+   ],
+   "max": [
+    -11.5,
+    9.6,
+    -15.5
+   ]
+  },
+  {
+   "s": "Column_m12_m8",
+   "min": [
+    -12.5,
+    6.4,
+    -8.5
+   ],
+   "max": [
+    -11.5,
+    9.6,
+    -7.5
+   ]
+  },
+  {
+   "s": "Column_m20_11",
+   "min": [
+    -20.5,
+    6.4,
+    10.5
+   ],
+   "max": [
+    -19.5,
+    9.6,
+    11.5
+   ]
+  },
+  {
+   "s": "Column_m20_19",
+   "min": [
+    -20.5,
+    6.4,
+    18.5
+   ],
+   "max": [
+    -19.5,
+    9.6,
+    19.5
+   ]
+  },
+  {
+   "s": "Column_m20_m16",
+   "min": [
+    -20.5,
+    6.4,
+    -16.5
+   ],
+   "max": [
+    -19.5,
+    9.6,
+    -15.5
+   ]
+  },
+  {
+   "s": "Column_m20_m8",
+   "min": [
+    -20.5,
+    6.4,
+    -8.5
+   ],
+   "max": [
+    -19.5,
+    9.6,
+    -7.5
+   ]
+  },
+  {
+   "s": "Column_m4_11",
+   "min": [
+    -4.5,
+    6.4,
+    10.5
+   ],
+   "max": [
+    -3.5,
+    9.6,
+    11.5
+   ]
+  },
+  {
+   "s": "Column_m4_19",
+   "min": [
+    -4.5,
+    6.4,
+    18.5
+   ],
+   "max": [
+    -3.5,
+    9.6,
+    19.5
+   ]
+  },
+  {
+   "s": "Column_m4_m16",
+   "min": [
+    -4.5,
+    6.4,
+    -16.5
+   ],
+   "max": [
+    -3.5,
+    9.6,
+    -15.5
+   ]
+  },
+  {
+   "s": "Column_m4_m8",
+   "min": [
+    -4.5,
+    6.4,
+    -8.5
+   ],
+   "max": [
+    -3.5,
+    9.6,
+    -7.5
+   ]
+  },
+  {
+   "s": "Floor",
+   "min": [
+    -26.3,
+    6.2,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    6.4,
+    27.35
+   ]
+  },
+  {
+   "s": "Hall_N_1",
+   "min": [
+    -26.1,
+    6.4,
+    0.9
+   ],
+   "max": [
+    -19.5,
+    9.6,
+    1.1
+   ]
+  },
+  {
+   "s": "Hall_N_2",
+   "min": [
+    -16.5,
+    6.4,
+    0.9
+   ],
+   "max": [
+    26.1,
+    9.6,
+    1.1
+   ]
+  },
+  {
+   "s": "Hall_S_1",
+   "min": [
+    -26.1,
+    6.4,
+    4.9
+   ],
+   "max": [
+    16.5,
+    9.6,
+    5.1
+   ]
+  },
+  {
+   "s": "Hall_S_2",
+   "min": [
+    19.5,
+    6.4,
+    4.9
+   ],
+   "max": [
+    26.1,
+    9.6,
+    5.1
+   ]
+  },
+  {
+   "s": "Landing_Floor_to_L3_4",
+   "min": [
+    -14.9,
+    6.35,
+    -19.73
+   ],
+   "max": [
+    -13.1,
+    6.406,
+    -18.53
+   ]
+  },
+  {
+   "s": "Landing_Head_to_L3_4",
+   "min": [
+    -14.6,
+    8.6,
+    -19.82
+   ],
+   "max": [
+    -13.4,
+    8.68,
+    -19.74
+   ]
+  },
+  {
+   "s": "Landing_Jamb_E_to_L3_4",
+   "min": [
+    -13.4,
+    6.4,
+    -19.82
+   ],
+   "max": [
+    -13.32,
+    8.68,
+    -19.74
+   ]
+  },
+  {
+   "s": "Landing_Jamb_W_to_L3_4",
+   "min": [
+    -14.68,
+    6.4,
+    -19.82
+   ],
+   "max": [
+    -14.6,
+    8.68,
+    -19.74
+   ]
+  },
+  {
+   "s": "Shaft_E_to_L3_4",
+   "min": [
+    -12.95,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    -12.75,
+    9.6,
+    -19.74
+   ]
+  },
+  {
+   "s": "Shaft_Fill_E_to_L3_4",
+   "min": [
+    -13.32,
+    6.4,
+    -20.05
+   ],
+   "max": [
+    -12.95,
+    9.6,
+    -19.74
+   ]
+  },
+  {
+   "s": "Shaft_Fill_W_to_L3_4",
+   "min": [
+    -15.05,
+    6.4,
+    -20.05
+   ],
+   "max": [
+    -14.68,
+    9.6,
+    -19.74
+   ]
+  },
+  {
+   "s": "Shaft_Head_Front_to_L3_4",
+   "min": [
+    -14.68,
+    8.8,
+    -20.05
+   ],
+   "max": [
+    -13.32,
+    9.6,
+    -19.74
+   ]
+  },
+  {
+   "s": "Shaft_Head_to_L3_4",
+   "min": [
+    -15.05,
+    8.88,
+    -22.15
+   ],
+   "max": [
+    -12.95,
+    9.6,
+    -20.05
+   ]
+  },
+  {
+   "s": "Shaft_W_to_L3_4",
+   "min": [
+    -15.25,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    -15.05,
+    9.6,
+    -19.74
+   ]
+  },
+  {
+   "s": "Wall_E_1",
+   "min": [
+    26.1,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    26.3,
+    9.6,
+    27.15
+   ]
+  },
+  {
+   "s": "Wall_N_1",
+   "min": [
+    -26.3,
+    6.4,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    9.6,
+    -22.15
+   ]
+  },
+  {
+   "s": "Wall_S_1",
+   "min": [
+    -26.3,
+    6.4,
+    27.15
+   ],
+   "max": [
+    -0.5,
+    9.6,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_S_2",
+   "min": [
+    -0.5,
+    8.6,
+    27.15
+   ],
+   "max": [
+    0.5,
+    9.6,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_S_3",
+   "min": [
+    0.5,
+    6.4,
+    27.15
+   ],
+   "max": [
+    26.3,
+    9.6,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_W_1",
+   "min": [
+    -26.3,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    -26.1,
+    9.6,
+    27.15
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_from_L3_2",
+   "level": "gbi_L3_3",
+   "hinge": [
+    0.47,
+    6.4,
+    27.15
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "door"
+  },
+  {
+   "name": "DoorLeaf_lift_to_L3_4",
+   "level": "gbi_L3_3",
+   "hinge": [
+    -13.4,
+    6.4,
+    -19.8
+   ],
+   "width": 1.2,
+   "height": 2.2,
+   "closed_yaw_deg": -180.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "elevator",
+   "leaves": "LiftLeaf_L,LiftLeaf_R",
+   "slide_m": 0.6,
+   "car": "elevator_car"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Arrival",
+   "room": "gbi_L3_3",
+   "level": "gbi_L3_3",
+   "kind": "Entrance",
+   "position": [
+    0.0,
+    6.4,
+    25.95
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "from_L3_2",
+   "at": [
+    0.0,
+    6.4,
+    26.55
+   ],
+   "arrive": [
+    0.0,
+    6.4,
+    25.95
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "lift_to_L3_4",
+   "at": [
+    -14.0,
+    6.4,
+    -19.2
+   ],
+   "arrive": [
+    -14.0,
+    6.4,
+    -18.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_crush_1",
+   "min": [
+    -7.2,
+    6.4,
+    1.1
+   ],
+   "max": [
+    -4.8,
+    9.6,
+    4.9
+   ]
+  },
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_crush_2",
+   "min": [
+    4.8,
+    6.4,
+    1.1
+   ],
+   "max": [
+    7.2,
+    9.6,
+    4.9
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "call",
+   "name": "Spot_call_1_to_L3_4",
+   "position": [
+    -13.12,
+    6.4,
+    -19.35
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the call button"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_1_a",
+   "position": [
+    -6.0,
+    6.4,
+    1.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_1",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 8.0,
+   "what": "a plaster slab slides across the hall and meets the far wall",
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_1_b",
+   "position": [
+    -6.0,
+    6.4,
+    4.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_1",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 8.0,
+   "what": "a plaster slab slides across the hall and meets the far wall",
+   "end": "b"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_2_a",
+   "position": [
+    6.0,
+    6.4,
+    1.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_2",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 9.0,
+   "what": "a plaster slab slides across the hall and meets the far wall",
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_crush_2_b",
+   "position": [
+    6.0,
+    6.4,
+    4.5
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_crush_2",
+   "kind_of": "crushing walls",
+   "motion": "close",
+   "period_s": 9.0,
+   "what": "a plaster slab slides across the hall and meets the far wall",
+   "end": "b"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1",
+   "position": [
+    4.0,
+    6.4,
+    25.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the Lost and Found: your loadout, and your gear back after you die"
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    -22.0,
+    6.4,
+    23.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_2",
+   "position": [
+    22.0,
+    6.4,
+    -20.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_3",
+   "position": [
+    0.0,
+    6.4,
+    3.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_1",
+   "position": [
+    8.0,
+    6.4,
+    -19.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "7"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_2",
+   "position": [
+    -22.0,
+    6.4,
+    -10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "7"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_3",
+   "position": [
+    16.0,
+    6.4,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "7"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_1",
+   "position": [
+    -8.0,
+    6.4,
+    15.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_2",
+   "position": [
+    8.0,
+    6.4,
+    -12.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_3",
+   "position": [
+    -24.0,
+    6.4,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "panel",
+   "name": "Spot_panel_1_to_L3_4",
+   "position": [
+    -13.45,
+    6.4,
+    -20.47
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "the car's floor buttons (inside the car)"
+  },
+  {
+   "kind": "puzzle",
+   "name": "Spot_puzzle_1",
+   "position": [
+    24.0,
+    6.4,
+    15.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a fuse box"
+  }
+ ]
+}

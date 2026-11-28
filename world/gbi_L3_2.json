@@ -1,0 +1,1044 @@
+{
+ "scene": "gbi_L3_2",
+ "colliders": [
+  {
+   "s": "Ceiling",
+   "min": [
+    -26.3,
+    9.6,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    9.8,
+    27.35
+   ]
+  },
+  {
+   "s": "Floor",
+   "min": [
+    -26.3,
+    6.2,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    6.4,
+    27.35
+   ]
+  },
+  {
+   "s": "Hall_Ceiling_from_L3_1",
+   "min": [
+    -17.2,
+    9.1,
+    16.95
+   ],
+   "max": [
+    -14.8,
+    9.3,
+    26.95
+   ]
+  },
+  {
+   "s": "Hall_End_E_from_L3_1",
+   "min": [
+    -17.2,
+    6.4,
+    26.95
+   ],
+   "max": [
+    -16.55,
+    9.1,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_End_Head_from_L3_1",
+   "min": [
+    -16.55,
+    8.56,
+    26.95
+   ],
+   "max": [
+    -15.45,
+    9.1,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_End_W_from_L3_1",
+   "min": [
+    -15.45,
+    6.4,
+    26.95
+   ],
+   "max": [
+    -14.8,
+    9.1,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_Floor_from_L3_1",
+   "min": [
+    -17.2,
+    6.1,
+    16.95
+   ],
+   "max": [
+    -14.8,
+    6.4,
+    26.95
+   ]
+  },
+  {
+   "s": "Hall_Wall_E_from_L3_1",
+   "min": [
+    -17.4,
+    6.1,
+    16.95
+   ],
+   "max": [
+    -17.2,
+    9.3,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_Wall_W_from_L3_1",
+   "min": [
+    -14.8,
+    6.1,
+    16.95
+   ],
+   "max": [
+    -14.6,
+    9.3,
+    27.15
+   ]
+  },
+  {
+   "s": "Plaster_W1_1",
+   "min": [
+    -8.0,
+    6.4,
+    7.85
+   ],
+   "max": [
+    4.0,
+    9.6,
+    8.15
+   ]
+  },
+  {
+   "s": "Plaster_W2_1",
+   "min": [
+    7.85,
+    6.4,
+    -6.0
+   ],
+   "max": [
+    8.15,
+    9.6,
+    10.0
+   ]
+  },
+  {
+   "s": "Plaster_W3_1",
+   "min": [
+    -16.0,
+    6.4,
+    -6.15
+   ],
+   "max": [
+    -4.0,
+    9.6,
+    -5.85
+   ]
+  },
+  {
+   "s": "Plaster_W4_1",
+   "min": [
+    -10.15,
+    6.4,
+    -20.0
+   ],
+   "max": [
+    -9.85,
+    9.6,
+    -13.0
+   ]
+  },
+  {
+   "s": "Plaster_W5_1",
+   "min": [
+    6.0,
+    6.4,
+    -14.15
+   ],
+   "max": [
+    18.0,
+    9.6,
+    -13.85
+   ]
+  },
+  {
+   "s": "Plaster_W6_1",
+   "min": [
+    17.85,
+    6.4,
+    12.0
+   ],
+   "max": [
+    18.15,
+    9.6,
+    22.0
+   ]
+  },
+  {
+   "s": "Plinth_1",
+   "min": [
+    -4.5,
+    6.4,
+    13.5
+   ],
+   "max": [
+    -3.5,
+    7.4,
+    14.5
+   ]
+  },
+  {
+   "s": "Plinth_2",
+   "min": [
+    1.5,
+    6.4,
+    17.5
+   ],
+   "max": [
+    2.5,
+    7.4,
+    18.5
+   ]
+  },
+  {
+   "s": "Plinth_3",
+   "min": [
+    13.5,
+    6.4,
+    3.5
+   ],
+   "max": [
+    14.5,
+    7.4,
+    4.5
+   ]
+  },
+  {
+   "s": "Plinth_4",
+   "min": [
+    -14.5,
+    6.4,
+    -14.5
+   ],
+   "max": [
+    -13.5,
+    7.4,
+    -13.5
+   ]
+  },
+  {
+   "s": "Plinth_5",
+   "min": [
+    21.5,
+    6.4,
+    -12.5
+   ],
+   "max": [
+    22.5,
+    7.4,
+    -11.5
+   ]
+  },
+  {
+   "s": "SH_Bench_L3",
+   "min": [
+    -23.5,
+    6.4,
+    -2.8
+   ],
+   "max": [
+    -21.9,
+    7.3,
+    -2.2
+   ]
+  },
+  {
+   "s": "SH_Ceiling_L3",
+   "min": [
+    -26.1,
+    9.2,
+    -3.2
+   ],
+   "max": [
+    -20.7,
+    9.25,
+    3.2
+   ]
+  },
+  {
+   "s": "SH_Counter_L3",
+   "min": [
+    -25.7,
+    6.4,
+    0.98
+   ],
+   "max": [
+    -25.08,
+    7.4,
+    2.82
+   ]
+  },
+  {
+   "s": "SH_Floor_L3",
+   "min": [
+    -26.1,
+    6.35,
+    -3.2
+   ],
+   "max": [
+    -20.7,
+    6.4,
+    3.2
+   ]
+  },
+  {
+   "s": "SH_Locker_L3",
+   "min": [
+    -22.3,
+    6.4,
+    2.28
+   ],
+   "max": [
+    -21.5,
+    8.4,
+    2.8
+   ]
+  },
+  {
+   "s": "SH_Save_Desk_L3",
+   "min": [
+    -25.9,
+    6.4,
+    -1.35
+   ],
+   "max": [
+    -25.6,
+    7.18,
+    -0.65
+   ]
+  },
+  {
+   "s": "SH_Stash_L3",
+   "min": [
+    -25.705,
+    6.4,
+    -2.805
+   ],
+   "max": [
+    -24.895,
+    7.4,
+    -1.995
+   ]
+  },
+  {
+   "s": "SH_Wall_E_L3",
+   "min": [
+    -25.9,
+    6.4,
+    -3.2
+   ],
+   "max": [
+    -20.9,
+    9.2,
+    -3.0
+   ]
+  },
+  {
+   "s": "SH_Wall_N_L3",
+   "min": [
+    -26.1,
+    6.4,
+    -3.2
+   ],
+   "max": [
+    -25.9,
+    9.2,
+    3.2
+   ]
+  },
+  {
+   "s": "SH_Wall_S_E_L3",
+   "min": [
+    -20.9,
+    6.4,
+    -3.2
+   ],
+   "max": [
+    -20.7,
+    9.2,
+    -0.5
+   ]
+  },
+  {
+   "s": "SH_Wall_S_Head_L3",
+   "min": [
+    -20.9,
+    8.56,
+    -0.5
+   ],
+   "max": [
+    -20.7,
+    9.2,
+    0.5
+   ]
+  },
+  {
+   "s": "SH_Wall_S_W_L3",
+   "min": [
+    -20.9,
+    6.4,
+    0.5
+   ],
+   "max": [
+    -20.7,
+    9.2,
+    3.2
+   ]
+  },
+  {
+   "s": "SH_Wall_W_L3",
+   "min": [
+    -25.9,
+    6.4,
+    3.0
+   ],
+   "max": [
+    -20.9,
+    9.2,
+    3.2
+   ]
+  },
+  {
+   "s": "Stair_ceil_0_from_L3_1",
+   "min": [
+    -17.35,
+    9.1,
+    15.15
+   ],
+   "max": [
+    -14.65,
+    9.3,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_landing_0_from_L3_1",
+   "min": [
+    -17.35,
+    6.2,
+    15.15
+   ],
+   "max": [
+    -14.65,
+    6.4,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_0_from_L3_1",
+   "min": [
+    -17.35,
+    6.4,
+    15.15
+   ],
+   "max": [
+    -17.15,
+    9.1,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_1_from_L3_1",
+   "min": [
+    -14.85,
+    6.4,
+    15.15
+   ],
+   "max": [
+    -14.65,
+    9.1,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_2_from_L3_1",
+   "min": [
+    -17.35,
+    6.4,
+    16.75
+   ],
+   "max": [
+    -16.55,
+    9.1,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_3_from_L3_1",
+   "min": [
+    -15.45,
+    6.4,
+    16.75
+   ],
+   "max": [
+    -14.65,
+    9.1,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_4_from_L3_1",
+   "min": [
+    -16.55,
+    8.56,
+    16.75
+   ],
+   "max": [
+    -15.45,
+    9.1,
+    16.95
+   ]
+  },
+  {
+   "s": "Wall_E_1",
+   "min": [
+    26.1,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    26.3,
+    9.6,
+    27.15
+   ]
+  },
+  {
+   "s": "Wall_N_1",
+   "min": [
+    -26.3,
+    6.4,
+    -22.35
+   ],
+   "max": [
+    13.5,
+    9.6,
+    -22.15
+   ]
+  },
+  {
+   "s": "Wall_N_2",
+   "min": [
+    13.5,
+    8.6,
+    -22.35
+   ],
+   "max": [
+    14.5,
+    9.6,
+    -22.15
+   ]
+  },
+  {
+   "s": "Wall_N_3",
+   "min": [
+    14.5,
+    6.4,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    9.6,
+    -22.15
+   ]
+  },
+  {
+   "s": "Wall_S_1",
+   "min": [
+    -26.3,
+    6.4,
+    27.15
+   ],
+   "max": [
+    26.3,
+    9.6,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_W_1",
+   "min": [
+    -26.3,
+    6.4,
+    -22.15
+   ],
+   "max": [
+    -26.1,
+    9.6,
+    27.15
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_hall_far_from_L3_1",
+   "level": "gbi_L3_2",
+   "hinge": [
+    -15.48,
+    6.4,
+    27.05
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": -180.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "hallway door"
+  },
+  {
+   "name": "DoorLeaf_stair_from_L3_1",
+   "level": "gbi_L3_2",
+   "hinge": [
+    -16.52,
+    6.4,
+    16.85
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -90.0,
+   "state": "closed",
+   "kind": "stair door",
+   "from": "store DoorLeaf_Stair_L1_L2_up"
+  },
+  {
+   "name": "DoorLeaf_to_L3_3",
+   "level": "gbi_L3_2",
+   "hinge": [
+    13.53,
+    6.4,
+    -22.15
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "door"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Arrival",
+   "room": "gbi_L3_2",
+   "level": "gbi_L3_2",
+   "kind": "Entrance",
+   "position": [
+    -16.0,
+    6.4,
+    15.8
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "stair_from_L3_1",
+   "at": [
+    -16.0,
+    6.4,
+    16.15
+   ],
+   "arrive": [
+    -16.0,
+    6.4,
+    15.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "to_L3_3",
+   "at": [
+    14.0,
+    6.4,
+    -21.55
+   ],
+   "arrive": [
+    14.0,
+    6.4,
+    -20.95
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_blade_1",
+   "min": [
+    -6.8,
+    6.4,
+    -11.2
+   ],
+   "max": [
+    14.8,
+    7.8,
+    -8.8
+   ]
+  },
+  {
+   "kind": "safe",
+   "name": "Zone_safe_safe_house_L3",
+   "min": [
+    -25.9,
+    6.4,
+    -3.0
+   ],
+   "max": [
+    -20.9,
+    9.2,
+    3.0
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "craft",
+   "name": "Spot_craft_1_L3",
+   "position": [
+    -22.7,
+    6.4,
+    -1.7
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_blade_1_a",
+   "position": [
+    -6.0,
+    6.4,
+    -10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_blade_1",
+   "kind_of": "moving chainsaw blades",
+   "motion": "track",
+   "period_s": 10.0,
+   "what": "a chainsaw blade runs along a slot across the gallery",
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_blade_1_b",
+   "position": [
+    14.0,
+    6.4,
+    -10.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_blade_1",
+   "kind_of": "moving chainsaw blades",
+   "motion": "track",
+   "period_s": 10.0,
+   "what": "a chainsaw blade runs along a slot across the gallery",
+   "end": "b"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1",
+   "position": [
+    -10.0,
+    6.4,
+    25.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the Lost and Found: your loadout, and your gear back after you die"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1_L3",
+   "position": [
+    -21.9,
+    6.4,
+    1.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    20.0,
+    6.4,
+    20.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_2",
+   "position": [
+    -22.0,
+    6.4,
+    -14.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_3",
+   "position": [
+    2.0,
+    6.4,
+    2.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_1",
+   "position": [
+    10.0,
+    6.4,
+    -18.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "6"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_2",
+   "position": [
+    20.0,
+    6.4,
+    -6.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "6"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_3",
+   "position": [
+    -4.0,
+    6.4,
+    -16.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "6"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_1",
+   "position": [
+    0.0,
+    6.4,
+    20.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_2",
+   "position": [
+    16.0,
+    6.4,
+    0.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_3",
+   "position": [
+    -18.0,
+    6.4,
+    -18.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "puzzle",
+   "name": "Spot_puzzle_1",
+   "position": [
+    24.0,
+    6.4,
+    -12.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a fuse box"
+  },
+  {
+   "kind": "respawn",
+   "name": "Spot_respawn_1_L3",
+   "position": [
+    -23.5,
+    6.4,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "save",
+   "name": "Spot_save_1_L3",
+   "position": [
+    -25.3,
+    6.4,
+    -1.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "shop",
+   "name": "Spot_shop_1_L3",
+   "position": [
+    -24.4,
+    6.4,
+    1.9
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "stash",
+   "name": "Spot_stash_1_L3",
+   "position": [
+    -24.3,
+    6.4,
+    -2.4
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  }
+ ]
+}
