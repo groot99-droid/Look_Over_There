@@ -494,6 +494,7 @@ async function loadScene(id, arrival) {
   scene.add(root);
   const chamber = passage ? null : REGISTRY.chamber(id);
   Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, baked: bake.n, bake, lightSet: "day", grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
+  S.sceneLinks = sceneLinksOf(id, doc);
   applySky(id, root); addBackdrop(cfg, root);
   boxes.length = 0; doors.length = 0;
   for (const c of doc.colliders) boxes.push({n: c.min, x: c.max});
@@ -555,6 +556,52 @@ async function loadScene(id, arrival) {
   fade.style.opacity = 0;
   AUD.clearMonsters(); AUD.setLevel(id);
 }
+// ---------------------------------------------------------------- the Blender-first scenes' ways out (docs/BLENDER_AREAS.md): each world/<id>.json lists its `links`
+// ({door, at, arrive, face}, written by tools/blender/export_scene.py), and the manifest says where each door leads. F near a door's `at` follows the manifest's built link
+// from it; a `walk` link follows as soon as you step onto it. A manifest link may also name the spot itself (`from.at`) when the scene's file has none (the older scenes the
+// Blender areas join onto: the mall's entrance, the grocery's main floor). Doors the page's own code already handles (the bus, the forest road, the store's doors, the
+// City's buildings) are left to it.
+const SCENE_LINK_REACH = 1.6, SCENE_WALK_REACH = 1.1;
+const CODE_DOORS = {parking_lot: ["bus_stop", "forest_road", "store_doors"]};
+const CODE_SCENES = () => [CITY_SCENE, APT_SCENE, ...FOREST_SCENES];
+function sceneLinksOf(id, doc) {
+  if (CODE_SCENES().includes(id)) return [];
+  const out = new Map(), skip = CODE_DOORS[id] || [];
+  for (const l of Array.isArray(doc.links) ? doc.links : []) if (!skip.includes(l.door)) out.set(l.door, {door: l.door, at: l.at});
+  for (const l of REGISTRY.linksFrom(id)) if (l.from.door && Array.isArray(l.from.at) && !skip.includes(l.from.door)) out.set(l.from.door, {door: l.from.door, at: l.from.at});
+  return [...out.values()].map(x => ({...x, link: REGISTRY.linkFrom(id, x.door) || REGISTRY.linksFrom(id).find(l => l.from.door === x.door) || null}));
+}
+function sceneLinkNear(walk = false) {
+  if (loading || dead || !S.sceneLinks) return null;
+  let best = null, bd = 1e9;
+  for (const x of S.sceneLinks) {
+    if (!x.link || (x.link.connector === "walk") !== walk) continue;
+    const d = Math.hypot(P.p.x - x.at[0], P.p.z - x.at[2]);
+    if (walk && !x.armed) { if (d > SCENE_WALK_REACH + 1.0) x.armed = true; continue; }     // you arrive beside the way back: it waits until you have stepped away from it
+    if (d < (walk ? SCENE_WALK_REACH : SCENE_LINK_REACH) && Math.abs(P.p.y - x.at[1]) < 2.2 && d < bd) { best = x; bd = d; }
+  }
+  return best;
+}
+const SCENE_VERB = {elevator: "take the elevator", escalator: "take the escalator", stairs: "take the stairs", one_way: "go through", doors: "go through the door", stair_door: "take the stairs",
+  hatch: "climb through the hatch", lift: "take the lift", freight_lift: "take the freight lift", mirror: "step through the mirror", sky_hall: "go into the hall", service: "go through the service door",
+  service_corridor: "take the service corridor", pool_route: "swim on", pool_dive: "dive in", door: "go through the door"};
+function sceneLinkPrompt() {
+  const x = sceneLinkNear(false); if (!x) return "";
+  const l = x.link;
+  if (l.status !== "built") return "This way is shut for now";
+  if (roomShut(l)) return "A solo place for now (not in a room)";
+  return `Press F to ${SCENE_VERB[l.connector] || "go through"}`;
+}
+function followSceneLink(x) {
+  const l = x.link;
+  if (!l || l.status !== "built") { toast("This way is shut for now"); return true; }
+  if (roomShut(l)) { toast("That does not open in a room yet"); return true; }
+  if (!l.to.scene) { toast("That leads somewhere not built yet"); return true; }
+  loadScene(l.to.scene, {pos: l.to.arrive, face: l.to.face});
+  return true;
+}
+function trySceneLink() { const x = sceneLinkNear(false); return x ? followSceneLink(x) : false; }
+function walkSceneLinks() { const x = sceneLinkNear(true); if (x && x.link.status === "built" && !roomShut(x.link) && x.link.to.scene) followSceneLink(x); }
 function goLink(dr) {
   const l = dr.link;
   if (l.game && !l.direct && S.id !== "T") {                             // the game gates go through a walkable passage first
@@ -967,7 +1014,7 @@ function useConsumable(slot) {
   else { const t = placeTrap(r.kind, P.p.x, P.p.z, TRAPS.t); t.mesh = trapMesh(r.kind, t); TRAPS.list.push(t); toast(`${KIT_NAMES[r.kind]} set down: ${r.kind === "mine" ? "armed in a moment" : "armed almost at once, and loud"}`); }
   return true;
 }
-const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryStation() && !tryLoot() && !tryBarricade() && !tryCity()) useDoor(); };
+const doAction = () => { if (!reviveTarget() && !tryFuse() && !trySwitch() && !tryNote() && !tryPower() && !tryStation() && !tryLoot() && !tryBarricade() && !tryCity() && !trySceneLink()) useDoor(); };
 const crouchToggle = () => { crouchLatch = !crouchLatch; };
 addEventListener("keydown", e => {
   if (inGame) return;
@@ -1584,6 +1631,7 @@ function updatePrompt() {
   if (!pz && !dead && !loading && !reviveTarget() && nearPower()) msg = "Press E to switch on the power";
   if (!msg && !dead && !loading && !reviveTarget() && nearStation()) msg = "Press E to open the Lost and Found";
   if (!msg && !dead && !loading && !reviveTarget()) msg = cityPrompt();
+  if (!msg && !dead && !loading && !reviveTarget()) msg = sceneLinkPrompt();
   if (!msg && !dead && !loading && !reviveTarget()) { const n = nearLoot(); if (n) msg = n.k === "locker" ? (LT.gun ? "You already carry a gun" : "Press E to open the locker") : n.k === "beacon" ? (BC.have >= MAX_BEACONS ? "You cannot carry more beacons" : "Press E to take the AFK Beacon") : (LT.rounds >= MAX_ROUNDS ? "You cannot carry more ammo" : "Press E to take the ammo pack (+3)"); }
   el.textContent = msg; el.style.display = msg ? "block" : "none";
   if (!pz && POWER_SOURCES.includes(S.id)) { hud.style.display = "block"; hud.textContent = POWER.on ? "POWER ON" : "POWER OFF"; }
@@ -3526,6 +3574,7 @@ function update(dt) {
   if ((keys.Space || g.jump) && P.ground && !P.crouch) { P.v.y = 6.2; P.ground = false; }
   move(wx, 0, wz); move(0, P.v.y * dt, 0);
   crossPortals(); if (loading) return;
+  walkSceneLinks(); if (loading) return;
   checkFall();
   P.eye += ((P.crouch ? 0.95 : EYE) - P.eye) * Math.min(1, dt * 10);
   simMonsters(dt);
@@ -3591,7 +3640,7 @@ FIN.t0 = performance.now();
 await loadScene(net.on && net.start ? net.start : "B1");                 // a room starts where its mode says (the server's welcome): B1, or the first chamber of Going back in
 $("fade").style.transition = "opacity .35s";
 $("load").style.opacity = 0; setTimeout(() => $("load").remove(), 700);
-window.__game = {ART_TEST, setLightSet, camera, FST, FOREST_SCENES, tryForest, forestPrompt, SHEAR, shearTick, shearCut, BAR, buildBarricades, cutBarricade, tryBarricade, gotPack, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
+window.__game = {sceneLinksOf, sceneLinkNear, sceneLinkPrompt, trySceneLink, ART_TEST, setLightSet, camera, FST, FOREST_SCENES, tryForest, forestPrompt, SHEAR, shearTick, shearCut, BAR, buildBarricades, cutBarricade, tryBarricade, gotPack, LASER, laserTick, ROCKET, fireRocket, HP, HORN, blowHorn, callHorn, FLAME, swapCanister, flameTick, DART, fireDart, BAT, swingBaton, dischargeBaton, DRV, fireDriver, PT, openParty, closeParty, gotoState, goToFriend, placeName, roomShut, peerTag, TRAPS, useConsumable, doAction, mainRegion, GB, BOW, STN, fireBow, tryStation, nearStation, startGoingBackIn, setHeld, GUN, HELD, AIM, owned, portals, addPortal, crossPortals, enterGame, AUD, camIdxNow: () => camIdx, set camIdx(v) { camIdx = v; }, drawMapNow: () => drawMap(performance.now() / 1000), MAP_FADE_MS, feedCam, CAMHOT, hotCam, ctime, camHud, BUZZ, CL, BC, toggleCloak, throwBeacon, addBeacon, beaconLures, beaconSpots, spawnFor, floorGoals, HP, applyHit, GUN, fire, rayMonster, banishSpot, resolveShot, rayClear, LT, lockerSpots, packSpots, nearLoot, tryLoot, lootAct, NAV, NX0, NZ0, NW, NH, segClear, sim, astar, nearestWalk, cellOf, aimFeed, feedCam, MAPSEEN, camSees, updateSeen, MAP_FADE_MS, cellXZ, FIN, SOLO, OW, HEMI, CITY, saveCity, restoreCity, SH, openShift, workShift, closeShift, sleepNow, APP, QZ, openQuiz, get NEEDS() { return NEEDS; }, set NEEDS(v) { NEEDS = v; }, needsHud, PC, openComputer, closeComputer, drawComputer, cityState, tryCity, cityPrompt, openOptions, closeOptions, walkOut, heldFlags, startAlarm, exitCheck, showResults, goOut, EXIT_Z, POWER, powerAct, farSwitchSpot, nearPower, tryPower, KP, KPUI, kpAct, kpPress, keypadSpots, nearNote, tryNote, openKeypad, SW, swAct, switchSpots, nearSwitch, trySwitch, puzzle, FZ, fuseAct, fuseSpots, isLocked, upDoor, tryFuse, nearFuse, myCarry, keys, net, CHARS, reviveTarget, closeDoor, groupSpawn, doorBusy, revived, step, P, monsters, doors, update, teleport, move, collide, boxes, S, loadScene, die, respawn, useDoor, toggleDevice, toggleMode, cycleCam, levelOfY, randomSpawn, openDoor, devOn, get dead() { return dead; }, get loading() { return loading; }, get mode() { return devMode; }};
 frame();
 </script>
 </body>
