@@ -1,0 +1,96 @@
+{
+ "day_0": {
+  "map": 0,
+  "size": 2048,
+  "px_per_m": 18.6,
+  "scale": 2.0668,
+  "knee": 1.545,
+  "raw_p50_p90_p99_max": [
+   0.8519,
+   1.9045,
+   2.1831,
+   3.474
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 53,
+  "materials": [
+   "M_D_ceil_L1",
+   "M_D_floor_L1",
+   "M_D_wall_L1",
+   "M_GBI_kit"
+  ]
+ },
+ "day_1": {
+  "map": 1,
+  "size": 2048,
+  "px_per_m": 53.5,
+  "scale": 3.3937,
+  "knee": 1.5896,
+  "raw_p50_p90_p99_max": [
+   0.6401,
+   8.7917,
+   8.9685,
+   10.8138
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 52,
+  "materials": [
+   "M_D_door",
+   "M_Fixture_Housing",
+   "M_GBI_furn_L1",
+   "M_GBI_vent",
+   "M_X_dark",
+   "M_X_steel",
+   "M_X_white"
+  ]
+ },
+ "night_0": {
+  "map": 2,
+  "size": 2048,
+  "px_per_m": 18.6,
+  "scale": 0.723,
+  "knee": 0.4354,
+  "raw_p50_p90_p99_max": [
+   0.1918,
+   0.5536,
+   0.8696,
+   2.873
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 45,
+  "materials": [
+   "M_D_ceil_L1",
+   "M_D_floor_L1",
+   "M_D_wall_L1",
+   "M_GBI_kit"
+  ]
+ },
+ "night_1": {
+  "map": 3,
+  "size": 2048,
+  "px_per_m": 53.5,
+  "scale": 0.6217,
+  "knee": 0.2552,
+  "raw_p50_p90_p99_max": [
+   0.1369,
+   0.4091,
+   8.9003,
+   11.0305
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 47,
+  "materials": [
+   "M_D_door",
+   "M_Fixture_Housing",
+   "M_GBI_furn_L1",
+   "M_GBI_vent",
+   "M_X_dark",
+   "M_X_steel",
+   "M_X_white"
+  ]
+ }
+}

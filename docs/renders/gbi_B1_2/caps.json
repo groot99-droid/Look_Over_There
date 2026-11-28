@@ -1,0 +1,34 @@
+{
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "day": {
+  "gain": 1.7241,
+  "wall_p50_before": 0.319,
+  "target_wall_p50": 0.55
+ },
+ "factor": {
+  "M_D_door": 1.7241,
+  "M_X_steel": 1.6194,
+  "M_D_ceil_B1": 1.7241,
+  "M_D_floor_B1": 1.7241,
+  "M_D_wall_B1": 1.372,
+  "M_Fixture_Housing": 0.1588,
+  "M_GBI_kit": 1.7241,
+  "M_X_white": 0.2598
+ },
+ "night": {
+  "gain": 4.2857,
+  "wall_p50_before": 0.035,
+  "target_wall_p50": 0.15
+ },
+ "factor_night": {
+  "M_D_door": 4.2857,
+  "M_X_steel": 4.2857,
+  "M_D_ceil_B1": 4.2857,
+  "M_D_floor_B1": 4.2857,
+  "M_D_wall_B1": 4.2857,
+  "M_Fixture_Housing": 4.2857,
+  "M_GBI_kit": 4.2857,
+  "M_X_white": 4.1102
+ }
+}

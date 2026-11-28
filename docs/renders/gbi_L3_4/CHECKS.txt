@@ -1,0 +1,54 @@
+## 1. tools/blender/check_layout.py on the dressed .blend (run on the box by the build's check stage: --collection Art --floor <y>)
+layout check: scene gbi_L3_4, 54 visible meshes, 46 colliders, floor at y 6.4
+PASS  STRAY  31 tall solid mesh(es), each over a collider; 0 decor_* mesh(es) exempt
+PASS  CLEAR  marker Arrival (14.00, 23.80): clear within 0.28 m
+PASS: 48 of 48 checks passed
+CHECK_LAYOUT exit 0
+
+## 2. the greybox's --check (all 15 chambers; GLBs: the greybox's)
+GATE links: 10 pairs inside the set (20 sides, both present), 9 that leave it; 29 links in the files, every one accounted for
+GATE one arrival and one way on: 15 chambers, each with exactly its arrival and its way on (gbi_L4_1 arrives by its spawn); the chain runs L4_1 > L4_2 > L4_3 > L4_4 > L3_1 > L3_2 > L3_3 > L3_4 > L2_1 > L2_2 > L2_3 > L2_4 > L1_1 > L1_2 > L1_3 > L1_4 > B1_1 > B1_2 > B1_3 > B1_4 > overworld
+GATE spots: every chamber has Spot_locker x1 and at least one Spot_loot, Spot_puzzle, Spot_object and Spot_monster; 5 safe houses (B1, L1, L2, L3, L4) each with shop, stash, save, craft, respawn, locker and a Zone_safe
+GATE monster distance: every Spot_monster at least 16 m from its chamber's arrival (the nearest 26.7 m)
+GATE footprints: 890 colliders, every one inside x -26.3 to 26.3, z -22.35 to 27.35 and its storey; every link, spot and marker on its chamber's floor (B1 -3, L1 0, L2 3.2, L3 6.4, L4 9.6)
+GATE overlaps: 796 standing colliders, no two sharing space (floor and ceiling slabs, and a kit piece's boxes among themselves, aside)
+GATE clearances: every link's two points and every spot clear of the colliders (walker radius 0.28 m); 93 doors, each with 0.7 m clear on both sides inside the chamber; 31 corridors and aisles, the narrowest 2.80 m (at least 1.6 m), none blocked
+GATE reachable: from each chamber's arrival a walker reaches the way on and every spot (287 points), doors open
+GATE hazards: 25 hazards, every chamber with at least one; each a Hazard_<kind>_<n> part with its two travel ends (Spot_hazard_..._a/_b) inside its Zone_hazard; kinds: crush x8, lava x2, tide x3, gas x4, blade x8
+GATE steps: 10 kerbs (the display islands), the highest rise 0.270 m (at most 0.27 m); no flights in these chambers
+GATE hazard parts: 25 of 25 Hazard_<kind>_<n> nodes in the chambers' GLBs, each its own object on its origin
+GATE model: 15 of 15 files exactly as the model says
+GATES PASS
+
+## 2b. the same --check with this chamber's dressed GLB in place of its greybox GLB (the hazard parts are their own nodes on their origins)
+GATE hazard parts: 25 of 25 Hazard_<kind>_<n> nodes in the chambers' GLBs, each its own object on its origin
+GATES PASS
+
+## 3. export_scene.py wrote the same layout file as the greybox (git diff of world/gbi_L3_4.json against the greybox's commit)
+identical: git diff --stat is empty
+
+## 4. node tools/worlddoc.mjs check world/gbi_L3_4.json
+  warning: scene gbi_L3_4 is not in the world manifest yet: a new scene to add
+  warning: link lift_from_L3_3: the manifest has no link from this door yet: a new link to add
+  warning: link stair_down: the manifest has no link from this door yet: a new link to add
+OK world/gbi_L3_4.json: 46 colliders, 3 doors, 1 markers, 2 links, 1 zones, 15 spots, 0 errors, 3 warnings
+
+## 5. glb_inspect --budget tris=300000,mb=8
+file       world\gbi_L3_4.glb  (0.52 MB, Khronos glTF Blender I/O v5.2.40)
+triangles  5754 drawn, in 12 mesh(es), 12 instance(s)
+materials  12: Emergency_Emit, M_GBI_hazard_lava, Lamp_Emit, M_D_ceil_L3, M_D_floor_L3, M_D_wall_L3, M_Fixture_Housing, M_GBI_kit, M_GBI_nightlight, M_GBI_tape, M_X_exit, M_X_white
+textures   8, images: 256x256, 512x512, 512x512, 512x512, 512x512, 128x128, 512x256
+bbox       52.2 x 3.2 x 49.3 (x, y up, z), min [-26.1, 6.4, -22.15]
+rig        0 skin(s); animations: none
+requires   EXT_texture_webp, KHR_texture_transform
+pass       tris: 5754 triangles, budget 300000
+pass       mb: 0.52 MB, budget 8
+glb_inspect exit: 0
+
+## 6. node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
+
+## 7. privacy grep (user names, absolute paths, session ids, e-mail; the .blend decompressed)
+privacy grep: 19 files, 0 with hits
