@@ -1,0 +1,57 @@
+{
+ "0": {
+  "map": 0,
+  "size": 2048,
+  "gain": 1.7608,
+  "C": 1.18,
+  "px_per_m": 32.4,
+  "p50_p90_p99_p995_max": [
+   0.8519,
+   1.4453,
+   7.5169,
+   10.93,
+   55.814
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 56,
+  "materials": [
+   "Tile_Wall",
+   "Tile_Pool",
+   "Tile_Deck",
+   "Tile_Accent",
+   "Tile_Trim",
+   "Tile_Lip",
+   "Tile_Lane",
+   "Ceiling_Paint"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "size": 1024,
+  "gain": 1.7608,
+  "C": 1.18,
+  "px_per_m": 78.1,
+  "p50_p90_p99_p995_max": [
+   0.4956,
+   0.9439,
+   1.3464,
+   1.4409,
+   2.4184
+  ],
+  "samples": 512,
+  "device": "GPU",
+  "seconds": 16,
+  "materials": [
+   "Chrome",
+   "Door_Paint",
+   "Signs",
+   "Grate_Iron",
+   "Plastic_White",
+   "Toy_Red",
+   "Toy_White",
+   "Toy_Yellow",
+   "DoorLeaf_atrium"
+  ]
+ }
+}

@@ -1,0 +1,630 @@
+{
+ "scene": "rdwe_repeating_room",
+ "colliders": [
+  {
+   "s": "Armchair",
+   "min": [
+    -4.6,
+    0.0,
+    0.2
+   ],
+   "max": [
+    -3.4,
+    0.9,
+    1.4
+   ]
+  },
+  {
+   "s": "Baffle",
+   "min": [
+    4.75,
+    0.0,
+    -4.8
+   ],
+   "max": [
+    4.95,
+    3.2,
+    -1.2
+   ]
+  },
+  {
+   "s": "Beyond_again",
+   "min": [
+    -0.81,
+    -0.05,
+    -6.55
+   ],
+   "max": [
+    0.81,
+    2.31,
+    -6.35
+   ]
+  },
+  {
+   "s": "Beyond_again_in",
+   "min": [
+    1.78,
+    -0.05,
+    6.35
+   ],
+   "max": [
+    3.22,
+    2.25,
+    6.55
+   ]
+  },
+  {
+   "s": "Beyond_library",
+   "min": [
+    -6.55,
+    -0.05,
+    1.25
+   ],
+   "max": [
+    -6.35,
+    2.25,
+    2.75
+   ]
+  },
+  {
+   "s": "Beyond_lift",
+   "min": [
+    -3.28,
+    -0.05,
+    6.35
+   ],
+   "max": [
+    -1.72,
+    2.31,
+    6.55
+   ]
+  },
+  {
+   "s": "Beyond_secret_ops",
+   "min": [
+    8.55,
+    -0.05,
+    -4.0
+   ],
+   "max": [
+    8.75,
+    2.4,
+    -2.0
+   ]
+  },
+  {
+   "s": "Recess_Ceiling",
+   "min": [
+    6.2,
+    2.6,
+    -4.0
+   ],
+   "max": [
+    8.4,
+    2.8,
+    -2.0
+   ]
+  },
+  {
+   "s": "Recess_Floor",
+   "min": [
+    6.2,
+    -0.3,
+    -3.8
+   ],
+   "max": [
+    8.4,
+    0.0,
+    -2.2
+   ]
+  },
+  {
+   "s": "Recess_Wall_E_1",
+   "min": [
+    8.2,
+    0.0,
+    -3.8
+   ],
+   "max": [
+    8.4,
+    2.6,
+    -3.5
+   ]
+  },
+  {
+   "s": "Recess_Wall_E_2",
+   "min": [
+    8.2,
+    2.2,
+    -3.5
+   ],
+   "max": [
+    8.4,
+    2.6,
+    -2.5
+   ]
+  },
+  {
+   "s": "Recess_Wall_E_3",
+   "min": [
+    8.2,
+    0.0,
+    -2.5
+   ],
+   "max": [
+    8.4,
+    2.6,
+    -2.2
+   ]
+  },
+  {
+   "s": "Recess_Wall_N",
+   "min": [
+    6.2,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    8.4,
+    2.6,
+    -3.8
+   ]
+  },
+  {
+   "s": "Recess_Wall_S",
+   "min": [
+    6.2,
+    0.0,
+    -2.2
+   ],
+   "max": [
+    8.4,
+    2.6,
+    -2.0
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -6.2,
+    3.2,
+    -6.2
+   ],
+   "max": [
+    6.2,
+    3.4,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -6.2,
+    -0.3,
+    -6.2
+   ],
+   "max": [
+    6.2,
+    0.0,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    6.0,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    6.2,
+    3.2,
+    -3.8
+   ]
+  },
+  {
+   "s": "Room_Wall_E_2",
+   "min": [
+    6.0,
+    2.6,
+    -3.8
+   ],
+   "max": [
+    6.2,
+    3.2,
+    -2.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_3",
+   "min": [
+    6.0,
+    0.0,
+    -2.2
+   ],
+   "max": [
+    6.2,
+    3.2,
+    6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -6.2,
+    0.0,
+    -6.2
+   ],
+   "max": [
+    -0.58,
+    3.2,
+    -6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    -0.58,
+    2.2,
+    -6.2
+   ],
+   "max": [
+    0.58,
+    3.2,
+    -6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    0.58,
+    0.0,
+    -6.2
+   ],
+   "max": [
+    6.2,
+    3.2,
+    -6.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -6.2,
+    0.0,
+    6.0
+   ],
+   "max": [
+    -3.05,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    -3.05,
+    2.2,
+    6.0
+   ],
+   "max": [
+    -1.95,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    -1.95,
+    0.0,
+    6.0
+   ],
+   "max": [
+    2.01,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_4",
+   "min": [
+    2.01,
+    2.14,
+    6.0
+   ],
+   "max": [
+    2.99,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_5",
+   "min": [
+    2.99,
+    0.0,
+    6.0
+   ],
+   "max": [
+    6.2,
+    3.2,
+    6.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -6.2,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    -6.0,
+    3.2,
+    1.48
+   ]
+  },
+  {
+   "s": "Room_Wall_W_2",
+   "min": [
+    -6.2,
+    2.14,
+    1.48
+   ],
+   "max": [
+    -6.0,
+    3.2,
+    2.52
+   ]
+  },
+  {
+   "s": "Room_Wall_W_3",
+   "min": [
+    -6.2,
+    0.0,
+    2.52
+   ],
+   "max": [
+    -6.0,
+    3.2,
+    6.0
+   ]
+  },
+  {
+   "s": "Side_Table",
+   "min": [
+    1.6,
+    0.0,
+    -1.2
+   ],
+   "max": [
+    2.4,
+    0.7,
+    -0.4
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_again",
+   "level": "rdwe_repeating_room",
+   "hinge": [
+    -0.56,
+    0.0,
+    -6.0
+   ],
+   "width": 1.12,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "again",
+   "look": "the north door: plain white flush, a number plate that changes every time"
+  },
+  {
+   "name": "DoorLeaf_again_in",
+   "level": "rdwe_repeating_room",
+   "hinge": [
+    2.97,
+    0.0,
+    6.0
+   ],
+   "width": 0.94,
+   "height": 2.1,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "arrival_of": "rdwe_repeating_room.again",
+   "look": "the south door: the north door again, seen from the other side, its number one higher"
+  },
+  {
+   "name": "DoorLeaf_library",
+   "level": "rdwe_repeating_room",
+   "hinge": [
+    -6.0,
+    0.0,
+    2.5
+   ],
+   "width": 1.0,
+   "height": 2.1,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "library",
+   "look": "stable (split) pink laminate door, brass knob"
+  },
+  {
+   "name": "DoorLeaf_lift",
+   "level": "rdwe_repeating_room",
+   "hinge": [
+    -1.97,
+    0.0,
+    6.0
+   ],
+   "width": 1.06,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lift",
+   "look": "six-panel oak door, no handle"
+  },
+  {
+   "name": "DoorLeaf_secret_ops",
+   "level": "rdwe_repeating_room",
+   "hinge": [
+    8.2,
+    0.0,
+    -3.45
+   ],
+   "width": 0.9,
+   "height": 2.12,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "secret_ops",
+   "look": "the door from one angle: painted the wall's lilac, on the recess's end, seen only past the baffle",
+   "seen_from": "Spot_view_1 only"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "again",
+   "at": [
+    0.0,
+    0.0,
+    -5.25
+   ],
+   "arrive": [
+    2.5,
+    0.0,
+    4.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "library",
+   "at": [
+    -5.25,
+    0.0,
+    2.0
+   ],
+   "arrive": [
+    -4.1,
+    0.0,
+    2.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "lift",
+   "at": [
+    -2.5,
+    0.0,
+    5.25
+   ],
+   "arrive": [
+    -2.5,
+    0.0,
+    4.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "secret_ops",
+   "at": [
+    7.6,
+    0.0,
+    -3.0
+   ],
+   "arrive": [
+    6.8,
+    0.0,
+    -3.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "change",
+   "name": "Spot_change_1",
+   "position": [
+    -3.0,
+    0.0,
+    -2.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "something here is different on each lap (the page swaps it)"
+  },
+  {
+   "kind": "change",
+   "name": "Spot_change_2",
+   "position": [
+    0.0,
+    0.0,
+    1.5
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "something here is different on each lap (the page swaps it)"
+  },
+  {
+   "kind": "change",
+   "name": "Spot_change_3",
+   "position": [
+    -4.6,
+    0.0,
+    -4.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "something here is different on each lap (the page swaps it)"
+  },
+  {
+   "kind": "view",
+   "name": "Spot_view_1",
+   "position": [
+    -3.5,
+    0.0,
+    4.5
+   ],
+   "face": [
+    0.849,
+    -0.529
+   ],
+   "yaw_deg": 121.9,
+   "scale": 1.0,
+   "what": "the one place the recess's door shows from: past the baffle's south end"
+  }
+ ]
+}

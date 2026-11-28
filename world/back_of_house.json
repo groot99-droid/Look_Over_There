@@ -1,0 +1,1506 @@
+{
+ "scene": "back_of_house",
+ "colliders": [
+  {
+   "s": "BOH_Ceiling",
+   "min": [
+    12.0,
+    4.5,
+    -9.2
+   ],
+   "max": [
+    42.4,
+    4.7,
+    15.2
+   ]
+  },
+  {
+   "s": "BOH_Floor",
+   "min": [
+    12.0,
+    -0.3,
+    -9.2
+   ],
+   "max": [
+    42.4,
+    0.0,
+    15.2
+   ]
+  },
+  {
+   "s": "BOH_Wall_E_1",
+   "min": [
+    42.2,
+    0.0,
+    -9.0
+   ],
+   "max": [
+    42.4,
+    4.5,
+    15.0
+   ]
+  },
+  {
+   "s": "BOH_Wall_N_1",
+   "min": [
+    12.0,
+    0.0,
+    -9.2
+   ],
+   "max": [
+    42.4,
+    4.5,
+    -9.0
+   ]
+  },
+  {
+   "s": "BOH_Wall_S_1",
+   "min": [
+    12.0,
+    0.0,
+    15.0
+   ],
+   "max": [
+    42.4,
+    4.5,
+    15.2
+   ]
+  },
+  {
+   "s": "BOH_Wall_W_1",
+   "min": [
+    12.0,
+    0.0,
+    -9.0
+   ],
+   "max": [
+    12.2,
+    4.5,
+    -6.3
+   ]
+  },
+  {
+   "s": "BOH_Wall_W_2",
+   "min": [
+    12.0,
+    2.2,
+    -6.3
+   ],
+   "max": [
+    12.2,
+    4.5,
+    -4.7
+   ]
+  },
+  {
+   "s": "BOH_Wall_W_3",
+   "min": [
+    12.0,
+    0.0,
+    -4.7
+   ],
+   "max": [
+    12.2,
+    4.5,
+    15.0
+   ]
+  },
+  {
+   "s": "Break_Chair",
+   "min": [
+    14.58,
+    0.0,
+    9.68
+   ],
+   "max": [
+    15.02,
+    0.9,
+    10.12
+   ]
+  },
+  {
+   "s": "Break_Chair_2",
+   "min": [
+    14.58,
+    0.0,
+    11.88
+   ],
+   "max": [
+    15.02,
+    0.9,
+    12.32
+   ]
+  },
+  {
+   "s": "Break_Chair_3",
+   "min": [
+    16.58,
+    0.0,
+    9.68
+   ],
+   "max": [
+    17.02,
+    0.9,
+    10.12
+   ]
+  },
+  {
+   "s": "Break_Chair_4",
+   "min": [
+    16.58,
+    0.0,
+    11.88
+   ],
+   "max": [
+    17.02,
+    0.9,
+    12.32
+   ]
+  },
+  {
+   "s": "Break_Counter",
+   "min": [
+    12.2,
+    0.0,
+    8.4
+   ],
+   "max": [
+    13.0,
+    0.9,
+    14.6
+   ]
+  },
+  {
+   "s": "Break_Fridge",
+   "min": [
+    12.2,
+    0.0,
+    7.4
+   ],
+   "max": [
+    12.95,
+    1.85,
+    8.3
+   ]
+  },
+  {
+   "s": "Break_Table",
+   "min": [
+    14.4,
+    0.0,
+    10.4
+   ],
+   "max": [
+    17.2,
+    0.75,
+    11.6
+   ]
+  },
+  {
+   "s": "Dock_Bumper",
+   "min": [
+    41.9,
+    0.2,
+    -8.1
+   ],
+   "max": [
+    42.14,
+    0.6,
+    -7.9
+   ]
+  },
+  {
+   "s": "Dock_Bumper_2",
+   "min": [
+    41.9,
+    0.2,
+    -5.1
+   ],
+   "max": [
+    42.14,
+    0.6,
+    -4.9
+   ]
+  },
+  {
+   "s": "Dock_Bumper_3",
+   "min": [
+    41.9,
+    0.2,
+    -3.1
+   ],
+   "max": [
+    42.14,
+    0.6,
+    -2.9
+   ]
+  },
+  {
+   "s": "Dock_Bumper_4",
+   "min": [
+    41.9,
+    0.2,
+    -0.1
+   ],
+   "max": [
+    42.14,
+    0.6,
+    0.1
+   ]
+  },
+  {
+   "s": "Dock_Bumper_5",
+   "min": [
+    41.9,
+    0.2,
+    1.9
+   ],
+   "max": [
+    42.14,
+    0.6,
+    2.1
+   ]
+  },
+  {
+   "s": "Dock_Bumper_6",
+   "min": [
+    41.9,
+    0.2,
+    4.9
+   ],
+   "max": [
+    42.14,
+    0.6,
+    5.1
+   ]
+  },
+  {
+   "s": "Dock_Door",
+   "min": [
+    42.14,
+    0.0,
+    -7.9
+   ],
+   "max": [
+    42.2,
+    3.2,
+    -5.1
+   ]
+  },
+  {
+   "s": "Dock_Door_2",
+   "min": [
+    42.14,
+    0.0,
+    -2.9
+   ],
+   "max": [
+    42.2,
+    3.2,
+    -0.1
+   ]
+  },
+  {
+   "s": "Dock_Door_3",
+   "min": [
+    42.14,
+    0.0,
+    2.1
+   ],
+   "max": [
+    42.2,
+    3.2,
+    4.9
+   ]
+  },
+  {
+   "s": "Keycard_Reader",
+   "min": [
+    40.9,
+    1.1,
+    10.12
+   ],
+   "max": [
+    41.2,
+    1.5,
+    10.2
+   ]
+  },
+  {
+   "s": "LiftCar_Ceiling",
+   "min": [
+    37.2,
+    2.8,
+    10.2
+   ],
+   "max": [
+    41.2,
+    3.0,
+    14.2
+   ]
+  },
+  {
+   "s": "LiftCar_Wall_E_1",
+   "min": [
+    41.0,
+    0.0,
+    10.4
+   ],
+   "max": [
+    41.2,
+    2.8,
+    14.0
+   ]
+  },
+  {
+   "s": "LiftCar_Wall_S_1",
+   "min": [
+    37.2,
+    0.0,
+    14.0
+   ],
+   "max": [
+    41.2,
+    2.8,
+    14.2
+   ]
+  },
+  {
+   "s": "LiftCar_Wall_W_1",
+   "min": [
+    37.2,
+    0.0,
+    10.4
+   ],
+   "max": [
+    37.4,
+    2.8,
+    14.0
+   ]
+  },
+  {
+   "s": "Lift_Wall_N_1",
+   "min": [
+    36.2,
+    0.0,
+    10.2
+   ],
+   "max": [
+    38.0,
+    3.0,
+    10.4
+   ]
+  },
+  {
+   "s": "Lift_Wall_N_2",
+   "min": [
+    38.0,
+    2.4,
+    10.2
+   ],
+   "max": [
+    40.4,
+    3.0,
+    10.4
+   ]
+  },
+  {
+   "s": "Lift_Wall_N_3",
+   "min": [
+    40.4,
+    0.0,
+    10.2
+   ],
+   "max": [
+    42.2,
+    3.0,
+    10.4
+   ]
+  },
+  {
+   "s": "Locker_Bench",
+   "min": [
+    22.2,
+    0.0,
+    9.6
+   ],
+   "max": [
+    23.0,
+    0.45,
+    13.4
+   ]
+  },
+  {
+   "s": "Lockers_E",
+   "min": [
+    24.5,
+    0.0,
+    8.0
+   ],
+   "max": [
+    25.0,
+    1.9,
+    14.6
+   ]
+  },
+  {
+   "s": "Lockers_W",
+   "min": [
+    20.2,
+    0.0,
+    8.0
+   ],
+   "max": [
+    20.7,
+    1.9,
+    14.6
+   ]
+  },
+  {
+   "s": "Monitor_Bank",
+   "min": [
+    25.4,
+    0.8,
+    13.2
+   ],
+   "max": [
+    31.8,
+    2.4,
+    13.6
+   ]
+  },
+  {
+   "s": "Monitor_Shelf",
+   "min": [
+    25.4,
+    0.0,
+    13.2
+   ],
+   "max": [
+    31.8,
+    0.8,
+    15.0
+   ]
+  },
+  {
+   "s": "Office_Cabinet",
+   "min": [
+    30.6,
+    0.0,
+    7.4
+   ],
+   "max": [
+    31.8,
+    1.3,
+    8.4
+   ]
+  },
+  {
+   "s": "Office_Desk",
+   "min": [
+    26.6,
+    0.0,
+    11.0
+   ],
+   "max": [
+    29.4,
+    0.75,
+    11.8
+   ]
+  },
+  {
+   "s": "Pallet",
+   "min": [
+    32.8,
+    0.0,
+    -8.5
+   ],
+   "max": [
+    34.0,
+    1.4,
+    -7.5
+   ]
+  },
+  {
+   "s": "Pallet_2",
+   "min": [
+    32.8,
+    0.0,
+    -7.1
+   ],
+   "max": [
+    34.0,
+    0.9,
+    -6.1
+   ]
+  },
+  {
+   "s": "Pallet_3",
+   "min": [
+    34.4,
+    0.0,
+    0.5
+   ],
+   "max": [
+    35.6,
+    1.6,
+    1.5
+   ]
+  },
+  {
+   "s": "Pallet_4",
+   "min": [
+    32.8,
+    0.0,
+    0.5
+   ],
+   "max": [
+    34.0,
+    0.15,
+    1.5
+   ]
+  },
+  {
+   "s": "Racking_1",
+   "min": [
+    15.6,
+    0.0,
+    -8.9
+   ],
+   "max": [
+    30.0,
+    4.0,
+    -7.8
+   ]
+  },
+  {
+   "s": "Racking_2",
+   "min": [
+    15.6,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    30.0,
+    4.0,
+    -4.1
+   ]
+  },
+  {
+   "s": "Racking_3",
+   "min": [
+    15.6,
+    0.0,
+    -1.5
+   ],
+   "max": [
+    30.0,
+    4.0,
+    -0.4
+   ]
+  },
+  {
+   "s": "Racking_4",
+   "min": [
+    15.6,
+    0.0,
+    2.2
+   ],
+   "max": [
+    30.0,
+    4.0,
+    3.3
+   ]
+  },
+  {
+   "s": "Rooms_Ceiling",
+   "min": [
+    12.2,
+    3.0,
+    7.0
+   ],
+   "max": [
+    42.2,
+    3.2,
+    15.0
+   ]
+  },
+  {
+   "s": "Rooms_Partition",
+   "min": [
+    20.0,
+    0.0,
+    7.2
+   ],
+   "max": [
+    20.2,
+    3.0,
+    15.0
+   ]
+  },
+  {
+   "s": "Rooms_Partition_2",
+   "min": [
+    25.0,
+    0.0,
+    7.2
+   ],
+   "max": [
+    25.2,
+    3.0,
+    15.0
+   ]
+  },
+  {
+   "s": "Rooms_Partition_3",
+   "min": [
+    32.0,
+    0.0,
+    7.2
+   ],
+   "max": [
+    32.2,
+    3.0,
+    15.0
+   ]
+  },
+  {
+   "s": "Rooms_Partition_4",
+   "min": [
+    36.0,
+    0.0,
+    7.2
+   ],
+   "max": [
+    36.2,
+    3.0,
+    15.0
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_1",
+   "min": [
+    12.2,
+    0.0,
+    7.0
+   ],
+   "max": [
+    15.63,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_10",
+   "min": [
+    37.8,
+    2.6,
+    7.0
+   ],
+   "max": [
+    40.6,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_11",
+   "min": [
+    40.6,
+    0.0,
+    7.0
+   ],
+   "max": [
+    42.2,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_2",
+   "min": [
+    15.63,
+    2.16,
+    7.0
+   ],
+   "max": [
+    16.57,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_3",
+   "min": [
+    16.57,
+    0.0,
+    7.0
+   ],
+   "max": [
+    22.13,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_4",
+   "min": [
+    22.13,
+    2.16,
+    7.0
+   ],
+   "max": [
+    23.07,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_5",
+   "min": [
+    23.07,
+    0.0,
+    7.0
+   ],
+   "max": [
+    28.13,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_6",
+   "min": [
+    28.13,
+    2.16,
+    7.0
+   ],
+   "max": [
+    29.07,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_7",
+   "min": [
+    29.07,
+    0.0,
+    7.0
+   ],
+   "max": [
+    33.63,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_8",
+   "min": [
+    33.63,
+    2.16,
+    7.0
+   ],
+   "max": [
+    34.57,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Rooms_Wall_N_9",
+   "min": [
+    34.57,
+    0.0,
+    7.0
+   ],
+   "max": [
+    37.8,
+    3.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Stair_Rail",
+   "min": [
+    32.4,
+    0.0,
+    8.8
+   ],
+   "max": [
+    35.8,
+    1.0,
+    8.95
+   ]
+  },
+  {
+   "s": "Vending",
+   "min": [
+    18.6,
+    0.0,
+    14.2
+   ],
+   "max": [
+    19.8,
+    1.9,
+    15.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_basement_stairs",
+   "level": "back_of_house",
+   "hinge": [
+    33.63,
+    0.0,
+    7.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "stair door"
+  },
+  {
+   "name": "DoorLeaf_break",
+   "level": "back_of_house",
+   "hinge": [
+    15.63,
+    0.0,
+    7.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_freight_lift",
+   "level": "back_of_house",
+   "hinge": [
+    38.0,
+    0.0,
+    10.2
+   ],
+   "width": 2.4,
+   "height": 2.4,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "freight lift gate"
+  },
+  {
+   "name": "DoorLeaf_lockers",
+   "level": "back_of_house",
+   "hinge": [
+    22.13,
+    0.0,
+    7.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_office",
+   "level": "back_of_house",
+   "hinge": [
+    28.13,
+    0.0,
+    7.2
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed"
+  },
+  {
+   "name": "DoorLeaf_staff_A",
+   "level": "back_of_house",
+   "hinge": [
+    12.2,
+    0.0,
+    -6.3
+   ],
+   "width": 0.8,
+   "height": 2.2,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "staff door"
+  },
+  {
+   "name": "DoorLeaf_staff_B",
+   "level": "back_of_house",
+   "hinge": [
+    12.2,
+    0.0,
+    -4.7
+   ],
+   "width": 0.8,
+   "height": 2.2,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "staff door"
+  }
+ ],
+ "cameras": [
+  {
+   "id": "SecCam_01",
+   "style": "security_camera_01",
+   "level": "back_of_house",
+   "position": [
+    12.6,
+    3.6,
+    -8.6
+   ],
+   "facing_deg": 45.0,
+   "mount_height_above_floor": 3.6,
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.1
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.0
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 70.0,
+    "cycles": 2,
+    "phase": 0.0,
+    "fov_v_wide_deg": 49.43,
+    "fov_v_tele_deg": 16.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    80
+   ]
+  },
+  {
+   "id": "SecCam_02",
+   "style": "security_camera_01",
+   "level": "back_of_house",
+   "position": [
+    41.8,
+    3.6,
+    -8.6
+   ],
+   "facing_deg": -45.0,
+   "mount_height_above_floor": 3.6,
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.4
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.0
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 70.0,
+    "cycles": 2,
+    "phase": 0.0,
+    "fov_v_wide_deg": 49.43,
+    "fov_v_tele_deg": 16.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    80
+   ]
+  },
+  {
+   "id": "SecCam_03",
+   "style": "security_camera_01",
+   "level": "back_of_house",
+   "position": [
+    12.6,
+    3.6,
+    6.6
+   ],
+   "facing_deg": 135.0,
+   "mount_height_above_floor": 3.6,
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.7
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.0
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 70.0,
+    "cycles": 2,
+    "phase": 0.0,
+    "fov_v_wide_deg": 49.43,
+    "fov_v_tele_deg": 16.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    80
+   ]
+  },
+  {
+   "id": "SecCam_04",
+   "style": "security_camera_01",
+   "level": "back_of_house",
+   "position": [
+    36.6,
+    2.6,
+    7.6
+   ],
+   "facing_deg": 36.9,
+   "mount_height_above_floor": 2.6,
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.2
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.0
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 70.0,
+    "cycles": 2,
+    "phase": 0.0,
+    "fov_v_wide_deg": 49.43,
+    "fov_v_tele_deg": 16.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    80
+   ]
+  },
+  {
+   "id": "SecCam_05",
+   "style": "security_camera_01",
+   "level": "back_of_house",
+   "position": [
+    25.6,
+    2.6,
+    7.6
+   ],
+   "facing_deg": 36.9,
+   "mount_height_above_floor": 2.6,
+   "pan": {
+    "amplitude_deg": 40.0,
+    "cycles": 1,
+    "phase": 0.55
+   },
+   "tilt": {
+    "base_deg": -18.0,
+    "wobble_deg": 4.0,
+    "cycles": 2,
+    "phase": 0.0
+   },
+   "zoom": {
+    "lens_wide_mm": 22.0,
+    "lens_tele_mm": 70.0,
+    "cycles": 2,
+    "phase": 0.0,
+    "fov_v_wide_deg": 49.43,
+    "fov_v_tele_deg": 16.46,
+    "formula": "u=0.5+0.5*sin(2*pi*(cycles*t/loop+phase)); z=smoothstep(0.35,0.65,u); lens=wide+(tele-wide)*z"
+   },
+   "loop_seconds": 20.0,
+   "aspect": "16:9",
+   "view_range_m": [
+    0.03,
+    80
+   ]
+  }
+ ],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "back_of_house",
+   "level": "back_of_house",
+   "kind": "Spawn",
+   "position": [
+    13.5,
+    0.0,
+    -5.5
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "basement_stairs",
+   "at": [
+    34.1,
+    0.0,
+    6.4
+   ],
+   "arrive": [
+    34.1,
+    0.0,
+    5.7
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "freight_down",
+   "at": [
+    38.6,
+    0.0,
+    9.6
+   ],
+   "arrive": [
+    38.6,
+    0.0,
+    8.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "main_floor",
+   "at": [
+    12.8,
+    0.0,
+    -5.5
+   ],
+   "arrive": [
+    13.5,
+    0.0,
+    -5.5
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "secret_ops",
+   "at": [
+    39.8,
+    0.0,
+    9.6
+   ],
+   "arrive": [
+    39.8,
+    0.0,
+    8.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "restricted",
+   "name": "Zone_restricted_back_of_house",
+   "min": [
+    12.2,
+    0.0,
+    -9.0
+   ],
+   "max": [
+    42.2,
+    4.5,
+    15.0
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "dock",
+   "name": "Spot_dock_1",
+   "position": [
+    41.2,
+    0.0,
+    -6.5
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a dock door that does not open: a truck later"
+  },
+  {
+   "kind": "dock",
+   "name": "Spot_dock_2",
+   "position": [
+    41.2,
+    0.0,
+    -1.5
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a dock door that does not open: a truck later"
+  },
+  {
+   "kind": "dock",
+   "name": "Spot_dock_3",
+   "position": [
+    41.2,
+    0.0,
+    3.5
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a dock door that does not open: a truck later"
+  },
+  {
+   "kind": "food",
+   "name": "Spot_food_stock_2",
+   "position": [
+    22.8,
+    0.0,
+    -5.8
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "where": "stockroom racking",
+   "shelf": "Racking_2"
+  },
+  {
+   "kind": "food",
+   "name": "Spot_food_stock_3",
+   "position": [
+    22.8,
+    0.0,
+    -2.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "where": "stockroom racking",
+   "shelf": "Racking_3"
+  },
+  {
+   "kind": "food",
+   "name": "Spot_food_stock_4",
+   "position": [
+    22.8,
+    0.0,
+    1.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "where": "stockroom racking",
+   "shelf": "Racking_4"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_1",
+   "position": [
+    18.9,
+    0.0,
+    9.4
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "where": "behind the break room door"
+  },
+  {
+   "kind": "hide",
+   "name": "Spot_hide_2",
+   "position": [
+    31.2,
+    0.0,
+    9.6
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "where": "behind the office cabinet"
+  },
+  {
+   "kind": "keycard",
+   "name": "Spot_keycard_1",
+   "position": [
+    41.05,
+    0.0,
+    9.5
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "requires": "keycard_tier_1",
+   "opens": "secret_ops",
+   "what": "the reader: swipe keycard_tier_1 and the lift goes on past the basement"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1",
+   "position": [
+    21.2,
+    0.0,
+    9.4
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_2",
+   "position": [
+    21.2,
+    0.0,
+    12.8
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_3",
+   "position": [
+    24.0,
+    0.0,
+    9.4
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_4",
+   "position": [
+    24.0,
+    0.0,
+    12.8
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "monitor",
+   "name": "Spot_monitor_1",
+   "position": [
+    28.6,
+    0.0,
+    12.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "the camera monitors: the SecCam_ feeds (code)"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_1",
+   "position": [
+    27.0,
+    0.0,
+    -6.5
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "when": "night",
+   "what": "a night threat (code)"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_2",
+   "position": [
+    39.0,
+    0.0,
+    5.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "when": "night",
+   "what": "a night threat (code)"
+  }
+ ]
+}

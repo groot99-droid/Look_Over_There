@@ -1,0 +1,90 @@
+{
+ "scene": "checkpoint_3",
+ "samples": 512,
+ "map_0": {
+  "set": "normal",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 52.0,
+  "gain": 0.29481,
+  "C": 1.2,
+  "wall_median_L": 1.60922,
+  "raw_p50_p90_p99": [
+   1.3988,
+   2.6658,
+   2.9359
+  ]
+ },
+ "map_1": {
+  "set": "normal",
+  "page": 1,
+  "size": 1536,
+  "px_per_m": 48.1,
+  "gain": 0.29481,
+  "C": 1.2,
+  "wall_median_L": 1.60922,
+  "raw_p50_p90_p99": [
+   0.9971,
+   2.2635,
+   6.1648
+  ]
+ },
+ "map_2": {
+  "set": "alarm",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 52.0,
+  "gain": 5.33372,
+  "C": 1.2,
+  "wall_median_L": 0.06223,
+  "raw_p50_p90_p99": [
+   0.0484,
+   0.2125,
+   1.1291
+  ]
+ },
+ "map_3": {
+  "set": "alarm",
+  "page": 1,
+  "size": 1536,
+  "px_per_m": 48.1,
+  "gain": 5.33372,
+  "C": 1.2,
+  "wall_median_L": 0.06223,
+  "raw_p50_p90_p99": [
+   0.034,
+   0.1519,
+   1.3955
+  ]
+ },
+ "page_0_materials": [
+  "Ceiling_Tile",
+  "Floor_Checkpoint",
+  "Floor_Tile",
+  "Wall_Checkpoint",
+  "Wall_Tile"
+ ],
+ "page_1_materials": [
+  "Cam_Body",
+  "Clock_Face",
+  "Concrete_Prop",
+  "Door_Frame",
+  "Door_Keycard",
+  "Door_Steel",
+  "Hazard",
+  "Laminate",
+  "Lamp_Housing",
+  "Notice",
+  "Paint_Grey",
+  "Pillar_Paint",
+  "Plastic_Black",
+  "Plastic_White",
+  "Sign_Plate",
+  "Skirting",
+  "Steel",
+  "Steel_Dark",
+  "Stripe_Red"
+ ],
+ "seconds": 231,
+ "device": "GPU"
+}

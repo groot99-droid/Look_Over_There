@@ -1,0 +1,90 @@
+{
+ "scene": "breaker_room",
+ "samples": 512,
+ "map_0": {
+  "set": "normal",
+  "page": 0,
+  "size": 1536,
+  "px_per_m": 47.5,
+  "gain": 0.42316,
+  "C": 1.2,
+  "wall_median_L": 1.12114,
+  "raw_p50_p90_p99": [
+   0.9773,
+   2.1072,
+   2.3385
+  ]
+ },
+ "map_1": {
+  "set": "normal",
+  "page": 1,
+  "size": 1536,
+  "px_per_m": 55.9,
+  "gain": 0.42316,
+  "C": 1.2,
+  "wall_median_L": 1.12114,
+  "raw_p50_p90_p99": [
+   0.3583,
+   1.5428,
+   5.2005
+  ]
+ },
+ "map_2": {
+  "set": "alarm",
+  "page": 0,
+  "size": 1536,
+  "px_per_m": 47.5,
+  "gain": 7.83837,
+  "C": 1.2,
+  "wall_median_L": 0.04234,
+  "raw_p50_p90_p99": [
+   0.0299,
+   0.1935,
+   1.5919
+  ]
+ },
+ "map_3": {
+  "set": "alarm",
+  "page": 1,
+  "size": 1536,
+  "px_per_m": 55.9,
+  "gain": 7.83837,
+  "C": 1.2,
+  "wall_median_L": 0.04234,
+  "raw_p50_p90_p99": [
+   0.0114,
+   0.0773,
+   0.8598
+  ]
+ },
+ "page_0_materials": [
+  "Ceiling_Concrete",
+  "Floor_Concrete",
+  "Wall_Service"
+ ],
+ "page_1_materials": [
+  "Breaker_Paint",
+  "Cable",
+  "Cam_Body",
+  "Clock_Face",
+  "Concrete_Prop",
+  "Door_Frame",
+  "Door_Keycard",
+  "Door_Steel",
+  "Hazard",
+  "Notice",
+  "Paint_Dark",
+  "Paint_Orange",
+  "Paint_Yellow",
+  "Plastic_Black",
+  "Plastic_White",
+  "Sign_Plate",
+  "Skirting",
+  "Steel",
+  "Steel_Dark",
+  "Stripe_Red",
+  "Trafo_Paint"
+ ],
+ "seconds": 67,
+ "device": "GPU"
+}

@@ -1,0 +1,94 @@
+{
+ "0": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 25.0,
+  "scale": 5.4957,
+  "knee": 3.8323,
+  "raw_p50_p90_p99_p995_max": [
+   2.412,
+   5.094,
+   6.003,
+   6.173,
+   8.773
+  ],
+  "p50_p90_p99_p995_max": [
+   2.412,
+   4.867,
+   5.408,
+   5.496,
+   6.49
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 100,
+  "materials": [
+   "Concrete_Apron",
+   "Pad_Wall",
+   "Truss_Deck"
+  ]
+ },
+ "1": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 23.7,
+  "scale": 6.139,
+  "knee": 5.4582,
+  "raw_p50_p90_p99_p995_max": [
+   3.048,
+   5.864,
+   6.078,
+   6.201,
+   16.249
+  ],
+  "p50_p90_p99_p995_max": [
+   3.048,
+   5.845,
+   6.035,
+   6.139,
+   10.113
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 142,
+  "materials": [
+   "Bed_Weave",
+   "Brass",
+   "Column_Band",
+   "Edge_Yellow",
+   "Marble_Door",
+   "Pad_Orange",
+   "Pad_Pale",
+   "Rubber_Black",
+   "Vent_Grille",
+   "Wall_Mesh"
+  ]
+ },
+ "2": {
+  "set": "day",
+  "size": 2048,
+  "px_per_m": 22.4,
+  "scale": 1.7585,
+  "knee": 1.1603,
+  "raw_p50_p90_p99_p995_max": [
+   0.931,
+   1.624,
+   1.983,
+   2.072,
+   7.384
+  ],
+  "p50_p90_p99_p995_max": [
+   0.931,
+   1.526,
+   1.719,
+   1.759,
+   2.52
+  ],
+  "samples": 768,
+  "device": "GPU",
+  "seconds": 26,
+  "materials": [
+   "Truss_Steel"
+  ]
+ }
+}

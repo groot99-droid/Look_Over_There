@@ -7,7 +7,8 @@ import {secondsAt, DAY_S, APARTMENT, TOWER_FRONT, bedUse, STALKER} from "../shar
 const {chromium} = createRequire(import.meta.url)("playwright");
 let failed = 0;
 const check = (name, ok, extra = "") => { console.log((ok ? "PASS " : "FAIL ") + name + (extra ? "  " + extra : "")); if (!ok) failed++; };
-const intoApt = REGISTRY.linkFrom("street", "tower"), outApt = REGISTRY.linkFrom("apartment", "front_door");
+// since the hotel (the owner, 2026-11-28: "Lobby only"): the tower's door opens the lobby, your apartment is room 301 on floor 3, and its door leads back to that corridor
+const intoTower = REGISTRY.linkFrom("street", "tower"), lobbyOut = REGISTRY.linkFrom("lobby", "street"), intoApt = REGISTRY.linkFrom("floor_3", "room_301"), outApt = REGISTRY.linkFrom("apartment", "front_door");
 const there = REGISTRY.linkFrom("parking_lot", "bus_stop"), back = REGISTRY.linkFrom("street", "bus_stop");
 check("the manifest has the bus there and back", !!there && !!back && there.to.scene === "street" && back.to.scene === "parking_lot");
 const browser = await chromium.launch({args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
@@ -70,10 +71,13 @@ try {
   const solid = await page.evaluate(() => { const g = window.__game, c = (x, z) => !!g.collide({x, y: 0.02, z}); return {tower: c(-15, -19), grocery: c(15, -17), road: c(0, -30), sidewalk: c(6.5, -30), edge: c(61, -20)}; });
   check("buildings and the edge of the world are solid; road and sidewalk are clear", solid.tower && solid.grocery && solid.edge && !solid.road && !solid.sidewalk, JSON.stringify(solid));
 
-  // slice 2: the tower's door opens into your apartment; the clock keeps running inside; the computer; the door back out
+  // slice 2, and the hotel since 2026-11-28: the tower's door opens the hotel's lobby; your apartment is room 301 on floor 3; the clock keeps running inside; the computer; the door back out
   await stand(-6.4, 0.02, -19, Math.PI / 2); await frames(5);
-  check("at the tower's door you are offered your apartment", /go up to your apartment/.test(await prompt()), await prompt());
+  check("at the tower's door you are offered the tower", /go into the tower/.test(await prompt()), await prompt());
   const tStreet = (await st()).t;
+  await page.keyboard.press("KeyF"); check("the tower's door opens the hotel's lobby", await settled("lobby"));
+  await page.evaluate(p => window.__game.loadScene("floor_3", {pos: p, face: [0, -1]}), intoApt.from.at); await settled("floor_3"); await frames(5);
+  check("on floor 3, at room 301's door you are offered your apartment", /Press F/.test(await page.evaluate(() => window.__game.sceneLinkPrompt())), await page.evaluate(() => window.__game.sceneLinkPrompt()));
   await page.keyboard.press("KeyF"); await settled("apartment");
   const inside = await page.evaluate(() => { const g = window.__game; return {p: g.P.p.toArray(), yaw: g.P.yaw, id: g.S.id}; });
   await frames(10);
@@ -109,11 +113,16 @@ try {
   await page.keyboard.press("Escape");
   await page.evaluate(([a]) => { window.__game.CITY.t = a; }, [secondsAt(12)]);
   await stand(APARTMENT.door.at[0], 0.02, APARTMENT.door.at[1] - 0.4, Math.PI); await frames(5);
-  check("by the door you are offered the street", /go out to Hallam Row/.test(await prompt()), await prompt());
+  check("by the door you are offered the corridor", /go out to the corridor/.test(await prompt()), await prompt());
+  await page.keyboard.press("KeyF"); await settled("floor_3");
+  const corr = await page.evaluate(() => window.__game.P.p.toArray());
+  check("the door leads back to floor 3's corridor, by room 301", Math.hypot(corr[0] - outApt.to.arrive[0], corr[2] - outApt.to.arrive[2]) < 0.05, JSON.stringify(corr));
+  const lobbyAt = (await page.evaluate(() => fetch("world/lobby.json").then(r => r.json()))).links.find(l => l.door === "street").at;
+  await page.evaluate(p => window.__game.loadScene("lobby", {pos: p, face: [1, 0]}), lobbyAt); await settled("lobby"); await frames(5);
   await page.keyboard.press("KeyF"); await settled("street");
   const out = await page.evaluate(() => { const g = window.__game; return {p: g.P.p.toArray(), yaw: g.P.yaw, opts: getComputedStyle(document.getElementById("pc")).display}; });
-  check("the door leads back to the tower's front on the street, and the computer is gone", Math.abs(out.p[0] - TOWER_FRONT.arrive[0]) < 0.01 && Math.abs(out.p[2] - TOWER_FRONT.arrive[2]) < 0.01 && out.opts === "none", JSON.stringify(out));
-  check("the apartment links are the manifest's", !!intoApt && !!outApt && intoApt.to.scene === "apartment" && outApt.to.scene === "street");
+  check("the lobby's front doors lead back to the tower's front on the street, and the computer is gone", Math.abs(out.p[0] - TOWER_FRONT.arrive[0]) < 0.01 && Math.abs(out.p[2] - TOWER_FRONT.arrive[2]) < 0.01 && out.opts === "none", JSON.stringify(out));
+  check("the tower's links are the manifest's", !!intoTower && intoTower.to.scene === "lobby" && lobbyOut.to.scene === "street" && intoApt.to.scene === "apartment" && outApt.to.scene === "floor_3");
 
   // the night rule, first half: at 20:00 the stores close
   await stand(6.4, 0.02, -41, -Math.PI / 2);

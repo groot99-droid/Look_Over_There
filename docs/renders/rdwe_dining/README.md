@@ -1,0 +1,379 @@
+# Right Door, Wrong Exit, Phases A and B: the seven rooms and the two set pieces dressed and lit
+
+`docs/BLENDER_AREAS.md`, section 7, step 2. The seven rooms that exist in `games/rdwe/scenes/*.js`, remade larger and psychedelic around the
+greybox (`tools/blender/build_rdwe_greybox.py`, `docs/renders/rdwe_greybox/`), in story order: `rdwe_dining`, `rdwe_hallway`, `rdwe_teal`,
+`rdwe_teal2`, `rdwe_flooded`, `rdwe_trampoline`, `rdwe_grocery`. Super Liminal, psychedelic: saturated, dreamlike, slightly wrong, and each
+room still recognisably itself (its palette, its furniture and its trick from the scene file, at the greybox's 1.2x to 3x scale). Phase B
+adds the two set pieces on the same method: `rdwe_repeating_room` (the room that repeats, and the door seen from one angle) and
+`rdwe_finale` (the hide-and-seek map).
+
+This README covers all nine. Each room's folder (`docs/renders/<scene>/`) holds its three stills, its plan, `bake.json` and `caps.json`.
+Nothing is wired: no manifest change, and `games/rdwe/`, `index.html`, `shared/` and the tests are untouched.
+
+| File | What it is |
+|---|---|
+| `world/<scene>.glb` | the room's art (art only; no colliders) |
+| `world/lightmaps/<scene>_0.webp`, `_1.webp` | its lightmaps on UV1 (`TEXCOORD_1`): `_0` the shell, `_1` everything in it. The dining room also has `_2`, `_3`: the alt set |
+| `world/<scene>.json` | the layout, written by `export_scene.py` from the dressed `.blend`: identical to the greybox's file |
+| `blender/scenes/<scene>.blend` | the saved scenes (Git LFS): `Art` (`Props`, and `Arch`: the shell colliders' grey twins, hidden, for the layout check and the plan), `Skin` (the shell as seen), `Doors` (the leaves), `Layout`, `Lights`, `Lights_Alt` |
+| `blender/textures/rdwe/` | the CC0 textures the build reads (below) |
+| `tools/blender/build_rdwe_phaseA.py` | the re-runnable build of all seven rooms |
+
+Built so far: `rdwe_dining`, `rdwe_hallway`, `rdwe_teal`, `rdwe_teal2`, `rdwe_flooded`, `rdwe_trampoline`, `rdwe_grocery`, `rdwe_repeating_room`, `rdwe_finale`.
+
+## How it is built
+
+The hotel floors' method (`tools/blender/build_hotel_floor2.py`), made for these rooms.
+
+- **The layout is the greybox's, unchanged.** The build makes every `COL_` box, `DoorLeaf_` (with all its properties, `look` included),
+  `Link_`/`Arrive_`, `Marker_`, `Zone_` and `Spot_` from `build_rdwe_greybox.build(<scene>)`; `export_scene.py` then writes `world/<scene>.json`,
+  and it is the greybox's file byte for byte (only Git's line endings differ). No collider, door, link, spot or zone moved; the greybox script is
+  untouched. The page-trick `Spot_` objects are as they were.
+- **The shell as seen** (`Skin`) is made from the greybox's shell boxes (walls, floors, ceilings, steps, landings, the black `Beyond_` boxes past
+  every door): each face is cut into pieces of 4 m at most, and a piece is kept when the air in front of it is in the room (`AIR`, the room and its
+  stairwell or well, plus every door's opening) and in no other shell box. Of the `Beyond_` boxes only the face toward the door is drawn.
+- **Furniture** (the greybox boxes listed in `FURNITURE`: the table, the chairs, the sofas, the plants, the rails, the heaps, the columns, the
+  shelving...) is dressed with props that cover the box (the layout check's COVER rule) and stand on it (STRAY). Small things you could walk
+  through are `decor_` (cushions, china on the table, the photo frames, the skirting, casings, lamps).
+- **Every door is different.** Each leaf is its own mesh, made from its `look`: the form (panelled, six-panel, flush, louvred, half-glazed, ledged
+  and braced, round-topped, studded, quilted, mirror-faced, porthole, stable), the finish (each of the 15 finishes is its own saturated leaf
+  material: `Leaf_Oak`, `Leaf_PinkLaminate`, `Leaf_CherryRed`...) and the handle (brass knob, glass knob, chrome lever, push plate, ring pull,
+  push bar, none). The story doors are built from their words: the front door's six panels and brass knocker, the cream door with no frame and
+  no handle (the loop), the black stair door with the hair of light round it (`Glow_Emit` on the reveal), the green baize door with its brass
+  studs, the mossy stone door with an iron ring, the square doorway's slab of black (`Void`), the arch (no leaf: `DoorLeaf_arch` is an empty, as
+  the layout needs its record), the door under peeled wallpaper (the grid shows through), the back of the arch (teal, round-topped), the picture
+  frame whose canvas is the leaf, the red door (`Emergency_Emit`), the marble door with a meander frieze, the padded vent door, the chained glass
+  pair, the steel fire door with its push bar, the bronze door with a laurel wreath, the stockroom's rubber flaps with STAFF ONLY. Each leaf is
+  its node `DoorLeaf_<door>`, origin at the hinge, as the greybox had it; each is baked into the props map.
+- **Export:** the skin as it is (one mesh a material) and the props merged by material (faces pressed against the shell dropped), plus the
+  leaves. Repetition (the grocery's 79 shelf runs, the trampoline park's 54 beds) is merged into one mesh a material, which keeps the draw calls
+  low.
+- **Textures:** CC0 photo textures already in the repo (below) and images generated here with numpy (own work, fixed seeds): the shag carpet,
+  the swirl paper, the photos, the round rug, the plaid, the diamond carpet, the mossy pixel stone, the flecked carpet, the glowing grid, the
+  tiles, the painted sky, the padded vinyl, the bed weave, the concrete, the speckled vinyl, the brushed metal.
+
+## Light
+
+- **Baked indoors, one set a room** (`lightmap` on UV1), with its lamps on. The dining room also has an **alt set** (`lightmap_night` /
+  `lightmap_night_intensity`, maps `_2` and `_3`; for a room with an alt set the alt maps follow its day maps): the same room with the green lamp on the sideboard off, for the page's lamp-off beat (the
+  photo changes when the lamp clicks off). The alt set shares the day set's white point, so it reads as the lamp going off and nothing else.
+- **Toggled materials:** `Lamp_Emit` (dome lights, tubes, panels, LED panels, strips), `Emergency_Emit` (the red door and its frame, the red glow,
+  the EXIT sign), `Window_Lit` (the teal room's fake window, whose sun never moves). The dining room's green lamp shade is its own
+  `Lamp_Emit_Green`, so the page can click it off alone. All are in the bake as on.
+- **Unbaked materials** (no lightmap; drawn as their colour): the toggled ones above, `Glow_Emit` (the hair of light round the dark door),
+  `Grid_Emit` (the glowing grid), `Amber_Emit` (the hallway's amber bars), `Void` (the black past every door), `Water` (the flooded floor's sheet:
+  a transparent, glossy plane 5 cm over the tiles, hidden from the bake so the floor under it is baked as if dry; the page may ripple it), and
+  `Glass_Clear`. The trampoline beds are baked like everything else (they are art, merged; the page bounces you, not them).
+- **Bake:** Cycles on the rented GPU (OptiX), 768 samples, diffuse direct and indirect, 8 px margin, OIDN, a highlight shoulder (above the map's
+  75th percentile, toward 2.5 times it), white point the 99.5th percentile (at most 12 times the 90th). **Pages are fixed** (`PAGES`): 2048 +
+  2048, the teal rooms 1536 + 1536; the trampoline park and the grocery have a third 2048 page (`_2`) for their big repeated props (the
+  truss; the gondola shelving), so the rest keeps its density. The shell is packed by hand (pixel-aligned rectangles); the props are
+  smart-projected. Metals are baked as if matte (Metallic 0 during the bake, then put back): a metal's diffuse pass is black, and the page
+  multiplies the light by the colour.
+
+## Brightness (as the page shows it)
+
+Measured with `lab_display.py` on the packed GLBs (displayed = texture x base colour x lightmap texel x intensity / pi, no tone mapping). Each
+room has one **gain** on its lightmap intensities (`caps.json`), chosen from the uncapped GLB so its main walls reach p50 0.30, and lowered if
+a wall would pass p99 0.97 or p90 0.88; any other material that would pass p99 0.97 or p90 0.88 is capped by its own factor. The packed GLB is
+capped by `build_rdwe_phaseA.py --caps <scene>` (the same numbers `stage_export` writes from the `.blend` with that `caps.json`).
+
+## Sources and licences
+
+| Texture (Poly Haven, CC0 1.0) | Used for | Source | Author |
+|---|---|---|---|
+| `plastered_wall_04` (diffuse 1k) | ceilings, the teal walls, the stairwell walls, the amber vestibule | https://polyhaven.com/a/plastered_wall_04 | Rob Tuytel |
+| `dark_wood` (diffuse 1k) | the maple table, chairs and sideboard, oak leaves, the frames | https://polyhaven.com/a/dark_wood | Dario Barresi, Dimitrios Savva, Rico Cilliers |
+| `rough_linen` (diffuse, resized to 512) | linen, sheers, leather, baize | https://polyhaven.com/a/rough_linen | colormass, Rico Cilliers |
+| `marble_01` (diffuse 1k) | the marble door | https://polyhaven.com/a/marble_01 | Rob Tuytel |
+| `concrete_floor_02` (diffuse 1k) | the stone planter, the stone door | https://polyhaven.com/a/concrete_floor_02 | Rob Tuytel |
+| `white_plaster_02` (`wall_paint_diff.jpg`, from `blender/textures/laboratory/`) | trims, painted leaves, the grocery's walls | https://polyhaven.com/a/white_plaster_02 | Rob Tuytel |
+| `tiled_floor_001` (`floor_vinyl_diff.jpg`, from `blender/textures/laboratory/`) | (spare) | https://polyhaven.com/a/tiled_floor_001 | Dimitrios Savva, Rob Tuytel |
+| `polystyrene` (`ceiling_tile_diff.jpg`, from `blender/textures/laboratory/`) | the grocery's acoustic ceiling | https://polyhaven.com/a/polystyrene | Dimitrios Savva, Dario Barresi |
+| `plywood` (diffuse 1k) | the cardboard, the flats | https://polyhaven.com/a/plywood | Rob Tuytel |
+
+Everything else is generated by the build (numpy, fixed seeds) or a flat colour. No Meshy, no Higgsfield, nothing bought.
+
+## The rooms
+
+### `rdwe_dining`: the Dining Room, the anchor
+
+16 m by 20 m, 4.2 m high (3x the old room). Cream walls in a swirl paper whose pink and mint curls seem to turn as you look, a deep green shag,
+a pale ceiling with two dome lights in plaster roses that have opened a little too far. The giant round maple table (4.4 m, 1.25 m high) on a
+turned pedestal and a cross of splayed feet, laid for four guests who never came (plates, cups and saucers the size of hats, a white runner, a
+vase of too-pink flowers), on a round rug of rings. Four arrow-back chairs to match, with cushions. The sideboard on the west wall with its
+drawers, brass knobs, a short stack of plates and the green ceramic lamp (`Lamp_Emit_Green`). The photo wall: six frames, dark and gilt, the
+family snapshots with every face missing. The good china in four crooked towers against the east wall, folded tablecloths by them, sheer
+curtains on a brass rod over a window that is not there. The steep green-carpeted stairwell in the back wall: stringers, a brass handrail on
+two brackets, and the black door at the top with a hair of light round it. Doors: the white six-panel front door with its brass knocker, the
+pantry's panelled oak door, the cream door with no frame and no handle (the loop), the black stair door.
+
+- GLB 2.62 MB, 25554 triangles, 30 draw calls; lightmaps `_0` / `_1` 2048 / 2048 at 53.8 / 52.2 px/m (109 KB / 517 KB), alt `_2` / `_3` (106 KB / 506 KB).
+- Light: two dome lights (900 W area lights) and four soft fills over the room, the green lamp (160 W, off in the alt set), a glow at the top of the stairs and one down the stairwell. Gain 0.42; capped: China 0.398, Flower_Pink 0.329.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Ceiling_Dining | 347.1 | 0.063 | 0.106 | 0.166 |
+| Shag_Green | 334.6 | 0.147 | 0.319 | 0.612 |
+| Wall_Cream | 300.0 | 0.300 | 0.556 | 0.813 |
+| Maple | 89.3 | 0.001 | 0.101 | 0.187 |
+| Stair_Wall | 73.2 | 0.007 | 0.041 | 0.079 |
+| China | 68.0 | 0.098 | 0.591 | 0.971 |
+| Trim_Cream | 45.1 | 0.171 | 0.464 | 0.695 |
+| China_Rim | 42.9 | 0.000 | 0.082 | 0.326 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+The stairwell is dark by design ("the dark, steep stairwell"). The ceiling is dimmer than the walls (lit from below by the down lights, and
+tinted by the green carpet). The alt set (the green lamp off) measures within a few hundredths of the day set except round the sideboard.
+
+### `rdwe_hallway`: the Hallway, the descent
+
+A corridor 49 m end to end, 3.2 m wide and 4.6 m high: from the lower landing up six carpeted steps (brass nosings) into the long plaid
+corridor of doors that do not feel right. The printed plaid is grey-beige with violet and lime threads gone a little too bright; the worn tan
+carpet has a lattice of dark diamonds with a pink dot in each; nine surface-mounted twin-tube fluorescents (`Lamp_Emit`: the page flickers
+them one at a time); a dark skirting and cornice. At the far end the amber vestibule (its walls amber plaster, its ceiling stacked with light
+bars, `Amber_Emit`) over the well of mossy pixel-block stone going down, moss creeping up its sides. Ten doors, each its own: the green baize
+door with brass studs back to the dining room, and nine down the corridor (pink laminate flush with a push plate, cherry red louvred, black
+lacquer half-glazed with a brass knob: the three that open; and six that never open: sky blue ledged and braced, an oak round-topped door with a
+glass knob, studded pink laminate, quilted cherry red with a ring pull, a mirror-faced black door, a sky blue porthole door).
+
+- GLB 1.88 MB, 16884 triangles, 39 draw calls; lightmaps `_0` / `_1` 2048 / 2048 at 59.4 / 51.3 px/m (94 KB / 226 KB).
+- Light: nine tube fittings (130 W cool area lights), the amber vestibule (500 W), a green glow in the well, a warm light on the landing. Gain 0.706; capped: Fixture 0.545, Glass_Knob 0.697.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Wall_Plaid | 361.3 | 0.300 | 0.542 | 0.750 |
+| Carpet_Tan | 183.7 | 0.323 | 0.436 | 0.551 |
+| Ceiling_Hall | 177.8 | 0.083 | 0.128 | 0.599 |
+| Wall_Amber | 78.1 | 0.385 | 0.590 | 0.697 |
+| Moss_Stone | 54.9 | 0.001 | 0.428 | 0.917 |
+| Trim_Hall | 35.0 | 0.070 | 0.105 | 0.128 |
+| Leaf_PinkLaminate | 13.2 | 0.001 | 0.736 | 0.843 |
+| Leaf_CherryRed | 12.9 | 0.001 | 0.501 | 0.626 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_teal`: Teal Room, Square Door, the glitch
+
+14 m by 18 m, 4 m high (2.5x). The empty clean teal box gone a shade too bright, a cream ceiling, the coarse brown carpet flecked with cream,
+black, orange and a few teal threads. The orange angular leather sofa against the back wall left of centre, 5.6 m long: a chamfered shell (an
+elongated octagon in side view), three seat cushions, a low back, black feet; F on it is the way on ("just for a minute"). The black square
+doorway right of centre: no leaf, a slab of black flush with the wall (`Void`) that swallows the light. The blocky little plant in its stone
+planter, pixel leaves. The fake window on the west wall: a painted sky whose sun never moves (`Window_Lit`), a cream frame, mullions and sill,
+and a warm low light falling from it across the carpet. A flush dome light. The well's low door: mossy stone-grey, ledged and braced, iron
+straps and an iron ring.
+
+- GLB 0.98 MB, 1804 triangles, 19 draw calls; lightmaps `_0` / `_1` 1536 / 1536 at 47.8 / 84.5 px/m (46 KB / 116 KB).
+- Light: the flush dome (700 W), four soft fills, the window's low warm sun (260 W area light from the fake window). Gain 4.273; capped: Carpet_Fleck 1.058, Ceiling_Teal 3.003, Dome 0.571, Leather 3.415, Leather_Seam 1.909, Plant_Leaf 2.787, Sill 0.772, Trim_Teal 1.32.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Carpet_Fleck | 265.0 | 0.110 | 0.216 | 0.970 |
+| Ceiling_Teal | 265.0 | 0.119 | 0.288 | 0.969 |
+| Wall_Teal | 255.9 | 0.291 | 0.499 | 0.968 |
+| Leather | 99.8 | 0.000 | 0.777 | 0.970 |
+| Trim_Teal | 9.4 | 0.665 | 0.873 | 0.970 |
+| Plant_Leaf | 7.7 | 0.095 | 0.714 | 0.969 |
+| Leaf_Stone | 6.1 | 0.000 | 0.174 | 0.362 |
+| Sill | 5.2 | 0.344 | 0.757 | 0.970 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_teal2`: Teal Room, Arched Door, the mutation
+
+8 m by 22 m and 5.5 m high: the same teal, cream and brown, narrower, taller and wrong. The rounded cognac sofa along the west wall (you wake
+beside it), its bolster arms and cushions. The tall arch in the back wall: no leaf (`DoorLeaf_arch` is an empty), its round top filled in teal,
+a cream trim round it, the black corridor beyond. The tall spiky plant in a terracotta pot. Three patches of wallpaper peeled back on the east
+wall, the glowing green grid under them (`Grid_Emit`), the paper curling off along the torn edge, and a faint green light from each. The door
+to the green grid is a teal door under the same paper, the grid showing through two tears. A flush dome light.
+
+- GLB 0.50 MB, 1808 triangles, 18 draw calls; lightmaps `_0` / `_1` 1536 / 1536 at 48.9 / 81.6 px/m (55 KB / 127 KB).
+- Light: the flush dome (600 W), four soft fills down the length, a faint green light off each patch of grid, almost nothing from the arch. Gain 7.5; capped: Carpet_Fleck 1.212, Dome 0.844, Leather 5.449, Paper_Back 1.148, Plant_Leaf 5.906, Terracotta 3.244, Trim_Teal 1.336.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Wall_Teal | 331.2 | 0.301 | 0.686 | 0.903 |
+| Carpet_Fleck | 188.2 | 0.070 | 0.151 | 0.970 |
+| Ceiling_Teal | 188.2 | 0.157 | 0.240 | 0.284 |
+| Leather | 37.5 | 0.017 | 0.850 | 0.972 |
+| Trim_Teal | 10.7 | 0.484 | 0.835 | 0.970 |
+| Paper_Teal | 4.8 | 0.022 | 0.512 | 0.554 |
+| Paper_Back | 3.6 | 0.164 | 0.810 | 0.970 |
+| Terracotta | 2.0 | 0.322 | 0.874 | 0.971 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_flooded`: Flooded Corridor, the decay
+
+A corridor 50 m by 5 m, 4 m high (1.5x), in one-point perspective. White square tile on every wall, cream tile underfoot with a yellow tactile
+strip, a white ceiling with eight square recessed light panels (`Lamp_Emit`) and little vents between them. Down the left, above a steel dado,
+the painted sky: a saturated blue, fat cumulus blushing pink, a green hill line and a strip of yellow flowers. Down the right, the empty wooden
+frames, shrinking toward the far end; one of them, door-sized, is a door (its canvas the leaf, a painted sky). Steel handrails on brackets both
+sides. Three heaps of sodden cardboard boxes and wet paper against the sky, three photographs on the first. The perfect blue blocks the drips
+leave, melting on the floor. The grate before the end (soft: the way down). At the end, the red door, lit red and framed in red light
+(`Emergency_Emit`): the lure, it never opens. The back of the arch you came through: teal, round-topped, already sealing.
+- **Water:** one sheet over the whole floor, 5 cm up, its own unbaked material `Water` (pale blue, glossy, alpha 0.28). It is hidden while
+  baking, so the tiles under it carry the light as if dry; the page may ripple it.
+
+- GLB 1.10 MB, 3658 triangles, 26 draw calls; lightmaps `_0` / `_1` 2048 / 2048 at 54.8 / 33.9 px/m (98 KB / 192 KB).
+- Light: eight square ceiling panels (300 W cool area lights), the red door's glow (120 W, red). Gain 0.271.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Tile_Wall | 441.5 | 0.300 | 0.550 | 0.787 |
+| Ceiling_White | 272.2 | 0.090 | 0.157 | 0.302 |
+| Tile_Floor | 272.2 | 0.455 | 0.578 | 0.832 |
+| Sky_Paint | 108.0 | 0.421 | 0.635 | 0.684 |
+| Cardboard | 74.1 | 0.000 | 0.076 | 0.113 |
+| Rail_Steel | 33.5 | 0.148 | 0.226 | 0.281 |
+| Cardboard_Light | 31.4 | 0.000 | 0.100 | 0.154 |
+| Frame_Wood | 14.0 | 0.042 | 0.079 | 0.115 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_trampoline`: Trampoline Park, the macro-structure
+
+30 m by 50 m, 9 m high (2x; the page still wraps you to make it go on forever). The grid of 54 black woven beds edged in yellow, set in orange
+padded frames (pale yellow every other row); padded orange columns with yellow bands; the angled trampoline walls at both edges, a sloped
+dark mesh in padded ends; padded orange walls all round; a bare concrete apron under the vent you fall out of (a grille in the ceiling); a dark
+steel truss ceiling, beams across every 4.7 m and purlins along, with a lattice of LED panels (`Lamp_Emit`). Far north, the red glow
+(`Emergency_Emit`): the anomaly. Doors: a tall white marble door with a brass meander frieze (reserved for the god rooms) and the padded orange
+vent door with its slots.
+- **The beds** are baked like everything else and merged into one mesh a material (the page bounces you in `Zone_trigger_beds`, not the beds);
+  no unbaked material was needed for the park's surfaces.
+
+- GLB 1.36 MB, 14738 triangles, 19 draw calls; lightmaps `_0` / `_1` / `_2` 2048 / 2048 / 2048 at 25.0 / 23.7 / 22.4 px/m (175 KB / 379 KB / 276 KB).
+- Light: 33 of the LED panels as 900 W area lights (every other one), the red glow (300 W, red). The walls' gain targets p50 0.45 here (the floor is grey concrete and the beds black, so the room needs it). Gain 0.187; capped: Edge_Yellow 0.151, Pad_Orange 0.17, Pad_Pale 0.177.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Concrete_Apron | 1532.2 | 0.114 | 0.202 | 0.223 |
+| Truss_Deck | 1532.2 | 0.004 | 0.005 | 0.006 |
+| Pad_Wall | 1444.5 | 0.450 | 0.679 | 0.930 |
+| Bed_Weave | 564.6 | 0.014 | 0.019 | 0.023 |
+| Truss_Steel | 525.6 | 0.005 | 0.008 | 0.009 |
+| Pad_Orange | 299.4 | 0.423 | 0.878 | 0.971 |
+| Pad_Pale | 106.8 | 0.618 | 0.880 | 0.921 |
+| Edge_Yellow | 97.8 | 0.726 | 0.878 | 0.919 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_grocery`: Grocery Store, the anomaly
+
+50 m by 50 m, 5 m high (1.2x): the stripped store as a maze of empty grey gondola shelving on 10 by 10 aisles of 5 m. Glossy speckled vinyl in
+big cream and mint squares (a pink fleck here and there), cream-painted walls, an acoustic tile ceiling with rows of fluorescent strips over the
+aisles (`Lamp_Emit`). Each shelf run is a gondola (kick, back panel, five shelves, end panels); the posts between runs are cream end caps, each
+with a band of candy colour (pink, lime, cyan) at eye height, the one psychedelic note in a stripped store. In the clearing in the middle, the
+red cart, roped off between four chrome stanchions with sagging caution tape. In three dead ends, pyramids of unlabelled tins with one red tin
+each, flats of cardboard beside them. Doors: the chained glass sliding pair at the entrance, the grey steel fire exit with its push bar under
+the lit EXIT (`Emergency_Emit`), the bronze door with a laurel wreath for a handle (from the god rooms), the stockroom's black rubber flaps
+with STAFF ONLY.
+
+- GLB 2.83 MB, 28490 triangles, 34 draw calls; lightmaps `_0` / `_1` / `_2` 2048 / 2048 / 2048 at 21.2 / 33.8 / 11.5 px/m (202 KB / 496 KB / 481 KB).
+- Light: the strip rows over the aisles (520 W area lights, 10 m long, one per row segment), the EXIT sign's glow. Gain 0.137.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Gondola | 3235.7 | 0.033 | 0.104 | 0.166 |
+| Acoustic | 2540.2 | 0.241 | 0.262 | 0.285 |
+| Vinyl_Floor | 2540.2 | 0.395 | 0.498 | 0.546 |
+| Gondola_Back | 1204.2 | 0.042 | 0.114 | 0.155 |
+| Store_Wall | 995.4 | 0.299 | 0.344 | 0.373 |
+| Post_Cream | 550.4 | 0.260 | 0.407 | 0.496 |
+| Kick | 359.3 | 0.000 | 0.028 | 0.038 |
+| Strip_Housing | 149.5 | 0.266 | 0.539 | 0.548 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_repeating_room`: the room that repeats, and the door seen from one angle (Phase B)
+
+12 m by 12 m, 3.2 m high. Lilac paper printed with a lattice of little pink doors, each a hair different; a peach shag; a pale pink
+ceiling with one glowing pendant; a cream skirting and cornice. The pink velvet armchair, the side table with its lamp, and on the west wall a
+picture of this room with a picture of this room in it. The north door (`again`) and the south door you come back in by (`again_in`) are the
+same plain white flush door, a brass number plate on each: 12 going out, 13 coming back in. The lift and the library doors are their own
+looks. On the east wall the free-standing baffle, papered like the walls with a cream foot, hides the 2 m recess; at its far end the door seen
+from one angle (`secret_ops`) is a flush leaf in the wall's own door paper, with no frame and no handle, so from anywhere but `Spot_view_1` it
+is wall. The page-trick spots (`Spot_view_1`, `Spot_change_1` to `_3`) are untouched and nothing is placed on them; the page swaps the
+changes.
+
+- GLB 0.77 MB, 3496 triangles, 22 draw calls; lightmaps `_0` / `_1` 1536 / 1536 at 56.8 / 99.5 px/m (52 KB / 119 KB).
+- Light: the pendant (260 W), the table lamp (60 W), four soft fills, a faint light in the recess. Gain 1.087; capped: Carpet_Peach 0.847.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Wall_Doors | 190.7 | 0.300 | 0.598 | 0.958 |
+| Ceiling_Repeat | 158.2 | 0.193 | 0.262 | 0.341 |
+| Carpet_Peach | 153.8 | 0.652 | 0.861 | 0.970 |
+| Trim_Repeat | 19.4 | 0.421 | 0.694 | 0.857 |
+| Velvet_Pink | 10.3 | 0.114 | 0.252 | 0.290 |
+| Leaf_White | 9.9 | 0.074 | 0.723 | 0.788 |
+| Leaf_PinkLaminate | 9.1 | 0.000 | 0.660 | 0.732 |
+| Leaf_Oak | 9.1 | 0.000 | 0.104 | 0.164 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+### `rdwe_finale`: the finale, hide and seek (Phase B)
+
+48 m by 44 m, 4.5 m high: a central hall and four wings behind navy partition walls, a neon pink stripe round the outer walls at 1.2 m,
+pale speckled vinyl, an acoustic ceiling with rows of fluorescent strips (`Lamp_Emit`).
+- **The offices (north-west):** six cubicles of blue fabric on aluminium frames, desks with monitors (`Screen_Emit`); the offices' computer is
+  the monitor on the first desk.
+- **The house (south-west):** a bed with a pink quilt, a wardrobe, a maple table with a laptop (the house's computer), an orange sofa, a round
+  teal rug; lit warmer.
+- **The server room (north-east, `Zone_restricted_servers`):** four 12 m rows of dark racks with grilles and green blinking lights
+  (`Server_Emit`); the console on the last rack; lit dimmer and blue.
+- **The aisles (south-east):** four gondola runs, a till with its screen on the last.
+- **The hall:** the cyan fountain (a basin, a spout, a sheet of `Water`); the seeker's spot by it.
+- **Cameras:** the ten `SecCam_` empties are unchanged in the layout; each has a white camera on a black arm drawn where it looks from.
+  The agents' six vents are grilles over black.
+- **Doors:** the grocery's glass sliding pair from the other side, unchained (the way in), and the tall blue double door under a green EXIT
+  (`Emergency_Emit_Green`), sealed until every camera is off.
+
+The page-trick spots (`Spot_computer_*`, `Spot_hide_*`, `Spot_agent_*`, `Spot_seeker_1`) are untouched; the screens and the till sit beside
+them, never on them.
+
+- GLB 1.99 MB, 14054 triangles, 36 draw calls; lightmaps `_0` / `_1` / `_2` 2048 / 2048 / 2048 at 20.5 / 30.9 / 41.4 px/m (238 KB / 394 KB / 224 KB).
+- Light: strip rows over the hall and the wings (520 W area lights, 10 m long; the server room's 300 W and blue, the house's warmer), the green EXIT's glow, a cyan light at the fountain. Gain 0.87; capped: Acoustic_Finale 0.543, Cam_White 0.81, Leaf_Blue 0.727, Strip_Housing 0.479, Stripe_Pink 0.761, Till 0.458, Vinyl_Finale 0.371.
+
+| Material | m2 | p50 | p90 | p99 |
+|---|---|---|---|---|
+| Acoustic_Finale | 2149.0 | 0.526 | 0.817 | 0.970 |
+| Vinyl_Finale | 2149.0 | 0.593 | 0.880 | 0.966 |
+| Wall_Navy | 1827.8 | 0.300 | 0.500 | 0.574 |
+| Gondola | 642.2 | 0.126 | 0.397 | 0.710 |
+| Rack_Grille | 308.6 | 0.001 | 0.007 | 0.009 |
+| Rack_Body | 276.8 | 0.000 | 0.050 | 0.078 |
+| Strip_Housing | 109.4 | 0.584 | 0.881 | 0.897 |
+| Cubicle_Panel | 103.0 | 0.423 | 0.534 | 0.575 |
+
+No material is over p90 0.9 or p99 0.98. (The full table is in the gate output; materials with p50 near 0 count faces no one sees: undersides, backs against walls, the leaves' edges in the reveal.)
+
+## Review stills
+
+Cycles, 128 samples adaptive, OIDN, 1920 x 1080 JPEG (comment and APP1 segments stripped), AgX Medium High Contrast, Blender's real lights (not
+the lightmaps). `plan.jpg` in each folder is a top-down view with the ceiling off.
+﻿
+## Checks
+
+For each room: `build_rdwe_greybox.py --check .` (GATES PASS), the layout check from the `.blend` (`check_layout.py`: every collider covered,
+no stray solid art, the markers clear), the axes check (game (x, y, z) = Blender (x, -z, y) = glTF), `world/<scene>.json` identical to the
+greybox's, `node tools/worlddoc.mjs check` (OK, 0 errors; the warnings say the scene and its links are new to the manifest), `glb_inspect`
+within 300 000 triangles and 8 MB, the brightness table, `node --test shared/*.test.js` (297 pass), and a privacy grep over every file
+committed (the `.blend` is saved uncompressed; its one hit is a chance three-byte match inside binary mesh data, not a path).
+
+`tools/blender/check_layout.py` takes floor 1's STRAY change: art may also sit in a collider at its own height (the upper steps of a flight).
+
+## Notes for the coordinator
+
+- Nothing is wired. The layout files are the greybox's, unchanged, so the manifest work is the greybox's notes.
+- The dining room's green lamp is `Lamp_Emit_Green` and its alt set is `lightmap_night` (maps `_2`, `_3`): for the lamp-off beat, dim that
+  material and swap the room to the alt maps; the rest of the room barely changes (the domes are on in both).
+- Unbaked materials are drawn as their colour: `Void`, `Glow_Emit`, `Grid_Emit`, `Amber_Emit`, `Water` (transparent, 0.28) and the toggled ones.
+- `DoorLeaf_arch` in `rdwe_teal2` is an empty (the arch has no leaf); every other leaf is a mesh with its origin at the hinge.
+- Phase B: `rdwe_finale`'s ten `SecCam_` empties are exported to `cameras` exactly as the greybox had them (the build keeps their
+  properties through the privacy scrub); the camera models drawn at them are art only (`Cam_White`, `Cam_Black`). `Screen_Emit` (the
+  monitors, the laptop, the console, the till) and `Server_Emit` (the racks' lights) are unbaked glows the page may switch off when a
+  computer is hacked. `Emergency_Emit_Green` is the green EXIT over the win doors.
+- In `rdwe_repeating_room` the hidden door is a leaf in the wall's own door paper (`Leaf_Lilac`), with no casing; its recess is lit only
+  faintly, so it reads as wall from anywhere but `Spot_view_1`.

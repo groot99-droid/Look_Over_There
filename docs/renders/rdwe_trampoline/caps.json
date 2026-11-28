@@ -1,0 +1,26 @@
+{
+ "gain": 0.187,
+ "wall_materials": [
+  "Pad_Wall"
+ ],
+ "wall_p50_before": 2.404,
+ "target_wall_p50": 0.45,
+ "target_p99": 0.97,
+ "target_p90": 0.88,
+ "factor": {
+  "Bed_Weave": 0.187,
+  "Brass": 0.187,
+  "Column_Band": 0.187,
+  "Concrete_Apron": 0.187,
+  "Edge_Yellow": 0.151,
+  "Marble_Door": 0.187,
+  "Pad_Orange": 0.17,
+  "Pad_Pale": 0.177,
+  "Pad_Wall": 0.187,
+  "Rubber_Black": 0.187,
+  "Truss_Deck": 0.187,
+  "Truss_Steel": 0.187,
+  "Vent_Grille": 0.187,
+  "Wall_Mesh": 0.187
+ }
+}

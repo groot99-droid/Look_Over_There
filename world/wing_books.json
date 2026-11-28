@@ -1,0 +1,1346 @@
+{
+ "scene": "wing_books",
+ "colliders": [
+  {
+   "s": "Front_bookstore",
+   "min": [
+    -7.0,
+    0.0,
+    8.95
+   ],
+   "max": [
+    -6.88,
+    3.2,
+    10.4
+   ]
+  },
+  {
+   "s": "Front_bookstore_2",
+   "min": [
+    -7.0,
+    0.0,
+    5.6
+   ],
+   "max": [
+    -6.88,
+    3.2,
+    7.05
+   ]
+  },
+  {
+   "s": "Front_bookstore_Over",
+   "min": [
+    -7.0,
+    2.4,
+    7.05
+   ],
+   "max": [
+    -6.88,
+    3.2,
+    8.95
+   ]
+  },
+  {
+   "s": "Front_scene_2909",
+   "min": [
+    6.88,
+    0.0,
+    0.52
+   ],
+   "max": [
+    7.0,
+    3.2,
+    2.4
+   ]
+  },
+  {
+   "s": "Front_scene_2909_2",
+   "min": [
+    6.88,
+    0.0,
+    -2.4
+   ],
+   "max": [
+    7.0,
+    3.2,
+    -0.52
+   ]
+  },
+  {
+   "s": "Front_scene_2909_Over",
+   "min": [
+    6.88,
+    2.16,
+    -0.52
+   ],
+   "max": [
+    7.0,
+    3.2,
+    0.52
+   ]
+  },
+  {
+   "s": "Front_service_corridor",
+   "min": [
+    6.88,
+    0.0,
+    -15.48
+   ],
+   "max": [
+    7.0,
+    3.2,
+    -13.6
+   ]
+  },
+  {
+   "s": "Front_service_corridor_2",
+   "min": [
+    6.88,
+    0.0,
+    -18.4
+   ],
+   "max": [
+    7.0,
+    3.2,
+    -16.52
+   ]
+  },
+  {
+   "s": "Front_service_corridor_Over",
+   "min": [
+    6.88,
+    2.16,
+    -16.52
+   ],
+   "max": [
+    7.0,
+    3.2,
+    -15.48
+   ]
+  },
+  {
+   "s": "Hoarding_Face",
+   "min": [
+    -7.0,
+    0.0,
+    -20.0
+   ],
+   "max": [
+    -0.65,
+    3.0,
+    -19.88
+   ]
+  },
+  {
+   "s": "Hoarding_Face_2",
+   "min": [
+    0.65,
+    0.0,
+    -20.0
+   ],
+   "max": [
+    7.0,
+    3.0,
+    -19.88
+   ]
+  },
+  {
+   "s": "Hoarding_Face_Over",
+   "min": [
+    -0.65,
+    2.2,
+    -20.0
+   ],
+   "max": [
+    0.65,
+    3.0,
+    -19.88
+   ]
+  },
+  {
+   "s": "Pilaster",
+   "min": [
+    -7.0,
+    0.0,
+    11.8
+   ],
+   "max": [
+    -6.7,
+    6.0,
+    12.2
+   ]
+  },
+  {
+   "s": "Pilaster_2",
+   "min": [
+    6.7,
+    0.0,
+    11.8
+   ],
+   "max": [
+    7.0,
+    6.0,
+    12.2
+   ]
+  },
+  {
+   "s": "Pilaster_3",
+   "min": [
+    -7.0,
+    0.0,
+    3.8
+   ],
+   "max": [
+    -6.7,
+    6.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Pilaster_4",
+   "min": [
+    6.7,
+    0.0,
+    3.8
+   ],
+   "max": [
+    7.0,
+    6.0,
+    4.2
+   ]
+  },
+  {
+   "s": "Pilaster_5",
+   "min": [
+    -7.0,
+    0.0,
+    -4.2
+   ],
+   "max": [
+    -6.7,
+    6.0,
+    -3.8
+   ]
+  },
+  {
+   "s": "Pilaster_6",
+   "min": [
+    6.7,
+    0.0,
+    -4.2
+   ],
+   "max": [
+    7.0,
+    6.0,
+    -3.8
+   ]
+  },
+  {
+   "s": "Pilaster_7",
+   "min": [
+    -7.0,
+    0.0,
+    -12.2
+   ],
+   "max": [
+    -6.7,
+    6.0,
+    -11.8
+   ]
+  },
+  {
+   "s": "Pilaster_8",
+   "min": [
+    6.7,
+    0.0,
+    -12.2
+   ],
+   "max": [
+    7.0,
+    6.0,
+    -11.8
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Deck",
+   "min": [
+    -6.65,
+    1.94,
+    -19.0
+   ],
+   "max": [
+    -5.5,
+    2.0,
+    -13.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Deck_2",
+   "min": [
+    -6.65,
+    3.94,
+    -19.0
+   ],
+   "max": [
+    -5.5,
+    4.0,
+    -13.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post",
+   "min": [
+    -6.7,
+    0.0,
+    -13.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -12.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post_2",
+   "min": [
+    -5.55,
+    0.0,
+    -13.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -12.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post_3",
+   "min": [
+    -6.7,
+    0.0,
+    -15.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -14.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post_4",
+   "min": [
+    -5.55,
+    0.0,
+    -15.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -14.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post_5",
+   "min": [
+    -6.7,
+    0.0,
+    -17.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -16.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post_6",
+   "min": [
+    -5.55,
+    0.0,
+    -17.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -16.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post_7",
+   "min": [
+    -6.7,
+    0.0,
+    -19.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -18.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Post_8",
+   "min": [
+    -5.55,
+    0.0,
+    -19.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -18.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Rail",
+   "min": [
+    -5.54,
+    2.95,
+    -19.0
+   ],
+   "max": [
+    -5.46,
+    3.0,
+    -13.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_NE_Rail_2",
+   "min": [
+    -5.54,
+    4.95,
+    -19.0
+   ],
+   "max": [
+    -5.46,
+    5.0,
+    -13.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Deck",
+   "min": [
+    -6.65,
+    1.94,
+    -11.0
+   ],
+   "max": [
+    -5.5,
+    2.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Deck_2",
+   "min": [
+    -6.65,
+    3.94,
+    -11.0
+   ],
+   "max": [
+    -5.5,
+    4.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post",
+   "min": [
+    -6.7,
+    0.0,
+    -5.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -4.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post_2",
+   "min": [
+    -5.55,
+    0.0,
+    -5.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -4.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post_3",
+   "min": [
+    -6.7,
+    0.0,
+    -7.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -6.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post_4",
+   "min": [
+    -5.55,
+    0.0,
+    -7.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -6.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post_5",
+   "min": [
+    -6.7,
+    0.0,
+    -9.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -8.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post_6",
+   "min": [
+    -5.55,
+    0.0,
+    -9.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -8.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post_7",
+   "min": [
+    -6.7,
+    0.0,
+    -11.05
+   ],
+   "max": [
+    -6.6,
+    5.0,
+    -10.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Post_8",
+   "min": [
+    -5.55,
+    0.0,
+    -11.05
+   ],
+   "max": [
+    -5.45,
+    5.0,
+    -10.95
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Rail",
+   "min": [
+    -5.54,
+    2.95,
+    -11.0
+   ],
+   "max": [
+    -5.46,
+    3.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_N_Rail_2",
+   "min": [
+    -5.54,
+    4.95,
+    -11.0
+   ],
+   "max": [
+    -5.46,
+    5.0,
+    -5.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Deck",
+   "min": [
+    5.5,
+    1.94,
+    13.0
+   ],
+   "max": [
+    6.65,
+    2.0,
+    19.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Deck_2",
+   "min": [
+    5.5,
+    3.94,
+    13.0
+   ],
+   "max": [
+    6.65,
+    4.0,
+    19.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post",
+   "min": [
+    5.45,
+    0.0,
+    18.95
+   ],
+   "max": [
+    5.55,
+    5.0,
+    19.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post_2",
+   "min": [
+    6.6,
+    0.0,
+    18.95
+   ],
+   "max": [
+    6.7,
+    5.0,
+    19.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post_3",
+   "min": [
+    5.45,
+    0.0,
+    16.95
+   ],
+   "max": [
+    5.55,
+    5.0,
+    17.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post_4",
+   "min": [
+    6.6,
+    0.0,
+    16.95
+   ],
+   "max": [
+    6.7,
+    5.0,
+    17.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post_5",
+   "min": [
+    5.45,
+    0.0,
+    14.95
+   ],
+   "max": [
+    5.55,
+    5.0,
+    15.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post_6",
+   "min": [
+    6.6,
+    0.0,
+    14.95
+   ],
+   "max": [
+    6.7,
+    5.0,
+    15.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post_7",
+   "min": [
+    5.45,
+    0.0,
+    12.95
+   ],
+   "max": [
+    5.55,
+    5.0,
+    13.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Post_8",
+   "min": [
+    6.6,
+    0.0,
+    12.95
+   ],
+   "max": [
+    6.7,
+    5.0,
+    13.05
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Rail",
+   "min": [
+    6.61,
+    2.95,
+    13.0
+   ],
+   "max": [
+    6.69,
+    3.0,
+    19.0
+   ]
+  },
+  {
+   "s": "Scaffold_books_SW_Rail_2",
+   "min": [
+    6.61,
+    4.95,
+    13.0
+   ],
+   "max": [
+    6.69,
+    5.0,
+    19.0
+   ]
+  },
+  {
+   "s": "Sheeted_Bench",
+   "min": [
+    3.6,
+    0.0,
+    11.0
+   ],
+   "max": [
+    4.3,
+    0.55,
+    13.0
+   ]
+  },
+  {
+   "s": "Sheeted_Bench_2",
+   "min": [
+    3.6,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    4.3,
+    0.55,
+    -3.0
+   ]
+  },
+  {
+   "s": "Sheeted_BookCart",
+   "min": [
+    -4.6,
+    0.0,
+    3.0
+   ],
+   "max": [
+    -3.6,
+    1.3,
+    5.0
+   ]
+  },
+  {
+   "s": "Sheeted_Planter",
+   "min": [
+    3.4,
+    0.0,
+    -12.8
+   ],
+   "max": [
+    5.0,
+    1.0,
+    -11.2
+   ]
+  },
+  {
+   "s": "Shutter_N1",
+   "min": [
+    -7.0,
+    0.0,
+    13.6
+   ],
+   "max": [
+    -6.88,
+    3.2,
+    18.4
+   ]
+  },
+  {
+   "s": "Shutter_N3",
+   "min": [
+    -7.0,
+    0.0,
+    -2.4
+   ],
+   "max": [
+    -6.88,
+    3.2,
+    2.4
+   ]
+  },
+  {
+   "s": "Shutter_N4",
+   "min": [
+    -7.0,
+    0.0,
+    -10.4
+   ],
+   "max": [
+    -6.88,
+    3.2,
+    -5.6
+   ]
+  },
+  {
+   "s": "Shutter_N5",
+   "min": [
+    -7.0,
+    0.0,
+    -18.4
+   ],
+   "max": [
+    -6.88,
+    3.2,
+    -13.6
+   ]
+  },
+  {
+   "s": "Shutter_S1",
+   "min": [
+    6.88,
+    0.0,
+    13.6
+   ],
+   "max": [
+    7.0,
+    3.2,
+    18.4
+   ]
+  },
+  {
+   "s": "Shutter_S2",
+   "min": [
+    6.88,
+    0.0,
+    5.6
+   ],
+   "max": [
+    7.0,
+    3.2,
+    10.4
+   ]
+  },
+  {
+   "s": "Shutter_S4",
+   "min": [
+    6.88,
+    0.0,
+    -10.4
+   ],
+   "max": [
+    7.0,
+    3.2,
+    -5.6
+   ]
+  },
+  {
+   "s": "Wing_Ceiling",
+   "min": [
+    -7.2,
+    6.0,
+    -20.2
+   ],
+   "max": [
+    7.2,
+    6.2,
+    20.2
+   ]
+  },
+  {
+   "s": "Wing_Floor",
+   "min": [
+    -7.2,
+    -0.3,
+    -20.2
+   ],
+   "max": [
+    7.2,
+    0.0,
+    20.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_E_1",
+   "min": [
+    -7.0,
+    0.0,
+    -20.2
+   ],
+   "max": [
+    -0.6,
+    6.0,
+    -20.0
+   ]
+  },
+  {
+   "s": "Wing_Wall_E_2",
+   "min": [
+    -0.6,
+    2.16,
+    -20.2
+   ],
+   "max": [
+    0.6,
+    6.0,
+    -20.0
+   ]
+  },
+  {
+   "s": "Wing_Wall_E_3",
+   "min": [
+    0.6,
+    0.0,
+    -20.2
+   ],
+   "max": [
+    7.0,
+    6.0,
+    -20.0
+   ]
+  },
+  {
+   "s": "Wing_Wall_N_1",
+   "min": [
+    -7.2,
+    0.0,
+    8.9
+   ],
+   "max": [
+    -7.0,
+    6.0,
+    20.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_N_2",
+   "min": [
+    -7.2,
+    2.4,
+    7.1
+   ],
+   "max": [
+    -7.0,
+    6.0,
+    8.9
+   ]
+  },
+  {
+   "s": "Wing_Wall_N_3",
+   "min": [
+    -7.2,
+    0.0,
+    -20.2
+   ],
+   "max": [
+    -7.0,
+    6.0,
+    7.1
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_1",
+   "min": [
+    7.0,
+    0.0,
+    0.47
+   ],
+   "max": [
+    7.2,
+    6.0,
+    20.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_2",
+   "min": [
+    7.0,
+    2.16,
+    -0.47
+   ],
+   "max": [
+    7.2,
+    6.0,
+    0.47
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_3",
+   "min": [
+    7.0,
+    0.0,
+    -15.53
+   ],
+   "max": [
+    7.2,
+    6.0,
+    -0.47
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_4",
+   "min": [
+    7.0,
+    2.16,
+    -16.47
+   ],
+   "max": [
+    7.2,
+    6.0,
+    -15.53
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_5",
+   "min": [
+    7.0,
+    0.0,
+    -20.2
+   ],
+   "max": [
+    7.2,
+    6.0,
+    -16.47
+   ]
+  },
+  {
+   "s": "Wing_Wall_W_1",
+   "min": [
+    -7.0,
+    0.0,
+    20.0
+   ],
+   "max": [
+    -1.2,
+    6.0,
+    20.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_W_2",
+   "min": [
+    -1.2,
+    2.6,
+    20.0
+   ],
+   "max": [
+    1.2,
+    6.0,
+    20.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_W_3",
+   "min": [
+    1.2,
+    0.0,
+    20.0
+   ],
+   "max": [
+    7.0,
+    6.0,
+    20.2
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_bookstore_A",
+   "level": "wing_books",
+   "hinge": [
+    -7.0,
+    0.0,
+    8.9
+   ],
+   "width": 0.9,
+   "height": 2.4,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "shop doors"
+  },
+  {
+   "name": "DoorLeaf_bookstore_B",
+   "level": "wing_books",
+   "hinge": [
+    -7.0,
+    0.0,
+    7.1
+   ],
+   "width": 0.9,
+   "height": 2.4,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "shop doors"
+  },
+  {
+   "name": "DoorLeaf_construction",
+   "level": "wing_books",
+   "hinge": [
+    -0.6,
+    0.0,
+    -20.0
+   ],
+   "width": 1.2,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "site door"
+  },
+  {
+   "name": "DoorLeaf_entrance_A",
+   "level": "wing_books",
+   "hinge": [
+    -1.2,
+    0.0,
+    20.0
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "mall doors (glass)"
+  },
+  {
+   "name": "DoorLeaf_entrance_B",
+   "level": "wing_books",
+   "hinge": [
+    1.2,
+    0.0,
+    20.0
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "mall doors (glass)"
+  },
+  {
+   "name": "DoorLeaf_scene_2909",
+   "level": "wing_books",
+   "hinge": [
+    7.0,
+    0.0,
+    -0.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "unmarked door between the shutters"
+  },
+  {
+   "name": "DoorLeaf_service_corridor",
+   "level": "wing_books",
+   "hinge": [
+    7.0,
+    0.0,
+    -16.47
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "staff door"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "wing_books",
+   "level": "wing_books",
+   "kind": "Spawn",
+   "position": [
+    0.0,
+    0.0,
+    18.6
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "bookstore",
+   "at": [
+    -6.4,
+    0.0,
+    8.0
+   ],
+   "arrive": [
+    -5.7,
+    0.0,
+    8.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "construction",
+   "at": [
+    0.0,
+    0.0,
+    -19.4
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -18.7
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "entrance",
+   "at": [
+    0.0,
+    0.0,
+    19.3
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    18.6
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "scene_2909",
+   "at": [
+    6.4,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    5.7,
+    0.0,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "service_corridor",
+   "at": [
+    6.4,
+    0.0,
+    -16.0
+   ],
+   "arrive": [
+    5.7,
+    0.0,
+    -16.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_1",
+   "position": [
+    -4.4,
+    0.0,
+    12.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "role": "dressing",
+   "what": "in a sheet, by the stationery shutter"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_2",
+   "position": [
+    -5.6,
+    0.0,
+    6.4
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "role": "npc",
+   "what": "in the bookstore's doorway, holding a book"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_3",
+   "position": [
+    4.6,
+    0.0,
+    -8.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "role": "monster",
+   "what": "facing the concourse, under the library cafe sign"
+  }
+ ]
+}

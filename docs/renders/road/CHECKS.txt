@@ -1,0 +1,61 @@
+blender (on the render box): tools/blender/dress_overworld.py -- --scene road --samples 512 --render-samples 128
+EXPORT_SCENE road_layout.json: 56 colliders, 0 doors, 0 cameras, 0 markers, 2 links, 0 zones, 6 spots
+GATE export: world/road.json from the dressed .blend EQUALS the greybox's
+PASS  STRAY  51 tall solid mesh(es), each over a collider; 63 decor_* mesh(es) exempt
+PASS  CLEAR  links.forest.arrive (0.00, -476.00): clear within 0.28 m
+PASS  CLEAR  links.forest.at (0.00, -480.90): clear within 0.28 m
+PASS  CLEAR  links.lot.arrive (0.00, -1.50): clear within 0.28 m
+PASS  CLEAR  links.lot.at (0.00, 2.60): clear within 0.28 m
+PASS: 57 of 57 checks passed
+GATE layout check: PASS
+GATES_IN_BLENDER PASS
+CYCLES device: GPU
+BAKE {'samples': 512, 'ao_distance_m': 2.5, 'pages': [{'page': 0, 'size': 2048, 'px_per_m': 9.8, 'ao_p1_p10_p50_p90': [0.023, 0.634, 0.934, 1.0], 'materials': ['Asphalt', 'Grass']}, {'page': 1, 'size': 2048, 'px_per_m': 11.1, 'ao_p1_p10_p50_p90': [0.003, 0.031, 0.792, 1.0], 'materials': ['Bark', 'Concrete', 'Deck', 'Fake_Door', 'Hedge', 'Leaf_Lilac', 'Leaf_Pink', 'Line_Yellow', 'More_To_Come', 'Paint_White', 'Plaster_Blue', 'Plaster_Pink', 'Sign_Forest', 'Sign_Lot', 'Steel']}], 'seconds': 129, 'device': 'GPU'}
+CYCLES device: GPU
+PASS  COVER lines (one per collider, each covered by art within 5 cm): 52
+
+python tools/blender/build_overworld_greybox.py --check .
+GATES PASS
+
+node tools/worlddoc.mjs check world/road.json
+  warning: the scene is 485 m along z: over 60 m, consider splitting it (one scene is loaded at a time)
+  warning: link forest: the manifest has no link from this door yet: a new link to add
+  warning: link lot: the manifest has no link from this door yet: a new link to add
+OK world/road.json: 56 colliders, 0 doors, 0 markers, 2 links, 0 zones, 6 spots, 0 errors, 3 warnings
+
+glb_inspect.py world/road.glb --budget tris=300000,mb=8
+triangles  32079 drawn, in 25 mesh(es), 25 instance(s)
+materials  25: Asphalt, Bark, Concrete, Deck, Fake_Door, Flower_Blue, Flower_Pink, Flower_Stem, Flower_White, Flower_Yellow, Gap_Glow, Grass, Hedge, Lamp_Emit, Leaf_Lilac, Leaf_Pink, Line_Yellow, More_To_Come, Paint_White, Plaster_Blue, Plaster_Pink, Sign_Forest, Sign_Lot, Steel, Window_Lit
+textures   16, images: 1024x1024, 512x512, 512x512, 1024x1024, 256x512, 1024x1024, 512x512, 512x512, 512x512, 1024x160, 512x512, 512x512, 1024x410, 1024x410, 256x256
+bbox       28.0 x 10.6 x 486.9998 (x, y up, z), min [-14.0, -0.3, -482.9998]
+requires   EXT_texture_webp
+pass       tris: 32079 triangles, budget 300000
+pass       mb: 2.94 MB, budget 8
+
+brightness (AO-only: base colour x AO texel, linear, under a white ambient of 1; the page's sun adds on top)
+material                m2           map       k    p50    p90    p99     >=1
+Grass              13916.4        road_0  1.0000  0.427  0.560  0.597   0.00%
+Asphalt             7739.8        road_0  1.0000  0.087  0.105  0.114   0.00%
+Hedge               4537.4        road_1  1.0000  0.225  0.301  0.352   0.00%
+Concrete             637.6        road_1  1.0000  0.446  0.565  0.597   0.00%
+Paint_White          239.6        road_1  1.0000  0.000  0.781  0.781   0.00%
+Leaf_Lilac           207.1        road_1  1.0000  0.744  0.852  0.889   0.00%
+Bark                 206.0        road_1  1.0000  0.222  0.279  0.314   0.00%
+Leaf_Pink            203.4        road_1  1.0000  0.758  0.852  0.889   0.00%
+Plaster_Blue         122.7        road_1  1.0000  0.831  0.863  0.880   0.00%
+Plaster_Pink         122.7        road_1  1.0000  0.768  0.807  0.831   0.00%
+Line_Yellow           40.2        road_1  1.0000  0.000  0.890  0.890   0.00%
+Steel                 33.6        road_1  1.0000  0.487  0.507  0.507   0.00%
+More_To_Come          14.4        road_1  1.0000  0.000  0.855  0.930   0.21%
+Deck                  13.3        road_1  1.0000  0.256  0.487  0.521   0.00%
+Fake_Door             12.2        road_1  1.0000  0.057  0.217  0.246   0.00%
+Sign_Forest            2.4        road_1  1.0000  0.564  0.599  0.617   0.00%
+Sign_Lot               2.4        road_1  1.0000  0.564  0.601  0.617   0.00%
+
+node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over this scene's files, the .blend decompressed
+privacy grep: 34 files, 0 with hits

@@ -1,0 +1,74 @@
+{
+ "0": {
+  "size": 2048,
+  "px_per_m": 50.3,
+  "scale": 0.7319,
+  "knee": 0.3239,
+  "raw_p50_p90_p99_p995_max": [
+   0.197,
+   0.67,
+   1.863,
+   2.873,
+   12.306
+  ],
+  "p50_p90_p99_p995_max": [
+   0.197,
+   0.526,
+   0.693,
+   0.732,
+   0.791
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 53,
+  "materials": [
+   "Carpet_Room",
+   "Ceiling_Popcorn",
+   "Door_Jamb",
+   "Threshold",
+   "Wall_Room"
+  ]
+ },
+ "1": {
+  "size": 2048,
+  "px_per_m": 82.5,
+  "scale": 0.5923,
+  "knee": 0.2384,
+  "raw_p50_p90_p99_p995_max": [
+   0.132,
+   0.543,
+   8.625,
+   33.302,
+   687.535
+  ],
+  "p50_p90_p99_p995_max": [
+   0.132,
+   0.403,
+   0.581,
+   0.592,
+   0.596
+  ],
+  "samples": 1024,
+  "device": "GPU",
+  "seconds": 61,
+  "materials": [
+   "Brass",
+   "Curtain",
+   "Decal_Ceiling",
+   "Decal_Floor",
+   "Gilt",
+   "Grille",
+   "Lamp_Dead",
+   "Leaf_Room",
+   "Picture",
+   "Plastic_Black",
+   "Plastic_White",
+   "Red_Paint",
+   "TV_Plastic",
+   "Trim_Wood",
+   "Upholstery",
+   "Window_Frame",
+   "Window_Void"
+  ]
+ }
+}

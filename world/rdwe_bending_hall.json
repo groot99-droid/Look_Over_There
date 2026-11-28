@@ -1,0 +1,438 @@
+{
+ "scene": "rdwe_bending_hall",
+ "colliders": [
+  {
+   "s": "Beyond_lap",
+   "min": [
+    7.22,
+    -0.05,
+    -10.55
+   ],
+   "max": [
+    8.78,
+    2.25,
+    -10.35
+   ]
+  },
+  {
+   "s": "Beyond_start",
+   "min": [
+    -8.66,
+    -0.05,
+    10.35
+   ],
+   "max": [
+    -7.34,
+    2.39,
+    10.55
+   ]
+  },
+  {
+   "s": "Core",
+   "min": [
+    -6.0,
+    0.0,
+    -6.0
+   ],
+   "max": [
+    6.0,
+    3.0,
+    6.0
+   ]
+  },
+  {
+   "s": "Plant_NE",
+   "min": [
+    9.0,
+    0.0,
+    -9.6
+   ],
+   "max": [
+    9.6,
+    1.3,
+    -9.0
+   ]
+  },
+  {
+   "s": "Plant_NW",
+   "min": [
+    -9.6,
+    0.0,
+    -9.6
+   ],
+   "max": [
+    -9.0,
+    1.3,
+    -9.0
+   ]
+  },
+  {
+   "s": "Plant_SE",
+   "min": [
+    9.0,
+    0.0,
+    9.0
+   ],
+   "max": [
+    9.6,
+    1.3,
+    9.6
+   ]
+  },
+  {
+   "s": "Plant_SW",
+   "min": [
+    -9.6,
+    0.0,
+    9.0
+   ],
+   "max": [
+    -9.0,
+    1.3,
+    9.6
+   ]
+  },
+  {
+   "s": "Radiator_E_1",
+   "min": [
+    9.85,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    10.0,
+    0.62,
+    -2.4
+   ]
+  },
+  {
+   "s": "Radiator_E_2",
+   "min": [
+    9.85,
+    0.0,
+    2.4
+   ],
+   "max": [
+    10.0,
+    0.62,
+    4.0
+   ]
+  },
+  {
+   "s": "Radiator_N_1",
+   "min": [
+    -4.0,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    -2.4,
+    0.62,
+    -9.85
+   ]
+  },
+  {
+   "s": "Radiator_N_2",
+   "min": [
+    2.4,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    4.0,
+    0.62,
+    -9.85
+   ]
+  },
+  {
+   "s": "Radiator_S_1",
+   "min": [
+    -4.0,
+    0.0,
+    9.85
+   ],
+   "max": [
+    -2.4,
+    0.62,
+    10.0
+   ]
+  },
+  {
+   "s": "Radiator_S_2",
+   "min": [
+    2.4,
+    0.0,
+    9.85
+   ],
+   "max": [
+    4.0,
+    0.62,
+    10.0
+   ]
+  },
+  {
+   "s": "Radiator_W_1",
+   "min": [
+    -10.0,
+    0.0,
+    -4.0
+   ],
+   "max": [
+    -9.85,
+    0.62,
+    -2.4
+   ]
+  },
+  {
+   "s": "Radiator_W_2",
+   "min": [
+    -10.0,
+    0.0,
+    2.4
+   ],
+   "max": [
+    -9.85,
+    0.62,
+    4.0
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -10.2,
+    3.0,
+    -10.2
+   ],
+   "max": [
+    10.2,
+    3.2,
+    10.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -10.2,
+    -0.3,
+    -10.2
+   ],
+   "max": [
+    10.2,
+    0.0,
+    10.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    10.0,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    10.2,
+    3.0,
+    10.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -10.2,
+    0.0,
+    -10.2
+   ],
+   "max": [
+    7.45,
+    3.0,
+    -10.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    7.45,
+    2.14,
+    -10.2
+   ],
+   "max": [
+    8.55,
+    3.0,
+    -10.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    8.55,
+    0.0,
+    -10.2
+   ],
+   "max": [
+    10.2,
+    3.0,
+    -10.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -10.2,
+    0.0,
+    10.0
+   ],
+   "max": [
+    -8.43,
+    3.0,
+    10.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    -8.43,
+    2.28,
+    10.0
+   ],
+   "max": [
+    -7.57,
+    3.0,
+    10.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    -7.57,
+    0.0,
+    10.0
+   ],
+   "max": [
+    10.2,
+    3.0,
+    10.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -10.2,
+    0.0,
+    -10.0
+   ],
+   "max": [
+    -10.0,
+    3.0,
+    10.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_lap",
+   "level": "rdwe_bending_hall",
+   "hinge": [
+    7.47,
+    0.0,
+    -10.0
+   ],
+   "width": 1.06,
+   "height": 2.1,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lap",
+   "shows": "on the third lap only",
+   "look": "round-topped cherry red door, brass knob"
+  },
+  {
+   "name": "DoorLeaf_start",
+   "level": "rdwe_bending_hall",
+   "hinge": [
+    -7.59,
+    0.0,
+    10.0
+   ],
+   "width": 0.82,
+   "height": 2.24,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "start",
+   "look": "ledged and braced pink laminate door, no handle"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "lap",
+   "at": [
+    8.0,
+    0.0,
+    -9.25
+   ],
+   "arrive": [
+    8.0,
+    0.0,
+    -8.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "start",
+   "at": [
+    -8.0,
+    0.0,
+    9.25
+   ],
+   "arrive": [
+    -8.0,
+    0.0,
+    8.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "lap",
+   "name": "Spot_lap_1",
+   "position": [
+    -8.0,
+    0.0,
+    0.0
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "count the laps: the door shows on the third"
+  },
+  {
+   "kind": "plaque",
+   "name": "Spot_plaque_1",
+   "position": [
+    8.0,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "the lap plaque: it reads one higher each time you pass"
+  }
+ ]
+}

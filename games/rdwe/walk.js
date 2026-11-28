@@ -13,6 +13,10 @@
 //   start(id, elements, opts)          -> Promise<'reached' | 'skipped' | 'cancelled'>
 //   skip()                             -> ends the current walk as 'skipped'
 //   cancel()                           -> tears the current walk down without resolving as reached
+//   start's opts.via = the door the walker comes in by (a Blender room: blender.js); next() after a 'reached' start says where the walk goes on:
+//                        {room, via} (another room of the game), or null (the game ends: the walker left by a door out of the set, or the story ended)
+//   elements.prompt (optional)         the host's prompt line: a Blender room's ways out are written there ("Press E to open the door")
+//   setCodeRooms(on)                   true: the seven rooms built in code (scenes/*.js) instead of their Blender remakes; default false
 //   start's opts.coop = { peers(), onFrame(pos, yaw) }  (a party room, session 11): peers() lists the other players in this room of the game as {id, x, y, z, yaw, color},
 //                        drawn as plain figures; onFrame is called every simulated tick with the walker's position and heading, for the page to send to the room
 import * as THREE from 'three';
@@ -22,6 +26,7 @@ import { disposeScene } from './build.js';
 import { createPlay } from './play.js';
 import { createPeerFigures } from './peers.js';
 import * as sound from './sound.js';
+import * as blender from './blender.js';
 
 const SCENES = {
   dining: () => import('./scenes/dining.js'),
@@ -35,7 +40,17 @@ const SCENES = {
 
 export function setSound(on) { sound.setEnabled(on); }
 
-export function hasScene(id) { return !!SCENES[id]; }
+// A room is the Blender one (world/rdwe_<room>.glb + .json, games/rdwe/blender.js) wherever one is delivered; the seven code rooms
+// remain for chapters(), and for setCodeRooms(true). The order the code rooms play in is the story (SCENES' order).
+let codeRooms = false;
+export function setCodeRooms(on) { codeRooms = !!on; prepared.clear(); }
+const isBlender = (id) => !(codeRooms && SCENES[id]) && blender.hasRoom(id);
+export function hasScene(id) { return !!SCENES[id] || blender.hasRoom(id); }
+export function blenderRoom(id) { return blender.hasRoom(id) ? blender.ROOMS[id] : null; }
+let nextStep = null;          // where the last 'reached' walk goes on (next())
+let lastLeave = null;         // the door out of the set it was left by, if any (dining's `house`, the finale's `win`): the page may route by it
+export function next() { return nextStep; }
+export function leftBy() { return lastLeave; }
 
 // The chapters, one per room, in the order SCENES registers the rooms. Each scene file holds its
 // own chapter (meta.chapter: clips, track, caption, stamp, log) next to its objective.
@@ -120,26 +135,29 @@ function getRenderer(mount) {
 const prepared = new Map(); // id -> Promise<built scene>
 
 export function prepare(id, elements) {
-  if (!SCENES[id]) return Promise.resolve(null);
+  if (!hasScene(id)) return Promise.resolve(null);
   if (prepared.has(id)) return prepared.get(id);
   const p = (async () => {
     const r = getRenderer(elements.mount);
-    const mod = await SCENES[id]();
-    const built = await mod.build({ quality, yieldFrame, renderer: r });
+    const mod = isBlender(id) ? null : await SCENES[id]();
+    // a Blender room takes the objective of the code room it remakes (its chapter stays in the code room: chapters())
+    const built = mod ? await mod.build({ quality, yieldFrame, renderer: r })
+      : await blender.buildRoom(id, { meta: SCENES[id] ? (await SCENES[id]()).meta : null });
     // The HUD text a walk changes (ctx.setObjective / setArrive) goes on this walk's own
     // copy, so a second lap through the game opens on the room's first words again.
     built.meta = { ...built.meta, start: { ...built.meta.start } };
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(built.background || 0x000000);
     scene.fog = built.fog || null;
-    scene.environment = envTexture;
+    scene.environment = built.environment === false ? null : envTexture;     // a Blender room's light is all baked
     scene.add(built.group);
     scene.add(built.lights);
     built.scene = scene;
     // First upload of every texture and shader while the video is still playing, so the
     // glitch into the room does not stall on compilation.
     const camera = new THREE.PerspectiveCamera(72, 1, 0.05, 80);
-    camera.position.set(built.meta.start.x, EYE_HEIGHT, built.meta.start.z);
+    camera.position.set(built.meta.start.x, EYE_HEIGHT + (built.meta.start.y || 0), built.meta.start.z);
+    r.toneMapping = built.toneMapping !== undefined ? built.toneMapping : THREE.AgXToneMapping;
     r.compile(scene, camera);
     return built;
   })();
@@ -157,6 +175,7 @@ export function active() { return !!current; }
 
 export async function start(id, elements, opts = {}) {
   if (current) current.finish('cancelled');
+  nextStep = null; lastLeave = null;
   const { fade } = elements;
   fade.classList.remove('soft');
   fade.style.opacity = '1';
@@ -166,16 +185,23 @@ export async function start(id, elements, opts = {}) {
   const q = quality;
   const reduced = q.reducedMotion || !!opts.reducedMotion;
   const scene = built.scene;
-  setPlayerScale(opts.scale || 1);
-  const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.05 / (opts.scale || 1), built.far || 80);
+  const scale = built.walkerScale || opts.scale || 1;          // a Blender room is built to the walker: it is not shrunk there
+  setPlayerScale(scale);
+  const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.05 / scale, built.far || 80);
   scene.add(camera);
   r.toneMappingExposure = built.exposure || 1;
+  r.toneMapping = built.toneMapping !== undefined ? built.toneMapping : THREE.AgXToneMapping;
   if (opts.sound !== undefined) sound.setEnabled(!!opts.sound);
   sound.resume();
 
   const controls = createControls(camera, r.domElement, { reducedMotion: reduced });
-  controls.setColliders(built.colliders, built.bounds);
-  controls.setPosition(built.meta.start.x, EYE_HEIGHT, built.meta.start.z);
+  if (built.world) {
+    // a Blender room: 3D boxes, and the walker comes in by the door it was given (or the room's spawn); a fall far below the floor puts it back there
+    const a = built.arrival(opts.via || null);
+    built.meta.start = { ...built.meta.start, ...a };
+    controls.setWorld(built.world, { below: built.floorY - 8, fn: () => { const b = built.arrival(opts.via || null); controls.setPosition(b.x, EYE_HEIGHT + b.y, b.z); } });
+  } else controls.setColliders(built.colliders, built.bounds);
+  controls.setPosition(built.meta.start.x, EYE_HEIGHT + (built.meta.start.y || 0), built.meta.start.z);
   controls.setLook(built.meta.start.yaw || 0, built.meta.start.pitch !== undefined ? built.meta.start.pitch : (window.innerWidth < window.innerHeight ? -0.08 : 0));
   // waking up: start low and stand up over the first moments
   let rise = built.meta.riseFrom !== undefined ? { from: built.meta.riseFrom - EYE_HEIGHT, t: 0 } : null;
@@ -206,7 +232,15 @@ export async function start(id, elements, opts = {}) {
     },
     exiting: false,
     sound, reduced, quality: q, controls,
+    // a Blender room's way out (blender.js): open the door, walk through it, and the walk resolves 'reached' with next() set to where it leads
+    leaveBy(door) {
+      if (state !== 'walk' || !built.leave) return;
+      chosen = door;
+      built.leave(door, camera.position.clone());
+      beginExit();
+    },
   };
+  let chosen = null;          // the door a Blender room is left by (null: the room's story exit, as finish('reached') takes)
 
   // The room's mini game: things to use. "use" is queued and handled inside the tick, so a
   // test stepping the simulation sees exactly what a player would.
@@ -261,6 +295,17 @@ export async function start(id, elements, opts = {}) {
     }
   });
 
+  // elements.prompt (optional, the host's own prompt line): a Blender room's way out, in the host's words ("Press E to open the door")
+  let prompted = null;
+  function showPrompt(t) {
+    const el = elements.prompt, want = t && t.aimless && state === 'walk' ? t : null;
+    if (!el || want === prompted) return;
+    prompted = want;
+    const label = want ? (typeof want.label === 'function' ? want.label() : want.label) : '';
+    el.textContent = !want ? '' : label === 'IT DOES NOT OPEN' ? 'It does not open' : `Press E to ${label.toLowerCase()}`;
+    el.style.display = want ? 'block' : 'none';
+  }
+
   // resize
   function resize() {
     const w = window.innerWidth, h = window.innerHeight;
@@ -310,6 +355,7 @@ export async function start(id, elements, opts = {}) {
     objective.classList.add('near');
     objective.textContent = built.meta.arrive;
     if (play) play.hide();
+    showPrompt(null);
     pendingUse = false;
     ctx.exiting = true;
     const from = camera.position.clone();
@@ -345,6 +391,7 @@ export async function start(id, elements, opts = {}) {
       if (play) {
         play.update(p);
         if (pendingUse) { pendingUse = false; play.use(ctx); play.update(p); }
+        showPrompt(play.pick);
       }
       if (built.trigger && inBox(p, built.trigger)) beginExit();
       else if (built.nearGoal && inBox(p, built.nearGoal)) {
@@ -433,6 +480,7 @@ export async function start(id, elements, opts = {}) {
     hint.classList.remove('visible');
     if (readout) readout.classList.remove('visible');
     if (tally) tally.classList.remove('visible');
+    showPrompt(null);
     if (useButton) {
       useButton.classList.remove('visible');
       useButton.removeEventListener('pointerup', onUsePointerUp);
@@ -446,14 +494,23 @@ export async function start(id, elements, opts = {}) {
     scene.traverse((o) => { if (o.isLight && o.shadow && o.shadow.map) { o.shadow.map.dispose(); o.shadow.map = null; } });   // shadow maps are not covered by disposeScene
     disposeScene(scene);
     fade.style.opacity = result === 'reached' ? '1' : '0';
+    if (result === 'reached' && jumpTo) { nextStep = jumpTo; lastLeave = null; }
+    else if (result === 'reached') {
+      if (built.next) { const n = built.next(chosen); nextStep = n && n.room ? { room: n.room, via: n.via } : null; lastLeave = n && 'leave' in n ? n.leave : null; }
+      else { const ids = Object.keys(SCENES), i = ids.indexOf(id); nextStep = i >= 0 && i + 1 < ids.length ? { room: ids[i + 1], via: null } : null; lastLeave = null; }
+    }
     resolveWalk(result);
   }
 
   // Test hook: press "use" now (the next tick handles it, as for a key press).
   function use() { requestUse(); return sim(1 / 60, 1); }
+  // Test hook: end this room as reached and go on to room `room`, coming in by door `via` (null: its spawn), whatever door was taken
+  let jumpTo = null;
+  function jump(room, via = null) { jumpTo = { room, via }; finish('reached'); }
 
   current = {
-    finish, step, sim, setLoop, use, controls, camera, built, scene, ctx,
+    finish, step, sim, setLoop, use, jump, controls, camera, built, scene, ctx,
+    leaveBy: (door) => ctx.leaveBy(door), get chosen() { return chosen; },
     peerCount: () => figures ? figures.count() : 0, peerPositions: () => figures ? figures.positions() : [],
     get state() { return state; },
     get target() { return play ? play.target : null; },

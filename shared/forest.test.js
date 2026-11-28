@@ -46,14 +46,16 @@ test("nothing solid stands where you arrive, at the doors' fronts or on the way 
   assert.equal(solid(m, ...MEADOW.house.door.at), false, "the house door's spot is reachable"); assert.equal(solid(m, ...MEADOW.shed.door.at), false, "the shed door's spot is reachable");
 });
 
-test("the manifest's links match the layout: the road both ways, the gaps both ways, and the house's door (solo only)", () => {
-  const into = REGISTRY.linkFrom("parking_lot", "forest_road"), back = REGISTRY.linkFrom("forest", "road_back");
+test("the manifest's links match the layout: the road both ways, the gaps both ways, and the house's door (a room can follow it)", () => {
+  // since the Overworld's road (#115): the lot's signpost walks onto the road, the road's far end walks into the forest, and the forest's signpost back walks to the road's forest end
+  const lot = REGISTRY.linkFrom("parking_lot", "forest_road"), into = REGISTRY.linkFrom("road", "forest"), back = REGISTRY.linkFrom("forest", "road_back"), home = REGISTRY.linkFrom("road", "lot");
+  assert.equal(lot.to.scene, "road"); assert.equal(back.to.scene, "road"); assert.equal(home.to.scene, "parking_lot");
   assert.deepEqual(into.to.arrive, FOREST.arrive); assert.deepEqual(into.to.face, FOREST.face);
-  assert.equal(back.to.scene, "parking_lot"); assert.ok(Math.hypot(back.to.arrive[0] - FOREST_ROAD_LOT.at[0], back.to.arrive[2] - FOREST_ROAD_LOT.at[1]) < FOREST_ROAD_LOT.reach + 1);
+  assert.ok(Math.hypot(home.to.arrive[0] - FOREST_ROAD_LOT.at[0], home.to.arrive[2] - FOREST_ROAD_LOT.at[1]) < FOREST_ROAD_LOT.reach + 1, "the road's lot end comes back by the signpost");
   const on = REGISTRY.linkFrom("forest", "gap"), off = REGISTRY.linkFrom("meadow", "gap");
   assert.deepEqual(on.to.arrive, MEADOW.arrive); assert.deepEqual(off.to.arrive, FOREST.fromMeadow.arrive); assert.deepEqual(off.to.face, FOREST.fromMeadow.face);
   const house = REGISTRY.linkFrom("meadow", "house_door");
-  assert.equal(house.soloOnly, true); assert.equal(house.to.area, "rdwe");
+  assert.ok(!house.soloOnly, "the owner, 2026-11-27: the meadow house is the co-op way in"); assert.equal(house.to.area, "rdwe");
   assert.deepEqual(house.returnTo.arrive, MEADOW.returnHouse.arrive); assert.deepEqual(house.returnTo.face, MEADOW.returnHouse.face);
   assert.equal(REGISTRY.linkFrom("meadow", "shed"), undefined, "the shed is still a planned link");
 });

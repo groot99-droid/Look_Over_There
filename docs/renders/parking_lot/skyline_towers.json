@@ -1,0 +1,418 @@
+[
+ {
+  "tower": 1,
+  "stood": [
+   177.2,
+   -18.1
+  ],
+  "height_m": 92.2,
+  "faces": 1668,
+  "now": [
+   -91.9,
+   372.8
+  ],
+  "bearing_from_bus": 188.0,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 32.3
+ },
+ {
+  "tower": 2,
+  "stood": [
+   -4.4,
+   59.4
+  ],
+  "height_m": 91.0,
+  "faces": 1596,
+  "now": [
+   -72.8,
+   374.9
+  ],
+  "bearing_from_bus": 184.7,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 31.9
+ },
+ {
+  "tower": 3,
+  "stood": [
+   213.3,
+   86.9
+  ],
+  "height_m": 86.2,
+  "faces": 3422,
+  "now": [
+   -110.9,
+   369.6
+  ],
+  "bearing_from_bus": 191.3,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 30.2
+ },
+ {
+  "tower": 4,
+  "stood": [
+   147.9,
+   -22.5
+  ],
+  "height_m": 85.6,
+  "faces": 3294,
+  "now": [
+   -53.7,
+   375.9
+  ],
+  "bearing_from_bus": 181.3,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 30.0
+ },
+ {
+  "tower": 5,
+  "stood": [
+   130.8,
+   -30.0
+  ],
+  "height_m": 82.5,
+  "faces": 1170,
+  "now": [
+   -129.6,
+   365.2
+  ],
+  "bearing_from_bus": 194.7,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 28.9
+ },
+ {
+  "tower": 6,
+  "stood": [
+   43.8,
+   148.8
+  ],
+  "height_m": 79.2,
+  "faces": 1380,
+  "now": [
+   -34.5,
+   375.8
+  ],
+  "bearing_from_bus": 178.0,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 27.7
+ },
+ {
+  "tower": 7,
+  "stood": [
+   38.2,
+   -5.3
+  ],
+  "height_m": 78.2,
+  "faces": 2964,
+  "now": [
+   -148.0,
+   359.8
+  ],
+  "bearing_from_bus": 198.0,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 27.4
+ },
+ {
+  "tower": 8,
+  "stood": [
+   26.1,
+   17.0
+  ],
+  "height_m": 75.0,
+  "faces": 2388,
+  "now": [
+   -15.3,
+   374.6
+  ],
+  "bearing_from_bus": 174.7,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 26.2
+ },
+ {
+  "tower": 9,
+  "stood": [
+   195.5,
+   125.2
+  ],
+  "height_m": 68.3,
+  "faces": 1706,
+  "now": [
+   -166.1,
+   353.4
+  ],
+  "bearing_from_bus": 201.3,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 23.9
+ },
+ {
+  "tower": 10,
+  "stood": [
+   100.7,
+   -26.8
+  ],
+  "height_m": 67.0,
+  "faces": 2714,
+  "now": [
+   3.7,
+   372.2
+  ],
+  "bearing_from_bus": 171.3,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 23.5
+ },
+ {
+  "tower": 11,
+  "stood": [
+   223.3,
+   101.7
+  ],
+  "height_m": 66.6,
+  "faces": 1546,
+  "now": [
+   -183.7,
+   345.9
+  ],
+  "bearing_from_bus": 204.7,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 23.3
+ },
+ {
+  "tower": 12,
+  "stood": [
+   228.4,
+   58.1
+  ],
+  "height_m": 65.2,
+  "faces": 2630,
+  "now": [
+   22.6,
+   368.8
+  ],
+  "bearing_from_bus": 168.0,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 22.8
+ },
+ {
+  "tower": 13,
+  "stood": [
+   75.8,
+   146.2
+  ],
+  "height_m": 65.0,
+  "faces": 1932,
+  "now": [
+   -200.9,
+   337.4
+  ],
+  "bearing_from_bus": 208.0,
+  "distance_from_bus_m": 330.0,
+  "height_now_m": 22.8
+ },
+ {
+  "tower": 14,
+  "stood": [
+   10.4,
+   105.0
+  ],
+  "height_m": 58.8,
+  "faces": 1692,
+  "now": [
+   -97.7,
+   353.7
+  ],
+  "bearing_from_bus": 189.5,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 20.6
+ },
+ {
+  "tower": 15,
+  "stood": [
+   188.6,
+   -0.6
+  ],
+  "height_m": 57.5,
+  "faces": 1692,
+  "now": [
+   -79.7,
+   356.2
+  ],
+  "bearing_from_bus": 186.2,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 20.1
+ },
+ {
+  "tower": 16,
+  "stood": [
+   17.5,
+   38.5
+  ],
+  "height_m": 55.6,
+  "faces": 948,
+  "now": [
+   -115.5,
+   350.2
+  ],
+  "bearing_from_bus": 192.9,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 19.5
+ },
+ {
+  "tower": 17,
+  "stood": [
+   224.8,
+   42.2
+  ],
+  "height_m": 55.0,
+  "faces": 634,
+  "now": [
+   -61.6,
+   357.6
+  ],
+  "bearing_from_bus": 182.9,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 19.2
+ },
+ {
+  "tower": 18,
+  "stood": [
+   81.8,
+   -25.2
+  ],
+  "height_m": 54.2,
+  "faces": 1344,
+  "now": [
+   -133.1,
+   345.6
+  ],
+  "bearing_from_bus": 196.2,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 19.0
+ },
+ {
+  "tower": 19,
+  "stood": [
+   178.9,
+   133.4
+  ],
+  "height_m": 52.5,
+  "faces": 1414,
+  "now": [
+   -43.5,
+   358.0
+  ],
+  "bearing_from_bus": 179.5,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 18.4
+ },
+ {
+  "tower": 20,
+  "stood": [
+   11.2,
+   80.3
+  ],
+  "height_m": 51.5,
+  "faces": 876,
+  "now": [
+   -150.3,
+   340.0
+  ],
+  "bearing_from_bus": 199.5,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 18.0
+ },
+ {
+  "tower": 21,
+  "stood": [
+   51.9,
+   122.3
+  ],
+  "height_m": 51.0,
+  "faces": 1164,
+  "now": [
+   -25.4,
+   357.3
+  ],
+  "bearing_from_bus": 176.2,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 17.9
+ },
+ {
+  "tower": 22,
+  "stood": [
+   220.7,
+   16.0
+  ],
+  "height_m": 47.8,
+  "faces": 1068,
+  "now": [
+   -167.3,
+   333.5
+  ],
+  "bearing_from_bus": 202.9,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 16.7
+ },
+ {
+  "tower": 23,
+  "stood": [
+   103.5,
+   164.5
+  ],
+  "height_m": 45.8,
+  "faces": 1332,
+  "now": [
+   -7.3,
+   355.6
+  ],
+  "bearing_from_bus": 172.9,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 16.0
+ },
+ {
+  "tower": 24,
+  "stood": [
+   150.0,
+   151.0
+  ],
+  "height_m": 45.0,
+  "faces": 1978,
+  "now": [
+   -183.8,
+   325.9
+  ],
+  "bearing_from_bus": 206.2,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 15.8
+ },
+ {
+  "tower": 25,
+  "stood": [
+   136.2,
+   159.5
+  ],
+  "height_m": 41.1,
+  "faces": 830,
+  "now": [
+   10.7,
+   352.8
+  ],
+  "bearing_from_bus": 169.5,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 14.4
+ },
+ {
+  "tower": 26,
+  "stood": [
+   64.8,
+   -13.0
+  ],
+  "height_m": 40.1,
+  "faces": 730,
+  "now": [
+   -199.8,
+   317.4
+  ],
+  "bearing_from_bus": 209.5,
+  "distance_from_bus_m": 312.0,
+  "height_now_m": 14.0
+ }
+]

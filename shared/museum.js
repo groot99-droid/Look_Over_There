@@ -11,7 +11,20 @@ export const MUSEUM = {
   door: {at: [0, 5.3], reach: 1.8},
   plinth: 0.45,                                         // half-width of a plinth (0.9 m square, 0.6 m high)
   homes: [[-4.4, -1], [4.4, -1], [-4.4, -7], [4.4, -7], [-4.4, -13], [4.4, -13]],
-  names: ["THE SWIMMER", "WOMAN WITH A JUG", "THE ORATOR", "BOY AND GOOSE", "THE WATCHER", "UNKNOWN FIGURE"],
+  wing: {z: -10, w: 1.8, top: {w: 2.6, e: 2.1}},       // the doorways to galleries_wing: Doric (west, leaves 2.6 m) and arched (east, leaves 2.1 m)
+  // the six statues are warriors (the owner, 2026-11-26: "Those warriors and the T. rex should be in the main museum hall instead of those faceless people"), in homes order
+  names: ["THE PHARAOH", "THE VIKING", "THE TERRACOTTA WARRIOR", "THE KNIGHT", "THE SAMURAI", "THE ROMAN"],
+  // their models (models/characters/, PR #78) and the scale each is drawn at so it stands 1.75 m tall, as in the bake's shadows (docs/renders/galleries/README.md)
+  models: [["warrior_egyptian_pharaoh", 4.105], ["warrior_viking_raider", 3.952], ["warrior_qin_terracotta", 3.858], ["warrior_medieval_knight", 3.440], ["warrior_japanese_samurai", 3.545], ["warrior_roman_legionary", 3.483]],
+  // the fixed exhibits built into world/galleries.glb (build_galleries.py): solid, never moving; each a pedestal and the figure's box above it
+  exhibits: [
+    {s: "Exhibit_Mongol", min: [2.316, 0.6, 4.557], max: [3.184, 2.35, 5.243]},
+    {s: "Exhibit_Mongol_Plinth", min: [2.3, 0, 4.45], max: [3.2, 0.6, 5.35]},
+    {s: "Exhibit_Redcoat", min: [-3.044, 0.6, 4.685], max: [-2.456, 2.35, 5.115]},
+    {s: "Exhibit_Redcoat_Plinth", min: [-3.2, 0, 4.45], max: [-2.3, 0.6, 5.35]},
+    {s: "TRex_Platform", min: [-3.7, 0, -19.6], max: [3.7, 0.3, -15.6]},
+    {s: "TRex_Skeleton", min: [-3.367, 0.3, -18.363], max: [3.188, 2.319, -16.81]},
+  ],
 };
 export const MUSEUM_FRONT = {arrive: [6.2, 0, -41], face: [-1, 0]};      // where you stand on the street when you come out (108's door is on the east side at z = -41)
 export const MOVE_S = 9, STEP_M = 1.0, MAX_OFF = 3, FIX_REACH = 1.6;
@@ -51,9 +64,18 @@ export function museumColliders() {
   const c = [], add = (s, min, max) => c.push({s, min, max}), [hx, hz] = MUSEUM.half, cz = MUSEUM.cz, h = MUSEUM.h, t = 0.2, p = MUSEUM.plinth;
   add("Floor_Museum", [-hx - t, -1, cz - hz - t], [hx + t, 0, cz + hz + t]); add("Ceiling_Museum", [-hx - t, h, cz - hz - t], [hx + t, h + t, cz + hz + t]);
   add("Wall_N", [-hx - t, 0, cz - hz - t], [hx + t, h, cz - hz]); add("Wall_S", [-hx - t, 0, cz + hz], [hx + t, h, cz + hz + t]);
-  add("Wall_W", [-hx - t, 0, cz - hz], [-hx, h, cz + hz]); add("Wall_E", [hx, 0, cz - hz], [hx + t, h, cz + hz]);
+  // the wing's two doorways (scene galleries_wing): 1.8 m wide at z = -10, each long wall split into the piece south of it, the piece north (_N) and the head (_Head)
+  const side = (s, x0, x1, top) => { const [z0, z1] = [MUSEUM.wing.z - MUSEUM.wing.w / 2, MUSEUM.wing.z + MUSEUM.wing.w / 2];
+    add(s, [x0, 0, z1], [x1, h, cz + hz]); add(s + "_N", [x0, 0, cz - hz], [x1, h, z0]); add(s + "_Head", [x0, top, z0], [x1, h, z1]); };
+  side("Wall_W", -hx - t, -hx, MUSEUM.wing.top.w); side("Wall_E", hx, hx + t, MUSEUM.wing.top.e);
   MUSEUM.homes.forEach(([x, z], i) => add("Plinth_" + i, [x - p, 0, z - p], [x + p, 0.6, z + p]));
+  MUSEUM.exhibits.forEach(e => add(e.s, e.min, e.max));
   return c;
 }
-export const museumDoc = () => ({scene: "galleries", colliders: museumColliders(), doors: [], cameras: [],
+// the wing doorways' four closed leaves (build_galleries.py writes the same): hinge at each jamb, 0.896 m wide, swinging into the hall
+const leaf = (name, x, z, height, yaw, swing) => ({name, level: "galleries", hinge: [x, 0, z], width: 0.896, height, closed_yaw_deg: yaw, swing_deg: swing, state: "closed"});
+export const museumDoors = () => { const {z, w, top} = MUSEUM.wing, [z0, z1] = [z - w / 2, z + w / 2], hx = MUSEUM.half[0];
+  return [leaf("DoorLeaf_wing_e_A", hx, z0, top.e, -90, -95), leaf("DoorLeaf_wing_e_B", hx, z1, top.e, 90, 95),
+          leaf("DoorLeaf_wing_w_A", -hx, z0, top.w, -90, 95), leaf("DoorLeaf_wing_w_B", -hx, z1, top.w, 90, -95)]; };
+export const museumDoc = () => ({scene: "galleries", colliders: museumColliders(), doors: museumDoors(), cameras: [],
   markers: [{name: "Spawn_door", kind: "Spawn", level: "galleries", position: MUSEUM.arrive}]});

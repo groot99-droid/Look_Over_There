@@ -1,0 +1,463 @@
+{
+ "scene": "B1",
+ "pages": {
+  "0": {
+   "size": 2048,
+   "px_per_m": 29.0,
+   "m2": 3136.1,
+   "m2_outside": 38.4,
+   "margin_px": 8,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_stains": [
+     0.0209,
+     0.4103,
+     0.5171,
+     0.5623
+    ],
+    "M_Door": [
+     0.2431,
+     0.5475,
+     0.6779,
+     0.6862
+    ],
+    "M_D_floor_B1": [
+     0.0968,
+     0.1223,
+     0.1425,
+     0.1807
+    ],
+    "M_Pipes": [
+     0.2054,
+     0.8997,
+     4.3289,
+     4.4688
+    ],
+    "M_D_floor_L1": [
+     0.0101,
+     0.3078,
+     0.3281,
+     0.3307
+    ]
+   },
+   "scale": 0.79526,
+   "seconds": 29,
+   "texel_p50_p90_p99_p995_max": [
+    0.102,
+    0.199,
+    1.0848,
+    2.042,
+    6.8917
+   ]
+  },
+  "1": {
+   "size": 2048,
+   "px_per_m": 19.0,
+   "m2": 9785.2,
+   "m2_outside": 5267.4,
+   "margin_px": 4,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_ceil_B1": [
+     0.1527,
+     0.2011,
+     0.2294,
+     0.2407
+    ],
+    "M_D_trim": [
+     0.0004,
+     0.1122,
+     0.2312,
+     0.2702
+    ],
+    "M_D_ceil_L1": [
+     0.0468,
+     0.211,
+     13.6802,
+     13.8994
+    ]
+   },
+   "scale": 0.24945,
+   "seconds": 20,
+   "texel_p50_p90_p99_p995_max": [
+    0.0546,
+    0.1909,
+    0.2659,
+    0.3143,
+    14.2347
+   ]
+  },
+  "2": {
+   "size": 2048,
+   "px_per_m": 12.6,
+   "m2": 7287.5,
+   "m2_outside": 640.6,
+   "margin_px": 8,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_wall_B1": [
+     0.2319,
+     0.3909,
+     0.4676,
+     0.4827
+    ],
+    "M_D_wall_L1": [
+     0.0703,
+     0.3157,
+     0.5227,
+     0.9196
+    ]
+   },
+   "scale": 0.48463,
+   "seconds": 25,
+   "texel_p50_p90_p99_p995_max": [
+    0.143,
+    0.3653,
+    0.4547,
+    0.4713,
+    1.7793
+   ]
+  },
+  "3": {
+   "size": 2048,
+   "px_per_m": 24.1,
+   "m2": 1701.9,
+   "m2_outside": 0.3,
+   "margin_px": 4,
+   "material_texels_p50_p90_p99_p995": {
+    "M_D_frame": [
+     0.0691,
+     0.34,
+     0.4238,
+     0.4429
+    ],
+    "M_X_red": [
+     0.1375,
+     0.4994,
+     0.6098,
+     0.6329
+    ],
+    "M_X_white": [
+     0.1476,
+     0.5054,
+     0.6122,
+     0.6305
+    ],
+    "M_X_blue": [
+     0.1441,
+     0.5074,
+     0.6171,
+     0.6296
+    ],
+    "M_X_rope": [
+     0.0,
+     0.1388,
+     0.4632,
+     0.4895
+    ],
+    "M_X_chrome": [
+     0.0,
+     0.234,
+     0.3789,
+     0.4121
+    ],
+    "M_X_steel": [
+     0.1239,
+     0.1722,
+     0.1944,
+     0.2017
+    ],
+    "M_X_dark": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "M_D_toy_red": [
+     0.2349,
+     0.5156,
+     0.6552,
+     0.7748
+    ],
+    "M_D_toy_white": [
+     0.2683,
+     0.572,
+     0.7446,
+     0.7505
+    ],
+    "M_D_toy_blue": [
+     0.2057,
+     0.5496,
+     0.6296,
+     0.65
+    ],
+    "fire_hydrant": [
+     0.0289,
+     0.2458,
+     0.4592,
+     0.4703
+    ],
+    "fire_hydrant_aged": [
+     0.0315,
+     0.223,
+     0.4465,
+     0.4694
+    ],
+    "korean_fire_extinguisher_01_body": [
+     0.1936,
+     0.3553,
+     0.4122,
+     0.4307
+    ],
+    "life_jacket": [
+     0.1603,
+     0.4591,
+     0.5409,
+     0.5516
+    ],
+    "lifebuoy": [
+     0.1221,
+     0.4075,
+     0.5563,
+     0.5676
+    ],
+    "metal_stool_01": [
+     0.0801,
+     0.3581,
+     0.4573,
+     0.4722
+    ],
+    "metal_trash_can": [
+     0.0476,
+     0.2476,
+     0.3333,
+     0.3511
+    ],
+    "metal_trash_can_rust": [
+     0.0419,
+     0.2456,
+     0.3367,
+     0.3457
+    ],
+    "metal_trash_can_rust.001": [
+     0.0257,
+     0.261,
+     0.3511,
+     0.3582
+    ],
+    "M_D_toy_green": [
+     0.0201,
+     0.398,
+     0.5563,
+     0.5607
+    ],
+    "M_D_toy_orange": [
+     0.0,
+     0.5518,
+     0.6221,
+     0.6221
+    ],
+    "M_D_toy_pink": [
+     0.1591,
+     0.5199,
+     0.6074,
+     0.6196
+    ],
+    "plastic_monobloc_chair_01": [
+     0.0809,
+     0.4688,
+     0.5431,
+     0.5453
+    ],
+    "M_D_toy_yellow": [
+     0.2838,
+     0.5607,
+     0.5978,
+     0.6137
+    ],
+    "WetFloorSign_01": [
+     0.0845,
+     0.3718,
+     0.4501,
+     0.4781
+    ],
+    "M_Fixture_Housing": [
+     0.1101,
+     12.9047,
+     14.3093,
+     14.6546
+    ],
+    "M_Fluorescent_Dead": [
+     0.0283,
+     0.1017,
+     0.1253,
+     0.1296
+    ]
+   },
+   "scale": 0.54309,
+   "seconds": 74,
+   "texel_p50_p90_p99_p995_max": [
+    0.1205,
+    0.4895,
+    13.1115,
+    13.7519,
+    17.1793
+   ]
+  }
+ },
+ "materials": {
+  "M_D_ceil_B1": {
+   "index": 4,
+   "page": 1
+  },
+  "M_D_frame": {
+   "index": 5,
+   "page": 3
+  },
+  "M_D_stains": {
+   "index": 6,
+   "page": 0
+  },
+  "M_D_trim": {
+   "index": 7,
+   "page": 1
+  },
+  "M_Door": {
+   "index": 8,
+   "page": 0
+  },
+  "M_X_red": {
+   "index": 10,
+   "page": 3
+  },
+  "M_X_white": {
+   "index": 11,
+   "page": 3
+  },
+  "M_X_blue": {
+   "index": 12,
+   "page": 3
+  },
+  "M_X_rope": {
+   "index": 13,
+   "page": 3
+  },
+  "M_X_chrome": {
+   "index": 14,
+   "page": 3
+  },
+  "M_X_steel": {
+   "index": 15,
+   "page": 3
+  },
+  "M_X_dark": {
+   "index": 16,
+   "page": 3
+  },
+  "M_D_toy_red": {
+   "index": 17,
+   "page": 3
+  },
+  "M_D_toy_white": {
+   "index": 18,
+   "page": 3
+  },
+  "M_D_toy_blue": {
+   "index": 19,
+   "page": 3
+  },
+  "fire_hydrant": {
+   "index": 21,
+   "page": 3
+  },
+  "fire_hydrant_aged": {
+   "index": 22,
+   "page": 3
+  },
+  "korean_fire_extinguisher_01_body": {
+   "index": 23,
+   "page": 3
+  },
+  "life_jacket": {
+   "index": 26,
+   "page": 3
+  },
+  "lifebuoy": {
+   "index": 27,
+   "page": 3
+  },
+  "metal_stool_01": {
+   "index": 28,
+   "page": 3
+  },
+  "metal_trash_can": {
+   "index": 29,
+   "page": 3
+  },
+  "metal_trash_can_rust": {
+   "index": 30,
+   "page": 3
+  },
+  "metal_trash_can_rust.001": {
+   "index": 31,
+   "page": 3
+  },
+  "M_D_toy_green": {
+   "index": 32,
+   "page": 3
+  },
+  "M_D_toy_orange": {
+   "index": 33,
+   "page": 3
+  },
+  "M_D_toy_pink": {
+   "index": 34,
+   "page": 3
+  },
+  "plastic_monobloc_chair_01": {
+   "index": 35,
+   "page": 3
+  },
+  "M_D_toy_yellow": {
+   "index": 36,
+   "page": 3
+  },
+  "WetFloorSign_01": {
+   "index": 39,
+   "page": 3
+  },
+  "M_D_floor_B1": {
+   "index": 40,
+   "page": 0
+  },
+  "M_D_wall_B1": {
+   "index": 41,
+   "page": 2
+  },
+  "M_Fixture_Housing": {
+   "index": 42,
+   "page": 3
+  },
+  "M_Fluorescent_Dead": {
+   "index": 44,
+   "page": 3
+  },
+  "M_Pipes": {
+   "index": 45,
+   "page": 0
+  },
+  "M_D_ceil_L1": {
+   "index": 47,
+   "page": 1
+  },
+  "M_D_floor_L1": {
+   "index": 48,
+   "page": 0
+  },
+  "M_D_wall_L1": {
+   "index": 49,
+   "page": 2
+  }
+ },
+ "samples": 512,
+ "lights": [],
+ "seconds": 179,
+ "device": "GPU"
+}

@@ -1,0 +1,2490 @@
+{
+ "scene": "gbi_L2_2",
+ "colliders": [
+  {
+   "s": "Boxes_1",
+   "min": [
+    -13.8,
+    3.2,
+    -18.6
+   ],
+   "max": [
+    -12.2,
+    4.1,
+    -17.4
+   ]
+  },
+  {
+   "s": "Boxes_2",
+   "min": [
+    3.55,
+    3.2,
+    -14.6
+   ],
+   "max": [
+    5.15,
+    4.1,
+    -13.4
+   ]
+  },
+  {
+   "s": "Boxes_3",
+   "min": [
+    20.95,
+    3.2,
+    -4.6
+   ],
+   "max": [
+    22.55,
+    4.1,
+    -3.4
+   ]
+  },
+  {
+   "s": "Boxes_4",
+   "min": [
+    -22.55,
+    3.2,
+    3.4
+   ],
+   "max": [
+    -20.95,
+    4.1,
+    4.6
+   ]
+  },
+  {
+   "s": "Boxes_5",
+   "min": [
+    12.25,
+    3.2,
+    3.9
+   ],
+   "max": [
+    13.85,
+    4.1,
+    5.1
+   ]
+  },
+  {
+   "s": "Ceiling",
+   "min": [
+    -26.3,
+    6.2,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    6.4,
+    27.35
+   ]
+  },
+  {
+   "s": "Floor",
+   "min": [
+    -26.3,
+    3.0,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    3.2,
+    27.35
+   ]
+  },
+  {
+   "s": "Grid_X_0_1",
+   "min": [
+    -26.1,
+    3.2,
+    -0.1
+   ],
+   "max": [
+    -22.25,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_10",
+   "min": [
+    13.55,
+    3.2,
+    -0.1
+   ],
+   "max": [
+    20.95,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_11",
+   "min": [
+    22.55,
+    3.2,
+    -0.1
+   ],
+   "max": [
+    26.1,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_2",
+   "min": [
+    -22.25,
+    5.4,
+    -0.1
+   ],
+   "max": [
+    -21.25,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_3",
+   "min": [
+    -21.25,
+    3.2,
+    -0.1
+   ],
+   "max": [
+    -13.85,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_4",
+   "min": [
+    -12.25,
+    3.2,
+    -0.1
+   ],
+   "max": [
+    -4.85,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_5",
+   "min": [
+    -4.85,
+    5.4,
+    -0.1
+   ],
+   "max": [
+    -3.85,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_6",
+   "min": [
+    -3.85,
+    3.2,
+    -0.1
+   ],
+   "max": [
+    3.85,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_7",
+   "min": [
+    3.85,
+    5.4,
+    -0.1
+   ],
+   "max": [
+    4.85,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_8",
+   "min": [
+    4.85,
+    3.2,
+    -0.1
+   ],
+   "max": [
+    12.55,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_0_9",
+   "min": [
+    12.55,
+    5.4,
+    -0.1
+   ],
+   "max": [
+    13.55,
+    6.2,
+    0.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_1",
+   "min": [
+    -26.1,
+    3.2,
+    7.9
+   ],
+   "max": [
+    -22.25,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_10",
+   "min": [
+    13.55,
+    3.2,
+    7.9
+   ],
+   "max": [
+    21.25,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_11",
+   "min": [
+    21.25,
+    5.4,
+    7.9
+   ],
+   "max": [
+    22.25,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_12",
+   "min": [
+    22.25,
+    3.2,
+    7.9
+   ],
+   "max": [
+    26.1,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_2",
+   "min": [
+    -22.25,
+    5.4,
+    7.9
+   ],
+   "max": [
+    -21.25,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_3",
+   "min": [
+    -21.25,
+    3.2,
+    7.9
+   ],
+   "max": [
+    -13.55,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_4",
+   "min": [
+    -13.55,
+    5.4,
+    7.9
+   ],
+   "max": [
+    -12.55,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_5",
+   "min": [
+    -12.55,
+    3.2,
+    7.9
+   ],
+   "max": [
+    -4.85,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_6",
+   "min": [
+    -4.85,
+    5.4,
+    7.9
+   ],
+   "max": [
+    -3.85,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_7",
+   "min": [
+    -3.85,
+    3.2,
+    7.9
+   ],
+   "max": [
+    3.55,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_8",
+   "min": [
+    5.15,
+    3.2,
+    7.9
+   ],
+   "max": [
+    12.55,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_8_9",
+   "min": [
+    12.55,
+    5.4,
+    7.9
+   ],
+   "max": [
+    13.55,
+    6.2,
+    8.1
+   ]
+  },
+  {
+   "s": "Grid_X_m8_1",
+   "min": [
+    -26.1,
+    3.2,
+    -8.1
+   ],
+   "max": [
+    -22.25,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_10",
+   "min": [
+    13.55,
+    3.2,
+    -8.1
+   ],
+   "max": [
+    21.25,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_11",
+   "min": [
+    21.25,
+    5.4,
+    -8.1
+   ],
+   "max": [
+    22.25,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_12",
+   "min": [
+    22.25,
+    3.2,
+    -8.1
+   ],
+   "max": [
+    26.1,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_2",
+   "min": [
+    -22.25,
+    5.4,
+    -8.1
+   ],
+   "max": [
+    -21.25,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_3",
+   "min": [
+    -21.25,
+    3.2,
+    -8.1
+   ],
+   "max": [
+    -13.55,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_4",
+   "min": [
+    -13.55,
+    5.4,
+    -8.1
+   ],
+   "max": [
+    -12.55,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_5",
+   "min": [
+    -12.55,
+    3.2,
+    -8.1
+   ],
+   "max": [
+    -4.85,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_6",
+   "min": [
+    -4.85,
+    5.4,
+    -8.1
+   ],
+   "max": [
+    -3.85,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_7",
+   "min": [
+    -3.85,
+    3.2,
+    -8.1
+   ],
+   "max": [
+    3.55,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_8",
+   "min": [
+    5.15,
+    3.2,
+    -8.1
+   ],
+   "max": [
+    12.55,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_X_m8_9",
+   "min": [
+    12.55,
+    5.4,
+    -8.1
+   ],
+   "max": [
+    13.55,
+    6.2,
+    -7.9
+   ]
+  },
+  {
+   "s": "Grid_Z_0_4_1",
+   "min": [
+    -0.1,
+    3.2,
+    0.1
+   ],
+   "max": [
+    0.1,
+    6.2,
+    3.2
+   ]
+  },
+  {
+   "s": "Grid_Z_0_4_2",
+   "min": [
+    -0.1,
+    3.2,
+    4.8
+   ],
+   "max": [
+    0.1,
+    6.2,
+    7.9
+   ]
+  },
+  {
+   "s": "Grid_Z_0_m15p1_1",
+   "min": [
+    -0.1,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    0.1,
+    6.2,
+    -15.6
+   ]
+  },
+  {
+   "s": "Grid_Z_0_m15p1_2",
+   "min": [
+    -0.1,
+    5.4,
+    -15.6
+   ],
+   "max": [
+    0.1,
+    6.2,
+    -14.6
+   ]
+  },
+  {
+   "s": "Grid_Z_0_m15p1_3",
+   "min": [
+    -0.1,
+    3.2,
+    -14.6
+   ],
+   "max": [
+    0.1,
+    6.2,
+    -8.1
+   ]
+  },
+  {
+   "s": "Grid_Z_0_m4_1",
+   "min": [
+    -0.1,
+    3.2,
+    -7.9
+   ],
+   "max": [
+    0.1,
+    6.2,
+    -4.5
+   ]
+  },
+  {
+   "s": "Grid_Z_0_m4_2",
+   "min": [
+    -0.1,
+    5.4,
+    -4.5
+   ],
+   "max": [
+    0.1,
+    6.2,
+    -3.5
+   ]
+  },
+  {
+   "s": "Grid_Z_0_m4_3",
+   "min": [
+    -0.1,
+    3.2,
+    -3.5
+   ],
+   "max": [
+    0.1,
+    6.2,
+    -0.1
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_4_1",
+   "min": [
+    17.3,
+    3.2,
+    0.1
+   ],
+   "max": [
+    17.5,
+    6.2,
+    3.2
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_4_2",
+   "min": [
+    17.3,
+    3.2,
+    4.8
+   ],
+   "max": [
+    17.5,
+    6.2,
+    7.9
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_m15p1_1",
+   "min": [
+    17.3,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    17.5,
+    6.2,
+    -15.6
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_m15p1_2",
+   "min": [
+    17.3,
+    5.4,
+    -15.6
+   ],
+   "max": [
+    17.5,
+    6.2,
+    -14.6
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_m15p1_3",
+   "min": [
+    17.3,
+    3.2,
+    -14.6
+   ],
+   "max": [
+    17.5,
+    6.2,
+    -8.1
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_m4_1",
+   "min": [
+    17.3,
+    3.2,
+    -7.9
+   ],
+   "max": [
+    17.5,
+    6.2,
+    -4.5
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_m4_2",
+   "min": [
+    17.3,
+    5.4,
+    -4.5
+   ],
+   "max": [
+    17.5,
+    6.2,
+    -3.5
+   ]
+  },
+  {
+   "s": "Grid_Z_17p4_m4_3",
+   "min": [
+    17.3,
+    3.2,
+    -3.5
+   ],
+   "max": [
+    17.5,
+    6.2,
+    -0.1
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_4_1",
+   "min": [
+    8.6,
+    3.2,
+    0.1
+   ],
+   "max": [
+    8.8,
+    6.2,
+    3.2
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_4_2",
+   "min": [
+    8.6,
+    3.2,
+    4.8
+   ],
+   "max": [
+    8.8,
+    6.2,
+    7.9
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_m15p1_1",
+   "min": [
+    8.6,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    8.8,
+    6.2,
+    -15.6
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_m15p1_2",
+   "min": [
+    8.6,
+    5.4,
+    -15.6
+   ],
+   "max": [
+    8.8,
+    6.2,
+    -14.6
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_m15p1_3",
+   "min": [
+    8.6,
+    3.2,
+    -14.6
+   ],
+   "max": [
+    8.8,
+    6.2,
+    -8.1
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_m4_1",
+   "min": [
+    8.6,
+    3.2,
+    -7.9
+   ],
+   "max": [
+    8.8,
+    6.2,
+    -4.5
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_m4_2",
+   "min": [
+    8.6,
+    5.4,
+    -4.5
+   ],
+   "max": [
+    8.8,
+    6.2,
+    -3.5
+   ]
+  },
+  {
+   "s": "Grid_Z_8p7_m4_3",
+   "min": [
+    8.6,
+    3.2,
+    -3.5
+   ],
+   "max": [
+    8.8,
+    6.2,
+    -0.1
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_4_1",
+   "min": [
+    -17.5,
+    3.2,
+    0.1
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    3.2
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_4_2",
+   "min": [
+    -17.5,
+    3.2,
+    4.8
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    7.9
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_m15p1_1",
+   "min": [
+    -17.5,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    -15.6
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_m15p1_2",
+   "min": [
+    -17.5,
+    5.4,
+    -15.6
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    -14.6
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_m15p1_3",
+   "min": [
+    -17.5,
+    3.2,
+    -14.6
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    -8.1
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_m4_1",
+   "min": [
+    -17.5,
+    3.2,
+    -7.9
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    -4.5
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_m4_2",
+   "min": [
+    -17.5,
+    5.4,
+    -4.5
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    -3.5
+   ]
+  },
+  {
+   "s": "Grid_Z_m17p4_m4_3",
+   "min": [
+    -17.5,
+    3.2,
+    -3.5
+   ],
+   "max": [
+    -17.3,
+    6.2,
+    -0.1
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_4_1",
+   "min": [
+    -8.8,
+    3.2,
+    0.1
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    3.2
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_4_2",
+   "min": [
+    -8.8,
+    3.2,
+    4.8
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    7.9
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_m15p1_1",
+   "min": [
+    -8.8,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    -15.6
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_m15p1_2",
+   "min": [
+    -8.8,
+    5.4,
+    -15.6
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    -14.6
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_m15p1_3",
+   "min": [
+    -8.8,
+    3.2,
+    -14.6
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    -8.1
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_m4_1",
+   "min": [
+    -8.8,
+    3.2,
+    -7.9
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    -4.5
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_m4_2",
+   "min": [
+    -8.8,
+    5.4,
+    -4.5
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    -3.5
+   ]
+  },
+  {
+   "s": "Grid_Z_m8p7_m4_3",
+   "min": [
+    -8.8,
+    3.2,
+    -3.5
+   ],
+   "max": [
+    -8.6,
+    6.2,
+    -0.1
+   ]
+  },
+  {
+   "s": "Hall_Ceiling_from_L2_1",
+   "min": [
+    14.8,
+    5.9,
+    16.95
+   ],
+   "max": [
+    17.2,
+    6.1,
+    26.95
+   ]
+  },
+  {
+   "s": "Hall_End_E_from_L2_1",
+   "min": [
+    14.8,
+    3.2,
+    26.95
+   ],
+   "max": [
+    15.45,
+    5.9,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_End_Head_from_L2_1",
+   "min": [
+    15.45,
+    5.36,
+    26.95
+   ],
+   "max": [
+    16.55,
+    5.9,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_End_W_from_L2_1",
+   "min": [
+    16.55,
+    3.2,
+    26.95
+   ],
+   "max": [
+    17.2,
+    5.9,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_Floor_from_L2_1",
+   "min": [
+    14.8,
+    2.9,
+    16.95
+   ],
+   "max": [
+    17.2,
+    3.2,
+    26.95
+   ]
+  },
+  {
+   "s": "Hall_Wall_E_from_L2_1",
+   "min": [
+    14.6,
+    2.9,
+    16.95
+   ],
+   "max": [
+    14.8,
+    6.1,
+    27.15
+   ]
+  },
+  {
+   "s": "Hall_Wall_W_from_L2_1",
+   "min": [
+    17.2,
+    2.9,
+    16.95
+   ],
+   "max": [
+    17.4,
+    6.1,
+    27.15
+   ]
+  },
+  {
+   "s": "SH_Bench_L2",
+   "min": [
+    -14.8,
+    3.2,
+    22.95
+   ],
+   "max": [
+    -14.2,
+    4.1,
+    24.55
+   ]
+  },
+  {
+   "s": "SH_Ceiling_L2",
+   "min": [
+    -15.2,
+    6.0,
+    21.75
+   ],
+   "max": [
+    -8.8,
+    6.05,
+    27.15
+   ]
+  },
+  {
+   "s": "SH_Counter_L2",
+   "min": [
+    -11.02,
+    3.2,
+    26.13
+   ],
+   "max": [
+    -9.18,
+    4.2,
+    26.75
+   ]
+  },
+  {
+   "s": "SH_Floor_L2",
+   "min": [
+    -15.2,
+    3.15,
+    21.75
+   ],
+   "max": [
+    -8.8,
+    3.2,
+    27.15
+   ]
+  },
+  {
+   "s": "SH_Locker_L2",
+   "min": [
+    -9.72,
+    3.2,
+    22.55
+   ],
+   "max": [
+    -9.2,
+    5.2,
+    23.35
+   ]
+  },
+  {
+   "s": "SH_Save_Desk_L2",
+   "min": [
+    -13.35,
+    3.2,
+    26.65
+   ],
+   "max": [
+    -12.65,
+    3.98,
+    26.95
+   ]
+  },
+  {
+   "s": "SH_Stash_L2",
+   "min": [
+    -14.805,
+    3.2,
+    25.945
+   ],
+   "max": [
+    -13.995,
+    4.2,
+    26.755
+   ]
+  },
+  {
+   "s": "SH_Wall_E_L2",
+   "min": [
+    -15.2,
+    3.2,
+    21.95
+   ],
+   "max": [
+    -15.0,
+    6.0,
+    26.95
+   ]
+  },
+  {
+   "s": "SH_Wall_N_L2",
+   "min": [
+    -15.2,
+    3.2,
+    26.95
+   ],
+   "max": [
+    -8.8,
+    6.0,
+    27.15
+   ]
+  },
+  {
+   "s": "SH_Wall_S_E_L2",
+   "min": [
+    -15.2,
+    3.2,
+    21.75
+   ],
+   "max": [
+    -12.5,
+    6.0,
+    21.95
+   ]
+  },
+  {
+   "s": "SH_Wall_S_Head_L2",
+   "min": [
+    -12.5,
+    5.36,
+    21.75
+   ],
+   "max": [
+    -11.5,
+    6.0,
+    21.95
+   ]
+  },
+  {
+   "s": "SH_Wall_S_W_L2",
+   "min": [
+    -11.5,
+    3.2,
+    21.75
+   ],
+   "max": [
+    -8.8,
+    6.0,
+    21.95
+   ]
+  },
+  {
+   "s": "SH_Wall_W_L2",
+   "min": [
+    -9.0,
+    3.2,
+    21.95
+   ],
+   "max": [
+    -8.8,
+    6.0,
+    26.95
+   ]
+  },
+  {
+   "s": "Sky_Ceiling_to_L2_3",
+   "min": [
+    -23.4,
+    6.2,
+    -22.15
+   ],
+   "max": [
+    -20.6,
+    6.45,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_0_to_L2_3",
+   "min": [
+    -23.2,
+    3.2,
+    -11.95
+   ],
+   "max": [
+    -22.55,
+    6.2,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_1_to_L2_3",
+   "min": [
+    -21.45,
+    3.2,
+    -11.95
+   ],
+   "max": [
+    -20.8,
+    6.2,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_2_to_L2_3",
+   "min": [
+    -22.55,
+    5.36,
+    -11.95
+   ],
+   "max": [
+    -21.45,
+    6.2,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_End_3_to_L2_3",
+   "min": [
+    -23.2,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    -22.55,
+    6.2,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_End_4_to_L2_3",
+   "min": [
+    -21.45,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    -20.8,
+    6.2,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_End_5_to_L2_3",
+   "min": [
+    -22.55,
+    5.36,
+    -22.15
+   ],
+   "max": [
+    -21.45,
+    6.2,
+    -21.95
+   ]
+  },
+  {
+   "s": "Sky_Floor_to_L2_3",
+   "min": [
+    -23.2,
+    2.9,
+    -21.95
+   ],
+   "max": [
+    -20.8,
+    3.2,
+    -11.95
+   ]
+  },
+  {
+   "s": "Sky_Wall_E_to_L2_3",
+   "min": [
+    -20.8,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    -20.6,
+    6.2,
+    -11.75
+   ]
+  },
+  {
+   "s": "Sky_Wall_W_to_L2_3",
+   "min": [
+    -23.4,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    -23.2,
+    6.2,
+    -11.75
+   ]
+  },
+  {
+   "s": "Stair_ceil_0_from_L2_1",
+   "min": [
+    14.65,
+    5.9,
+    15.15
+   ],
+   "max": [
+    17.35,
+    6.1,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_landing_0_from_L2_1",
+   "min": [
+    14.65,
+    3.0,
+    15.15
+   ],
+   "max": [
+    17.35,
+    3.2,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_0_from_L2_1",
+   "min": [
+    14.65,
+    3.2,
+    15.15
+   ],
+   "max": [
+    14.85,
+    5.9,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_1_from_L2_1",
+   "min": [
+    17.15,
+    3.2,
+    15.15
+   ],
+   "max": [
+    17.35,
+    5.9,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_2_from_L2_1",
+   "min": [
+    14.65,
+    3.2,
+    16.75
+   ],
+   "max": [
+    15.45,
+    5.9,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_3_from_L2_1",
+   "min": [
+    16.55,
+    3.2,
+    16.75
+   ],
+   "max": [
+    17.35,
+    5.9,
+    16.95
+   ]
+  },
+  {
+   "s": "Stair_wallHi_4_from_L2_1",
+   "min": [
+    15.45,
+    5.36,
+    16.75
+   ],
+   "max": [
+    16.55,
+    5.9,
+    16.95
+   ]
+  },
+  {
+   "s": "Vent_1",
+   "min": [
+    25.1,
+    3.2,
+    -18.0
+   ],
+   "max": [
+    26.1,
+    4.2,
+    -13.0
+   ]
+  },
+  {
+   "s": "Wall_E_1",
+   "min": [
+    26.1,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    26.3,
+    6.2,
+    27.15
+   ]
+  },
+  {
+   "s": "Wall_N_1",
+   "min": [
+    -26.3,
+    3.2,
+    -22.35
+   ],
+   "max": [
+    26.3,
+    6.2,
+    -22.15
+   ]
+  },
+  {
+   "s": "Wall_S_1",
+   "min": [
+    -26.3,
+    3.2,
+    27.15
+   ],
+   "max": [
+    26.3,
+    6.2,
+    27.35
+   ]
+  },
+  {
+   "s": "Wall_W_1",
+   "min": [
+    -26.3,
+    3.2,
+    -22.15
+   ],
+   "max": [
+    -26.1,
+    6.2,
+    27.15
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_Grid_X_0_13p05",
+   "level": "gbi_L2_2",
+   "hinge": [
+    12.58,
+    3.2,
+    0.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_0_4p35",
+   "level": "gbi_L2_2",
+   "hinge": [
+    3.88,
+    3.2,
+    0.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_0_m21p75",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -22.22,
+    3.2,
+    0.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_0_m4p35",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -4.82,
+    3.2,
+    0.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_8_13p05",
+   "level": "gbi_L2_2",
+   "hinge": [
+    12.58,
+    3.2,
+    8.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_8_21p75",
+   "level": "gbi_L2_2",
+   "hinge": [
+    21.28,
+    3.2,
+    8.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_8_m13p05",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -13.52,
+    3.2,
+    8.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_8_m21p75",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -22.22,
+    3.2,
+    8.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_8_m4p35",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -4.82,
+    3.2,
+    8.1
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_m8_13p05",
+   "level": "gbi_L2_2",
+   "hinge": [
+    12.58,
+    3.2,
+    -7.9
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_m8_21p75",
+   "level": "gbi_L2_2",
+   "hinge": [
+    21.28,
+    3.2,
+    -7.9
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_m8_m13p05",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -13.52,
+    3.2,
+    -7.9
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_m8_m21p75",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -22.22,
+    3.2,
+    -7.9
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_X_m8_m4p35",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -4.82,
+    3.2,
+    -7.9
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_0_m15p1_m15p1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    0.1,
+    3.2,
+    -14.63
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_0_m4_m4",
+   "level": "gbi_L2_2",
+   "hinge": [
+    0.1,
+    3.2,
+    -3.53
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_17p4_m15p1_m15p1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    17.5,
+    3.2,
+    -14.63
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_17p4_m4_m4",
+   "level": "gbi_L2_2",
+   "hinge": [
+    17.5,
+    3.2,
+    -3.53
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_8p7_m15p1_m15p1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    8.8,
+    3.2,
+    -14.63
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_8p7_m4_m4",
+   "level": "gbi_L2_2",
+   "hinge": [
+    8.8,
+    3.2,
+    -3.53
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_m17p4_m15p1_m15p1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -17.3,
+    3.2,
+    -14.63
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_m17p4_m4_m4",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -17.3,
+    3.2,
+    -3.53
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_m8p7_m15p1_m15p1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -8.6,
+    3.2,
+    -14.63
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "open",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_Grid_Z_m8p7_m4_m4",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -8.6,
+    3.2,
+    -3.53
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "ajar",
+   "kind": "chamber door",
+   "barricade": "yes"
+  },
+  {
+   "name": "DoorLeaf_entry_to_L2_3",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -22.52,
+    3.2,
+    -11.85
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "hall door"
+  },
+  {
+   "name": "DoorLeaf_exit_to_L2_3",
+   "level": "gbi_L2_2",
+   "hinge": [
+    -21.48,
+    3.2,
+    -22.05
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": -180.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "EXIT door"
+  },
+  {
+   "name": "DoorLeaf_hall_far_from_L2_1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    16.52,
+    3.2,
+    27.05
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": -180.0,
+   "swing_deg": 90.0,
+   "state": "closed",
+   "kind": "hallway door"
+  },
+  {
+   "name": "DoorLeaf_stair_from_L2_1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    15.48,
+    3.2,
+    16.85
+   ],
+   "width": 1.04,
+   "height": 2.12,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -90.0,
+   "state": "closed",
+   "kind": "stair door",
+   "from": "store DoorLeaf_Stair_L1_L2_up"
+  },
+  {
+   "name": "DoorLeaf_vent_1",
+   "level": "gbi_L2_2",
+   "hinge": [
+    25.2,
+    3.3,
+    -18.0
+   ],
+   "width": 0.8,
+   "height": 0.8,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "vent",
+   "locked": "crawling is not in the game yet"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Arrival",
+   "room": "gbi_L2_2",
+   "level": "gbi_L2_2",
+   "kind": "Entrance",
+   "position": [
+    16.0,
+    3.2,
+    15.8
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "exit_to_L2_3",
+   "at": [
+    -22.0,
+    3.2,
+    -21.45
+   ],
+   "arrive": [
+    -22.0,
+    3.2,
+    -21.05
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "stair_from_L2_1",
+   "at": [
+    16.0,
+    3.2,
+    16.15
+   ],
+   "arrive": [
+    16.0,
+    3.2,
+    15.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [
+  {
+   "kind": "hazard",
+   "name": "Zone_hazard_gas_1",
+   "min": [
+    -26.1,
+    3.2,
+    -7.9
+   ],
+   "max": [
+    26.1,
+    6.2,
+    -0.1
+   ]
+  },
+  {
+   "kind": "safe",
+   "name": "Zone_safe_safe_house_L2",
+   "min": [
+    -15.0,
+    3.2,
+    21.95
+   ],
+   "max": [
+    -9.0,
+    6.0,
+    26.95
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "kind": "craft",
+   "name": "Spot_craft_1_L2",
+   "position": [
+    -13.7,
+    3.2,
+    23.75
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_gas_1_a",
+   "position": [
+    24.0,
+    3.2,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_gas_1",
+   "kind_of": "toxic gas",
+   "motion": "drift",
+   "period_s": 40.0,
+   "what": "a cloud of gas drifts down the middle row of rooms from the east",
+   "end": "a"
+  },
+  {
+   "kind": "hazard",
+   "name": "Spot_hazard_gas_1_b",
+   "position": [
+    -24.0,
+    3.2,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "hazard": "Hazard_gas_1",
+   "kind_of": "toxic gas",
+   "motion": "drift",
+   "period_s": 40.0,
+   "what": "a cloud of gas drifts down the middle row of rooms from the east",
+   "end": "b"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1",
+   "position": [
+    20.5,
+    3.2,
+    25.8
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the Lost and Found: your loadout, and your gear back after you die"
+  },
+  {
+   "kind": "locker",
+   "name": "Spot_locker_1_L2",
+   "position": [
+    -10.2,
+    3.2,
+    22.95
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_1",
+   "position": [
+    -13.0,
+    3.2,
+    4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_2",
+   "position": [
+    13.0,
+    3.2,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "loot",
+   "name": "Spot_loot_3",
+   "position": [
+    4.35,
+    3.2,
+    -19.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_1",
+   "position": [
+    13.0,
+    3.2,
+    -18.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "10"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_2",
+   "position": [
+    -13.0,
+    3.2,
+    -14.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "10"
+  },
+  {
+   "kind": "monster",
+   "name": "Spot_monster_3",
+   "position": [
+    -4.35,
+    3.2,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "wave": "10"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_1",
+   "position": [
+    -21.75,
+    3.2,
+    -4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_2",
+   "position": [
+    4.35,
+    3.2,
+    4.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "object",
+   "name": "Spot_object_3",
+   "position": [
+    -4.35,
+    3.2,
+    -18.0
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "what": "a missing object"
+  },
+  {
+   "kind": "puzzle",
+   "name": "Spot_puzzle_1",
+   "position": [
+    21.75,
+    3.2,
+    -13.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "a code digit on a note"
+  },
+  {
+   "kind": "respawn",
+   "name": "Spot_respawn_1_L2",
+   "position": [
+    -12.0,
+    3.2,
+    24.55
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "save",
+   "name": "Spot_save_1_L2",
+   "position": [
+    -13.0,
+    3.2,
+    26.35
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "shop",
+   "name": "Spot_shop_1_L2",
+   "position": [
+    -10.1,
+    3.2,
+    25.45
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "stash",
+   "name": "Spot_stash_1_L2",
+   "position": [
+    -14.4,
+    3.2,
+    25.35
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "of": "safe_house"
+  },
+  {
+   "kind": "vent",
+   "name": "Spot_vent_1",
+   "position": [
+    25.6,
+    3.2,
+    -18.9
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "to": "gbi_L2_3 (shut: crawling is not in the game yet)",
+   "state": "shut"
+  }
+ ]
+}

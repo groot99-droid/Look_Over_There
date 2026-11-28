@@ -1,0 +1,77 @@
+{
+ "0": {
+  "map": 0,
+  "size": 1536,
+  "gain": 3.2716,
+  "C": 1.12,
+  "px_per_m": 58.2,
+  "p50_p90_p99_p995_max": [
+   0.4432,
+   0.6868,
+   0.8197,
+   0.8567,
+   1.2141
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 13,
+  "materials": [
+   "Ceil_White",
+   "Floor_Checker_Pale",
+   "Wall_Teal_Cream"
+  ]
+ },
+ "1": {
+  "map": 1,
+  "size": 2048,
+  "gain": 3.2716,
+  "C": 1.12,
+  "px_per_m": 86.8,
+  "p50_p90_p99_p995_max": [
+   0.336,
+   0.5719,
+   0.9955,
+   1.2295,
+   2.3428
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 25,
+  "materials": [
+   "Brass",
+   "Floor_Paint_Yellow",
+   "Frame_Gilt",
+   "Leaf_BottleGreen",
+   "Leaf_Glass",
+   "Leaf_Painted",
+   "Marble_Prop",
+   "Paint_White",
+   "Photo",
+   "Trim_Teal",
+   "Trim_White",
+   "Velvet_Green",
+   "Walnut"
+  ]
+ },
+ "2": {
+  "map": 2,
+  "size": 1024,
+  "gain": 3.2716,
+  "C": 1.12,
+  "px_per_m": 180.7,
+  "p50_p90_p99_p995_max": [
+   0.5481,
+   0.6912,
+   0.7517,
+   0.7607,
+   1.1893
+  ],
+  "samples": 384,
+  "device": "GPU",
+  "seconds": 11,
+  "materials": [
+   "Painted_Door_T",
+   "Wall_Teal_Cream_T"
+  ]
+ }
+}

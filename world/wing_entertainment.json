@@ -1,0 +1,1151 @@
+{
+ "scene": "wing_entertainment",
+ "colliders": [
+  {
+   "s": "Front_scene_2991",
+   "min": [
+    -2.4,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -0.52,
+    3.2,
+    -6.88
+   ]
+  },
+  {
+   "s": "Front_scene_2991_2",
+   "min": [
+    0.52,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    2.4,
+    3.2,
+    -6.88
+   ]
+  },
+  {
+   "s": "Front_scene_2991_Over",
+   "min": [
+    -0.52,
+    2.16,
+    -7.0
+   ],
+   "max": [
+    0.52,
+    3.2,
+    -6.88
+   ]
+  },
+  {
+   "s": "Front_scene_3008",
+   "min": [
+    -10.4,
+    0.0,
+    6.88
+   ],
+   "max": [
+    -8.52,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Front_scene_3008_2",
+   "min": [
+    -7.48,
+    0.0,
+    6.88
+   ],
+   "max": [
+    -5.6,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Front_scene_3008_Over",
+   "min": [
+    -8.52,
+    2.16,
+    6.88
+   ],
+   "max": [
+    -7.48,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Front_service_corridor",
+   "min": [
+    13.6,
+    0.0,
+    6.88
+   ],
+   "max": [
+    15.48,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Front_service_corridor_2",
+   "min": [
+    16.52,
+    0.0,
+    6.88
+   ],
+   "max": [
+    18.4,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Front_service_corridor_Over",
+   "min": [
+    15.48,
+    2.16,
+    6.88
+   ],
+   "max": [
+    16.52,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Pilaster",
+   "min": [
+    -12.2,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -11.8,
+    6.0,
+    -6.7
+   ]
+  },
+  {
+   "s": "Pilaster_2",
+   "min": [
+    -12.2,
+    0.0,
+    6.7
+   ],
+   "max": [
+    -11.8,
+    6.0,
+    7.0
+   ]
+  },
+  {
+   "s": "Pilaster_3",
+   "min": [
+    -4.2,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -3.8,
+    6.0,
+    -6.7
+   ]
+  },
+  {
+   "s": "Pilaster_4",
+   "min": [
+    -4.2,
+    0.0,
+    6.7
+   ],
+   "max": [
+    -3.8,
+    6.0,
+    7.0
+   ]
+  },
+  {
+   "s": "Pilaster_5",
+   "min": [
+    3.8,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    4.2,
+    6.0,
+    -6.7
+   ]
+  },
+  {
+   "s": "Pilaster_6",
+   "min": [
+    3.8,
+    0.0,
+    6.7
+   ],
+   "max": [
+    4.2,
+    6.0,
+    7.0
+   ]
+  },
+  {
+   "s": "Pilaster_7",
+   "min": [
+    11.8,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    12.2,
+    6.0,
+    -6.7
+   ]
+  },
+  {
+   "s": "Pilaster_8",
+   "min": [
+    11.8,
+    0.0,
+    6.7
+   ],
+   "max": [
+    12.2,
+    6.0,
+    7.0
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Deck",
+   "min": [
+    -19.0,
+    1.94,
+    -6.65
+   ],
+   "max": [
+    -13.0,
+    2.0,
+    -5.5
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Deck_2",
+   "min": [
+    -19.0,
+    3.94,
+    -6.65
+   ],
+   "max": [
+    -13.0,
+    4.0,
+    -5.5
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post",
+   "min": [
+    -19.05,
+    0.0,
+    -6.7
+   ],
+   "max": [
+    -18.95,
+    5.0,
+    -6.6
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post_2",
+   "min": [
+    -19.05,
+    0.0,
+    -5.55
+   ],
+   "max": [
+    -18.95,
+    5.0,
+    -5.45
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post_3",
+   "min": [
+    -17.05,
+    0.0,
+    -6.7
+   ],
+   "max": [
+    -16.95,
+    5.0,
+    -6.6
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post_4",
+   "min": [
+    -17.05,
+    0.0,
+    -5.55
+   ],
+   "max": [
+    -16.95,
+    5.0,
+    -5.45
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post_5",
+   "min": [
+    -15.05,
+    0.0,
+    -6.7
+   ],
+   "max": [
+    -14.95,
+    5.0,
+    -6.6
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post_6",
+   "min": [
+    -15.05,
+    0.0,
+    -5.55
+   ],
+   "max": [
+    -14.95,
+    5.0,
+    -5.45
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post_7",
+   "min": [
+    -13.05,
+    0.0,
+    -6.7
+   ],
+   "max": [
+    -12.95,
+    5.0,
+    -6.6
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Post_8",
+   "min": [
+    -13.05,
+    0.0,
+    -5.55
+   ],
+   "max": [
+    -12.95,
+    5.0,
+    -5.45
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Rail",
+   "min": [
+    -19.0,
+    2.95,
+    -5.54
+   ],
+   "max": [
+    -13.0,
+    3.0,
+    -5.46
+   ]
+  },
+  {
+   "s": "Scaffold_ent_NW_Rail_2",
+   "min": [
+    -19.0,
+    4.95,
+    -5.54
+   ],
+   "max": [
+    -13.0,
+    5.0,
+    -5.46
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Deck",
+   "min": [
+    5.0,
+    1.94,
+    5.5
+   ],
+   "max": [
+    11.0,
+    2.0,
+    6.65
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Deck_2",
+   "min": [
+    5.0,
+    3.94,
+    5.5
+   ],
+   "max": [
+    11.0,
+    4.0,
+    6.65
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post",
+   "min": [
+    4.95,
+    0.0,
+    5.45
+   ],
+   "max": [
+    5.05,
+    5.0,
+    5.55
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post_2",
+   "min": [
+    4.95,
+    0.0,
+    6.6
+   ],
+   "max": [
+    5.05,
+    5.0,
+    6.7
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post_3",
+   "min": [
+    6.95,
+    0.0,
+    5.45
+   ],
+   "max": [
+    7.05,
+    5.0,
+    5.55
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post_4",
+   "min": [
+    6.95,
+    0.0,
+    6.6
+   ],
+   "max": [
+    7.05,
+    5.0,
+    6.7
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post_5",
+   "min": [
+    8.95,
+    0.0,
+    5.45
+   ],
+   "max": [
+    9.05,
+    5.0,
+    5.55
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post_6",
+   "min": [
+    8.95,
+    0.0,
+    6.6
+   ],
+   "max": [
+    9.05,
+    5.0,
+    6.7
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post_7",
+   "min": [
+    10.95,
+    0.0,
+    5.45
+   ],
+   "max": [
+    11.05,
+    5.0,
+    5.55
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Post_8",
+   "min": [
+    10.95,
+    0.0,
+    6.6
+   ],
+   "max": [
+    11.05,
+    5.0,
+    6.7
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Rail",
+   "min": [
+    5.0,
+    2.95,
+    6.61
+   ],
+   "max": [
+    11.0,
+    3.0,
+    6.69
+   ]
+  },
+  {
+   "s": "Scaffold_ent_S_Rail_2",
+   "min": [
+    5.0,
+    4.95,
+    6.61
+   ],
+   "max": [
+    11.0,
+    5.0,
+    6.69
+   ]
+  },
+  {
+   "s": "Sheeted_ClawMachine",
+   "min": [
+    3.2,
+    0.0,
+    -4.6
+   ],
+   "max": [
+    4.8,
+    1.9,
+    -3.6
+   ]
+  },
+  {
+   "s": "Sheeted_ClawMachine_2",
+   "min": [
+    11.2,
+    0.0,
+    -4.6
+   ],
+   "max": [
+    12.8,
+    1.9,
+    -3.6
+   ]
+  },
+  {
+   "s": "Sheeted_KiddieRide_Car",
+   "min": [
+    -13.6,
+    0.0,
+    3.4
+   ],
+   "max": [
+    -12.4,
+    1.2,
+    4.6
+   ]
+  },
+  {
+   "s": "Sheeted_KiddieRide_Horse",
+   "min": [
+    -5.0,
+    0.0,
+    3.5
+   ],
+   "max": [
+    -3.6,
+    1.4,
+    4.5
+   ]
+  },
+  {
+   "s": "Shutter_N1",
+   "min": [
+    -18.4,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -13.6,
+    3.2,
+    -6.88
+   ]
+  },
+  {
+   "s": "Shutter_N2",
+   "min": [
+    -10.4,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -5.6,
+    3.2,
+    -6.88
+   ]
+  },
+  {
+   "s": "Shutter_N4",
+   "min": [
+    5.6,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    10.4,
+    3.2,
+    -6.88
+   ]
+  },
+  {
+   "s": "Shutter_N5",
+   "min": [
+    13.6,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    18.4,
+    3.2,
+    -6.88
+   ]
+  },
+  {
+   "s": "Shutter_S1",
+   "min": [
+    -18.4,
+    0.0,
+    6.88
+   ],
+   "max": [
+    -13.6,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Shutter_S3",
+   "min": [
+    -2.4,
+    0.0,
+    6.88
+   ],
+   "max": [
+    2.4,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Shutter_S4",
+   "min": [
+    5.6,
+    0.0,
+    6.88
+   ],
+   "max": [
+    10.4,
+    3.2,
+    7.0
+   ]
+  },
+  {
+   "s": "Wing_Ceiling",
+   "min": [
+    -20.2,
+    6.0,
+    -7.2
+   ],
+   "max": [
+    20.2,
+    6.2,
+    7.2
+   ]
+  },
+  {
+   "s": "Wing_Floor",
+   "min": [
+    -20.2,
+    -0.3,
+    -7.2
+   ],
+   "max": [
+    20.2,
+    0.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_E_1",
+   "min": [
+    20.0,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    20.2,
+    6.0,
+    -1.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_E_2",
+   "min": [
+    20.0,
+    2.6,
+    -1.2
+   ],
+   "max": [
+    20.2,
+    6.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_E_3",
+   "min": [
+    20.0,
+    0.0,
+    1.2
+   ],
+   "max": [
+    20.2,
+    6.0,
+    7.0
+   ]
+  },
+  {
+   "s": "Wing_Wall_N_1",
+   "min": [
+    -20.2,
+    0.0,
+    -7.2
+   ],
+   "max": [
+    -0.47,
+    6.0,
+    -7.0
+   ]
+  },
+  {
+   "s": "Wing_Wall_N_2",
+   "min": [
+    -0.47,
+    2.16,
+    -7.2
+   ],
+   "max": [
+    0.47,
+    6.0,
+    -7.0
+   ]
+  },
+  {
+   "s": "Wing_Wall_N_3",
+   "min": [
+    0.47,
+    0.0,
+    -7.2
+   ],
+   "max": [
+    20.2,
+    6.0,
+    -7.0
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_1",
+   "min": [
+    -20.2,
+    0.0,
+    7.0
+   ],
+   "max": [
+    -8.47,
+    6.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_2",
+   "min": [
+    -8.47,
+    2.16,
+    7.0
+   ],
+   "max": [
+    -7.53,
+    6.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_3",
+   "min": [
+    -7.53,
+    0.0,
+    7.0
+   ],
+   "max": [
+    15.53,
+    6.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_4",
+   "min": [
+    15.53,
+    2.16,
+    7.0
+   ],
+   "max": [
+    16.47,
+    6.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_S_5",
+   "min": [
+    16.47,
+    0.0,
+    7.0
+   ],
+   "max": [
+    20.2,
+    6.0,
+    7.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_W_1",
+   "min": [
+    -20.2,
+    0.0,
+    -7.0
+   ],
+   "max": [
+    -20.0,
+    6.0,
+    -1.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_W_2",
+   "min": [
+    -20.2,
+    2.6,
+    -1.2
+   ],
+   "max": [
+    -20.0,
+    6.0,
+    1.2
+   ]
+  },
+  {
+   "s": "Wing_Wall_W_3",
+   "min": [
+    -20.2,
+    0.0,
+    1.2
+   ],
+   "max": [
+    -20.0,
+    6.0,
+    7.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_entrance_A",
+   "level": "wing_entertainment",
+   "hinge": [
+    -20.0,
+    0.0,
+    -1.2
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "mall doors (glass)"
+  },
+  {
+   "name": "DoorLeaf_entrance_B",
+   "level": "wing_entertainment",
+   "hinge": [
+    -20.0,
+    0.0,
+    1.2
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "mall doors (glass)"
+  },
+  {
+   "name": "DoorLeaf_food_court_A",
+   "level": "wing_entertainment",
+   "hinge": [
+    20.0,
+    0.0,
+    -1.2
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": -90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "food court doors (glass)"
+  },
+  {
+   "name": "DoorLeaf_food_court_B",
+   "level": "wing_entertainment",
+   "hinge": [
+    20.0,
+    0.0,
+    1.2
+   ],
+   "width": 1.2,
+   "height": 2.6,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": 95.0,
+   "state": "closed",
+   "kind": "food court doors (glass)"
+  },
+  {
+   "name": "DoorLeaf_scene_2991",
+   "level": "wing_entertainment",
+   "hinge": [
+    -0.47,
+    0.0,
+    -7.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "unmarked door between the shutters"
+  },
+  {
+   "name": "DoorLeaf_scene_3008",
+   "level": "wing_entertainment",
+   "hinge": [
+    -7.53,
+    0.0,
+    7.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "unmarked door between the shutters"
+  },
+  {
+   "name": "DoorLeaf_service_corridor",
+   "level": "wing_entertainment",
+   "hinge": [
+    16.47,
+    0.0,
+    7.0
+   ],
+   "width": 0.94,
+   "height": 2.16,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "kind": "staff door"
+  }
+ ],
+ "cameras": [],
+ "markers": [
+  {
+   "name": "Spawn",
+   "room": "wing_entertainment",
+   "level": "wing_entertainment",
+   "kind": "Spawn",
+   "position": [
+    -18.6,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "links": [
+  {
+   "door": "entrance",
+   "at": [
+    -19.3,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -18.6,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "food_court",
+   "at": [
+    19.4,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    18.7,
+    0.0,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "scene_2991",
+   "at": [
+    0.0,
+    0.0,
+    -6.4
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    -5.7
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "scene_3008",
+   "at": [
+    -8.0,
+    0.0,
+    6.4
+   ],
+   "arrive": [
+    -8.0,
+    0.0,
+    5.7
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "service_corridor",
+   "at": [
+    16.0,
+    0.0,
+    6.4
+   ],
+   "arrive": [
+    16.0,
+    0.0,
+    5.7
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_1",
+   "position": [
+    -16.0,
+    0.0,
+    -4.6
+   ],
+   "face": [
+    0.0,
+    1.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "role": "dressing",
+   "what": "a bowler mid-swing, in front of the bowling shutter"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_2",
+   "position": [
+    -12.0,
+    0.0,
+    4.9
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "role": "npc",
+   "what": "beside the kiddie ride, a coin in its hand"
+  },
+  {
+   "kind": "mannequin",
+   "name": "Spot_mannequin_3",
+   "position": [
+    14.0,
+    0.0,
+    -4.4
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ],
+   "yaw_deg": -90.0,
+   "scale": 1.0,
+   "role": "monster",
+   "what": "between the claw machines, facing the atrium"
+  }
+ ]
+}

@@ -1,0 +1,96 @@
+{
+ "scene": "service_entry",
+ "samples": 512,
+ "map_0": {
+  "set": "normal",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 43.8,
+  "gain": 0.42842,
+  "C": 1.2,
+  "wall_median_L": 1.10736,
+  "raw_p50_p90_p99": [
+   1.2088,
+   2.9278,
+   3.6649
+  ]
+ },
+ "map_1": {
+  "set": "normal",
+  "page": 1,
+  "size": 2048,
+  "px_per_m": 100.3,
+  "gain": 0.42842,
+  "C": 1.2,
+  "wall_median_L": 1.10736,
+  "raw_p50_p90_p99": [
+   0.5376,
+   1.7837,
+   6.1585
+  ]
+ },
+ "map_2": {
+  "set": "alarm",
+  "page": 0,
+  "size": 2048,
+  "px_per_m": 43.8,
+  "gain": 8.53994,
+  "C": 1.2,
+  "wall_median_L": 0.03887,
+  "raw_p50_p90_p99": [
+   0.0331,
+   0.1184,
+   0.5478
+  ]
+ },
+ "map_3": {
+  "set": "alarm",
+  "page": 1,
+  "size": 2048,
+  "px_per_m": 100.3,
+  "gain": 8.53994,
+  "C": 1.2,
+  "wall_median_L": 0.03887,
+  "raw_p50_p90_p99": [
+   0.017,
+   0.0795,
+   0.4253
+  ]
+ },
+ "page_0_materials": [
+  "Ceiling_Concrete",
+  "Ceiling_Tile",
+  "Floor_Concrete",
+  "Floor_Steel",
+  "Floor_Tile",
+  "Wall_Service",
+  "Wall_Steel",
+  "Wall_Tile"
+ ],
+ "page_1_materials": [
+  "Cam_Body",
+  "Cardboard",
+  "Clock_Face",
+  "Door_Frame",
+  "Door_Steel",
+  "Fabric",
+  "Hazard",
+  "Laminate",
+  "Lamp_Housing",
+  "Paint_Dark",
+  "Paint_Grey",
+  "Paint_Yellow",
+  "Pillar_Paint",
+  "Plastic_Black",
+  "Plastic_White",
+  "Rubber",
+  "Sign_Plate",
+  "Skirting",
+  "Steel",
+  "Steel_Dark",
+  "Stripe_Red",
+  "Wood_Crate"
+ ],
+ "seconds": 175,
+ "device": "GPU"
+}

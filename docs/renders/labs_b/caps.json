@@ -1,0 +1,14 @@
+{
+ "normal": {
+  "gain": 1.145,
+  "walls_p50_before": 0.262,
+  "target": 0.3,
+  "factor": {}
+ },
+ "alarm": {
+  "gain": 0.799,
+  "walls_p50_before": 0.194,
+  "target": 0.155,
+  "factor": {}
+ }
+}

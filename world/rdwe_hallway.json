@@ -1,0 +1,1120 @@
+{
+ "scene": "rdwe_hallway",
+ "colliders": [
+  {
+   "s": "Beyond_dining",
+   "min": [
+    -4.55,
+    -0.05,
+    -0.68
+   ],
+   "max": [
+    -4.35,
+    2.45,
+    0.68
+   ]
+  },
+  {
+   "s": "Beyond_door_a",
+   "min": [
+    8.28,
+    1.15,
+    -2.15
+   ],
+   "max": [
+    9.72,
+    3.59,
+    -1.95
+   ]
+  },
+  {
+   "s": "Beyond_door_b",
+   "min": [
+    32.34,
+    1.15,
+    -2.15
+   ],
+   "max": [
+    33.66,
+    3.75,
+    -1.95
+   ]
+  },
+  {
+   "s": "Beyond_door_c",
+   "min": [
+    20.34,
+    1.15,
+    -2.15
+   ],
+   "max": [
+    21.66,
+    3.75,
+    -1.95
+   ]
+  },
+  {
+   "s": "Beyond_wrong_1",
+   "min": [
+    5.32,
+    1.15,
+    1.95
+   ],
+   "max": [
+    6.68,
+    3.39,
+    2.15
+   ]
+  },
+  {
+   "s": "Beyond_wrong_2",
+   "min": [
+    14.3,
+    1.15,
+    1.95
+   ],
+   "max": [
+    15.7,
+    3.45,
+    2.15
+   ]
+  },
+  {
+   "s": "Beyond_wrong_3",
+   "min": [
+    26.19,
+    1.15,
+    -2.15
+   ],
+   "max": [
+    27.81,
+    3.51,
+    -1.95
+   ]
+  },
+  {
+   "s": "Beyond_wrong_4",
+   "min": [
+    23.32,
+    1.15,
+    1.95
+   ],
+   "max": [
+    24.68,
+    3.65,
+    2.15
+   ]
+  },
+  {
+   "s": "Beyond_wrong_5",
+   "min": [
+    35.28,
+    1.15,
+    1.95
+   ],
+   "max": [
+    36.72,
+    3.75,
+    2.15
+   ]
+  },
+  {
+   "s": "Beyond_wrong_6",
+   "min": [
+    14.28,
+    1.15,
+    -2.15
+   ],
+   "max": [
+    15.72,
+    3.75,
+    -1.95
+   ]
+  },
+  {
+   "s": "Corridor_Floor",
+   "min": [
+    2.4,
+    -2.2,
+    -1.6
+   ],
+   "max": [
+    40.0,
+    1.2,
+    1.6
+   ]
+  },
+  {
+   "s": "Hall_Ceiling",
+   "min": [
+    -4.2,
+    4.6,
+    -1.8
+   ],
+   "max": [
+    45.2,
+    4.8,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_E_1",
+   "min": [
+    45.0,
+    -2.2,
+    -1.6
+   ],
+   "max": [
+    45.2,
+    4.6,
+    1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_1",
+   "min": [
+    -4.2,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    8.51,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_10",
+   "min": [
+    21.43,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    26.42,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_11",
+   "min": [
+    26.42,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    27.58,
+    1.2,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_12",
+   "min": [
+    26.42,
+    3.4,
+    -1.8
+   ],
+   "max": [
+    27.58,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_13",
+   "min": [
+    27.58,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    32.57,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_14",
+   "min": [
+    32.57,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    33.43,
+    1.2,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_15",
+   "min": [
+    32.57,
+    3.64,
+    -1.8
+   ],
+   "max": [
+    33.43,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_16",
+   "min": [
+    33.43,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    45.2,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_2",
+   "min": [
+    8.51,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    9.49,
+    1.2,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_3",
+   "min": [
+    8.51,
+    3.48,
+    -1.8
+   ],
+   "max": [
+    9.49,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_4",
+   "min": [
+    9.49,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    14.51,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_5",
+   "min": [
+    14.51,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    15.49,
+    1.2,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_6",
+   "min": [
+    14.51,
+    3.64,
+    -1.8
+   ],
+   "max": [
+    15.49,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_7",
+   "min": [
+    15.49,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    20.57,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_8",
+   "min": [
+    20.57,
+    -2.2,
+    -1.8
+   ],
+   "max": [
+    21.43,
+    1.2,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_N_9",
+   "min": [
+    20.57,
+    3.64,
+    -1.8
+   ],
+   "max": [
+    21.43,
+    4.6,
+    -1.6
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_1",
+   "min": [
+    -4.2,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    5.55,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_10",
+   "min": [
+    24.45,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    35.51,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_11",
+   "min": [
+    35.51,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    36.49,
+    1.2,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_12",
+   "min": [
+    35.51,
+    3.64,
+    1.6
+   ],
+   "max": [
+    36.49,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_13",
+   "min": [
+    36.49,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    45.2,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_2",
+   "min": [
+    5.55,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    6.45,
+    1.2,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_3",
+   "min": [
+    5.55,
+    3.28,
+    1.6
+   ],
+   "max": [
+    6.45,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_4",
+   "min": [
+    6.45,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    14.53,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_5",
+   "min": [
+    14.53,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    15.47,
+    1.2,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_6",
+   "min": [
+    14.53,
+    3.34,
+    1.6
+   ],
+   "max": [
+    15.47,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_7",
+   "min": [
+    15.47,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    23.55,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_8",
+   "min": [
+    23.55,
+    -2.2,
+    1.6
+   ],
+   "max": [
+    24.45,
+    1.2,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_S_9",
+   "min": [
+    23.55,
+    3.54,
+    1.6
+   ],
+   "max": [
+    24.45,
+    4.6,
+    1.8
+   ]
+  },
+  {
+   "s": "Hall_Wall_W_1",
+   "min": [
+    -4.2,
+    -2.2,
+    -1.6
+   ],
+   "max": [
+    -4.0,
+    4.6,
+    -0.45
+   ]
+  },
+  {
+   "s": "Hall_Wall_W_2",
+   "min": [
+    -4.2,
+    -2.2,
+    -0.45
+   ],
+   "max": [
+    -4.0,
+    0.0,
+    0.45
+   ]
+  },
+  {
+   "s": "Hall_Wall_W_3",
+   "min": [
+    -4.2,
+    2.34,
+    -0.45
+   ],
+   "max": [
+    -4.0,
+    4.6,
+    0.45
+   ]
+  },
+  {
+   "s": "Hall_Wall_W_4",
+   "min": [
+    -4.2,
+    -2.2,
+    0.45
+   ],
+   "max": [
+    -4.0,
+    4.6,
+    1.6
+   ]
+  },
+  {
+   "s": "Landing_Floor",
+   "min": [
+    -4.0,
+    -0.3,
+    -1.6
+   ],
+   "max": [
+    2.4,
+    0.0,
+    1.6
+   ]
+  },
+  {
+   "s": "Step_up_00",
+   "min": [
+    0.0,
+    0.0,
+    -1.6
+   ],
+   "max": [
+    0.4,
+    0.2,
+    1.6
+   ]
+  },
+  {
+   "s": "Step_up_01",
+   "min": [
+    0.4,
+    0.2,
+    -1.6
+   ],
+   "max": [
+    0.8,
+    0.4,
+    1.6
+   ]
+  },
+  {
+   "s": "Step_up_02",
+   "min": [
+    0.8,
+    0.4,
+    -1.6
+   ],
+   "max": [
+    1.2,
+    0.6,
+    1.6
+   ]
+  },
+  {
+   "s": "Step_up_03",
+   "min": [
+    1.2,
+    0.6,
+    -1.6
+   ],
+   "max": [
+    1.6,
+    0.8,
+    1.6
+   ]
+  },
+  {
+   "s": "Step_up_04",
+   "min": [
+    1.6,
+    0.8,
+    -1.6
+   ],
+   "max": [
+    2.0,
+    1.0,
+    1.6
+   ]
+  },
+  {
+   "s": "Step_up_05",
+   "min": [
+    2.0,
+    1.0,
+    -1.6
+   ],
+   "max": [
+    2.4,
+    1.2,
+    1.6
+   ]
+  },
+  {
+   "s": "Step_well_00",
+   "min": [
+    42.45,
+    -0.8,
+    -0.8
+   ],
+   "max": [
+    42.8,
+    -0.55,
+    0.8
+   ]
+  },
+  {
+   "s": "Step_well_01",
+   "min": [
+    42.1,
+    -0.55,
+    -0.8
+   ],
+   "max": [
+    42.45,
+    -0.3,
+    0.8
+   ]
+  },
+  {
+   "s": "Step_well_02",
+   "min": [
+    41.75,
+    -0.3,
+    -0.8
+   ],
+   "max": [
+    42.1,
+    -0.05,
+    0.8
+   ]
+  },
+  {
+   "s": "Step_well_03",
+   "min": [
+    41.4,
+    -0.05,
+    -0.8
+   ],
+   "max": [
+    41.75,
+    0.2,
+    0.8
+   ]
+  },
+  {
+   "s": "Step_well_04",
+   "min": [
+    41.05,
+    0.2,
+    -0.8
+   ],
+   "max": [
+    41.4,
+    0.45,
+    0.8
+   ]
+  },
+  {
+   "s": "Step_well_05",
+   "min": [
+    40.7,
+    0.45,
+    -0.8
+   ],
+   "max": [
+    41.05,
+    0.7,
+    0.8
+   ]
+  },
+  {
+   "s": "Step_well_06",
+   "min": [
+    40.35,
+    0.7,
+    -0.8
+   ],
+   "max": [
+    40.7,
+    0.95,
+    0.8
+   ]
+  },
+  {
+   "s": "Step_well_07",
+   "min": [
+    40.0,
+    0.95,
+    -0.8
+   ],
+   "max": [
+    40.35,
+    1.2,
+    0.8
+   ]
+  },
+  {
+   "s": "Well_Landing",
+   "min": [
+    42.8,
+    -2.2,
+    -1.6
+   ],
+   "max": [
+    45.0,
+    -0.8,
+    1.6
+   ]
+  },
+  {
+   "s": "Well_Side_N",
+   "min": [
+    40.0,
+    -2.2,
+    -1.6
+   ],
+   "max": [
+    42.8,
+    1.2,
+    -0.8
+   ]
+  },
+  {
+   "s": "Well_Side_S",
+   "min": [
+    40.0,
+    -2.2,
+    0.8
+   ],
+   "max": [
+    42.8,
+    1.2,
+    1.6
+   ]
+  },
+  {
+   "s": "Well_Under",
+   "min": [
+    40.0,
+    -2.2,
+    -0.8
+   ],
+   "max": [
+    42.8,
+    -0.8,
+    0.8
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_dining",
+   "level": "rdwe_hallway",
+   "hinge": [
+    -4.0,
+    0.0,
+    0.43
+   ],
+   "width": 0.86,
+   "height": 2.3,
+   "closed_yaw_deg": 90.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "dining",
+   "look": "the landing door: green baize, worn through at the push plate"
+  },
+  {
+   "name": "DoorLeaf_door_a",
+   "level": "rdwe_hallway",
+   "hinge": [
+    8.53,
+    1.2,
+    -1.6
+   ],
+   "width": 0.94,
+   "height": 2.24,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "door_a",
+   "look": "flush pink laminate door, push plate"
+  },
+  {
+   "name": "DoorLeaf_door_b",
+   "level": "rdwe_hallway",
+   "hinge": [
+    32.59,
+    1.2,
+    -1.6
+   ],
+   "width": 0.82,
+   "height": 2.4,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "door_b",
+   "look": "half-glazed black lacquer door, brass knob"
+  },
+  {
+   "name": "DoorLeaf_door_c",
+   "level": "rdwe_hallway",
+   "hinge": [
+    20.59,
+    1.2,
+    -1.6
+   ],
+   "width": 0.82,
+   "height": 2.4,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "door_c",
+   "look": "louvred cherry red door, no handle"
+  },
+  {
+   "name": "DoorLeaf_wrong_1",
+   "level": "rdwe_hallway",
+   "hinge": [
+    6.43,
+    1.2,
+    1.6
+   ],
+   "width": 0.86,
+   "height": 2.04,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "ledged and braced sky blue door, push plate"
+  },
+  {
+   "name": "DoorLeaf_wrong_2",
+   "level": "rdwe_hallway",
+   "hinge": [
+    15.45,
+    1.2,
+    1.6
+   ],
+   "width": 0.9,
+   "height": 2.1,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "round-topped oak door, glass knob"
+  },
+  {
+   "name": "DoorLeaf_wrong_3",
+   "level": "rdwe_hallway",
+   "hinge": [
+    26.44,
+    1.2,
+    -1.6
+   ],
+   "width": 1.12,
+   "height": 2.16,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "studded pink laminate door, chrome lever"
+  },
+  {
+   "name": "DoorLeaf_wrong_4",
+   "level": "rdwe_hallway",
+   "hinge": [
+    24.43,
+    1.2,
+    1.6
+   ],
+   "width": 0.86,
+   "height": 2.3,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "quilted cherry red door, ring pull"
+  },
+  {
+   "name": "DoorLeaf_wrong_5",
+   "level": "rdwe_hallway",
+   "hinge": [
+    36.47,
+    1.2,
+    1.6
+   ],
+   "width": 0.94,
+   "height": 2.4,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "mirror-faced black lacquer door, glass knob"
+  },
+  {
+   "name": "DoorLeaf_wrong_6",
+   "level": "rdwe_hallway",
+   "hinge": [
+    14.53,
+    1.2,
+    -1.6
+   ],
+   "width": 0.94,
+   "height": 2.4,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "opens": "never",
+   "look": "porthole sky blue door, chrome lever"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "dining",
+   "at": [
+    -3.25,
+    0.0,
+    0.0
+   ],
+   "arrive": [
+    -2.1,
+    0.0,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "door": "door_a",
+   "at": [
+    9.0,
+    1.2,
+    -0.85
+   ],
+   "arrive": [
+    9.0,
+    1.2,
+    0.3
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "door_b",
+   "at": [
+    33.0,
+    1.2,
+    -0.85
+   ],
+   "arrive": [
+    33.0,
+    1.2,
+    0.3
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "door_c",
+   "at": [
+    21.0,
+    1.2,
+    -0.85
+   ],
+   "arrive": [
+    21.0,
+    1.2,
+    0.3
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "well",
+   "at": [
+    44.2,
+    -0.8,
+    0.0
+   ],
+   "arrive": [
+    43.1,
+    -0.8,
+    0.0
+   ],
+   "face": [
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "hum",
+   "name": "Spot_hum_1",
+   "position": [
+    24.0,
+    1.2,
+    0.0
+   ],
+   "face": [
+    1.0,
+    0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "what": "the fluorescents flicker one at a time; the hum peaks here"
+  }
+ ]
+}

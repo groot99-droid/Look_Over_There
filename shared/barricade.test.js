@@ -25,21 +25,27 @@ test("the third floor chamber's stairwell door opens on a side room; chaining it
   assert.ok(spot, "there is floor behind it for a pack"); assert.ok(Math.hypot(spot[0] - dr.cx, spot[1] - dr.cz) < 2.5, "just inside the door");
   const seen = reach(W.nav, nearestWalk(W.nav, ...spotsOf(W)[0])); assert.ok(!seen[nearestWalk(W.nav, ...spot)], "not on the open floor");
 });
-test("on both real chambers, the picked door leaves every spot reachable; never a stair link, a door on another floor or a gate off the map", () => {
-  for (const id of ["gbi_L4_4", "gbi_L3_1"]) for (let seed = 1; seed <= 6; seed++) {
+test("on every chamber, the picked door leaves every spot reachable; never a stair link, a door on another floor or a gate off the map", () => {
+  let picked = 0;
+  for (const id of REGISTRY.chambers) for (let seed = 1; seed <= 3; seed++) {
     const W = worldOf(id), spots = spotsOf(W), dr = pickChainedDoor(W, spots, rng32(seed));
     if (!dr) continue;
+    picked++;
     assert.ok(!dr.link && Math.abs(dr.cy - W.floor) < 0.6, id + " " + dr.d.name);
     setChained(W, dr, true); relink(W);
     const seen = reach(W.nav, nearestWalk(W.nav, ...spots[0]));
     for (const s of spots) assert.ok(seen[nearestWalk(W.nav, ...s)], id + " seed " + seed + ": a spot behind the chain");
   }
-  assert.equal(pickChainedDoor(worldOf("gbi_L3_1"), spotsOf(worldOf("gbi_L3_1")), rng32(1)).d.name, L3_DOOR);
-  assert.equal(pickChainedDoor(worldOf("gbi_L4_4"), spotsOf(worldOf("gbi_L4_4")), rng32(1)), null, "the fourth floor chamber has no door that is safe: its stair door is the way back, its gates are off the map");
+  assert.ok(picked > 0, "some chamber has a door that is safe to chain");
+  for (const id of REGISTRY.chambers) { const W = worldOf(id), dr = pickChainedDoor(W, spotsOf(W), rng32(1)); if (dr) assert.ok(dr.d.kind !== "vent" && !dr.d.locked && !W.linkDoors.has(dr.d.name), `${id}: ${dr.d.name} is a real side door`); }
+  // since #123 the third floor's stairwell door is chamber 1's way on (into chamber 2), so it is a link and never chained
+  const l31 = pickChainedDoor(worldOf("gbi_L3_1"), spotsOf(worldOf("gbi_L3_1")), rng32(1)); assert.ok(!l31 || l31.d.name !== L3_DOOR);
+  assert.equal(pickChainedDoor(worldOf("gbi_L4_4"), spotsOf(worldOf("gbi_L4_4")), rng32(1)), null, "the fourth floor chamber has no door that is safe: its stair door is the way on, its gates are off the map");
 });
 test("a door with a spot that matters behind it is never safe", () => {
-  const W = worldOf("gbi_L3_1"), dr = W.doors.find(d => d.d.name === L3_DOOR), spots = spotsOf(W);
-  assert.equal(safeToChain(W, dr, spots), true);
+  const pick = c => { const W = worldOf(c), dr = pickChainedDoor(W, spotsOf(W), rng32(1)); return dr && behindSpot(W, dr) ? {W, dr} : null; };          // a chamber with a safe door that has floor behind it
+  const id = REGISTRY.chambers.find(c => pick(c)), {W, dr} = pick(id), spots = spotsOf(W);
+  assert.equal(safeToChain(W, dr, spots), true, id);
   assert.equal(safeToChain(W, dr, [...spots, behindSpot(W, dr)]), false, "the locker or the loot is in the side room");
   assert.equal(safeToChain(W, {...dr, link: {to: "L2"}}, spots), false, "a stair door");
 });

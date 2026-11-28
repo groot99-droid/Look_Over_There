@@ -1,0 +1,47 @@
+blender (on the render box): tools/blender/dress_overworld.py -- --scene table_and_chairs --samples 512 --render-samples 128
+EXPORT_SCENE table_and_chairs_layout.json: 6 colliders, 0 doors, 0 cameras, 1 markers, 0 links, 0 zones, 0 spots
+GATE export: world/table_and_chairs.json from the dressed .blend EQUALS the greybox's
+PASS  LOT    Ground_lot: the lot's own asphalt (part 1's parking_lot) is this ground in the game; top at y 0.00, inside the lot round the set
+PASS  STRAY  5 tall solid mesh(es), each over a collider; 11 decor_* mesh(es) exempt
+PASS  CLEAR  marker Spawn (0.00, 2.60): clear within 0.28 m
+PASS: 7 of 7 checks passed
+GATE layout check (the set's ground by the LOT rule above): PASS
+GATES_IN_BLENDER PASS
+CYCLES device: GPU
+BAKE {'samples': 512, 'ao_distance_m': 2.5, 'pages': [{'page': 0, 'size': 1024, 'px_per_m': 160.8, 'ao_p1_p10_p50_p90': [0.003, 0.065, 0.531, 0.999], 'materials': ['Paint_White', 'Parasol_Pink', 'Parasol_White', 'Plastic_Blue', 'Plastic_Grey', 'Plastic_Mint', 'Plastic_Pink', 'Plastic_White', 'Plastic_Yellow']}], 'seconds': 41, 'device': 'GPU'}
+CYCLES device: GPU
+PASS  COVER lines (one per collider, each covered by art within 5 cm): 5
+
+python tools/blender/build_overworld_greybox.py --check .
+GATES PASS
+
+node tools/worlddoc.mjs check world/table_and_chairs.json
+OK world/table_and_chairs.json: 6 colliders, 0 doors, 1 markers, 0 links, 0 zones, 0 spots, 0 errors, 0 warnings
+
+glb_inspect.py world/table_and_chairs.glb --budget tris=300000,mb=8
+triangles  4512 drawn, in 9 mesh(es), 9 instance(s)
+materials  9: Paint_White, Parasol_Pink, Parasol_White, Plastic_Blue, Plastic_Grey, Plastic_Mint, Plastic_Pink, Plastic_White, Plastic_Yellow
+textures   0, images: none
+bbox       3.2088 x 2.515 x 3.2088 (x, y up, z), min [-1.6044, 0.0, -1.6044]
+pass       tris: 4512 triangles, budget 300000
+pass       mb: 0.27 MB, budget 8
+
+brightness (AO-only: base colour x AO texel, linear, under a white ambient of 1; the page's sun adds on top)
+material                m2           map       k    p50    p90    p99     >=1
+Plastic_White          5.8 table_and_chairs_0  1.0000  0.289  0.479  0.619   0.00%
+Parasol_Pink           3.1 table_and_chairs_0  1.0000  0.869  0.869  0.869   0.00%
+Parasol_White          3.1 table_and_chairs_0  1.0000  0.848  0.848  0.848   0.00%
+Plastic_Blue           1.3 table_and_chairs_0  1.0000  0.483  0.633  0.772   0.00%
+Plastic_Mint           1.3 table_and_chairs_0  1.0000  0.390  0.508  0.610   0.00%
+Plastic_Pink           1.3 table_and_chairs_0  1.0000  0.487  0.633  0.761   0.00%
+Plastic_Yellow         1.3 table_and_chairs_0  1.0000  0.487  0.629  0.761   0.00%
+Plastic_Grey           0.9 table_and_chairs_0  1.0000  0.200  0.273  0.304   0.00%
+Paint_White            0.1 table_and_chairs_0  1.0000  0.290  0.359  0.401   0.00%
+
+node --test shared/*.test.js
+ℹ tests 297
+ℹ pass 297
+ℹ fail 0
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over this scene's files, the .blend decompressed
+privacy grep: 39 files, 0 with hits

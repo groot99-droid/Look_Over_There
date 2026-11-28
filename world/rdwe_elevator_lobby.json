@@ -1,0 +1,604 @@
+{
+ "scene": "rdwe_elevator_lobby",
+ "colliders": [
+  {
+   "s": "Bench_E",
+   "min": [
+    5.5,
+    0.0,
+    3.8
+   ],
+   "max": [
+    7.5,
+    0.45,
+    4.4
+   ]
+  },
+  {
+   "s": "Bench_W",
+   "min": [
+    -7.5,
+    0.0,
+    3.8
+   ],
+   "max": [
+    -5.5,
+    0.45,
+    4.4
+   ]
+  },
+  {
+   "s": "Beyond_crossroads",
+   "min": [
+    -0.66,
+    -0.05,
+    5.35
+   ],
+   "max": [
+    0.66,
+    2.25,
+    5.55
+   ]
+  },
+  {
+   "s": "Beyond_lift_1",
+   "min": [
+    -6.66,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    -5.34,
+    2.19,
+    -5.35
+   ]
+  },
+  {
+   "s": "Beyond_lift_2",
+   "min": [
+    -2.75,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    -1.25,
+    2.39,
+    -5.35
+   ]
+  },
+  {
+   "s": "Beyond_lift_3",
+   "min": [
+    1.32,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    2.68,
+    2.19,
+    -5.35
+   ]
+  },
+  {
+   "s": "Beyond_lift_4",
+   "min": [
+    5.28,
+    -0.05,
+    -5.55
+   ],
+   "max": [
+    6.72,
+    2.55,
+    -5.35
+   ]
+  },
+  {
+   "s": "Bin_1",
+   "min": [
+    -4.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -3.8,
+    0.7,
+    -4.6
+   ]
+  },
+  {
+   "s": "Bin_2",
+   "min": [
+    -0.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    0.2,
+    0.7,
+    -4.6
+   ]
+  },
+  {
+   "s": "Bin_3",
+   "min": [
+    3.8,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    4.2,
+    0.7,
+    -4.6
+   ]
+  },
+  {
+   "s": "Call_Pillar",
+   "min": [
+    -0.4,
+    0.0,
+    0.4
+   ],
+   "max": [
+    0.4,
+    1.3,
+    1.2
+   ]
+  },
+  {
+   "s": "Planter_E",
+   "min": [
+    8.1,
+    0.0,
+    4.2
+   ],
+   "max": [
+    8.7,
+    1.0,
+    4.8
+   ]
+  },
+  {
+   "s": "Planter_W",
+   "min": [
+    -8.7,
+    0.0,
+    4.2
+   ],
+   "max": [
+    -8.1,
+    1.0,
+    4.8
+   ]
+  },
+  {
+   "s": "Room_Ceiling",
+   "min": [
+    -9.2,
+    3.6,
+    -5.2
+   ],
+   "max": [
+    9.2,
+    3.8,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Floor",
+   "min": [
+    -9.2,
+    -0.3,
+    -5.2
+   ],
+   "max": [
+    9.2,
+    0.0,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_E_1",
+   "min": [
+    9.0,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    9.2,
+    3.6,
+    5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_1",
+   "min": [
+    -9.2,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    -6.43,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_2",
+   "min": [
+    -6.43,
+    2.08,
+    -5.2
+   ],
+   "max": [
+    -5.57,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_3",
+   "min": [
+    -5.57,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    -2.52,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_4",
+   "min": [
+    -2.52,
+    2.28,
+    -5.2
+   ],
+   "max": [
+    -1.48,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_5",
+   "min": [
+    -1.48,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    1.55,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_6",
+   "min": [
+    1.55,
+    2.08,
+    -5.2
+   ],
+   "max": [
+    2.45,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_7",
+   "min": [
+    2.45,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    5.51,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_8",
+   "min": [
+    5.51,
+    2.44,
+    -5.2
+   ],
+   "max": [
+    6.49,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_N_9",
+   "min": [
+    6.49,
+    0.0,
+    -5.2
+   ],
+   "max": [
+    9.2,
+    3.6,
+    -5.0
+   ]
+  },
+  {
+   "s": "Room_Wall_S_1",
+   "min": [
+    -9.2,
+    0.0,
+    5.0
+   ],
+   "max": [
+    -0.43,
+    3.6,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_2",
+   "min": [
+    -0.43,
+    2.14,
+    5.0
+   ],
+   "max": [
+    0.43,
+    3.6,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_S_3",
+   "min": [
+    0.43,
+    0.0,
+    5.0
+   ],
+   "max": [
+    9.2,
+    3.6,
+    5.2
+   ]
+  },
+  {
+   "s": "Room_Wall_W_1",
+   "min": [
+    -9.2,
+    0.0,
+    -5.0
+   ],
+   "max": [
+    -9.0,
+    3.6,
+    5.0
+   ]
+  }
+ ],
+ "doors": [
+  {
+   "name": "DoorLeaf_crossroads",
+   "level": "rdwe_elevator_lobby",
+   "hinge": [
+    0.41,
+    0.0,
+    5.0
+   ],
+   "width": 0.82,
+   "height": 2.1,
+   "closed_yaw_deg": 180.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "crossroads",
+   "look": "panelled brushed steel door, glass knob"
+  },
+  {
+   "name": "DoorLeaf_lift_1",
+   "level": "rdwe_elevator_lobby",
+   "hinge": [
+    -6.41,
+    0.0,
+    -5.0
+   ],
+   "width": 0.82,
+   "height": 2.04,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lift_1",
+   "look": "flush bottle green door, chrome lever"
+  },
+  {
+   "name": "DoorLeaf_lift_2",
+   "level": "rdwe_elevator_lobby",
+   "hinge": [
+    -2.5,
+    0.0,
+    -5.0
+   ],
+   "width": 1.0,
+   "height": 2.24,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lift_2",
+   "look": "louvred birch door, ring pull"
+  },
+  {
+   "name": "DoorLeaf_lift_3",
+   "level": "rdwe_elevator_lobby",
+   "hinge": [
+    1.57,
+    0.0,
+    -5.0
+   ],
+   "width": 0.86,
+   "height": 2.04,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lift_3",
+   "look": "half-glazed mustard door, glass knob"
+  },
+  {
+   "name": "DoorLeaf_lift_4",
+   "level": "rdwe_elevator_lobby",
+   "hinge": [
+    5.53,
+    0.0,
+    -5.0
+   ],
+   "width": 0.94,
+   "height": 2.4,
+   "closed_yaw_deg": 0.0,
+   "swing_deg": -95.0,
+   "state": "closed",
+   "exit": "lift_4",
+   "look": "ledged and braced teal paint door, push plate"
+  }
+ ],
+ "cameras": [],
+ "markers": [],
+ "links": [
+  {
+   "door": "crossroads",
+   "at": [
+    0.0,
+    0.0,
+    4.25
+   ],
+   "arrive": [
+    0.0,
+    0.0,
+    3.1
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ]
+  },
+  {
+   "door": "lift_1",
+   "at": [
+    -6.0,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    -6.0,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "lift_2",
+   "at": [
+    -2.0,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    -2.0,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "lift_3",
+   "at": [
+    2.0,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    2.0,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "door": "lift_4",
+   "at": [
+    6.0,
+    0.0,
+    -4.25
+   ],
+   "arrive": [
+    6.0,
+    0.0,
+    -3.1
+   ],
+   "face": [
+    0.0,
+    1.0
+   ]
+  }
+ ],
+ "zones": [],
+ "spots": [
+  {
+   "kind": "buttons",
+   "name": "Spot_buttons_1",
+   "position": [
+    0.0,
+    0.0,
+    2.2
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "the call button has no numbers"
+  },
+  {
+   "kind": "buttons",
+   "name": "Spot_buttons_2",
+   "position": [
+    -6.0,
+    0.0,
+    -3.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "lift 1: the dial over it points past the last floor"
+  },
+  {
+   "kind": "buttons",
+   "name": "Spot_buttons_3",
+   "position": [
+    6.0,
+    0.0,
+    -3.4
+   ],
+   "face": [
+    0.0,
+    -1.0
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "what": "lift 4: its dial has no numbers either"
+  }
+ ]
+}

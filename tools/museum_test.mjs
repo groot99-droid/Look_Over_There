@@ -35,7 +35,7 @@ try {
   check("the shift starts in the galleries: six statues home, until 23:30 on the clock and the HUD", m.active && m.id === "galleries" && m.offs.every(o => o === 0) && /ON SHIFT UNTIL 23:30/.test(m.sub) && /STATUES HOME 6\/6/.test(m.hud), JSON.stringify(m));
   check("on their plinths the statues stand on top of them", m.figs.every(f => Math.abs(f[1] - 0.6) < 1e-6), JSON.stringify(m.figs));
 
-  // watch THE ORATOR (statue 2) for 20 seconds, with your back to BOY AND GOOSE (statue 3)
+  // watch statue 2 (THE TERRACOTTA WARRIOR) for 20 seconds, with your back to statue 3 (THE KNIGHT): the warriors since 2026-11-26
   const [ox, oz] = MUSEUM.homes[2]; await stand(0, oz, face(0, oz, ox, oz)); await frames(400);
   m = await mu();
   check("the statue you watch never moves", m.offs[2] === 0, JSON.stringify(m.offs));
@@ -46,7 +46,7 @@ try {
 
   // set it back
   const [bx, bz] = exhibitAt(3, m.offs[3]); await stand(bx - 0.9, bz, face(bx - 0.9, bz, bx, bz)); await frames(1);
-  check("next to it you are offered to set it back", /set BOY AND GOOSE back on its plinth/.test(await prompt()), await prompt());
+  check("next to it you are offered to set it back", new RegExp(`set ${MUSEUM.names[3]} back on its plinth`).test(await prompt()), await prompt());
   await page.keyboard.press("KeyF"); await frames(1); m = await mu();
   check("F sets it back: home again, one fix", m.offs[3] === 0 && m.fixes === 1 && /back on its plinth/.test(await toast()), JSON.stringify(m));
 

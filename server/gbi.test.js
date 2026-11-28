@@ -249,6 +249,7 @@ test("E, the tripwire (chosen at the locker): everything in the blast dies, the 
   const late = await join(srv, "CE2", "Cy"); at(late, START, 0, 0);
   const w = await late.next(kind("wave")); assert.deepEqual(w.traps.map(x => [x.id, x.kind]), [[t.id, "wire"]], "a late arrival sees the tripwire");
   const [m0, m1, m2] = floor.monsters; m0.pos.set(spot[0] + 1, m0.fy, spot[1]); m1.pos.set(spot[0] - (WIRE_BLAST_R - 0.3), m1.fy, spot[1]); m2.pos.set(spot[0] + WIRE_NOISE_R - 5, m2.fy, spot[1]);
+  m2.cfg = {...m2.cfg, sight: 0};          // the far one only hears it: 20 m off it could also see a player, depending on where it faces, and chase instead of looking (the flake on #133 and #134)
   stepN(floor, WIRE_ARM_S + 0.2);
   await b.next(kind("sprung")); const k2 = await b.next(m => m.t === "kill" && m.kills === 2);
   assert.equal(k2.cleared, false); assert.deepEqual(floor.monsters, [m2], "the two in the blast are dead, the far one is not");

@@ -36,10 +36,13 @@ test("world/apartment.json is what shared/city.js makes", () => {
   assert.deepEqual(JSON.parse(fs.readFileSync(new URL("../world/apartment.json", import.meta.url), "utf8")), JSON.parse(JSON.stringify(apartmentDoc())));
 });
 test("the apartment links match the layout, and the clock runs in both City scenes", () => {
-  const into = REGISTRY.linkFrom("street", "tower"), out = REGISTRY.linkFrom("apartment", "front_door");
-  assert.ok(into && into.status === "built" && !into.soloOnly && out && out.status === "built" && !out.soloOnly, "a room can go home too (session 17)");
+  // since the hotel (the owner, 2026-11-28: "Lobby only"): the tower's door opens the hotel's lobby, and your apartment is room 301 on hotel floor 3
+  const tower = REGISTRY.linkFrom("street", "tower"), lobbyOut = REGISTRY.linkFrom("lobby", "street"), into = REGISTRY.linkFrom("floor_3", "room_301"), out = REGISTRY.linkFrom("apartment", "front_door");
+  for (const l of [tower, lobbyOut, into, out]) assert.ok(l && l.status === "built" && !l.soloOnly, "a room can go home too (session 17)");
+  assert.equal(tower.to.scene, "lobby"); assert.equal(into.to.scene, "apartment"); assert.equal(out.to.scene, "floor_3");
   assert.deepEqual(into.to.arrive, APARTMENT.arrive); assert.deepEqual(into.to.face, APARTMENT.face);
-  assert.deepEqual(out.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(out.to.face, TOWER_FRONT.face);
+  assert.deepEqual(lobbyOut.to.arrive, TOWER_FRONT.arrive); assert.deepEqual(lobbyOut.to.face, TOWER_FRONT.face);
+  assert.ok(Math.hypot(out.to.arrive[0] - into.from.at[0], out.to.arrive[2] - into.from.at[2]) < 1, "you come out by your own door");
   assert.deepEqual(CITY_SCENES, ["street", "apartment", "main_floor", "entrance", "galleries", "factory_floor", "laboratory"]);
   const [hx, hz] = APARTMENT.half, inside = ([x, z]) => Math.abs(x) < hx && Math.abs(z) < hz, hit = ([x, z], b) => x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2];
   for (const p of [APARTMENT.arrive.filter((_, i) => i !== 1), APARTMENT.door.at, APARTMENT.computer.at]) { assert.ok(inside(p), "inside the room " + p); assert.ok(!hit(p, APARTMENT.bed) && !hit(p, APARTMENT.desk), "clear of furniture " + p); }
@@ -158,6 +161,9 @@ test("only a stalker that is out at night follows, and only between the street a
   assert.ok(inside.active && inside.waited && inside.wait === 0);
   const back = carryStalker(inside, 2, "street");
   assert.ok(back.active && back.waited && back.x === inside.x && back.z === inside.z, "it is where it waited");
+  // since the hotel (2026-11-28) the tower's door opens its lobby: anywhere behind it, it waits outside, the same spot however far in you go
+  const tower = ["apartment", "lobby", "floor_3"], lobby = carryStalker(out, 1.5, "lobby", tower), deeper = carryStalker(lobby, 1.6, "floor_3", tower);
+  assert.ok(lobby.waited && deeper.waited && deeper.x === lobby.x && deeper.z === lobby.z && carryStalker(lobby, 1.6, "lobby").active === false, "only the scenes it is told are the tower's");
   for (const [s, h, to] of [[out, 7, "apartment"], [out, 12, "street"], [{...out, active: false, wait: 2}, 1, "apartment"], [out, 1, "parking_lot"], [out, 1, "main_floor"], [null, 1, "street"]]) {
     const r = carryStalker(s, h, to);
     assert.deepEqual(r, {active: false, x: 0, z: 0, wait: STALKER.firstWait}, JSON.stringify([s, h, to]));
