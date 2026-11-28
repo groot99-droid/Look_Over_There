@@ -33,14 +33,15 @@ try {
   };
   // what the scene holds: the page's own lamps, its code-made solids (Lambert), its signs (a canvas texture on an unlit plane), and the model's materials
   const look = () => page.evaluate(() => {
-    const g = window.__game, S = g.S, o = {lights: 0, solids: 0, signs: 0, baked: 0, ao: 0, emit: {}, set: S.lightSet, n: S.baked};
+    const g = window.__game, S = g.S, o = {lights: 0, solids: 0, signs: 0, baked: 0, ao: 0, emit: {}, set: S.lightSet, n: S.baked}, mats = new Set();
     S.root.traverse(x => {
       if (x.isLight) o.lights++; if (!x.isMesh && !x.isInstancedMesh) return; const m = x.material; if (Array.isArray(m)) return;
       if (m.isMeshLambertMaterial) o.solids++; if (m.isMeshBasicMaterial && m.map && m.map.isCanvasTexture) o.signs++;
-      if (m.userData && m.userData.baked) { o.baked++; o.bakedOk = m.isMeshBasicMaterial && !!m.lightMap && m.lightMap.channel === 1 && !!x.geometry.attributes.uv1; o.bakedK = m.lightMapIntensity; }
+      if (m.userData && m.userData.baked) { o.baked++; mats.add(m); o.bakedOk = m.isMeshBasicMaterial && !!m.lightMap && m.lightMap.channel === 1 && !!x.geometry.attributes.uv1; o.bakedK = m.lightMapIntensity; }
       if (m.userData && m.userData.ao) { o.ao++; o.aoOk = m.isMeshStandardMaterial && !!m.aoMap && m.aoMap.channel === 1 && Math.abs(m.aoMapIntensity - 0.8) < 1e-6; }
       if (["Lamp_Emit", "Window_Lit", "Emergency_Emit"].includes(m.name)) o.emit[m.name] = m.emissiveIntensity;
     });
+    o.bakedMats = mats.size;          // a baked material is made once per source material, and meshes may share one (the galleries' since #81)
     return o;
   });
   await page.evaluate(() => window.__game.loadScene("street", {pos: [0, 0, 4], face: [0, -1]})); await settled("street"); await setT(12); await frames(3);
@@ -62,7 +63,7 @@ try {
     check(`${name}: the model's baked material shows unlit on the second UV set, and its AO one stays lit`, a.n === 1 && a.baked === 1 && a.bakedOk && a.ao === 1 && a.aoOk, JSON.stringify(a));
     if (REGISTRY.pageScenes[id].glbs.length) {                          // the game's own Blender build (docs/BLENDER.md): as the game loads it
       await load(id, null); const own = await look();
-      check(`${name} as the game has it: its own model's baked light, no box room, no lamp of the page's, and the page keeps ${kept}`, own.lights === 0 && own.n > 0 && own.baked === own.n && own.bakedOk && (want.solids === undefined || own.solids === want.solids) && own.signs === want.signs, JSON.stringify(own));
+      check(`${name} as the game has it: its own model's baked light, no box room, no lamp of the page's, and the page keeps ${kept}`, own.lights === 0 && own.n > 0 && own.bakedMats === own.n && own.bakedOk && (want.solids === undefined || own.solids === want.solids) && own.signs === want.signs, JSON.stringify(own));
     }
   }
   const kept = await page.evaluate(async () => {
@@ -85,7 +86,7 @@ try {
   check("and back to the day set in the morning", m.set === "day" && m.bakedK === 2 && m.emit.Lamp_Emit === 5, JSON.stringify(m));
 
   // the street: the page keeps the doors' signs, lamps and shutters and the anomalies; lit windows and lamp heads follow the clock; the backdrop
-  await load("street", null, [0, 0, 4]); await setT(12, 3); await frames(3); const plainSt = await look();
+  await load("street", NONE, [0, 0, 4]); await setT(12, 3); await frames(3); const plainSt = await look();          // NONE: since #83 the street has its own model
   check("the street with no model draws as it always did, and has no backdrop", plainSt.solids > 30 && plainSt.n === 0 && await page.evaluate(() => window.__game.S.backdrop === null), JSON.stringify(plainSt));
   await load("street", {...ART, backdrop: {day: "fixtures/sky_day.png", night: "fixtures/sky_night.png"}}, [0, 0, 4]); await setT(12, 3); await frames(3);
   let s = await look();
