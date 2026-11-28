@@ -613,9 +613,9 @@ function goLink(dr) {
 
 // ---------------------------------------------------------------- hidden games: each keeps its own renderer and canvas; the host shows exactly one at a time
 let inGame = null;
-const RDWE_SCALE = 1.7;                                                              // rooms are made larger by shrinking the walker (see games/rdwe/controls.js)
+const RDWE_SCALE = 1.7;                                                              // the code rooms are made larger by shrinking the walker (see games/rdwe/controls.js); the Blender rooms are built to it
 const INTERN_SCALE = 1.6;
-const RDWE_ORDER = ["dining", "hallway", "teal", "teal2", "flooded", "trampoline", "grocery"];
+const RDWE_FIRST = "dining";                                                          // where the game starts when a link names no room of it (its rooms: games/rdwe/walk.js)
 const mkEl = (tag = "div") => document.createElement(tag);                          // detached elements: the original HUD stays invisible
 // the manifest's entry for a game gate (its soloOnly flag and where the player returns to); world/L4.json links carry the game and arrival, the manifest the rest
 const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === l.game && JSON.stringify(x.to.arrive) === JSON.stringify(l.arrive));
@@ -646,12 +646,16 @@ async function enterGame(l) {
   if (l.game === "rdwe") {
     const walk = await import("./games/rdwe/walk.js");
     const joy = mkEl(); const knob = mkEl(); knob.className = "knob"; joy.appendChild(knob);
-    const els = {mount, fade: gf, objective: mkEl(), hint: mkEl(), joystick: joy, readout: mkEl(), tally: mkEl(), use: mkEl("button")};
-    for (let i = Math.max(0, RDWE_ORDER.indexOf(l.room)); i < RDWE_ORDER.length; i++) {
+    const els = {mount, fade: gf, objective: mkEl(), hint: mkEl(), joystick: joy, readout: mkEl(), tally: mkEl(), use: mkEl("button"), prompt: $("prompt")};          // the page's prompt line shows a room's ways out
+    // the rooms are a graph (games/rdwe/blender_rooms.js): each walk ends by a door, and walk.next() says which room and door it leads to; none: the game ends
+    let room = walk.hasScene(l.room) ? l.room : RDWE_FIRST, via = null;
+    for (;;) {
       const coop = net.on && !roomShutGate(l) ? {peers: gamePeers, onFrame: gameNetTick} : undefined;          // in a party room: other players are drawn, and ours is sent
-      GN.place = coop ? `rdwe:${RDWE_ORDER[i]}` : null; GN.t = 0; GN.last = null;
-      result = await walk.start(RDWE_ORDER[i], els, {sound: true, scale: RDWE_SCALE, coop});
-      if (result !== "reached") break;
+      GN.place = coop ? `rdwe:${room}` : null; GN.t = 0; GN.last = null;
+      result = await walk.start(room, els, {sound: true, scale: RDWE_SCALE, coop, via});
+      const nx = result === "reached" ? walk.next() : null;
+      if (!nx) break;
+      ({room, via} = nx);
     }
     walk.cancel();
   } else if (l.game === "intern") {
