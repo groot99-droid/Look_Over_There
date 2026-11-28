@@ -1,0 +1,40 @@
+python tools/blender/build_grocery_greybox.py --check .
+GATE links: 4 pairs, 8 sides, 3 that leave this set; 11 links in the files
+  off this set: aisles.main_floor -> main_floor
+  off this set: back_of_house.main_floor -> main_floor
+  off this set: back_of_house.secret_ops -> secret_ops/service_entry
+GATE steps: 54 step boxes, the highest rise 0.267 m (at most 0.27 m)
+GATE corridors: 30 corridor, aisle and doorway rects, the narrowest 1.68 m (at least 1.6 m), none blocked
+GATE cameras: aisles 0, second_floor 0, back_of_house 5, basement 2
+GATES PASS
+
+node tools/worlddoc.mjs check world/aisles.json world/second_floor.json world/back_of_house.json world/basement.json
+  warning: scene aisles is not in the world manifest yet: a new scene to add
+  warning: link escalator_up: the manifest has no link from this door yet: a new link to add
+  warning: link main_floor: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_up: the manifest has no link from this door yet: a new link to add
+OK world/aisles.json: 112 colliders, 2 doors, 1 markers, 3 links, 0 zones, 34 spots, 0 errors, 4 warnings
+  warning: scene second_floor is not in the world manifest yet: a new scene to add
+  warning: link escalator_down: the manifest has no link from this door yet: a new link to add
+  warning: link stairs_down: the manifest has no link from this door yet: a new link to add
+OK world/second_floor.json: 38 colliders, 2 doors, 1 markers, 2 links, 0 zones, 5 spots, 0 errors, 3 warnings
+  warning: link basement_stairs: the manifest has no link from this door yet: a new link to add
+  warning: link freight_down: the manifest has no link from this door yet: a new link to add
+  warning: link main_floor: the manifest has no link from this door yet: a new link to add
+  warning: link secret_ops: the manifest has no link from this door yet: a new link to add
+OK world/back_of_house.json: 64 colliders, 7 doors, 1 markers, 4 links, 1 zones, 16 spots, 0 errors, 4 warnings
+  warning: scene basement is not in the world manifest yet: a new scene to add
+  warning: link back_of_house: the manifest has no link from this door yet: a new link to add
+  warning: link freight_up: the manifest has no link from this door yet: a new link to add
+OK world/basement.json: 74 colliders, 5 doors, 1 markers, 2 links, 1 zones, 7 spots, 0 errors, 3 warnings
+exit 0
+
+node --test shared/*.test.js
+  tests 297
+  pass 297
+  fail 0
+
+privacy grep (user names, absolute paths, session ids, e-mail addresses, the render host) over the 22 files of this commit and the owner sheet
+  privacy grep: 23 files, 0 with hits (the sheets' Windows font folder is allowed)
+
+export check: every world/<scene>.json from Blender equals --preview's (the model alone): aisles, second_floor, back_of_house, basement all equal
