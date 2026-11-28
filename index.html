@@ -515,7 +515,7 @@ async function loadScene(id, arrival) {
   if (id === OW_SCENE) { overworldProps(root); busStopLotProps(root); forestRoadLotProps(root); }
   if (id === FOREST_SCENE) forestProps(root);
   if (id === MEADOW_SCENE) meadowProps(root);
-  CITY.st = carryStalker(CITY.st, hourAt(CITY.t), id); CITY.mesh = null;                          // slice 10: at night it waits outside your apartment; otherwise it belongs to one visit to the street
+  CITY.st = carryStalker(CITY.st, hourAt(CITY.t), id, [APT_SCENE, ...(REGISTRY.area("hotel").scenes || []).map(s => s.id)]); CITY.mesh = null;                          // slice 10: at night it waits outside your apartment; otherwise it belongs to one visit to the street
   if (id === CITY_SCENE) cityProps(root);
   if (id === APT_SCENE) apartmentProps(root);
   if (id === GROCERY_SCENE) groceryProps(root);

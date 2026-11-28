@@ -161,6 +161,9 @@ test("only a stalker that is out at night follows, and only between the street a
   assert.ok(inside.active && inside.waited && inside.wait === 0);
   const back = carryStalker(inside, 2, "street");
   assert.ok(back.active && back.waited && back.x === inside.x && back.z === inside.z, "it is where it waited");
+  // since the hotel (2026-11-28) the tower's door opens its lobby: anywhere behind it, it waits outside, the same spot however far in you go
+  const tower = ["apartment", "lobby", "floor_3"], lobby = carryStalker(out, 1.5, "lobby", tower), deeper = carryStalker(lobby, 1.6, "floor_3", tower);
+  assert.ok(lobby.waited && deeper.waited && deeper.x === lobby.x && deeper.z === lobby.z && carryStalker(lobby, 1.6, "lobby").active === false, "only the scenes it is told are the tower's");
   for (const [s, h, to] of [[out, 7, "apartment"], [out, 12, "street"], [{...out, active: false, wait: 2}, 1, "apartment"], [out, 1, "parking_lot"], [out, 1, "main_floor"], [null, 1, "street"]]) {
     const r = carryStalker(s, h, to);
     assert.deepEqual(r, {active: false, x: 0, z: 0, wait: STALKER.firstWait}, JSON.stringify([s, h, to]));
