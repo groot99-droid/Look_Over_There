@@ -618,7 +618,9 @@ const INTERN_SCALE = 1.6;
 const RDWE_FIRST = "dining";                                                          // where the game starts when a link names no room of it (its rooms: games/rdwe/walk.js)
 const mkEl = (tag = "div") => document.createElement(tag);                          // detached elements: the original HUD stays invisible
 // the manifest's entry for a game gate (its soloOnly flag and where the player returns to); world/L4.json links carry the game and arrival, the manifest the rest
-const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.connector === "gate" && x.to.area === l.game && JSON.stringify(x.to.arrive) === JSON.stringify(l.arrive));
+// the meadow house's door (#133, the way into Right Door, Wrong Exit) is a door, not a gate: the page enters the game from it with its returnTo as the place to come back to
+const gateEntry = l => REGISTRY.links.find(x => x.status === "built" && x.to.area === l.game && (x.connector === "gate" ? JSON.stringify(x.to.arrive) === JSON.stringify(l.arrive)
+  : !!x.returnTo && x.returnTo.scene === l.scene && JSON.stringify(x.returnTo.arrive) === JSON.stringify(l.arrive)));
 // in a room, a game gate the manifest does not mark coop-ready (soloOnly) stays shut; an unknown gate is shut too
 const roomShutGate = l => { const e = gateEntry(l); return !e || !!e.soloOnly; };
 // the room's view of me while I am inside a game: where, and which room of the game (the place the server relays by: `rdwe:teal`), sent from the game's own loop because the page's does not run
