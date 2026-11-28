@@ -495,6 +495,7 @@ async function loadScene(id, arrival) {
   const chamber = passage ? null : REGISTRY.chamber(id);
   Object.assign(S, {id, art: chamber ? chamber.floor : id, floor: cfg.floor, root, baked: bake.n, bake, lightSet: "day", grid: new Map(), cams: doc.cameras || [], mapLayer: null, markers: doc.markers || [], colliders: doc.colliders});
   S.sceneLinks = sceneLinksOf(id, doc);
+  S.linkDoors = new Set((Array.isArray(doc.links) ? doc.links : []).map(l => "DoorLeaf_" + l.door));          // its ways in and on: never barricaded (shared/barricade.js)
   applySky(id, root); addBackdrop(cfg, root);
   boxes.length = 0; doors.length = 0;
   for (const c of doc.colliders) boxes.push({n: c.min, x: c.max});
